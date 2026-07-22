@@ -1,0 +1,3 @@
+jiwer==3.0.4
+sacrebleu==2.4.3
+soundfile==0.12.1

@@ -1,0 +1,34 @@
+[
+  {
+    "audio": "audio/sample.wav",
+    "reference_transcript": "Hello everyone, welcome to this lecture number 4.",
+    "reference_translations": {
+      "hi": "नमस्ते सभी को, इस व्याख्यान संख्या 4 में आपका स्वागत है।",
+      "fr": "Bonjour à tous, bienvenue à ce cours numéro 4."
+    }
+  },
+  {
+    "audio": "audio/sample2.wav",
+    "reference_transcript": "I hope all of you are doing good.",
+    "reference_translations": {
+      "hi": "मुझे उम्मीद है कि आप सभी अच्छा कर रहे हैं।",
+      "fr": "J'espère que vous allez tous bien."
+    }
+  },
+  {
+    "audio": "audio/sample3.wav",
+    "reference_transcript": "I hope everybody has their notebooks and pens out.",
+    "reference_translations": {
+      "hi": "मुझे उम्मीद है कि सभी के पास अपनी नोटबुक और पेन तैयार हैं।",
+      "fr": "J'espère que tout le monde a son cahier et ses stylos prêts."
+    }
+  },
+  {
+    "audio": "audio/sample5.wav",
+    "reference_transcript": "I hope you all are aware of the same.",
+    "reference_translations": {
+      "hi": "मुझे उम्मीद है कि आप सभी इस बारे में जानते हैं।",
+      "fr": "J'espère que vous êtes tous au courant de cela."
+    }
+  }
+]

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LDST — Live Captions</title>
+<style>
+  :root {
+    --bg: #10152a;
+    --bg-raised: #1a2140;
+    --bg-raised-2: #232c52;
+    --ink: #f4f1e8;
+    --ink-dim: #8991b3;
+    --ink-faint: #4d5578;
+    --accent: #e8a33d;
+    --accent-deep: #b97324;
+    --live: #5fd68a;
+    --error: #e2645a;
+    --focus: #cfd6ff;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+  button:focus-visible, a:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    font-weight: 600;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Screen shell                                                      */
+  /* ---------------------------------------------------------------- */
+
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.35s ease;
+  }
+  .screen[hidden] { display: none; }
+
+  /* ---------------------------------------------------------------- */
+  /* Join / language picker                                            */
+  /* ---------------------------------------------------------------- */
+
+  #join-screen {
+    align-items: center;
+    justify-content: center;
+    padding: 6vh 6vw;
+    text-align: center;
+  }
+
+  .session-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    background: var(--bg-raised);
+    border: 1px solid var(--accent-deep);
+    color: var(--accent);
+    padding: 0.4em 0.9em;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    margin-bottom: 2rem;
+  }
+  .session-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .join-title {
+    font-size: clamp(1.8rem, 6vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.5rem;
+  }
+  .join-sub {
+    color: var(--ink-dim);
+    font-size: 1rem;
+    max-width: 34ch;
+    margin: 0 auto 2.75rem;
+    line-height: 1.5;
+  }
+
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 460px;
+  }
+
+  .lang-btn {
+    background: var(--bg-raised);
+    border: 1px solid var(--bg-raised-2);
+    color: var(--ink);
+    border-radius: 14px;
+    padding: 1.1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    text-align: left;
+    transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  }
+  .lang-btn:hover, .lang-btn:active {
+    border-color: var(--accent);
+    background: var(--bg-raised-2);
+    transform: translateY(-1px);
+  }
+  .lang-native {
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+  .lang-english {
+    font-size: 0.75rem;
+    color: var(--ink-dim);
+  }
+
+  .custom-lang {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 460px;
+  }
+  .custom-lang input {
+    flex: 1;
+    background: var(--bg-raised);
+    border: 1px solid var(--bg-raised-2);
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.9rem;
+  }
+  .custom-lang input::placeholder { color: var(--ink-faint); }
+  .custom-lang button {
+    background: transparent;
+    border: 1px solid var(--bg-raised-2);
+    color: var(--ink-dim);
+    border-radius: 10px;
+    padding: 0.7rem 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .custom-lang button:hover { border-color: var(--accent); color: var(--accent); }
+
+  .join-error {
+    color: var(--error);
+    font-size: 0.9rem;
+    margin-top: 1.5rem;
+    max-width: 32ch;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Live caption screen                                               */
+  /* ---------------------------------------------------------------- */
+
+  #live-screen {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .live-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--bg-raised);
+    flex-shrink: 0;
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 0.55em;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--ink-faint);
+    transition: background 0.2s ease;
+  }
+  .status-dot.live { background: var(--live); box-shadow: 0 0 0 4px rgba(95,214,138,0.15); }
+  .status-dot.connecting { background: var(--accent); animation: pulse 1.1s ease-in-out infinite; }
+  .status-dot.down { background: var(--error); }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+  .status-text.live { color: var(--live); }
+  .status-text.connecting { color: var(--accent); }
+  .status-text.down { color: var(--error); }
+  .status-text.idle { color: var(--ink-dim); }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+  .lang-chip {
+    font-size: 0.78rem;
+    color: var(--ink-dim);
+    border: 1px solid var(--bg-raised-2);
+    border-radius: 999px;
+    padding: 0.3em 0.75em;
+  }
+  .change-lang-btn {
+    background: transparent;
+    border: none;
+    color: var(--ink-dim);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 0.3em 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--ink-faint);
+  }
+  .change-lang-btn:hover { color: var(--ink); }
+
+  .caption-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2rem 6vw 3.5rem;
+    overflow: hidden;
+    gap: 0.6rem;
+  }
+
+  .caption-line {
+    line-height: 1.35;
+    font-weight: 600;
+    animation: rise 0.4s ease-out;
+    transform-origin: bottom left;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: var(--target-opacity, 1); transform: translateY(0); }
+  }
+
+  .caption-line.age-0 { font-size: clamp(1.6rem, 5vw, 2.6rem); color: var(--ink); opacity: 1; }
+  .caption-line.age-1 { font-size: clamp(1.3rem, 4vw, 2rem); color: var(--ink); opacity: 0.72; }
+  .caption-line.age-2 { font-size: clamp(1.1rem, 3.2vw, 1.6rem); color: var(--ink-dim); opacity: 0.5; }
+  .caption-line.age-3 { font-size: clamp(1rem, 2.8vw, 1.4rem); color: var(--ink-dim); opacity: 0.3; }
+  .caption-line.interim { color: var(--ink-dim); font-style: normal; }
+  .caption-line.interim::after {
+    content: "";
+    display: inline-block;
+    width: 0.4em;
+    opacity: 0.6;
+  }
+
+  .waiting-state {
+    color: var(--ink-faint);
+    font-size: 1.1rem;
+    padding: 2rem 6vw 3.5rem;
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .reconnect-banner {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: rgba(226, 100, 90, 0.12);
+    border-top: 1px solid rgba(226, 100, 90, 0.35);
+    color: var(--error);
+    font-size: 0.85rem;
+    padding: 0.85rem 1.25rem;
+    flex-shrink: 0;
+  }
+  .reconnect-banner.visible { display: flex; }
+  .reconnect-banner button {
+    background: transparent;
+    border: 1px solid var(--error);
+    color: var(--error);
+    border-radius: 8px;
+    padding: 0.4em 0.9em;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== JOIN / LANGUAGE PICKER ===================== -->
+<section id="join-screen" class="screen">
+  <div class="session-badge"><span class="dot"></span><span id="session-badge-text">SESSION —</span></div>
+  <h1 class="join-title">Pick your language</h1>
+  <p class="join-sub">Captions stream directly from the presenter's device over this room's network. Nothing leaves the building.</p>
+
+  <div class="lang-grid" id="lang-grid"></div>
+
+  <div class="custom-lang">
+    <input id="custom-lang-input" type="text" placeholder="Other language code, e.g. ja, ar" maxlength="12">
+    <button id="custom-lang-btn" type="button">Join</button>
+  </div>
+
+  <p class="join-error" id="join-error" hidden></p>
+</section>
+
+<!-- ===================== LIVE CAPTION VIEW ===================== -->
+<section id="live-screen" class="screen" hidden>
+  <header class="live-header">
+    <div class="status">
+      <span class="status-dot" id="status-dot"></span>
+      <span class="status-text idle" id="status-text">Connecting…</span>
+    </div>
+    <div class="header-right">
+      <span class="lang-chip" id="live-lang-chip"></span>
+      <button class="change-lang-btn" id="change-lang-btn" type="button">Change language</button>
+    </div>
+  </header>
+
+  <div class="waiting-state" id="waiting-state">Waiting for the presenter to begin…</div>
+  <div class="caption-stage" id="caption-stage" hidden></div>
+
+  <div class="reconnect-banner" id="reconnect-banner">
+    <span>Connection to the presenter's device dropped.</span>
+    <button id="reconnect-btn" type="button">Retry now</button>
+  </div>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  // -- languages offered as presets; anything else can be typed in directly --
+  var LANGUAGES = [
+    { code: "en", native: "English", english: "English" },
+    { code: "hi", native: "हिन्दी", english: "Hindi" },
+    { code: "pa", native: "ਪੰਜਾਬੀ", english: "Punjabi" },
+    { code: "bn", native: "বাংলা", english: "Bengali" },
+    { code: "ta", native: "தமிழ்", english: "Tamil" },
+    { code: "te", native: "తెలుగు", english: "Telugu" },
+    { code: "mr", native: "मराठी", english: "Marathi" },
+    { code: "ur", native: "اردو", english: "Urdu" }
+  ];
+
+  var MAX_VISIBLE_LINES = 4;
+  var RECONNECT_DELAYS = [1000, 2000, 4000, 8000, 8000]; // ms, last value repeats
+
+  var joinScreen = document.getElementById("join-screen");
+  var liveScreen = document.getElementById("live-screen");
+  var langGrid = document.getElementById("lang-grid");
+  var sessionBadgeText = document.getElementById("session-badge-text");
+  var joinError = document.getElementById("join-error");
+  var customInput = document.getElementById("custom-lang-input");
+  var customBtn = document.getElementById("custom-lang-btn");
+
+  var statusDot = document.getElementById("status-dot");
+  var statusText = document.getElementById("status-text");
+  var liveLangChip = document.getElementById("live-lang-chip");
+  var changeLangBtn = document.getElementById("change-lang-btn");
+  var waitingState = document.getElementById("waiting-state");
+  var captionStage = document.getElementById("caption-stage");
+  var reconnectBanner = document.getElementById("reconnect-banner");
+  var reconnectBtn = document.getElementById("reconnect-btn");
+
+  var sessionId = new URLSearchParams(window.location.search).get("session");
+  var socket = null;
+  var reconnectAttempt = 0;
+  var reconnectTimer = null;
+  var manuallyDisconnected = false;
+  var currentLang = null;
+  var lines = []; // committed caption lines, newest last
+  var interimLine = "";
+
+  // -- render language picker --------------------------------------------
+
+  function buildLangGrid() {
+    LANGUAGES.forEach(function (lang) {
+      var btn = document.createElement("button");
+      btn.className = "lang-btn";
+      btn.type = "button";
+      btn.innerHTML =
+        '<span class="lang-native">' + lang.native + '</span>' +
+        '<span class="lang-english">' + lang.english + '</span>';
+      btn.addEventListener("click", function () { joinWithLanguage(lang.code); });
+      langGrid.appendChild(btn);
+    });
+  }
+
+  function showJoinError(message) {
+    joinError.textContent = message;
+    joinError.hidden = false;
+  }
+
+  // -- join flow -----------------------------------------------------------
+
+  function init() {
+    if (!sessionId) {
+      sessionBadgeText.textContent = "NO SESSION FOUND";
+      showJoinError("This link is missing a session code. Ask the presenter to re-share the QR code.");
+      langGrid.style.display = "none";
+      customInput.parentElement.style.display = "none";
+      return;
+    }
+    sessionBadgeText.textContent = "SESSION " + sessionId.toUpperCase();
+    buildLangGrid();
+  }
+
+  customBtn.addEventListener("click", function () {
+    var code = customInput.value.trim().toLowerCase();
+    if (!code) return;
+    joinWithLanguage(code);
+  });
+  customInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") customBtn.click();
+  });
+
+  function joinWithLanguage(langCode) {
+    currentLang = langCode;
+    joinScreen.hidden = true;
+    liveScreen.hidden = false;
+    liveLangChip.textContent = displayNameFor(langCode);
+    resetCaptionState();
+    connect();
+  }
+
+  function displayNameFor(code) {
+    var known = LANGUAGES.filter(function (l) { return l.code === code; })[0];
+    return known ? known.native : code;
+  }
+
+  changeLangBtn.addEventListener("click", function () {
+    manuallyDisconnected = true;
+    if (socket) socket.close();
+    clearTimeout(reconnectTimer);
+    liveScreen.hidden = true;
+    joinScreen.hidden = false;
+  });
+
+  // -- websocket lifecycle --------------------------------------------------
+
+  function wsUrl() {
+    var protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    return protocol + "//" + window.location.host + "/ws?lang=" +
+      encodeURIComponent(currentLang) + "&session_param=" + encodeURIComponent(sessionId);
+  }
+
+  function connect() {
+    manuallyDisconnected = false;
+    setStatus("connecting", "Connecting…");
+    reconnectBanner.classList.remove("visible");
+
+    socket = new WebSocket(wsUrl());
+
+    socket.addEventListener("open", function () {
+      reconnectAttempt = 0;
+      setStatus("live", "Live");
+    });
+
+    socket.addEventListener("message", function (event) {
+      var payload;
+      try {
+        payload = JSON.parse(event.data);
+      } catch (err) {
+        return; // ignore malformed frames rather than crash the caption view
+      }
+      handleCaption(payload);
+    });
+
+    socket.addEventListener("close", function (event) {
+      if (manuallyDisconnected) return;
+      if (event.code === 4000) {
+        setStatus("down", "Session not found");
+        showReconnectBanner("This session code isn't recognized by the presenter's device anymore.");
+        return;
+      }
+      setStatus("down", "Disconnected");
+      showReconnectBanner("Connection to the presenter's device dropped.");
+      scheduleReconnect();
+    });
+
+    socket.addEventListener("error", function () {
+      // "close" fires right after "error" on a failed connection; no action needed here.
+    });
+  }
+
+  function scheduleReconnect() {
+    var delay = RECONNECT_DELAYS[Math.min(reconnectAttempt, RECONNECT_DELAYS.length - 1)];
+    reconnectAttempt += 1;
+    reconnectTimer = setTimeout(function () {
+      if (!manuallyDisconnected) connect();
+    }, delay);
+  }
+
+  reconnectBtn.addEventListener("click", function () {
+    clearTimeout(reconnectTimer);
+    reconnectAttempt = 0;
+    connect();
+  });
+
+  function setStatus(state, label) {
+    statusDot.className = "status-dot " + state;
+    statusText.className = "status-text " + state;
+    statusText.textContent = label;
+  }
+
+  function showReconnectBanner(text) {
+    reconnectBanner.querySelector("span").textContent = text;
+    reconnectBanner.classList.add("visible");
+  }
+
+  // -- caption rendering (surtitle-style stack) ------------------------------
+
+  function resetCaptionState() {
+    lines = [];
+    interimLine = "";
+    captionStage.hidden = true;
+    captionStage.innerHTML = "";
+    waitingState.hidden = false;
+  }
+
+  function handleCaption(payload) {
+    if (typeof payload.text !== "string") return;
+
+    if (waitingState.hidden === false) {
+      waitingState.hidden = true;
+      captionStage.hidden = false;
+    }
+
+    if (payload.final) {
+      lines.push(payload.text);
+      if (lines.length > MAX_VISIBLE_LINES) {
+        lines = lines.slice(lines.length - MAX_VISIBLE_LINES);
+      }
+      interimLine = "";
+    } else {
+      interimLine = payload.text;
+    }
+    renderCaptionStage();
+  }
+
+  function renderCaptionStage() {
+    var display = lines.slice();
+    if (interimLine) display.push(interimLine);
+    if (display.length > MAX_VISIBLE_LINES) {
+      display = display.slice(display.length - MAX_VISIBLE_LINES);
+    }
+
+    captionStage.innerHTML = "";
+    var count = display.length;
+    display.forEach(function (text, idx) {
+      var ageFromNewest = count - 1 - idx; // 0 = newest
+      var isInterim = interimLine && idx === count - 1 && text === interimLine;
+      var el = document.createElement("div");
+      el.className = "caption-line age-" + Math.min(ageFromNewest, 3) + (isInterim ? " interim" : "");
+      el.textContent = text;
+      captionStage.appendChild(el);
+    });
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

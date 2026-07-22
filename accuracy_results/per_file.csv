@@ -1,0 +1,9 @@
+audio_file,target_language,wer,bleu,chrf,reference_transcript,hypothesis_transcript,reference_translation,hypothesis_translation
+sample.wav,hi,0.0,73.69,81.32,"Hello everyone, welcome to this lecture number 4.","Hello everyone, welcome to this lecture number 4.","नमस्ते सभी को, इस व्याख्यान संख्या 4 में आपका स्वागत है।","नमस्कार सभी, इस व्याख्यान संख्या 4 में आपका स्वागत है।"
+sample.wav,fr,0.0,58.77,77.78,"Hello everyone, welcome to this lecture number 4.","Hello everyone, welcome to this lecture number 4.","Bonjour à tous, bienvenue à ce cours numéro 4.","Bonjour à tous, bienvenue à cette conférence numéro 4."
+sample2.wav,hi,0.0,78.25,73.77,I hope all of you are doing good.,I hope all of you are doing good.,मुझे उम्मीद है कि आप सभी अच्छा कर रहे हैं।,मुझे आशा है कि आप सभी अच्छा कर रहे हैं।
+sample2.wav,fr,0.0,51.15,77.28,I hope all of you are doing good.,I hope all of you are doing good.,J'espère que vous allez tous bien.,J'espère que vous allez bien.
+sample3.wav,hi,0.0,35.42,49.99,I hope everybody has their notebooks and pens out.,I hope everybody has their notebooks and pens out.,मुझे उम्मीद है कि सभी के पास अपनी नोटबुक और पेन तैयार हैं।,मुझे आशा है कि हर किसी के पास अपनी नोटबुक और कलम हैं।
+sample3.wav,fr,0.0,50.17,74.03,I hope everybody has their notebooks and pens out.,I hope everybody has their notebooks and pens out.,J'espère que tout le monde a son cahier et ses stylos prêts.,J'espère que tout le monde a ses cahiers et ses stylos.
+sample5.wav,hi,0.0,20.45,28.45,I hope you all are aware of the same.,I hope you all are aware of the same.,मुझे उम्मीद है कि आप सभी इस बारे में जानते हैं।,मुझे आशा है कि आप सभी को एक ही बात का पता है।
+sample5.wav,fr,0.0,21.07,54.16,I hope you all are aware of the same.,I hope you all are aware of the same.,J'espère que vous êtes tous au courant de cela.,J'espère que vous en êtes tous conscients.

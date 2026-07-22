@@ -1,0 +1,30 @@
+[
+  {
+    "source": "The Transformer architecture uses CUDA for training.",
+    "reference_translations": {
+      "hi": "ट्रांसफार्मर आर्किटेक्चर प्रशिक्षण के लिए CUDA का उपयोग करता है।",
+      "fr": "L'architecture Transformer utilise CUDA pour l'entraînement."
+    }
+  },
+  {
+    "source": "Our Diffusion Model is accelerated by Tensor Core hardware.",
+    "reference_translations": {
+      "hi": "हमारा डिफ्यूज़न मॉडल Tensor Core हार्डवेयर से तेज़ किया गया है।",
+      "fr": "Notre modèle de diffusion est accéléré par le matériel Tensor Core."
+    }
+  },
+  {
+    "source": "This paper introduces a new CUDA kernel for the Transformer.",
+    "reference_translations": {
+      "hi": "यह शोधपत्र ट्रांसफार्मर के लिए एक नया CUDA कर्नेल प्रस्तुत करता है।",
+      "fr": "Cet article présente un nouveau noyau CUDA pour le Transformer."
+    }
+  },
+  {
+    "source": "Without Tensor Core support, the Diffusion Model runs much slower.",
+    "reference_translations": {
+      "hi": "Tensor Core समर्थन के बिना, डिफ्यूज़न मॉडल बहुत धीमा चलता है।",
+      "fr": "Sans le support Tensor Core, le modèle de diffusion fonctionne beaucoup plus lentement."
+    }
+  }
+]

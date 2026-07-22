@@ -1,0 +1,22 @@
+[
+  {
+    "term": "CUDA",
+    "translations": { "hi": "CUDA", "fr": "CUDA" },
+    "case_sensitive": true
+  },
+  {
+    "term": "Tensor Core",
+    "translations": { "hi": "Tensor Core", "fr": "Tensor Core" },
+    "case_sensitive": false
+  },
+  {
+    "term": "Transformer",
+    "translations": { "hi": "ट्रांसफार्मर", "fr": "Transformer" },
+    "case_sensitive": false
+  },
+  {
+    "term": "Diffusion Model",
+    "translations": { "hi": "डिफ्यूज़न मॉडल", "fr": "modèle de diffusion" },
+    "case_sensitive": false
+  }
+]

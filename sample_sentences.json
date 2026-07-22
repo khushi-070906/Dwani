@@ -1,0 +1,20 @@
+[
+  "Welcome everyone to the seminar, please find your seats.",
+  "Today we will discuss attention mechanisms in transformer models.",
+  "As I mentioned earlier, attention lets the model weigh different tokens.",
+  "So, as I mentioned before, attention lets the model weigh different tokens.",
+  "Let's move on to the next slide, which covers positional encoding.",
+  "Positional encoding gives the model a sense of token order.",
+  "Any questions so far before we continue?",
+  "Any questions before we move on?",
+  "Now let's look at multi-head attention in more detail.",
+  "Multi-head attention runs several attention operations in parallel.",
+  "To recap, attention lets the model weigh different tokens.",
+  "Let's take a short five minute break.",
+  "Welcome back everyone, let's continue.",
+  "Next, we'll cover the feed-forward layer in each transformer block.",
+  "The feed-forward layer applies the same transformation to each position.",
+  "Are there any questions about the feed-forward layer?",
+  "Thank you all for coming today.",
+  "Thank you everyone for coming, see you next week."
+]

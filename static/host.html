@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LDST — Presenter</title>
+<style>
+  :root {
+    --bg: #10152a;
+    --bg-raised: #1a2140;
+    --bg-raised-2: #232c52;
+    --ink: #f4f1e8;
+    --ink-dim: #8991b3;
+    --ink-faint: #4d5578;
+    --accent: #e8a33d;
+    --accent-deep: #b97324;
+    --live: #5fd68a;
+    --error: #e2645a;
+    --focus: #cfd6ff;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6vh 6vw;
+  }
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+  button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    font-weight: 600;
+  }
+
+  .session-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    background: var(--bg-raised);
+    border: 1px solid var(--accent-deep);
+    color: var(--accent);
+    padding: 0.4em 0.9em;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    margin-bottom: 1.75rem;
+  }
+  .session-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .join-panel {
+    background: var(--bg-raised);
+    border: 1px solid var(--bg-raised-2);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+  }
+  .join-panel img {
+    border-radius: 8px;
+    background: #fff;
+    padding: 8px;
+  }
+  .join-url {
+    font-size: 0.8rem;
+    color: var(--ink-dim);
+    text-align: center;
+    word-break: break-all;
+    margin: 0;
+  }
+
+  h1 {
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.5rem;
+    text-align: center;
+  }
+  .sub {
+    color: var(--ink-dim);
+    font-size: 0.95rem;
+    max-width: 40ch;
+    text-align: center;
+    margin: 0 auto 2.5rem;
+    line-height: 1.5;
+  }
+
+  .mic-btn {
+    width: 132px;
+    height: 132px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-raised);
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+    box-shadow: 0 0 0 0 rgba(95, 214, 138, 0);
+  }
+  .mic-btn svg { width: 34px; height: 34px; }
+  .mic-btn.live {
+    background: var(--live);
+    color: #0e2116;
+    box-shadow: 0 0 0 8px rgba(95, 214, 138, 0.15);
+  }
+  .mic-btn.live.speaking {
+    box-shadow: 0 0 0 14px rgba(95, 214, 138, 0.22);
+  }
+  .mic-btn:active { transform: scale(0.97); }
+
+  .status-line {
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink-dim);
+    text-align: center;
+    min-height: 1.2em;
+  }
+  .status-line.error { color: var(--error); }
+  .status-line.live { color: var(--live); }
+
+  .audience {
+    margin-top: 3rem;
+    width: 100%;
+    max-width: 420px;
+  }
+  .audience h2 {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+    text-align: center;
+  }
+  .lang-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  .lang-pill {
+    background: var(--bg-raised);
+    border: 1px solid var(--bg-raised-2);
+    color: var(--ink-dim);
+    border-radius: 999px;
+    padding: 0.35em 0.9em;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .lang-pill .count { color: var(--accent); margin-left: 0.35em; }
+  .no-audience {
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="session-badge"><span class="dot"></span><span id="session-badge-text">SESSION —</span></div>
+
+<div class="join-panel" id="join-panel">
+  <img id="qr-image" alt="Join QR code" width="180" height="180">
+  <p class="join-url" id="join-url-text"></p>
+</div>
+
+<h1>Presenter mic</h1>
+<p class="sub">Tap to start streaming your microphone to attendees over this room's local network. Nothing leaves the building.</p>
+
+<button class="mic-btn" id="mic-btn" type="button">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+    <line x1="12" y1="19" x2="12" y2="23"></line>
+    <line x1="8" y1="23" x2="16" y2="23"></line>
+  </svg>
+  <span id="mic-btn-label">Start</span>
+</button>
+
+<p class="status-line" id="status-line">Not presenting</p>
+
+<div class="audience">
+  <h2>Connected attendees</h2>
+  <div class="lang-pill-row" id="lang-pill-row"></div>
+  <p class="no-audience" id="no-audience" hidden>Nobody has joined yet.</p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var TARGET_SAMPLE_RATE = 16000;
+  var CHUNK_SIZE = 4096; // samples per ScriptProcessor callback
+  var POLL_INTERVAL_MS = 3000;
+
+  var sessionId = null; // resolved from /presenter-info on load, not the URL
+  var micBtn = document.getElementById("mic-btn");
+  var micBtnLabel = document.getElementById("mic-btn-label");
+  var statusLine = document.getElementById("status-line");
+  var sessionBadgeText = document.getElementById("session-badge-text");
+  var qrImage = document.getElementById("qr-image");
+  var joinUrlText = document.getElementById("join-url-text");
+  var langPillRow = document.getElementById("lang-pill-row");
+  var noAudience = document.getElementById("no-audience");
+
+  var socket = null;
+  var audioContext = null;
+  var mediaStream = null;
+  var sourceNode = null;
+  var processorNode = null;
+  var isPresenting = false;
+  var pollTimer = null;
+
+  function setStatus(text, cls) {
+    statusLine.textContent = text;
+    statusLine.className = "status-line" + (cls ? " " + cls : "");
+  }
+
+  function init() {
+    fetch("/presenter-info")
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then(function (info) {
+        sessionId = info.session_id;
+        sessionBadgeText.textContent = "SESSION " + sessionId.toUpperCase();
+        qrImage.src = info.qr_url;
+        joinUrlText.textContent = info.join_url;
+        pollAudience();
+        pollTimer = setInterval(pollAudience, POLL_INTERVAL_MS);
+      })
+      .catch(function (err) {
+        sessionBadgeText.textContent = "SERVER UNREACHABLE";
+        setStatus("Couldn't load session info from the server: " + err.message, "error");
+        micBtn.disabled = true;
+      });
+  }
+
+  // -- audience polling (read-only view of who's connected) -----------------
+
+  function pollAudience() {
+    fetch("/session-info")
+      .then(function (r) { return r.json(); })
+      .then(renderAudience)
+      .catch(function () { /* transient fetch failures are fine to ignore */ });
+  }
+
+  function renderAudience(info) {
+    var langs = info.languages_available || [];
+    langPillRow.innerHTML = "";
+    if (langs.length === 0) {
+      noAudience.hidden = false;
+      return;
+    }
+    noAudience.hidden = true;
+    langs.forEach(function (lang) {
+      var pill = document.createElement("span");
+      pill.className = "lang-pill";
+      pill.textContent = lang.toUpperCase();
+      langPillRow.appendChild(pill);
+    });
+  }
+
+  // -- mic capture + streaming ----------------------------------------------
+
+  micBtn.addEventListener("click", function () {
+    if (isPresenting) {
+      stopPresenting();
+    } else {
+      startPresenting();
+    }
+  });
+
+  function startPresenting() {
+    if (!sessionId) {
+      setStatus("Still loading session info -- wait a moment and try again.", "error");
+      return;
+    }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setStatus(
+        "This browser won't allow microphone access on this page. " +
+        "Microphone access requires https:// or http://localhost -- " +
+        "if you're using the network IP address, switch to " +
+        "http://localhost:" + window.location.port + window.location.pathname + window.location.search,
+        "error"
+      );
+      return;
+    }
+    setStatus("Requesting microphone…", null);
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+      .then(function (stream) {
+        mediaStream = stream;
+        connectSocket();
+      })
+      .catch(function (err) {
+        setStatus("Microphone access denied or unavailable: " + err.name + " -- " + err.message, "error");
+      });
+  }
+
+  function connectSocket() {
+    var protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    var url = protocol + "//" + window.location.host + "/host-ws?session_param=" + encodeURIComponent(sessionId);
+    socket = new WebSocket(url);
+    socket.binaryType = "arraybuffer";
+
+    socket.addEventListener("open", function () {
+      startAudioPipeline();
+    });
+
+    socket.addEventListener("close", function (event) {
+      var wasPresenting = isPresenting;
+      teardownAudio();
+      if (event.code === 4000) {
+        setStatus("This session code isn't recognized by the server anymore.", "error");
+      } else if (event.code === 4001) {
+        setStatus("Another presenter is already streaming for this session.", "error");
+      } else if (wasPresenting) {
+        setStatus("Disconnected from the server.", "error");
+      }
+      isPresenting = false;
+      micBtn.classList.remove("live", "speaking");
+      micBtnLabel.textContent = "Start";
+    });
+
+    socket.addEventListener("error", function () {
+      // "close" fires right after "error" on a failed connection; handled there.
+    });
+  }
+
+  function startAudioPipeline() {
+    // Request the context at 16kHz directly -- most modern browsers honor
+    // this constructor option. If a browser silently ignores it (some do),
+    // downsampleTo16k() below still corrects for whatever rate we actually
+    // get, since AudioSegmenter on the server assumes every chunk it
+    // receives really is at its configured sample_rate (16000 by default).
+    var AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AudioContextCtor({ sampleRate: TARGET_SAMPLE_RATE });
+    sourceNode = audioContext.createMediaStreamSource(mediaStream);
+
+    // ScriptProcessorNode is deprecated in favor of AudioWorklet, but it
+    // needs no separate worklet module file and is supported everywhere
+    // still running today -- fine for a single-presenter local tool like
+    // this one.
+    processorNode = audioContext.createScriptProcessor(CHUNK_SIZE, 1, 1);
+    processorNode.addEventListener("audioprocess", function (event) {
+      var input = event.inputBuffer.getChannelData(0);
+      var resampled = downsampleTo16k(input, audioContext.sampleRate);
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(resampled.buffer);
+      }
+      updateSpeakingIndicator(input);
+    });
+
+    sourceNode.connect(processorNode);
+    // ScriptProcessorNode must be connected to a destination to fire
+    // audioprocess events in every browser; route to a silent gain node
+    // rather than actual speakers so the presenter doesn't hear themselves.
+    var silentSink = audioContext.createGain();
+    silentSink.gain.value = 0;
+    processorNode.connect(silentSink);
+    silentSink.connect(audioContext.destination);
+
+    isPresenting = true;
+    micBtn.classList.add("live");
+    micBtnLabel.textContent = "Stop";
+    setStatus("Live — streaming to attendees", "live");
+  }
+
+  function updateSpeakingIndicator(samples) {
+    var sumSquares = 0;
+    for (var i = 0; i < samples.length; i++) sumSquares += samples[i] * samples[i];
+    var rms = Math.sqrt(sumSquares / samples.length);
+    micBtn.classList.toggle("speaking", rms > 0.02);
+  }
+
+  function downsampleTo16k(buffer, sourceRate) {
+    if (sourceRate === TARGET_SAMPLE_RATE) return buffer;
+    var ratio = sourceRate / TARGET_SAMPLE_RATE;
+    var newLength = Math.max(1, Math.round(buffer.length / ratio));
+    var result = new Float32Array(newLength);
+    for (var i = 0; i < newLength; i++) {
+      var srcIndex = i * ratio;
+      var i0 = Math.floor(srcIndex);
+      var i1 = Math.min(i0 + 1, buffer.length - 1);
+      var frac = srcIndex - i0;
+      result[i] = buffer[i0] * (1 - frac) + buffer[i1] * frac;
+    }
+    return result;
+  }
+
+  function stopPresenting() {
+    setStatus("Stopping…", null);
+    if (socket) socket.close(1000, "presenter stopped");
+    teardownAudio();
+  }
+
+  function teardownAudio() {
+    if (processorNode) { processorNode.disconnect(); processorNode = null; }
+    if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
+    if (audioContext) { audioContext.close(); audioContext = null; }
+    if (mediaStream) { mediaStream.getTracks().forEach(function (t) { t.stop(); }); mediaStream = null; }
+  }
+
+  window.addEventListener("beforeunload", function () {
+    if (socket) socket.close(1000, "page closed");
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>

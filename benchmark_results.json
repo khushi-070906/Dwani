@@ -1,0 +1,24 @@
+{
+  "no_cache": {
+    "hits": 0,
+    "misses": 36,
+    "hit_rate": 0.0,
+    "total_seconds": 22.827999999994063,
+    "mean_translate_seconds": 0.6341111111109462,
+    "translate_call_count": 36,
+    "avg_cpu_percent": 272.2776566757493,
+    "peak_rss_delta_mb": 24.9375
+  },
+  "semantic_cache": {
+    "hits": 4,
+    "misses": 32,
+    "hit_rate": 0.1111111111111111,
+    "total_seconds": 61.85899999999674,
+    "mean_translate_seconds": 1.656750000000784,
+    "translate_call_count": 32,
+    "avg_cpu_percent": 160.52333965844403,
+    "peak_rss_delta_mb": 91.35546875
+  },
+  "translation_time_reduction_percent": -170.98,
+  "cache_hit_rate": 0.1111
+}
