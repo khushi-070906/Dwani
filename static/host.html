@@ -177,6 +177,139 @@
     font-size: 0.85rem;
     text-align: center;
   }
+
+  .qa-panel {
+    margin-top: 2.5rem;
+    width: 100%;
+    max-width: 480px;
+  }
+  .qa-panel h2 {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+    text-align: center;
+  }
+  .qa-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    font-size: 0.78rem;
+    color: var(--ink-dim);
+    margin-bottom: 0.9rem;
+  }
+  .qa-status .qa-status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--ink-faint);
+  }
+  .qa-status.live .qa-status-dot { background: var(--live); }
+  .qa-status.down .qa-status-dot { background: var(--error); }
+  .qa-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .qa-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--bg-raised-2);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    animation: rise 0.35s ease-out;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .qa-card.answered { opacity: 0.4; }
+  .qa-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.35rem;
+  }
+  .qa-card-lang {
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .qa-card-text {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0 0 0.6rem;
+  }
+  .qa-card-original {
+    font-size: 0.78rem;
+    color: var(--ink-dim);
+    margin: 0 0 0.6rem;
+    font-style: italic;
+  }
+  .qa-answer-btn {
+    background: transparent;
+    border: 1px solid var(--bg-raised-2);
+    color: var(--ink-dim);
+    border-radius: 8px;
+    padding: 0.3em 0.8em;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .qa-answer-btn:hover { border-color: var(--live); color: var(--live); }
+  .qa-empty {
+    color: var(--ink-faint);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  .qa-empty[hidden] { display: none; }
+
+  .stats-panel {
+    margin-top: 2.5rem;
+    width: 100%;
+    max-width: 480px;
+  }
+  .stats-panel h2 {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+    text-align: center;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+  .stat-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--bg-raised-2);
+    border-radius: 12px;
+    padding: 0.75rem 0.9rem;
+  }
+  .stat-card[hidden] { display: none; }
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .stat-label {
+    font-size: 0.72rem;
+    color: var(--ink-dim);
+    margin-top: 0.2rem;
+  }
+  .stat-sublabel {
+    font-size: 0.68rem;
+    color: var(--ink-faint);
+    margin-top: 0.3rem;
+    line-height: 1.4;
+  }
 </style>
 </head>
 <body>
@@ -209,6 +342,45 @@
   <p class="no-audience" id="no-audience" hidden>Nobody has joined yet.</p>
 </div>
 
+<div class="qa-panel" id="qa-panel">
+  <h2>Questions from the audience</h2>
+  <div class="qa-status" id="qa-status"><span class="qa-status-dot"></span><span id="qa-status-text">Connecting…</span></div>
+  <div class="qa-list" id="qa-list"></div>
+  <p class="qa-empty" id="qa-empty">No questions yet.</p>
+</div>
+
+<div class="stats-panel" id="stats-panel">
+  <h2>Live session stats</h2>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-attendees">0</div>
+      <div class="stat-label">Attendees connected</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-languages">0</div>
+      <div class="stat-label">Languages in the room</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-a11y">0</div>
+      <div class="stat-label">Using accessibility mode</div>
+      <div class="stat-sublabel" id="stat-a11y-breakdown"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-questions">0 / 0</div>
+      <div class="stat-label">Questions answered / asked</div>
+    </div>
+    <div class="stat-card" id="stat-cache-card" hidden>
+      <div class="stat-value" id="stat-cache">—</div>
+      <div class="stat-label">Semantic cache hit rate</div>
+      <div class="stat-sublabel" id="stat-cache-sublabel"></div>
+    </div>
+    <div class="stat-card" id="stat-glossary-card" hidden>
+      <div class="stat-value" id="stat-glossary">0</div>
+      <div class="stat-label">Glossary terms tracked</div>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   "use strict";
@@ -226,6 +398,20 @@
   var joinUrlText = document.getElementById("join-url-text");
   var langPillRow = document.getElementById("lang-pill-row");
   var noAudience = document.getElementById("no-audience");
+  var qaStatus = document.getElementById("qa-status");
+  var qaStatusText = document.getElementById("qa-status-text");
+  var qaList = document.getElementById("qa-list");
+  var qaEmpty = document.getElementById("qa-empty");
+  var statAttendees = document.getElementById("stat-attendees");
+  var statLanguages = document.getElementById("stat-languages");
+  var statA11y = document.getElementById("stat-a11y");
+  var statA11yBreakdown = document.getElementById("stat-a11y-breakdown");
+  var statQuestions = document.getElementById("stat-questions");
+  var statCacheCard = document.getElementById("stat-cache-card");
+  var statCache = document.getElementById("stat-cache");
+  var statCacheSublabel = document.getElementById("stat-cache-sublabel");
+  var statGlossaryCard = document.getElementById("stat-glossary-card");
+  var statGlossary = document.getElementById("stat-glossary");
 
   var socket = null;
   var audioContext = null;
@@ -234,6 +420,12 @@
   var processorNode = null;
   var isPresenting = false;
   var pollTimer = null;
+  var qaSocket = null;
+  var qaReconnectTimer = null;
+  var qaReconnectAttempt = 0;
+  var QA_RECONNECT_DELAYS = [1000, 2000, 4000, 8000, 8000];
+  var qaAskedCount = 0;
+  var qaAnsweredCount = 0;
 
   function setStatus(text, cls) {
     statusLine.textContent = text;
@@ -252,7 +444,9 @@
         qrImage.src = info.qr_url;
         joinUrlText.textContent = info.join_url;
         pollAudience();
-        pollTimer = setInterval(pollAudience, POLL_INTERVAL_MS);
+        pollStats();
+        pollTimer = setInterval(function () { pollAudience(); pollStats(); }, POLL_INTERVAL_MS);
+        connectQaNotify();
       })
       .catch(function (err) {
         sessionBadgeText.textContent = "SERVER UNREACHABLE";
@@ -272,6 +466,7 @@
 
   function renderAudience(info) {
     var langs = info.languages_available || [];
+    statLanguages.textContent = langs.length;
     langPillRow.innerHTML = "";
     if (langs.length === 0) {
       noAudience.hidden = false;
@@ -284,6 +479,154 @@
       pill.textContent = lang.toUpperCase();
       langPillRow.appendChild(pill);
     });
+  }
+
+  // -- live stats dashboard ---------------------------------------------
+  //
+  // Pulls together endpoints that already existed for evaluation purposes
+  // (Section 7-style metrics) but had no visual home before -- this panel
+  // doesn't compute anything new, it just puts /accessibility-stats,
+  // /cache-stats, and /glossary-stats somewhere the presenter can actually
+  // see them live. Cache/glossary cards stay hidden entirely when those
+  // features weren't enabled for this run (enabled: false), so the panel
+  // doesn't show empty/misleading numbers for flags that weren't passed.
+
+  function updateQuestionStat() {
+    statQuestions.textContent = qaAnsweredCount + " / " + qaAskedCount;
+  }
+
+  function pollStats() {
+    fetch("/accessibility-stats")
+      .then(function (r) { return r.json(); })
+      .then(function (stats) {
+        statAttendees.textContent = stats.connected_attendees;
+        statA11y.textContent = stats.attendees_with_accessibility_settings;
+        var parts = [];
+        if (stats.high_contrast_count) parts.push(stats.high_contrast_count + " high contrast");
+        if (stats.large_text_count) parts.push(stats.large_text_count + " large text");
+        if (stats.flash_on_new_caption_count) parts.push(stats.flash_on_new_caption_count + " flash");
+        statA11yBreakdown.textContent = parts.join(" · ");
+      })
+      .catch(function () { /* transient fetch failures are fine to ignore */ });
+
+    fetch("/cache-stats")
+      .then(function (r) { return r.json(); })
+      .then(function (stats) {
+        if (!stats.enabled) { statCacheCard.hidden = true; return; }
+        statCacheCard.hidden = false;
+        statCache.textContent = (stats.hit_rate * 100).toFixed(0) + "%";
+        statCacheSublabel.textContent = stats.hits + " hits / " + (stats.hits + stats.misses) + " lookups · "
+          + stats.estimated_seconds_saved.toFixed(1) + "s saved";
+      })
+      .catch(function () { /* transient fetch failures are fine to ignore */ });
+
+    fetch("/glossary-stats")
+      .then(function (r) { return r.json(); })
+      .then(function (stats) {
+        if (!stats.enabled) { statGlossaryCard.hidden = true; return; }
+        statGlossaryCard.hidden = false;
+        statGlossary.textContent = stats.glossary_term_count;
+      })
+      .catch(function () { /* transient fetch failures are fine to ignore */ });
+  }
+
+  // -- Q&A (bidirectional): live incoming questions from attendees ---------
+  //
+  // Passive push channel -- this page never sends audio itself, it just
+  // listens for whatever qa_pipeline.py has already transcribed and
+  // translated (see server.py's qa_notify_socket). Works whether or not
+  // --qa was passed to server.py: if it wasn't, this channel simply never
+  // receives anything, which reads to the presenter as "no questions yet"
+  // rather than an error -- there's no reason to make that distinction
+  // loudly on a page the presenter is watching mid-talk.
+
+  function setQaStatus(state, label) {
+    qaStatus.className = "qa-status " + state;
+    qaStatusText.textContent = label;
+  }
+
+  function qaWsUrl() {
+    var protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    return protocol + "//" + window.location.host + "/qa-notify?session_param=" + encodeURIComponent(sessionId);
+  }
+
+  function connectQaNotify() {
+    setQaStatus("connecting", "Connecting…");
+    qaSocket = new WebSocket(qaWsUrl());
+
+    qaSocket.addEventListener("open", function () {
+      qaReconnectAttempt = 0;
+      setQaStatus("live", "Listening for questions");
+    });
+
+    qaSocket.addEventListener("message", function (event) {
+      var question;
+      try {
+        question = JSON.parse(event.data);
+      } catch (err) {
+        return; // ignore malformed frames rather than crash the panel
+      }
+      renderQuestion(question);
+    });
+
+    qaSocket.addEventListener("close", function () {
+      setQaStatus("down", "Reconnecting…");
+      var delay = QA_RECONNECT_DELAYS[Math.min(qaReconnectAttempt, QA_RECONNECT_DELAYS.length - 1)];
+      qaReconnectAttempt += 1;
+      qaReconnectTimer = setTimeout(connectQaNotify, delay);
+    });
+
+    qaSocket.addEventListener("error", function () {
+      // "close" fires right after "error" on a failed connection; handled there.
+    });
+  }
+
+  function renderQuestion(question) {
+    qaEmpty.hidden = true;
+    qaAskedCount += 1;
+    updateQuestionStat();
+    var card = document.createElement("div");
+    card.className = "qa-card";
+    card.dataset.questionId = question.id;
+
+    var meta = document.createElement("div");
+    meta.className = "qa-card-meta";
+    var langSpan = document.createElement("span");
+    langSpan.className = "qa-card-lang";
+    langSpan.textContent = "Asked in " + (question.asker_language || "?").toUpperCase();
+    meta.appendChild(langSpan);
+
+    var answerBtn = document.createElement("button");
+    answerBtn.className = "qa-answer-btn";
+    answerBtn.type = "button";
+    answerBtn.textContent = "Mark answered";
+    answerBtn.addEventListener("click", function () {
+      fetch("/qa/answer/" + encodeURIComponent(question.id), { method: "POST" })
+        .then(function () {
+          card.classList.add("answered");
+          answerBtn.disabled = true;
+          answerBtn.textContent = "Answered";
+          qaAnsweredCount += 1;
+          updateQuestionStat();
+        })
+        .catch(function () { /* best-effort -- the card just stays active if this fails */ });
+    });
+    meta.appendChild(answerBtn);
+    card.appendChild(meta);
+
+    var translated = document.createElement("p");
+    translated.className = "qa-card-text";
+    translated.textContent = question.translated_text || "";
+    card.appendChild(translated);
+
+    if (question.original_text && question.original_text !== question.translated_text) {
+      var original = document.createElement("p");
+      original.className = "qa-card-original";
+      original.textContent = "Original: " + question.original_text;
+      card.appendChild(original);
+    }
+
+    qaList.insertBefore(card, qaList.firstChild); // newest on top
   }
 
   // -- mic capture + streaming ----------------------------------------------
@@ -428,6 +771,8 @@
 
   window.addEventListener("beforeunload", function () {
     if (socket) socket.close(1000, "page closed");
+    if (qaSocket) qaSocket.close(1000, "page closed");
+    clearTimeout(qaReconnectTimer);
   });
 
   init();

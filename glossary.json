@@ -1,22 +1,997 @@
 [
   {
-    "term": "CUDA",
-    "translations": { "hi": "CUDA", "fr": "CUDA" },
-    "case_sensitive": true
-  },
-  {
-    "term": "Tensor Core",
-    "translations": { "hi": "Tensor Core", "fr": "Tensor Core" },
+    "term": "Instrumentation Engineering Department",
+    "translations": {},
     "case_sensitive": false
   },
   {
-    "term": "Transformer",
-    "translations": { "hi": "ट्रांसफार्मर", "fr": "Transformer" },
+    "term": "Application Programming Interface",
+    "translations": {},
     "case_sensitive": false
   },
   {
-    "term": "Diffusion Model",
-    "translations": { "hi": "डिफ्यूज़न मॉडल", "fr": "modèle de diffusion" },
+    "term": "Instrumentation Engineering KFUPM",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Transportation Research Procedia",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Embodied Instruction-Following",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Autonomous Indoor Navigation",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Nature Machine Intelligence",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Navigation Using Generative",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Neuromorphic LLM Navigation",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "AI Artificial Intelligence",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Disaster Site Applications",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "System Combining Language",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Autonomous Indoor Rescue",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Based Sound Localization",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "International Conference",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "National Fire Protection",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Artificial Intelligence",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "GPS Global Positioning",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Reinforcement Learning",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Transportation Meeting",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Current Drone Spatial",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Large Language Models",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Measure Virtual Sound",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Recent Action History",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Sound Source Tracking",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Using Multiple Drones",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Configure Gemini API",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Emergency Sound Cues",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "KFUPM Joint Research",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "King Fahd University",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Large Language Model",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Logistics Ecosystems",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "UAV Navigation Using",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "LLM Largae Language",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Neuromorphic Vision",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "UAV Unmanned Aerial",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Autonomous Systems",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "EURO Working Group",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Vision Integration",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Autonomous Drones",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Gemini Vision LLM",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "IEEE Transactions",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Literature Review",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Raghad Al-Johania",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Scene Description",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Acknowledgements",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Applied Sciences",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Control Pipeline",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Drone Navigation",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Multimodal Sound",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Aerial Vehicles",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "GenerativeModel",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Language Models",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Neural Networks",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Research Center",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Asma Al-Arfaja",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Hussein Sammaa",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Language Model",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Movement Steps",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Rotation Angle",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Smart Mobility",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Action Reason",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Deep Learning",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Free Off-Road",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Rescue Drones",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "ScienceDirect",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Testing Tello",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "United States",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Additionally",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Collectively",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Drone Guided",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Experimental",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Instructions",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "KFUPM JRC-AI",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Rawan Bakroa",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Saudi Arabia",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Term Meaning",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Association",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "IEEE Access",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Integration",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Methodology",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Rawan Bakro",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Traditional",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "ELSEVIER B",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Elsevier B",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Neuro-LIFT",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Nevethless",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Saudi Arab",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Vision LLM",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "According",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Available",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "DJI Tello",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Determine",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Framework",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Frontiers",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Petroleum",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Published",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Tello SDK",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "CC BY-NC",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Describe",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Keywords",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Learning",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Minerals",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Previous",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Robotics",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Strength",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Strongly",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Together",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Unmanned",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Analyze",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Authors",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Context",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Control",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Current",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Decibel",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Despite",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Dhahran",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "However",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Paredes",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Provide",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Sensors",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Studies",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Systems",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Vehicle",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Virtual",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Action",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Arabia",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Author",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Center",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Choose",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Drones",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "During",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Gemini",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "JRC-AI",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Nguyen",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Recent",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Rescue",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Rotate",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Search",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "System",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Vision",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Yamada",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Avoid",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "BY-NC",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Based",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "CC BY",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Favor",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Fires",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Given",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Indoo",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Joshi",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "KFUPM",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Large",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Lotfi",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "NC-ND",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Neuro",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "SDAIA",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "SMILE",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Saudi",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Sound",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Tello",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Their",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Track",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Where",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Zhang",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Chen",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "EURO",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Each",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Fuse",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "IEEE",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "JSON",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "LIFT",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "LLMs",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "List",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "NFPA",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Peer",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Send",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Shah",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Such",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "UAVs",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Wang",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "API",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "DJI",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Due",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Fig",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "GPS",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "JRC",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "LLM",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Map",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Nav",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "One",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "SDK",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "UAV",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "Use",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "AI",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "BY",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "CC",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "LM",
+    "translations": {},
+    "case_sensitive": false
+  },
+  {
+    "term": "ND",
+    "translations": {},
     "case_sensitive": false
   }
 ]

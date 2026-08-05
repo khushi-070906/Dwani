@@ -10,6 +10,8 @@ Run:
 
 import argparse
 import asyncio
+import dataclasses
+import json
 import socket
 from pathlib import Path
 
@@ -18,7 +20,9 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from accessibility import AccessibilityPreferences
 from pipeline import AudioSegmenter, FakeASRBackend, FakeTranslationBackend, Pipeline
+from qa_pipeline import BidirectionalTranslationBackend, FakeBidirectionalTranslationBackend, QAPipeline
 from session import Session
 
 app = FastAPI()
@@ -31,6 +35,13 @@ session = Session(port=8000)
 # language_code -> set of connected websockets subscribed to that language
 subscribers: dict[str, set[WebSocket]] = {}
 
+# websocket -> that attendee's most recently sent accessibility settings.
+# Populated from the same /ws connection subscribers already uses -- see
+# attendee_socket() below -- rather than a separate endpoint, since it's
+# just another field on the same "attendee connected" control channel the
+# language selection already goes over.
+accessibility_prefs: dict[WebSocket, AccessibilityPreferences] = {}
+
 # True while a presenter's /host-ws stream is connected -- only one presenter
 # stream is meaningful per session, so a second one is rejected rather than
 # silently interleaving audio with the first.
@@ -39,6 +50,18 @@ host_connected = False
 # Set in __main__ if --dynamic-glossary is passed; picked up by the startup
 # event below to launch its background polling loop. None means disabled.
 dynamic_glossary_updater = None
+
+# Set in __main__ if --qa is passed (see qa_pipeline.py). None means the
+# reverse (attendee -> presenter) translation path is disabled entirely --
+# /qa-ws, /qa-notify, /qa/pending, /qa/answer all report enabled=False or
+# reject connections rather than partially working.
+qa_pipeline_instance: QAPipeline | None = None
+
+# Presenter-side listeners for incoming Q&A (host.html and/or
+# qa_presenter_listener.py -- see that script's docstring) -- pushed to as
+# soon as a question finishes translating, same fan-out shape
+# broadcast_caption already uses for attendees.
+qa_listeners: set[WebSocket] = set()
 
 
 @app.websocket("/ws")
@@ -51,13 +74,29 @@ async def attendee_socket(websocket: WebSocket, lang: str, session_param: str):
     subscribers.setdefault(lang, set()).add(websocket)
     try:
         while True:
-            # attendee client doesn't send anything meaningful, this just
-            # keeps the connection open and detects disconnects
-            await websocket.receive_text()
+            # The default attendee client doesn't send anything meaningful,
+            # so this mainly just keeps the connection open and detects
+            # disconnects -- but accessible_caption_client.html (and any
+            # client wanting accessibility formatting) sends a JSON control
+            # message of the form {"type": "settings", "accessibility": {...}}
+            # over this same connection whenever the attendee changes a
+            # setting. Anything else received (including the default
+            # client's plain keepalive text) is silently ignored here,
+            # same as before this feature existed.
+            raw = await websocket.receive_text()
+            try:
+                message = json.loads(raw)
+            except (ValueError, TypeError):
+                continue
+            if isinstance(message, dict) and message.get("type") == "settings":
+                accessibility_prefs[websocket] = AccessibilityPreferences.from_dict(
+                    message.get("accessibility", {})
+                )
     except WebSocketDisconnect:
         pass
     finally:
         subscribers[lang].discard(websocket)
+        accessibility_prefs.pop(websocket, None)
 
 
 async def broadcast_caption(lang: str, text: str, is_final: bool = True):
@@ -129,6 +168,126 @@ async def host_socket(websocket: WebSocket, session_param: str):
         host_connected = False
 
 
+async def _push_question_to_presenter(question) -> None:
+    """QAPipeline's deliver_to_presenter callback: fans a translated
+    question out to every connected presenter-side listener (host.html
+    and/or qa_presenter_listener.py), same snapshot-before-await pattern
+    broadcast_caption uses so a listener disconnecting mid-fan-out can't
+    raise RuntimeError."""
+    dead = []
+    for ws in list(qa_listeners):
+        try:
+            await ws.send_json(dataclasses.asdict(question))
+        except Exception:
+            dead.append(ws)
+    for ws in dead:
+        qa_listeners.discard(ws)
+
+
+@app.post("/qa/ask")
+async def qa_ask(payload: dict):
+    """Typed-question counterpart to /qa-ws: no mic, no browser audio
+    permissions, no secure-context (HTTPS) requirement at all -- an
+    attendee types their question in whatever language they're comfortable
+    in, it's translated straight to --presenter-language via
+    qa_pipeline.py's handle_question_text(), and delivered to presenter-side
+    listeners exactly the same way a spoken question is (see
+    _push_question_to_presenter above). Body: {"text": "...", "lang": "hi"}.
+    """
+    if qa_pipeline_instance is None:
+        return JSONResponse({"error": "Q&A is not enabled on this server (start with --qa)"}, status_code=404)
+
+    text = (payload.get("text") or "").strip()
+    lang = (payload.get("lang") or "").strip()
+    if not text:
+        return JSONResponse({"error": "text is required"}, status_code=400)
+    if not lang:
+        return JSONResponse({"error": "lang is required"}, status_code=400)
+
+    question = await qa_pipeline_instance.handle_question_text(text, asker_language=lang)
+    return {"ok": True, "question": dataclasses.asdict(question)}
+
+
+@app.websocket("/qa-ws")
+async def qa_socket(websocket: WebSocket, lang: str, session_param: str):
+    """Attendee mic stream for asking a question (the reverse of
+    /host-ws): receives raw float32, 16kHz, mono PCM chunks -- same wire
+    format /host-ws expects -- while an attendee has their hand raised,
+    for exactly as long as that one WebSocket connection is open. `lang`
+    is the language the attendee is asking their question in.
+
+    Deliberately its own endpoint rather than reusing /host-ws: many
+    attendees may open this concurrently (one per raised hand), whereas
+    /host-ws is explicitly single-presenter (host_connected guard above),
+    and a question's audio should never be run through the *forward*
+    pipeline's segmenter/broadcast by mistake.
+    """
+    if qa_pipeline_instance is None:
+        await websocket.close(code=4004, reason="Q&A is not enabled on this server (start with --qa)")
+        return
+    if session_param != session.session_id:
+        await websocket.close(code=4000, reason="unknown session")
+        return
+
+    await websocket.accept()
+    segmenter = AudioSegmenter()  # fresh per raised-hand connection, same reasoning as /host-ws
+    try:
+        while True:
+            data = await websocket.receive_bytes()
+            chunk = np.frombuffer(data, dtype=np.float32).copy()
+            segment = segmenter.push(chunk)
+            if segment is not None:
+                await qa_pipeline_instance.handle_question_audio(segment, asker_language=lang)
+    except WebSocketDisconnect:
+        pass
+    finally:
+        trailing = segmenter.flush()
+        if trailing is not None:
+            await qa_pipeline_instance.handle_question_audio(trailing, asker_language=lang)
+
+
+@app.websocket("/qa-notify")
+async def qa_notify_socket(websocket: WebSocket, session_param: str):
+    """Presenter-side push channel: as soon as a question finishes
+    translating, its JSON representation is sent here (see
+    _push_question_to_presenter above). host.html and
+    qa_presenter_listener.py both connect here rather than polling
+    /qa/pending, for lower latency between a question being asked and the
+    presenter seeing/hearing it."""
+    if session_param != session.session_id:
+        await websocket.close(code=4000, reason="unknown session")
+        return
+
+    await websocket.accept()
+    qa_listeners.add(websocket)
+    try:
+        while True:
+            await websocket.receive_text()  # keepalive / detect disconnect only
+    except WebSocketDisconnect:
+        pass
+    finally:
+        qa_listeners.discard(websocket)
+
+
+@app.get("/qa/pending")
+async def qa_pending():
+    """Polling alternative to /qa-notify -- e.g. for a presenter-side page
+    that only refreshes periodically rather than holding a WebSocket open.
+    Returns enabled=False when --qa wasn't passed, same convention as
+    /cache-stats and /glossary-stats above."""
+    if qa_pipeline_instance is None:
+        return {"enabled": False}
+    return {"enabled": True, "questions": [dataclasses.asdict(q) for q in qa_pipeline_instance.pending_questions()]}
+
+
+@app.post("/qa/answer/{question_id}")
+async def qa_answer(question_id: str):
+    if qa_pipeline_instance is None:
+        return JSONResponse({"error": "Q&A is not enabled on this server"}, status_code=404)
+    qa_pipeline_instance.mark_answered(question_id)
+    return {"ok": True}
+
+
 @app.get("/session-info")
 async def session_info():
     return {"session_id": session.session_id, "languages_available": list(subscribers.keys())}
@@ -197,6 +356,23 @@ async def cache_stats():
         "hit_rate": stats.hit_rate,
         "mean_translate_seconds": stats.mean_translate_seconds,
         "estimated_seconds_saved": stats.estimated_seconds_saved,
+    }
+
+
+@app.get("/accessibility-stats")
+async def accessibility_stats():
+    """How many currently-connected attendees have accessibility mode
+    settings active, and which ones -- a live number worth having on
+    screen during a demo, and a real evaluation metric (Section 7-style)
+    for the accessibility extension on its own: adoption, not just
+    presence of the feature."""
+    active = list(accessibility_prefs.values())
+    return {
+        "connected_attendees": sum(len(v) for v in subscribers.values()),
+        "attendees_with_accessibility_settings": len(active),
+        "high_contrast_count": sum(1 for p in active if p.high_contrast),
+        "large_text_count": sum(1 for p in active if p.large_text),
+        "flash_on_new_caption_count": sum(1 for p in active if p.flash_on_new_caption),
     }
 
 
@@ -279,6 +455,16 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="LDST host server")
     parser.add_argument("--port", type=int, default=8000)
+    parser.add_argument(
+        "--https",
+        action="store_true",
+        help="Serve over HTTPS using cert.pem/key.pem in the current directory (see generate_cert.py). "
+        "Required for the mic-based features (host.html's presenter mic, index.html's Ask-a-question, "
+        "qa_pipeline.py) to work on attendee devices connecting over the LAN IP rather than localhost -- "
+        "browsers only allow microphone access on a secure context (https://, or http://localhost), "
+        "and a plain http://<lan-ip> join URL doesn't qualify. Not needed if every device using the mic "
+        "features is on http://localhost (e.g. testing on the presenter's own machine).",
+    )
     parser.add_argument(
         "--session-id",
         type=str,
@@ -370,6 +556,14 @@ if __name__ == "__main__":
         "cache is in use even if --semantic-cache wasn't separately passed.",
     )
     parser.add_argument(
+        "--qa",
+        action="store_true",
+        help="Enable bidirectional Q&A (qa_pipeline.py): attendees can stream a spoken question "
+        "in their own language over /qa-ws, translated back into --presenter-language and pushed "
+        "to presenter-side listeners over /qa-notify. Works with placeholder ASR/MT if "
+        "--whisper-model/--nllb-model-dir aren't given, same as the main pipeline.",
+    )
+    parser.add_argument(
         "--no-hotspot",
         dest="hotspot",
         action="store_false",
@@ -419,7 +613,7 @@ if __name__ == "__main__":
             )
         print(f"Using port {resolved_port} instead. Use the URLs printed below (not the ones from any earlier run).\n")
 
-    session = Session(port=resolved_port, session_id=args.session_id)
+    session = Session(port=resolved_port, session_id=args.session_id, scheme="https" if args.https else "http")
 
     if args.whisper_model or args.nllb_model_dir:
         from backends import RealNLLBBackend, RealWhisperBackend
@@ -517,6 +711,38 @@ if __name__ == "__main__":
     else:
         print("No --whisper-model/--nllb-model-dir given -- broadcasting placeholder transcripts/translations.")
 
+    if args.qa:
+        # A separate RealWhisperBackend instance from the main pipeline's,
+        # deliberately: the main one is pinned to language=args.presenter_language
+        # (Section 4.3 -- the presenter's language is known ahead of time), but
+        # a question could be asked in any language an attendee has selected,
+        # so this one auto-detects per question instead (language=None). See
+        # qa_pipeline.py's module docstring for the full reasoning.
+        if args.whisper_model:
+            from backends import RealWhisperBackend
+
+            qa_asr = RealWhisperBackend(model_size=args.whisper_model, language=None)
+        else:
+            qa_asr = FakeASRBackend(default_transcript="[no --whisper-model given]")
+
+        qa_translator = (
+            BidirectionalTranslationBackend(nllb_model_dir=args.nllb_model_dir)
+            if args.nllb_model_dir
+            else FakeBidirectionalTranslationBackend()
+        )
+
+        qa_pipeline_instance = QAPipeline(
+            asr=qa_asr,
+            translator=qa_translator,
+            presenter_language=args.presenter_language,
+            deliver_to_presenter=_push_question_to_presenter,
+        )
+        print(
+            f"Q&A enabled: attendees can ask questions at /qa-ws, delivered to /qa-notify "
+            f"in {args.presenter_language} "
+            f"(whisper={args.whisper_model or '(placeholder)'} nllb_dir={args.nllb_model_dir or '(placeholder)'})."
+        )
+
     if args.hotspot:
         join_url = session.announce_with_hotspot(args.hotspot_ssid, args.hotspot_password)
     else:
@@ -527,8 +753,24 @@ if __name__ == "__main__":
     host_url = join_url.replace(f"/?session=", "/host?session=")
     print(f"Presenter mic page: {host_url}\n")
 
+    ssl_kwargs = {}
+    if args.https:
+        cert_path, key_path = Path("cert.pem"), Path("key.pem")
+        if not cert_path.exists() or not key_path.exists():
+            raise SystemExit(
+                "--https was passed but cert.pem/key.pem weren't found in the current directory.\n"
+                "Generate them first (fully offline, no CA/internet needed): python generate_cert.py"
+            )
+        ssl_kwargs = {"ssl_certfile": str(cert_path), "ssl_keyfile": str(key_path)}
+        print(
+            "Serving over HTTPS with a self-signed certificate -- attendee browsers will show a "
+            "'not secure' warning on first visit; that's expected (see generate_cert.py's docstring). "
+            "This is what makes the mic-based features (presenter mic, Ask a question) work on "
+            "phones connecting over the LAN IP rather than localhost.\n"
+        )
+
     try:
-        uvicorn.run(app, host="0.0.0.0", port=resolved_port)
+        uvicorn.run(app, host="0.0.0.0", port=resolved_port, **ssl_kwargs)
     finally:
         # Best-effort: if we started a hotspot, don't leave it broadcasting
         # (and, on Windows, holding the WiFi adapter in AP mode) after the

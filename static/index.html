@@ -316,6 +316,88 @@
     font-weight: 700;
     flex-shrink: 0;
   }
+
+  /* ---------------------------------------------------------------- */
+  /* Accessibility mode                                                 */
+  /* ---------------------------------------------------------------- */
+
+  body.a11y-high-contrast {
+    --bg: #000000;
+    --bg-raised: #000000;
+    --bg-raised-2: #1a1a00;
+    --ink: #ffff00;
+    --ink-dim: #ffff00;
+    --ink-faint: #cccc00;
+    --accent: #ffff00;
+  }
+  /* Same selectors as the base caption-line rules above, later in source
+     order so they win the cascade -- multiplies the existing clamp()
+     sizes by --a11y-scale rather than duplicating/overriding the
+     responsive clamp bounds themselves. */
+  body.a11y-scaled .caption-line.age-0 { font-size: calc(clamp(1.6rem, 5vw, 2.6rem) * var(--a11y-scale, 1)); }
+  body.a11y-scaled .caption-line.age-1 { font-size: calc(clamp(1.3rem, 4vw, 2rem) * var(--a11y-scale, 1)); }
+  body.a11y-scaled .caption-line.age-2 { font-size: calc(clamp(1.1rem, 3.2vw, 1.6rem) * var(--a11y-scale, 1)); }
+  body.a11y-scaled .caption-line.age-3 { font-size: calc(clamp(1rem, 2.8vw, 1.4rem) * var(--a11y-scale, 1)); }
+
+  .caption-stage.flash { animation: flash-pulse 0.3s ease; }
+  @keyframes flash-pulse {
+    0%, 100% { background: transparent; }
+    50% { background: rgba(232, 163, 61, 0.18); }
+  }
+
+  .header-btn {
+    background: transparent;
+    border: 1px solid var(--bg-raised-2);
+    color: var(--ink-dim);
+    border-radius: 8px;
+    padding: 0.35em 0.7em;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .header-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .header-btn.recording {
+    border-color: var(--error);
+    color: var(--error);
+    animation: pulse 1s ease-in-out infinite;
+  }
+  .header-btn.panel-open { border-color: var(--accent); color: var(--accent); }
+
+  .a11y-panel {
+    position: fixed;
+    top: 3.6rem;
+    right: 1rem;
+    background: var(--bg-raised);
+    border: 1px solid var(--bg-raised-2);
+    border-radius: 12px;
+    padding: 1rem;
+    width: min(280px, 84vw);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: 0.82rem;
+    z-index: 20;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+  .a11y-panel[hidden] { display: none; }
+  .a11y-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .a11y-row label {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    flex: 1;
+  }
+  .a11y-row input[type="range"] { flex: 1; }
+  .a11y-ask-status {
+    font-size: 0.75rem;
+    color: var(--ink-dim);
+    text-align: center;
+    min-height: 1.1em;
+  }
 </style>
 </head>
 <body>
@@ -345,9 +427,25 @@
     </div>
     <div class="header-right">
       <span class="lang-chip" id="live-lang-chip"></span>
+      <button class="header-btn" id="ask-btn" type="button">💬 Ask</button>
+      <button class="header-btn" id="a11y-btn" type="button">⚙ Accessibility</button>
       <button class="change-lang-btn" id="change-lang-btn" type="button">Change language</button>
     </div>
   </header>
+
+  <div class="a11y-panel" id="ask-panel" hidden>
+    <p style="margin:0; color:var(--ink-dim); font-size:0.8rem;">Type your question in any language -- the presenter sees it in their own language.</p>
+    <textarea id="ask-textarea" rows="3" placeholder="Type your question…" style="width:100%; background:var(--bg); color:var(--ink); border:1px solid var(--bg-raised-2); border-radius:8px; padding:0.6rem; font-family:inherit; font-size:0.9rem; resize:vertical;"></textarea>
+    <button class="change-lang-btn" id="ask-send-btn" type="button" style="align-self:flex-end; text-decoration:none; background:var(--accent); color:#10152a; border-radius:8px; padding:0.4em 1em; font-weight:700;">Send</button>
+  </div>
+  <p class="a11y-ask-status" id="ask-status"></p>
+
+  <div class="a11y-panel" id="a11y-panel" hidden>
+    <div class="a11y-row"><label><input type="checkbox" id="a11y-high-contrast"> High contrast</label></div>
+    <div class="a11y-row"><label>Text size <input type="range" id="a11y-font-scale" min="1" max="2.5" step="0.1" value="1"></label></div>
+    <div class="a11y-row"><label><input type="checkbox" id="a11y-hold-longer"> Hold captions longer</label></div>
+    <div class="a11y-row"><label><input type="checkbox" id="a11y-flash"> Flash on new caption</label></div>
+  </div>
 
   <div class="waiting-state" id="waiting-state">Waiting for the presenter to begin…</div>
   <div class="caption-stage" id="caption-stage" hidden></div>
@@ -375,7 +473,16 @@
   ];
 
   var MAX_VISIBLE_LINES = 4;
+  var MAX_VISIBLE_LINES_HOLD_LONGER = 8; // "hold captions longer" -- fewer are dropped as new ones arrive
   var RECONNECT_DELAYS = [1000, 2000, 4000, 8000, 8000]; // ms, last value repeats
+
+  var a11y = {
+    high_contrast: false,
+    large_text: false,
+    font_scale: 1.0,
+    hold_seconds: 6.0,
+    flash_on_new_caption: false,
+  };
 
   var joinScreen = document.getElementById("join-screen");
   var liveScreen = document.getElementById("live-screen");
@@ -393,6 +500,15 @@
   var captionStage = document.getElementById("caption-stage");
   var reconnectBanner = document.getElementById("reconnect-banner");
   var reconnectBtn = document.getElementById("reconnect-btn");
+
+  var a11yBtn = document.getElementById("a11y-btn");
+  var a11yPanel = document.getElementById("a11y-panel");
+  var a11yHighContrast = document.getElementById("a11y-high-contrast");
+  var a11yFontScale = document.getElementById("a11y-font-scale");
+  var a11yHoldLonger = document.getElementById("a11y-hold-longer");
+  var a11yFlash = document.getElementById("a11y-flash");
+  var askBtn = document.getElementById("ask-btn");
+  var askStatus = document.getElementById("ask-status");
 
   var sessionId = new URLSearchParams(window.location.search).get("session");
   var socket = null;
@@ -486,6 +602,7 @@
     socket.addEventListener("open", function () {
       reconnectAttempt = 0;
       setStatus("live", "Live");
+      sendAccessibilitySettings();
     });
 
     socket.addEventListener("message", function (event) {
@@ -550,6 +667,10 @@
     waitingState.hidden = false;
   }
 
+  function effectiveMaxLines() {
+    return a11y.hold_seconds > 6 ? MAX_VISIBLE_LINES_HOLD_LONGER : MAX_VISIBLE_LINES;
+  }
+
   function handleCaption(payload) {
     if (typeof payload.text !== "string") return;
 
@@ -560,10 +681,17 @@
 
     if (payload.final) {
       lines.push(payload.text);
-      if (lines.length > MAX_VISIBLE_LINES) {
-        lines = lines.slice(lines.length - MAX_VISIBLE_LINES);
+      var cap = effectiveMaxLines();
+      if (lines.length > cap) {
+        lines = lines.slice(lines.length - cap);
       }
       interimLine = "";
+      if (a11y.flash_on_new_caption) {
+        captionStage.classList.remove("flash");
+        // force reflow so the animation restarts on back-to-back captions
+        void captionStage.offsetWidth;
+        captionStage.classList.add("flash");
+      }
     } else {
       interimLine = payload.text;
     }
@@ -571,10 +699,11 @@
   }
 
   function renderCaptionStage() {
+    var cap = effectiveMaxLines();
     var display = lines.slice();
     if (interimLine) display.push(interimLine);
-    if (display.length > MAX_VISIBLE_LINES) {
-      display = display.slice(display.length - MAX_VISIBLE_LINES);
+    if (display.length > cap) {
+      display = display.slice(display.length - cap);
     }
 
     captionStage.innerHTML = "";
@@ -587,6 +716,114 @@
       el.textContent = text;
       captionStage.appendChild(el);
     });
+  }
+
+  // -- accessibility mode ----------------------------------------------------
+  //
+  // Sends {"type": "settings", "accessibility": {...}} over the same /ws
+  // connection the caption stream already uses -- see server.py's
+  // attendee_socket and accessibility.py's AccessibilityPreferences. This
+  // page's own rendering (effectiveMaxLines/flash above, high-contrast/
+  // font-scale classes below) is what actually changes the experience;
+  // the message sent to the server is purely so /accessibility-stats can
+  // report live adoption during a demo.
+
+  a11yBtn.addEventListener("click", function () {
+    var opening = a11yPanel.hidden;
+    a11yPanel.hidden = !opening;
+    a11yBtn.classList.toggle("panel-open", opening);
+    if (opening) {
+      askPanel.hidden = true;
+      askBtn.classList.remove("panel-open");
+    }
+  });
+
+  [a11yHighContrast, a11yFontScale, a11yHoldLonger, a11yFlash].forEach(function (el) {
+    el.addEventListener("input", function () {
+      a11y.high_contrast = a11yHighContrast.checked;
+      a11y.large_text = a11yFontScale.value > 1;
+      a11y.font_scale = parseFloat(a11yFontScale.value);
+      a11y.hold_seconds = a11yHoldLonger.checked ? 15.0 : 6.0;
+      a11y.flash_on_new_caption = a11yFlash.checked;
+      applyAccessibilityLocal();
+      sendAccessibilitySettings();
+      renderCaptionStage(); // re-render immediately if the line cap just changed
+    });
+  });
+
+  function applyAccessibilityLocal() {
+    document.body.classList.toggle("a11y-high-contrast", a11y.high_contrast);
+    document.body.classList.toggle("a11y-scaled", a11y.font_scale !== 1);
+    document.documentElement.style.setProperty("--a11y-scale", a11y.font_scale);
+  }
+
+  function sendAccessibilitySettings() {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ type: "settings", accessibility: a11y }));
+    }
+  }
+
+  // -- ask a question (bidirectional Q&A) -------------------------------
+  //
+  // Typed rather than spoken: no mic, no getUserMedia, no HTTPS/secure-
+  // context requirement -- just POSTs the text to /qa/ask, which is
+  // translated server-side (qa_pipeline.py's handle_question_text) and
+  // pushed to presenter-side listeners the same way a spoken question
+  // would be. Deliberately simpler than the /qa-ws audio path: an
+  // attendee's own device keyboard already supports whatever language
+  // they're comfortable in, so there's no ASR step needed at all here.
+
+  var askPanel = document.getElementById("ask-panel");
+  var askTextarea = document.getElementById("ask-textarea");
+  var askSendBtn = document.getElementById("ask-send-btn");
+
+  askBtn.addEventListener("click", function () {
+    var opening = askPanel.hidden;
+    askPanel.hidden = !opening;
+    askBtn.classList.toggle("panel-open", opening);
+    if (opening) {
+      a11yPanel.hidden = true; // only one panel open at a time
+      a11yBtn.classList.remove("panel-open");
+      askTextarea.focus();
+    }
+  });
+
+  askSendBtn.addEventListener("click", sendTypedQuestion);
+  askTextarea.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendTypedQuestion();
+    }
+  });
+
+  function sendTypedQuestion() {
+    var text = askTextarea.value.trim();
+    if (!text) return;
+
+    askSendBtn.disabled = true;
+    askStatus.textContent = "Sending…";
+
+    fetch("/qa/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: text, lang: currentLang }),
+    })
+      .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+      .then(function (result) {
+        askSendBtn.disabled = false;
+        if (!result.ok) {
+          askStatus.textContent = result.data.error || "Couldn't send -- try again.";
+          return;
+        }
+        askTextarea.value = "";
+        askStatus.textContent = "Sent -- the presenter will see it shortly.";
+        askPanel.hidden = true;
+        askBtn.classList.remove("panel-open");
+      })
+      .catch(function () {
+        askSendBtn.disabled = false;
+        askStatus.textContent = "Couldn't reach the server -- check your connection and try again.";
+      });
   }
 
   init();

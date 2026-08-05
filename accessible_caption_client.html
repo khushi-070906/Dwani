@@ -1,0 +1,366 @@
+<!--
+Accessible caption client -- Hackathon Extension.
+
+Standalone alternative to the default attendee page (Section 4.4): built
+to be READ, not skimmed. Differences from the default caption client:
+
+  1. The previous caption stays visible (smaller, faded) above the current
+     one for at least `hold_seconds` instead of being replaced instantly --
+     see accessibility.py's docstring for why this matters for an attendee
+     for whom captions are their only channel into the talk.
+  2. High-contrast mode (black background, yellow text -- WCAG-favored
+     combination) and a font-size slider up to 3x, both togglable live.
+  3. A brief flash on the caption panel when a new caption arrives, for
+     an attendee who isn't looking directly at the screen the instant it
+     updates.
+
+Wire WS_URL to whatever path server.py's existing caption WebSocket
+endpoint uses (same one the default index.html connects to) -- this page
+is a different *renderer* for the same caption stream, not a new backend
+endpoint. On connect, this page sends its accessibility prefs as a JSON
+control message the same way the default client sends its language
+selection; see accessibility.py's module docstring for the message shape
+server.py should expect.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LDST -- Accessible Captions</title>
+<style>
+  :root {
+    --bg: #0b0b0f;
+    --fg: #f5f5f7;
+    --accent: #6ea8fe;
+    --panel: #17171c;
+    --font-scale: 1;
+  }
+  body.high-contrast {
+    --bg: #000000;
+    --fg: #ffff00;
+    --accent: #ffff00;
+    --panel: #000000;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  #controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    font-size: 14px;
+  }
+  #controls label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  #controls select, #controls input[type="range"] { cursor: pointer; }
+  #caption-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 24px 32px 48px;
+    gap: 10px;
+    transition: background-color 0.15s ease;
+  }
+  #caption-stage.flash { background-color: rgba(110,168,254,0.15); }
+  body.high-contrast #caption-stage.flash { background-color: rgba(255,255,0,0.12); }
+  .caption-line {
+    line-height: 1.35;
+    word-wrap: break-word;
+  }
+  .caption-line.previous {
+    opacity: 0.45;
+    font-size: calc(1.2rem * var(--font-scale));
+  }
+  .caption-line.current {
+    font-size: calc(2.2rem * var(--font-scale));
+    font-weight: 600;
+  }
+  #status {
+    padding: 6px 16px;
+    font-size: 12px;
+    opacity: 0.6;
+    background: var(--panel);
+  }
+  #ask-question-btn {
+    background: var(--accent);
+    color: #0b0b0f;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #ask-question-btn.recording {
+    background: #ff5c5c;
+    color: #fff;
+    animation: pulse 1s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+  #ask-status { font-size: 12px; opacity: 0.7; }
+</style>
+</head>
+<body>
+
+<div id="controls">
+  <label><input type="checkbox" id="high-contrast-toggle"> High contrast</label>
+  <label>Text size
+    <input type="range" id="font-scale" min="1" max="3" step="0.1" value="1">
+  </label>
+  <label>Hold time (s)
+    <input type="range" id="hold-seconds" min="2" max="30" step="1" value="6">
+    <span id="hold-seconds-value">6</span>
+  </label>
+  <label><input type="checkbox" id="flash-toggle"> Flash on new caption</label>
+  <label>Language
+    <select id="language-select">
+      <option value="en">English</option>
+      <option value="hi">Hindi</option>
+      <option value="pa">Punjabi</option>
+      <option value="bn">Bengali</option>
+      <option value="ta">Tamil</option>
+      <option value="te">Telugu</option>
+      <option value="mr">Marathi</option>
+      <option value="ur">Urdu</option>
+    </select>
+  </label>
+  <button id="ask-question-btn" type="button">🎤 Ask a question</button>
+  <span id="ask-status"></span>
+</div>
+
+<div id="caption-stage">
+  <div class="caption-line previous" id="previous-caption"></div>
+  <div class="caption-line current" id="current-caption">Waiting for the presenter to start...</div>
+</div>
+
+<div id="status">Connecting...</div>
+
+<script>
+  // Point this at the same caption WebSocket path the default index.html
+  // client already connects to -- this page is a different renderer for
+  // the same stream, not a new server endpoint.
+  const WS_URL = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws/caption";
+
+  const body = document.body;
+  const stage = document.getElementById("caption-stage");
+  const currentEl = document.getElementById("current-caption");
+  const previousEl = document.getElementById("previous-caption");
+  const statusEl = document.getElementById("status");
+
+  const highContrastToggle = document.getElementById("high-contrast-toggle");
+  const fontScaleInput = document.getElementById("font-scale");
+  const holdSecondsInput = document.getElementById("hold-seconds");
+  const holdSecondsValue = document.getElementById("hold-seconds-value");
+  const flashToggle = document.getElementById("flash-toggle");
+  const languageSelect = document.getElementById("language-select");
+
+  let holdSeconds = 6;
+  let holdTimer = null;
+  let ws = null;
+
+  function currentPrefs() {
+    return {
+      high_contrast: highContrastToggle.checked,
+      large_text: true,
+      font_scale: parseFloat(fontScaleInput.value),
+      hold_seconds: parseFloat(holdSecondsInput.value),
+      flash_on_new_caption: flashToggle.checked,
+    };
+  }
+
+  function applyLocalPrefs() {
+    body.classList.toggle("high-contrast", highContrastToggle.checked);
+    document.documentElement.style.setProperty("--font-scale", fontScaleInput.value);
+    holdSeconds = parseFloat(holdSecondsInput.value);
+    holdSecondsValue.textContent = holdSecondsInput.value;
+  }
+
+  function sendPrefs() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        type: "settings",
+        language: languageSelect.value,
+        accessibility: currentPrefs(),
+      }));
+    }
+  }
+
+  [highContrastToggle, fontScaleInput, holdSecondsInput, flashToggle].forEach(el => {
+    el.addEventListener("input", () => { applyLocalPrefs(); sendPrefs(); });
+  });
+  languageSelect.addEventListener("change", sendPrefs);
+
+  function showCaption(text) {
+    // Hold the outgoing caption visible (faded, smaller) rather than
+    // yanking it the instant the new one arrives -- see
+    // accessibility.py's docstring for why this matters here.
+    if (currentEl.textContent && currentEl.textContent !== text) {
+      previousEl.textContent = currentEl.textContent;
+    }
+    currentEl.textContent = text;
+
+    if (flashToggle.checked) {
+      stage.classList.add("flash");
+      setTimeout(() => stage.classList.remove("flash"), 200);
+    }
+
+    if (holdTimer) clearTimeout(holdTimer);
+    holdTimer = setTimeout(() => { previousEl.textContent = ""; }, holdSeconds * 1000);
+  }
+
+  function connect() {
+    ws = new WebSocket(WS_URL);
+    ws.onopen = () => {
+      statusEl.textContent = "Connected";
+      sendPrefs();
+    };
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.caption) showCaption(data.caption);
+      } catch (e) {
+        // Fall back to treating the payload as plain caption text, in case
+        // server.py's caption message shape is a bare string rather than
+        // {"caption": ...} -- adjust this branch to match whichever shape
+        // the existing server.py actually sends.
+        showCaption(event.data);
+      }
+    };
+    ws.onclose = () => {
+      statusEl.textContent = "Disconnected -- retrying...";
+      setTimeout(connect, 2000);
+    };
+    ws.onerror = () => { ws.close(); };
+  }
+
+  applyLocalPrefs();
+  connect();
+
+  // -- Ask a question (bidirectional Q&A) --------------------------------
+  //
+  // Captures the mic locally, downsamples to 16kHz mono float32 (same wire
+  // format /host-ws and presenter_mic.py already use for the forward
+  // direction -- see backends.py's resample_linear, mirrored below), and
+  // streams it to /qa-ws for exactly as long as the attendee is holding
+  // the question open. The server runs its own AudioSegmenter on this
+  // stream (see server.py's qa_socket -- it doesn't just treat the whole
+  // connection as one segment), so a natural pause while composing a
+  // question doesn't need to be handled specially here; closing the
+  // WebSocket on "stop" is enough to flush any trailing audio.
+  const QA_WS_URL = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/qa-ws";
+  const QA_TARGET_SAMPLE_RATE = 16000;
+
+  const askBtn = document.getElementById("ask-question-btn");
+  const askStatus = document.getElementById("ask-status");
+
+  let qaWs = null;
+  let qaAudioContext = null;
+  let qaProcessor = null;
+  let qaSourceNode = null;
+  let qaStream = null;
+  let asking = false;
+
+  function resampleLinear(samples, fromRate, toRate) {
+    // Mirrors backends.py's resample_linear exactly, so a chunk resampled
+    // here and one resampled server-side (e.g. by presenter_mic.py) behave
+    // the same way -- deliberately duplicated rather than shared, since
+    // this runs in the browser and that runs in Python.
+    if (fromRate === toRate || samples.length === 0) return samples;
+    const duration = samples.length / fromRate;
+    const newLen = Math.max(1, Math.round(duration * toRate));
+    const out = new Float32Array(newLen);
+    for (let i = 0; i < newLen; i++) {
+      const t = (i / newLen) * (samples.length - 1);
+      const lo = Math.floor(t), hi = Math.min(lo + 1, samples.length - 1);
+      const frac = t - lo;
+      out[i] = samples[lo] * (1 - frac) + samples[hi] * frac;
+    }
+    return out;
+  }
+
+  async function startAsking() {
+    const sessionMatch = location.search.match(/session=([^&]+)/);
+    const sessionId = sessionMatch ? sessionMatch[1] : "";
+    if (!sessionId) {
+      askStatus.textContent = "No session ID in URL -- can't connect.";
+      return;
+    }
+
+    try {
+      qaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (e) {
+      askStatus.textContent = "Microphone permission denied.";
+      return;
+    }
+
+    qaWs = new WebSocket(`${QA_WS_URL}?lang=${encodeURIComponent(languageSelect.value)}&session_param=${encodeURIComponent(sessionId)}`);
+    qaWs.binaryType = "arraybuffer";
+
+    qaWs.onopen = () => {
+      asking = true;
+      askBtn.classList.add("recording");
+      askBtn.textContent = "🔴 Stop (asking...)";
+      askStatus.textContent = "Recording -- speak your question now.";
+
+      qaAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+      qaSourceNode = qaAudioContext.createMediaStreamSource(qaStream);
+      // ScriptProcessorNode is deprecated in favor of AudioWorklet, but
+      // needs no separate worklet file to load and is universally
+      // supported -- the right trade-off for a hackathon demo. Swap for
+      // an AudioWorkletNode if this needs to become production code.
+      qaProcessor = qaAudioContext.createScriptProcessor(4096, 1, 1);
+      qaSourceNode.connect(qaProcessor);
+      qaProcessor.connect(qaAudioContext.destination);
+
+      qaProcessor.onaudioprocess = (event) => {
+        if (!asking || qaWs.readyState !== WebSocket.OPEN) return;
+        const input = event.inputBuffer.getChannelData(0);
+        const resampled = resampleLinear(input, qaAudioContext.sampleRate, QA_TARGET_SAMPLE_RATE);
+        qaWs.send(resampled.buffer);
+      };
+    };
+
+    qaWs.onclose = () => { stopAsking(); };
+    qaWs.onerror = () => { askStatus.textContent = "Connection error."; stopAsking(); };
+  }
+
+  function stopAsking() {
+    asking = false;
+    askBtn.classList.remove("recording");
+    askBtn.textContent = "🎤 Ask a question";
+    askStatus.textContent = "Question sent -- the presenter will see it shortly.";
+
+    if (qaProcessor) { qaProcessor.disconnect(); qaProcessor = null; }
+    if (qaSourceNode) { qaSourceNode.disconnect(); qaSourceNode = null; }
+    if (qaAudioContext) { qaAudioContext.close(); qaAudioContext = null; }
+    if (qaStream) { qaStream.getTracks().forEach(t => t.stop()); qaStream = null; }
+    if (qaWs && qaWs.readyState === WebSocket.OPEN) { qaWs.close(); }
+    qaWs = null;
+  }
+
+  askBtn.addEventListener("click", () => {
+    if (asking) {
+      stopAsking();
+    } else {
+      startAsking();
+    }
+  });
+</script>
+
+</body>
+</html>

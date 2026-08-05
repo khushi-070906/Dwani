@@ -67,6 +67,14 @@ class Session:
     session_id: str = field(default_factory=lambda: uuid.uuid4().hex[:8])
     qr_image_path: Path | None = None
     wifi_qr_image_path: Path | None = None
+    # "http" or "https" -- set to "https" by __main__ (server.py) when --https
+    # is passed, so the printed/QR-coded join URL matches whichever scheme
+    # uvicorn is actually serving on. Getting this wrong wouldn't break the
+    # caption stream itself (that reconnects over ws:// or wss:// based on
+    # window.location.protocol, see index.html's wsUrl()), but it's exactly
+    # the mismatch that breaks getUserMedia silently for anyone who follows
+    # a stale http:// link into what's actually an https:// server.
+    scheme: str = "http"
 
     # Hotspot state -- not constructor args, set by start_hotspot()/stop_hotspot().
     hotspot_active: bool = field(default=False, init=False)
@@ -253,7 +261,7 @@ class Session:
     # -- URL building --------------------------------------------------------
 
     def url_for(self, ip: str) -> str:
-        return f"http://{ip}:{self.port}/?session={self.session_id}"
+        return f"{self.scheme}://{ip}:{self.port}/?session={self.session_id}"
 
     def primary_url(self) -> str:
         return self.url_for(self.primary_ip())
