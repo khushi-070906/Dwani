@@ -1,0 +1,42 @@
+# Secrets — never commit these
+.env
+.env.*
+
+# Local database (Render/production DB shouldn't come from git anyway)
+licenses.db
+*.db
+*.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+
+# ML models (Whisper, NLLB, etc.) — downloaded separately per README setup
+# step, not committed. These can be several GB each.
+*.pt
+*.bin
+*.safetensors
+*.ckpt
+*.onnx
+*.gguf
+*.h5
+models/
+checkpoints/
+whisper_models/
+nllb_models/
+.cache/
+huggingface_cache/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
