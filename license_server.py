@@ -56,7 +56,7 @@ from licensing import License, sign_license, TIER_FEATURES
 
 load_dotenv()  # reads .env in the current directory if present, no-op if it doesn't exist
 
-DB_PATH = Path(__file__).parent / "licenses.db"
+DB_PATH = Path(os.environ.get("LDST_DB_PATH", str(Path(__file__).parent / "licenses.db")))
 SIGNING_KEY = os.environ.get("LDST_LICENSE_SIGNING_KEY", "").encode("utf-8")
 RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "")
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
