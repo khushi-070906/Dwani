@@ -12,7 +12,9 @@ import argparse
 import asyncio
 import dataclasses
 import json
+import os
 import socket
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -20,7 +22,10 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from dotenv import load_dotenv
+
 from accessibility import AccessibilityPreferences
+from licensing import check_license, LicenseError
 from pipeline import AudioSegmenter, FakeASRBackend, FakeTranslationBackend, Pipeline
 from qa_pipeline import BidirectionalTranslationBackend, FakeBidirectionalTranslationBackend, QAPipeline
 from session import Session
@@ -589,6 +594,30 @@ if __name__ == "__main__":
         "--hotspot-ssid, for the same reason.",
     )
     args = parser.parse_args()
+
+    load_dotenv()  # reads .env in the current directory (LDST_LICENSE_SIGNING_KEY) if present
+
+    # --- License check -------------------------------------------------
+    # Reads the cached token written by activate.py (~/.ldst/license.token
+    # by default) and confirms it's valid, not expired past the grace
+    # period, and covers every flag requested above. Exits before any
+    # model loading, session creation, or network binding happens if not.
+    LICENSE_SIGNING_KEY = os.environ["LDST_LICENSE_SIGNING_KEY"].encode("utf-8")
+    try:
+        check_license(
+            LICENSE_SIGNING_KEY,
+            requested_flags={
+                "semantic_cache": args.semantic_cache,
+                "glossary_file": args.glossary_file,
+                "qa": args.qa,
+                "dynamic_glossary": args.dynamic_glossary,
+                "itde": args.itde,
+            },
+        )
+    except LicenseError as e:
+        print(f"[license] {e}")
+        sys.exit(1)
+    # ---------------------------------------------------------------------
 
     def _port_is_free(port: int) -> bool:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

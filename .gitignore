@@ -1,8 +1,8 @@
-# Secrets — never commit these
+﻿# Secrets — never commit these
 .env
 .env.*
 
-# Local database (Render/production DB shouldn't come from git anyway)
+# Local database
 licenses.db
 *.db
 *.sqlite3
@@ -16,8 +16,7 @@ __pycache__/
 venv/
 env/
 
-# ML models (Whisper, NLLB, etc.) — downloaded separately per README setup
-# step, not committed. These can be several GB each.
+# ML models
 *.pt
 *.bin
 *.safetensors
@@ -29,8 +28,17 @@ models/
 checkpoints/
 whisper_models/
 nllb_models/
+nllb-200-ct2/
 .cache/
 huggingface_cache/
+
+# Node
+node_modules/
+
+# TLS/SSL certs and private keys
+*.pem
+*.key
+*.crt
 
 # OS junk
 .DS_Store

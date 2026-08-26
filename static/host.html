@@ -3,25 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>LDST — Presenter</title>
+<title>DwaniLive — Presenter</title>
 <style>
   :root {
-    --bg: #10152a;
-    --bg-raised: #1a2140;
-    --bg-raised-2: #232c52;
-    --ink: #f4f1e8;
-    --ink-dim: #8991b3;
-    --ink-faint: #4d5578;
-    --accent: #e8a33d;
-    --accent-deep: #b97324;
-    --live: #5fd68a;
-    --error: #e2645a;
-    --focus: #cfd6ff;
+    --bg: #fffdf7;
+    --bg-raised: #ffffff;
+    --bg-raised-2: #f2ead8;
+    --ink: #17101f;
+    --ink-dim: #4a3d5c;
+    --ink-faint: #6d5c82;
+    --accent-4: #7c3aed;
+    --accent: #f2900d;
+    --accent-deep: #c2660b;
+    --accent-2: #d6336c;
+    --accent-3: #0f766e;
+    --live: #16a34a;
+    --error: #dc2626;
+    --focus: #c2660b;
+    --shadow: 0 1px 2px rgba(43, 33, 64, 0.06), 0 10px 24px -8px rgba(43, 33, 64, 0.14);
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body {
-    background: var(--bg);
+    background:
+      radial-gradient(circle at 1px 1px, rgba(194, 102, 11, 0.10) 1px, transparent 0) 0 0 / 26px 26px,
+      radial-gradient(ellipse at 50% -10%, rgba(214, 51, 108, 0.08), transparent 55%),
+      var(--bg);
     color: var(--ink);
     font-family: "Noto Sans", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -45,32 +52,114 @@
     font-weight: 600;
   }
 
+  .brand-name {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .brand-name .dwani {
+    background: linear-gradient(120deg, var(--accent), var(--accent-2), var(--accent-4));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .brand-name .live { color: var(--ink-dim); font-weight: 600; }
+
+  .top-bar {
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+  .top-bar .session-badge { margin-bottom: 0; }
+
+  .mandala-bg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 95vmin;
+    height: 95vmin;
+    margin-top: -47.5vmin;
+    margin-left: -47.5vmin;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+    animation: mandala-spin 220s linear infinite;
+    transform-origin: center center;
+  }
+  @keyframes mandala-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
   .session-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.5em;
     background: var(--bg-raised);
     border: 1px solid var(--accent-deep);
-    color: var(--accent);
+    color: var(--accent-deep);
     padding: 0.4em 0.9em;
     border-radius: 999px;
     font-size: 0.78rem;
     letter-spacing: 0.08em;
     font-weight: 700;
     margin-bottom: 1.75rem;
+    box-shadow: var(--shadow);
   }
   .session-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 
+  .join-section {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 2rem;
+  }
+  .join-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    background: var(--bg-raised);
+    border: 1px solid var(--bg-raised-2);
+    color: var(--ink-dim);
+    border-radius: 12px;
+    padding: 0.65em 1em;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: var(--shadow);
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .join-toggle:hover { border-color: var(--accent); color: var(--accent-deep); }
+  .join-toggle svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+  .join-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
   .join-panel {
     background: var(--bg-raised);
     border: 1px solid var(--bg-raised-2);
-    border-radius: 16px;
+    border-top: none;
+    border-radius: 0 0 16px 16px;
     padding: 1.25rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.6rem;
-    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+  }
+  .join-panel[hidden] { display: none; }
+  .join-toggle[aria-expanded="true"] {
+    border-radius: 12px 12px 0 0;
+    border-bottom-color: transparent;
+    box-shadow: none;
   }
   .join-panel img {
     border-radius: 8px;
@@ -84,6 +173,17 @@
     word-break: break-all;
     margin: 0;
   }
+  .copy-link-btn {
+    background: transparent;
+    border: 1px solid var(--bg-raised-2);
+    color: var(--ink-dim);
+    border-radius: 8px;
+    padding: 0.4em 1em;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .copy-link-btn:hover { border-color: var(--accent); color: var(--accent-deep); }
+  .copy-link-btn.copied { border-color: var(--live); color: var(--live); }
 
   h1 {
     font-size: clamp(1.6rem, 5vw, 2.2rem);
@@ -105,8 +205,10 @@
     width: 132px;
     height: 132px;
     border-radius: 50%;
-    border: none;
-    background: var(--bg-raised);
+    border: 2px solid transparent;
+    background:
+      linear-gradient(var(--bg-raised), var(--bg-raised)) padding-box,
+      linear-gradient(135deg, var(--accent), var(--accent-2)) border-box;
     color: var(--ink);
     display: flex;
     flex-direction: column;
@@ -118,16 +220,16 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
     transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
-    box-shadow: 0 0 0 0 rgba(95, 214, 138, 0);
+    box-shadow: var(--shadow), 0 0 0 0 rgba(61, 220, 132, 0);
   }
   .mic-btn svg { width: 34px; height: 34px; }
   .mic-btn.live {
     background: var(--live);
     color: #0e2116;
-    box-shadow: 0 0 0 8px rgba(95, 214, 138, 0.15);
+    box-shadow: 0 0 0 8px rgba(61, 220, 132, 0.15);
   }
   .mic-btn.live.speaking {
-    box-shadow: 0 0 0 14px rgba(95, 214, 138, 0.22);
+    box-shadow: 0 0 0 14px rgba(61, 220, 132, 0.22);
   }
   .mic-btn:active { transform: scale(0.97); }
 
@@ -142,20 +244,60 @@
   .status-line.error { color: var(--error); }
   .status-line.live { color: var(--live); }
 
-  .audience {
+  .dashboard {
     margin-top: 3rem;
     width: 100%;
-    max-width: 420px;
+    max-width: 480px;
   }
-  .audience h2 {
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
+  .tab-bar {
+    display: flex;
+    background: var(--bg-raised-2);
+    border-radius: 12px;
+    padding: 0.25rem;
+    gap: 0.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4em;
+    background: transparent;
+    border: none;
+    border-radius: 9px;
+    padding: 0.55em 0.4em;
+    font-size: 0.78rem;
     font-weight: 700;
-    margin: 0 0 0.75rem;
-    text-align: center;
+    color: var(--ink-dim);
+    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
   }
+  .tab-btn.active {
+    background: var(--bg-raised);
+    color: var(--accent-deep);
+    box-shadow: var(--shadow);
+  }
+  .tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.3em;
+    height: 1.3em;
+    padding: 0 0.35em;
+    border-radius: 999px;
+    background: var(--bg-raised-2);
+    color: var(--ink-faint);
+    font-size: 0.68rem;
+    font-weight: 800;
+  }
+  .tab-btn.active .tab-badge { background: var(--accent); color: #fff; }
+  .tab-badge.attention { background: var(--accent-2); color: #fff; }
+  .tab-panel[hidden] { display: none; }
+
+  .audience {
+    width: 100%;
+  }
+  .audience h2 { display: none; }
   .lang-pill-row {
     display: flex;
     flex-wrap: wrap;
@@ -170,6 +312,7 @@
     padding: 0.35em 0.9em;
     font-size: 0.8rem;
     font-weight: 600;
+    box-shadow: var(--shadow);
   }
   .lang-pill .count { color: var(--accent); margin-left: 0.35em; }
   .no-audience {
@@ -179,19 +322,9 @@
   }
 
   .qa-panel {
-    margin-top: 2.5rem;
     width: 100%;
-    max-width: 480px;
   }
-  .qa-panel h2 {
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    font-weight: 700;
-    margin: 0 0 0.75rem;
-    text-align: center;
-  }
+  .qa-panel h2 { display: none; }
   .qa-status {
     display: flex;
     align-items: center;
@@ -219,6 +352,7 @@
     border-radius: 12px;
     padding: 0.85rem 1rem;
     animation: rise 0.35s ease-out;
+    box-shadow: var(--shadow);
   }
   @keyframes rise {
     from { opacity: 0; transform: translateY(10px); }
@@ -268,19 +402,9 @@
   .qa-empty[hidden] { display: none; }
 
   .stats-panel {
-    margin-top: 2.5rem;
     width: 100%;
-    max-width: 480px;
   }
-  .stats-panel h2 {
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    font-weight: 700;
-    margin: 0 0 0.75rem;
-    text-align: center;
-  }
+  .stats-panel h2 { display: none; }
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -291,6 +415,7 @@
     border: 1px solid var(--bg-raised-2);
     border-radius: 12px;
     padding: 0.75rem 0.9rem;
+    box-shadow: var(--shadow);
   }
   .stat-card[hidden] { display: none; }
   .stat-value {
@@ -313,12 +438,58 @@
 </style>
 </head>
 <body>
+<svg class="mandala-bg" viewBox="0 0 680 680" aria-hidden="true" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="mandalaGrad" x1="15%" y1="10%" x2="85%" y2="90%">
+      <stop offset="0%" stop-color="#e8a3b3"/>
+      <stop offset="45%" stop-color="#dcb0a8"/>
+      <stop offset="60%" stop-color="#aec2a0"/>
+      <stop offset="100%" stop-color="#8fc0a3"/>
+    </linearGradient>
+    <g id="diamond"><path d="M0,-9 L6,0 L0,11 L-6,0 Z" fill="url(#mandalaGrad)" fill-opacity="0.28" stroke="url(#mandalaGrad)" stroke-width="0.9"/></g>
+    <g id="dotLg"><circle cx="0" cy="0" r="3.2" fill="url(#mandalaGrad)" fill-opacity="0.35"/></g>
+    <g id="dotSm"><circle cx="0" cy="0" r="1.7" fill="url(#mandalaGrad)" fill-opacity="0.32"/></g>
+    <g id="petalLace"><path d="M0,0 C11,-12 11,-34 0,-50 C-11,-34 -11,-12 0,0 Z" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.9"/><path d="M0,-4 C6,-14 6,-30 0,-42 C-6,-30 -6,-14 0,-4 Z" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.7"/></g>
+    <g id="petalLace2"><path d="M0,0 C8,-9 8,-24 0,-36 C-8,-24 -8,-9 0,0 Z" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.8"/></g>
+    <g id="scallop"><path d="M-7,6 Q0,-9 7,6" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.8"/></g>
+    <g id="teardropTiny"><path d="M0,0 C4,-4 4,-10 0,-15 C-4,-10 -4,-4 0,0 Z" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.7"/></g>
+  </defs>
+  <g transform="translate(340,340)">
+  <circle r="14" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.9"/>
+  <circle r="8" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.7"/>
+  <g><use xlink:href="#teardropTiny" transform="rotate(0.0) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(22.5) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(45.0) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(67.5) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(90.0) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(112.5) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(135.0) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(157.5) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(180.0) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(202.5) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(225.0) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(247.5) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(270.0) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(292.5) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(315.0) translate(0,-20)"/><use xlink:href="#teardropTiny" transform="rotate(337.5) translate(0,-20)"/></g>
+  <circle r="26" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.8"/>
+  <g><use xlink:href="#dotSm" transform="rotate(0.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(9.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(18.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(27.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(36.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(45.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(54.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(63.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(72.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(81.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(90.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(99.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(108.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(117.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(126.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(135.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(144.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(153.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(162.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(171.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(180.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(189.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(198.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(207.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(216.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(225.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(234.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(243.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(252.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(261.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(270.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(279.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(288.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(297.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(306.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(315.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(324.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(333.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(342.0) translate(0,-36)"/><use xlink:href="#dotSm" transform="rotate(351.0) translate(0,-36)"/></g>
+  <circle r="40" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.6"/>
+  <g><use xlink:href="#scallop" transform="rotate(0.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(15.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(30.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(45.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(60.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(75.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(90.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(105.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(120.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(135.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(150.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(165.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(180.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(195.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(210.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(225.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(240.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(255.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(270.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(285.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(300.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(315.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(330.0) translate(0,-46)"/><use xlink:href="#scallop" transform="rotate(345.0) translate(0,-46)"/></g>
+  <g><use xlink:href="#petalLace2" transform="rotate(0.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(20.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(40.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(60.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(80.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(100.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(120.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(140.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(160.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(180.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(200.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(220.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(240.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(260.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(280.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(300.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(320.0) translate(0,-58)"/><use xlink:href="#petalLace2" transform="rotate(340.0) translate(0,-58)"/></g>
+  <circle r="60" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.8"/>
+  <g><use xlink:href="#dotLg" transform="rotate(0.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(12.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(24.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(36.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(48.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(60.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(72.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(84.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(96.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(108.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(120.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(132.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(144.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(156.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(168.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(180.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(192.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(204.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(216.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(228.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(240.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(252.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(264.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(276.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(288.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(300.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(312.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(324.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(336.0) translate(0,-78)"/><use xlink:href="#dotLg" transform="rotate(348.0) translate(0,-78)"/></g>
+  <g><use xlink:href="#scallop" transform="rotate(0.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(12.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(24.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(36.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(48.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(60.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(72.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(84.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(96.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(108.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(120.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(132.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(144.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(156.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(168.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(180.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(192.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(204.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(216.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(228.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(240.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(252.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(264.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(276.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(288.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(300.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(312.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(324.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(336.0) translate(0,-96) scale(1.15)"/><use xlink:href="#scallop" transform="rotate(348.0) translate(0,-96) scale(1.15)"/></g>
+  <circle r="100" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.6"/>
+  <g><use xlink:href="#diamond" transform="rotate(0.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(18.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(36.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(54.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(72.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(90.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(108.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(126.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(144.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(162.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(180.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(198.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(216.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(234.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(252.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(270.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(288.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(306.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(324.0) translate(0,-118)"/><use xlink:href="#diamond" transform="rotate(342.0) translate(0,-118)"/></g>
+  <circle r="124" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.8"/>
+  <g><use xlink:href="#petalLace" transform="rotate(0.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(18.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(36.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(54.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(72.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(90.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(108.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(126.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(144.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(162.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(180.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(198.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(216.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(234.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(252.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(270.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(288.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(306.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(324.0) translate(0,-150)"/><use xlink:href="#petalLace" transform="rotate(342.0) translate(0,-150)"/></g>
+  <circle r="152" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.6"/>
+  <circle r="168" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.5" stroke-dasharray="1.5,3"/>
+  <circle r="178" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.5" stroke-dasharray="1.5,3"/>
+  <circle r="188" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.5" stroke-dasharray="1.5,3"/>
+  <g><use xlink:href="#dotSm" transform="rotate(0.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(6.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(12.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(18.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(24.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(30.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(36.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(42.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(48.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(54.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(60.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(66.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(72.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(78.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(84.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(90.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(96.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(102.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(108.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(114.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(120.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(126.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(132.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(138.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(144.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(150.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(156.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(162.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(168.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(174.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(180.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(186.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(192.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(198.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(204.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(210.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(216.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(222.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(228.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(234.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(240.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(246.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(252.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(258.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(264.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(270.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(276.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(282.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(288.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(294.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(300.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(306.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(312.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(318.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(324.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(330.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(336.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(342.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(348.0) translate(0,-200)"/><use xlink:href="#dotSm" transform="rotate(354.0) translate(0,-200)"/></g>
+  <circle r="204" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.8"/>
+  <g><use xlink:href="#scallop" transform="rotate(0.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(10.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(20.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(30.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(40.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(50.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(60.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(70.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(80.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(90.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(100.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(110.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(120.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(130.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(140.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(150.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(160.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(170.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(180.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(190.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(200.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(210.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(220.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(230.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(240.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(250.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(260.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(270.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(280.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(290.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(300.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(310.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(320.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(330.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(340.0) translate(0,-224) scale(1.3)"/><use xlink:href="#scallop" transform="rotate(350.0) translate(0,-224) scale(1.3)"/></g>
+  <g><use xlink:href="#petalLace" transform="rotate(0.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(15.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(30.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(45.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(60.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(75.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(90.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(105.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(120.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(135.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(150.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(165.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(180.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(195.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(210.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(225.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(240.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(255.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(270.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(285.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(300.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(315.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(330.0) translate(0,-250) scale(1.15)"/><use xlink:href="#petalLace" transform="rotate(345.0) translate(0,-250) scale(1.15)"/></g>
+  <circle r="252" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.6"/>
+  <g><use xlink:href="#diamond" transform="rotate(0.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(15.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(30.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(45.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(60.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(75.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(90.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(105.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(120.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(135.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(150.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(165.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(180.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(195.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(210.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(225.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(240.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(255.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(270.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(285.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(300.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(315.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(330.0) translate(0,-278) scale(1.3)"/><use xlink:href="#diamond" transform="rotate(345.0) translate(0,-278) scale(1.3)"/></g>
+  <circle r="286" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.8"/>
+  <g><use xlink:href="#dotSm" transform="rotate(0.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(5.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(10.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(15.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(20.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(25.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(30.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(35.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(40.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(45.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(50.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(55.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(60.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(65.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(70.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(75.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(80.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(85.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(90.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(95.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(100.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(105.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(110.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(115.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(120.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(125.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(130.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(135.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(140.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(145.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(150.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(155.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(160.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(165.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(170.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(175.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(180.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(185.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(190.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(195.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(200.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(205.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(210.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(215.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(220.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(225.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(230.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(235.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(240.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(245.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(250.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(255.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(260.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(265.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(270.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(275.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(280.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(285.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(290.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(295.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(300.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(305.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(310.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(315.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(320.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(325.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(330.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(335.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(340.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(345.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(350.0) translate(0,-300)"/><use xlink:href="#dotSm" transform="rotate(355.0) translate(0,-300)"/></g>
+  <circle r="312" fill="none" stroke="url(#mandalaGrad)" stroke-width="0.9"/>
+  <g><use xlink:href="#dotSm" transform="rotate(0.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(7.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(15.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(22.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(30.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(37.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(45.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(52.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(60.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(67.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(75.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(82.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(90.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(97.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(105.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(112.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(120.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(127.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(135.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(142.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(150.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(157.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(165.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(172.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(180.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(187.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(195.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(202.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(210.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(217.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(225.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(232.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(240.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(247.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(255.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(262.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(270.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(277.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(285.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(292.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(300.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(307.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(315.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(322.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(330.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(337.5) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(345.0) translate(0,-318)"/><use xlink:href="#dotSm" transform="rotate(352.5) translate(0,-318)"/></g>
+  </g>
+</svg>
 
-<div class="session-badge"><span class="dot"></span><span id="session-badge-text">SESSION —</span></div>
-
-<div class="join-panel" id="join-panel">
-  <img id="qr-image" alt="Join QR code" width="180" height="180">
-  <p class="join-url" id="join-url-text"></p>
+<div class="top-bar">
+  <span class="brand-name"><span class="dwani">ध्वनि</span><span class="live">Live</span></span>
+  <div class="session-badge"><span class="dot"></span><span id="session-badge-text">SESSION —</span></div>
 </div>
 
 <h1>Presenter mic</h1>
@@ -336,47 +507,73 @@
 
 <p class="status-line" id="status-line">Not presenting</p>
 
-<div class="audience">
-  <h2>Connected attendees</h2>
-  <div class="lang-pill-row" id="lang-pill-row"></div>
-  <p class="no-audience" id="no-audience" hidden>Nobody has joined yet.</p>
+<div class="join-section">
+  <button type="button" class="join-toggle" id="join-toggle" aria-expanded="true">
+    <span>Join QR &amp; link</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+  </button>
+  <div class="join-panel" id="join-panel">
+    <img id="qr-image" alt="Join QR code" width="160" height="160">
+    <p class="join-url" id="join-url-text"></p>
+    <button type="button" class="copy-link-btn" id="copy-link-btn">Copy link</button>
+  </div>
 </div>
 
-<div class="qa-panel" id="qa-panel">
-  <h2>Questions from the audience</h2>
-  <div class="qa-status" id="qa-status"><span class="qa-status-dot"></span><span id="qa-status-text">Connecting…</span></div>
-  <div class="qa-list" id="qa-list"></div>
-  <p class="qa-empty" id="qa-empty">No questions yet.</p>
-</div>
+<div class="dashboard">
+  <div class="tab-bar" role="tablist">
+    <button class="tab-btn active" data-tab="attendees" type="button" role="tab" aria-selected="true">Attendees<span class="tab-badge" id="tab-badge-attendees">0</span></button>
+    <button class="tab-btn" data-tab="questions" type="button" role="tab" aria-selected="false">Questions<span class="tab-badge" id="tab-badge-questions">0</span></button>
+    <button class="tab-btn" data-tab="stats" type="button" role="tab" aria-selected="false">Stats</button>
+  </div>
 
-<div class="stats-panel" id="stats-panel">
-  <h2>Live session stats</h2>
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-value" id="stat-attendees">0</div>
-      <div class="stat-label">Attendees connected</div>
+  <div class="tab-panel" id="tab-attendees" role="tabpanel">
+    <div class="audience">
+      <h2>Connected attendees</h2>
+      <div class="lang-pill-row" id="lang-pill-row"></div>
+      <p class="no-audience" id="no-audience" hidden>Nobody has joined yet.</p>
     </div>
-    <div class="stat-card">
-      <div class="stat-value" id="stat-languages">0</div>
-      <div class="stat-label">Languages in the room</div>
+  </div>
+
+  <div class="tab-panel" id="tab-questions" role="tabpanel" hidden>
+    <div class="qa-panel" id="qa-panel">
+      <h2>Questions from the audience</h2>
+      <div class="qa-status" id="qa-status"><span class="qa-status-dot"></span><span id="qa-status-text">Connecting…</span></div>
+      <div class="qa-list" id="qa-list"></div>
+      <p class="qa-empty" id="qa-empty">No questions yet.</p>
     </div>
-    <div class="stat-card">
-      <div class="stat-value" id="stat-a11y">0</div>
-      <div class="stat-label">Using accessibility mode</div>
-      <div class="stat-sublabel" id="stat-a11y-breakdown"></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="stat-questions">0 / 0</div>
-      <div class="stat-label">Questions answered / asked</div>
-    </div>
-    <div class="stat-card" id="stat-cache-card" hidden>
-      <div class="stat-value" id="stat-cache">—</div>
-      <div class="stat-label">Semantic cache hit rate</div>
-      <div class="stat-sublabel" id="stat-cache-sublabel"></div>
-    </div>
-    <div class="stat-card" id="stat-glossary-card" hidden>
-      <div class="stat-value" id="stat-glossary">0</div>
-      <div class="stat-label">Glossary terms tracked</div>
+  </div>
+
+  <div class="tab-panel" id="tab-stats" role="tabpanel" hidden>
+    <div class="stats-panel" id="stats-panel">
+      <h2>Live session stats</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-attendees">0</div>
+          <div class="stat-label">Attendees connected</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-languages">0</div>
+          <div class="stat-label">Languages in the room</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-a11y">0</div>
+          <div class="stat-label">Using accessibility mode</div>
+          <div class="stat-sublabel" id="stat-a11y-breakdown"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-questions">0 / 0</div>
+          <div class="stat-label">Questions answered / asked</div>
+        </div>
+        <div class="stat-card" id="stat-cache-card" hidden>
+          <div class="stat-value" id="stat-cache">—</div>
+          <div class="stat-label">Semantic cache hit rate</div>
+          <div class="stat-sublabel" id="stat-cache-sublabel"></div>
+        </div>
+        <div class="stat-card" id="stat-glossary-card" hidden>
+          <div class="stat-value" id="stat-glossary">0</div>
+          <div class="stat-label">Glossary terms tracked</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -412,6 +609,13 @@
   var statCacheSublabel = document.getElementById("stat-cache-sublabel");
   var statGlossaryCard = document.getElementById("stat-glossary-card");
   var statGlossary = document.getElementById("stat-glossary");
+  var joinToggle = document.getElementById("join-toggle");
+  var joinPanel = document.getElementById("join-panel");
+  var copyLinkBtn = document.getElementById("copy-link-btn");
+  var tabBadgeAttendees = document.getElementById("tab-badge-attendees");
+  var tabBadgeQuestions = document.getElementById("tab-badge-questions");
+  var tabButtons = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var tabPanels = { attendees: document.getElementById("tab-attendees"), questions: document.getElementById("tab-questions"), stats: document.getElementById("tab-stats") };
 
   var socket = null;
   var audioContext = null;
@@ -431,6 +635,46 @@
     statusLine.textContent = text;
     statusLine.className = "status-line" + (cls ? " " + cls : "");
   }
+
+  // -- join panel collapse ----------------------------------------------
+
+  joinToggle.addEventListener("click", function () {
+    var opening = joinPanel.hidden;
+    joinPanel.hidden = !opening;
+    joinToggle.setAttribute("aria-expanded", opening ? "true" : "false");
+  });
+
+  copyLinkBtn.addEventListener("click", function () {
+    var text = joinUrlText.textContent;
+    if (!text) return;
+    var done = function () {
+      copyLinkBtn.textContent = "Copied!";
+      copyLinkBtn.classList.add("copied");
+      setTimeout(function () {
+        copyLinkBtn.textContent = "Copy link";
+        copyLinkBtn.classList.remove("copied");
+      }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(function () {});
+    }
+  });
+
+  // -- dashboard tabs -----------------------------------------------------
+
+  tabButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var target = btn.getAttribute("data-tab");
+      tabButtons.forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle("active", active);
+        b.setAttribute("aria-selected", active ? "true" : "false");
+      });
+      Object.keys(tabPanels).forEach(function (key) {
+        tabPanels[key].hidden = key !== target;
+      });
+    });
+  });
 
   function init() {
     fetch("/presenter-info")
@@ -493,6 +737,9 @@
 
   function updateQuestionStat() {
     statQuestions.textContent = qaAnsweredCount + " / " + qaAskedCount;
+    var pending = Math.max(0, qaAskedCount - qaAnsweredCount);
+    tabBadgeQuestions.textContent = pending;
+    tabBadgeQuestions.classList.toggle("attention", pending > 0);
   }
 
   function pollStats() {
@@ -500,6 +747,7 @@
       .then(function (r) { return r.json(); })
       .then(function (stats) {
         statAttendees.textContent = stats.connected_attendees;
+        tabBadgeAttendees.textContent = stats.connected_attendees;
         statA11y.textContent = stats.attendees_with_accessibility_settings;
         var parts = [];
         if (stats.high_contrast_count) parts.push(stats.high_contrast_count + " high contrast");

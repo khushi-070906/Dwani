@@ -1,0 +1,5 @@
+faster-whisper
+ctranslate2
+transformers
+sentencepiece
+torch
