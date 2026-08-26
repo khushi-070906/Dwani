@@ -463,7 +463,10 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
   // ---- EDIT ME: point this at wherever license_server.py is deployed ----
-  const API_BASE = "http://localhost:8443";
+  // Same-origin: this page is served BY license_server.py itself
+  // (at / and /pricing.html), so requests go to whatever host it's
+  // actually running on — no hardcoded URL needed.
+  const API_BASE = "";
 
   // Billing toggle (cosmetic: swaps displayed price only; the Razorpay Plan
   // actually charged is whatever TIER_PERIOD_TO_PLAN resolves server-side
