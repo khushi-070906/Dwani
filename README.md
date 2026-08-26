@@ -158,4 +158,11 @@ python server.py --nllb-model-dir nllb-200-ct2 --whisper-model small --semantic-
 python server.py --whisper-model small --nllb-model-dir nllb-200-ct2 --itde --cache-storage-path memory\cache.json --persistent-glossary-path memory\glossary.json --dynamic-glossary --dynamic-glossary-interval 5
 
 
-python run.py --whisper-model small --nllb-model-dir nllb-200-ct2 --presenter-language en --itde --semantic-cache-threshold 0.92 --cache-storage-path memory/cache.json --persistent-glossary-path memory/glossary.json --dynamic-glossary --dynamic-glossary-interval 5
+python run.py --whisper-model small --nllb-model-dir nllb-200-ct2 --presenter-language en --persistent-glossary-path memory/glossary.json --dynamic-glossary --dynamic-glossary-interval 5
+
+
+
+
+python build_glossary.py --input input_paper.pdf --output glossary.json --min-occurrences 2
+
+python server.py --whisper-model small --nllb-model-dir nllb-200-ct2 --qa --semantic-cache --glossary-file glossary.json
