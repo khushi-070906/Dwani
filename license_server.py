@@ -13,11 +13,14 @@ itself) — enough to run a real pilot, not a production billing system.
 Swap SQLite for Postgres and add rate limiting before scaling this up.
 
 Run:
-    pip install fastapi uvicorn razorpay python-dotenv --break-system-packages
+    pip install fastapi uvicorn razorpay python-dotenv cryptography --break-system-packages
     export RAZORPAY_KEY_ID=rzp_test_...
     export RAZORPAY_KEY_SECRET=...
     export RAZORPAY_WEBHOOK_SECRET=...          # set when you add the webhook in the Dashboard
-    export LDST_LICENSE_SIGNING_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
+    python generate_signing_keys.py             # run ONCE, save both keys somewhere safe
+    export LDST_LICENSE_PRIVATE_KEY=<the PRIVATE key it printed>
+    # The PUBLIC key it printed goes on the PRESENTER's machine instead,
+    # as LDST_LICENSE_PUBLIC_KEY -- never set it here.
     uvicorn license_server:app --host 0.0.0.0 --port 8443
 
 One-time setup in the Razorpay Dashboard (Test mode first):
@@ -57,7 +60,7 @@ from licensing import License, sign_license, TIER_FEATURES
 load_dotenv()  # reads .env in the current directory if present, no-op if it doesn't exist
 
 DB_PATH = Path(os.environ.get("LDST_DB_PATH", str(Path(__file__).parent / "licenses.db")))
-SIGNING_KEY = os.environ.get("LDST_LICENSE_SIGNING_KEY", "").encode("utf-8")
+PRIVATE_KEY = os.environ.get("LDST_LICENSE_PRIVATE_KEY", "")
 RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "")
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
 RAZORPAY_WEBHOOK_SECRET = os.environ.get("RAZORPAY_WEBHOOK_SECRET", "")
@@ -68,8 +71,9 @@ RAZORPAY_WEBHOOK_SECRET = os.environ.get("RAZORPAY_WEBHOOK_SECRET", "")
 # Locally it's wherever you run uvicorn, e.g. http://localhost:8443
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:8443") + "/pricing.html"
 
-if not SIGNING_KEY:
-    raise RuntimeError("Set LDST_LICENSE_SIGNING_KEY before starting the server.")
+if not PRIVATE_KEY:
+    raise RuntimeError("Set LDST_LICENSE_PRIVATE_KEY before starting the server. "
+                       "Generate one with generate_signing_keys.py.")
 
 app = FastAPI(title="DwaniLive License Server")
 
@@ -173,7 +177,7 @@ def activate(req: ActivateRequest):
         expires_at=expires_at,
         max_attendees=row["max_attendees"],
     )
-    token = sign_license(license, SIGNING_KEY)
+    token = sign_license(license, PRIVATE_KEY)
 
     return {
         "token": token,

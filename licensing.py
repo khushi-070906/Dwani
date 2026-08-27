@@ -1,21 +1,48 @@
 """
 licensing.py
 
-License enforcement for LDST, following the same wrapper pattern as
+License enforcement for LDST/DwaniLive, following the same wrapper pattern as
 glossary.py / accessibility.py: a small, clamped/validated module that
 plugs into server.py at session start without touching the core pipeline.
+
+SIGNING SCHEME: Ed25519 (asymmetric), not shared-secret HMAC.
+-----------------------------------------------------------------
+This matters: the presenter's app must be able to verify a license token
+completely offline, with no server contact. That means whatever key material
+ships inside the presenter's app (baked into the .exe, or set via env var)
+is, eventually, extractable by a determined person -- decompilation, memory
+dumps, etc. all get easier over time even with a compiled binary.
+
+With a SHARED SECRET (the old HMAC approach), extracting that key means the
+attacker can forge a brand new token claiming any tier, any expiry -- e.g.
+"institution", valid until year 3000 -- and run forever, completely offline,
+never contacting your license server again.
+
+With Ed25519, the presenter's app only ever holds the PUBLIC key. A public
+key can verify a signature but cannot produce a new valid one. Extracting it
+gains an attacker nothing -- they still can't forge a token without the
+PRIVATE key, which lives ONLY on license_server.py's infrastructure and is
+never shipped anywhere near a presenter's machine.
+
+This does not make the app un-crackable -- someone can still patch the
+compiled binary to skip the check_license() call entirely, the same way
+any client-side license check in any desktop software can theoretically be
+patched out. What this fixes specifically is the "extract one key, mint
+unlimited free licenses forever" failure mode, which is a much lower bar of
+effort than binary patching and was the actual hole in the HMAC version.
 
 Design goals (matching the project's offline-first constraint):
 - Presenter activates ONCE while they still have internet (same moment
   they download the Whisper/NLLB models, per the README setup step).
 - The activation call returns a signed license token, cached to disk.
-- Every subsequent session start validates the CACHED token locally —
-  no network call required at the venue.
+- Every subsequent session start validates the CACHED token locally
+  against the PUBLIC key -- no network call required at the venue.
 - Token carries an expiry + a grace window so a presenter mid-conference
   isn't stranded if they're a day past their check-in date.
 
-This file does NOT implement the license *server* — see license_server.py
-for that (a separate process you run, not shipped to presenters).
+This file does NOT implement the license *server* -- see license_server.py
+for that (a separate process you run, not shipped to presenters). Only
+license_server.py should ever hold the PRIVATE key.
 """
 
 from __future__ import annotations
@@ -23,29 +50,16 @@ from __future__ import annotations
 import json
 import time
 import base64
-import hmac
-import hashlib
 import dataclasses
-import os
-from dotenv import load_dotenv
-import razorpay
-
 from pathlib import Path
 from typing import Optional, Set
-load_dotenv()
 
-RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
-RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
-
-if not RAZORPAY_KEY_ID:
-    raise RuntimeError("RAZORPAY_KEY_ID is missing")
-
-if not RAZORPAY_KEY_SECRET:
-    raise RuntimeError("RAZORPAY_KEY_SECRET is missing")
-
-razorpay_client = razorpay.Client(
-    auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET)
+from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+    Ed25519PrivateKey,
+    Ed25519PublicKey,
 )
+from cryptography.exceptions import InvalidSignature
+
 # ---------------------------------------------------------------------------
 # Tiers and feature gating
 # ---------------------------------------------------------------------------
@@ -66,6 +80,7 @@ TIER_FEATURES = {
         "glossary",
         "qa",
         "accessibility",
+        "isl",
         "dynamic-glossary",
         "itde",
     },
@@ -76,9 +91,10 @@ FLAG_TO_FEATURE = {
     "semantic_cache": "semantic-cache",
     "glossary_file": "glossary",
     "qa": "qa",
+    "isl": "isl",
     "dynamic_glossary": "dynamic-glossary",
     "itde": "itde",
-    # accessibility mode has no flag today (always-on per README) —
+    # accessibility mode has no flag today (always-on per README) --
     # included here so it CAN be gated later without changing callers.
     "accessibility": "accessibility",
 }
@@ -111,10 +127,7 @@ class License:
 
 
 # ---------------------------------------------------------------------------
-# Token format: base64(payload_json) + "." + base64(hmac_sha256(payload))
-# Deliberately simple (no external JWT dependency) — swap for a real JWT
-# library + asymmetric signing (Ed25519) before shipping to real customers,
-# so the server's private key never has to live anywhere near the client.
+# Key helpers
 # ---------------------------------------------------------------------------
 
 def _b64encode(data: bytes) -> str:
@@ -126,26 +139,68 @@ def _b64decode(data: str) -> bytes:
     return base64.urlsafe_b64decode(data + padding)
 
 
-def sign_license(license: License, secret_key: bytes) -> str:
-    """Server-side only: produce a token to hand back to the client on activation."""
+def generate_keypair() -> tuple[str, str]:
+    """
+    Run this ONCE, on your own machine, to create the keypair. Print both,
+    store the private key ONLY in license_server.py's environment
+    (LDST_LICENSE_PRIVATE_KEY), and bake/ship the public key into the
+    presenter app (LDST_LICENSE_PUBLIC_KEY). Never commit either to git.
+    Returns (private_key_b64, public_key_b64).
+    """
+    private_key = Ed25519PrivateKey.generate()
+    public_key = private_key.public_key()
+
+    private_bytes = private_key.private_bytes_raw()
+    public_bytes = public_key.public_bytes_raw()
+
+    return _b64encode(private_bytes), _b64encode(public_bytes)
+
+
+def _load_private_key(private_key_b64: str) -> Ed25519PrivateKey:
+    return Ed25519PrivateKey.from_private_bytes(_b64decode(private_key_b64))
+
+
+def _load_public_key(public_key_b64: str) -> Ed25519PublicKey:
+    return Ed25519PublicKey.from_public_bytes(_b64decode(public_key_b64))
+
+
+# ---------------------------------------------------------------------------
+# Token format: base64(payload_json) + "." + base64(ed25519_signature)
+# ---------------------------------------------------------------------------
+
+def sign_license(license: License, private_key_b64: str) -> str:
+    """
+    SERVER-SIDE ONLY. Requires the PRIVATE key -- never call this from
+    anything that ships to a presenter's machine.
+    """
+    private_key = _load_private_key(private_key_b64)
     payload = json.dumps(dataclasses.asdict(license), separators=(",", ":")).encode("utf-8")
-    sig = hmac.new(secret_key, payload, hashlib.sha256).digest()
-    return f"{_b64encode(payload)}.{_b64encode(sig)}"
+    signature = private_key.sign(payload)
+    return f"{_b64encode(payload)}.{_b64encode(signature)}"
 
 
-def verify_license(token: str, secret_key: bytes) -> License:
-    """Client-side: verify signature and decode. Raises LicenseError on any failure."""
+def verify_license(token: str, public_key_b64: str) -> License:
+    """
+    CLIENT-SIDE. Only needs the PUBLIC key. Raises LicenseError on any
+    failure -- malformed token, bad signature, or corrupt payload.
+    """
     try:
         payload_b64, sig_b64 = token.split(".", 1)
         payload = _b64decode(payload_b64)
-        sig = _b64decode(sig_b64)
+        signature = _b64decode(sig_b64)
     except (ValueError, Exception) as exc:
         raise LicenseError(f"Malformed license token: {exc}") from exc
 
-    expected_sig = hmac.new(secret_key, payload, hashlib.sha256).digest()
-    if not hmac.compare_digest(sig, expected_sig):
-        raise LicenseError("License signature invalid — token was not issued by this server "
-                            "or has been tampered with.")
+    try:
+        public_key = _load_public_key(public_key_b64)
+        public_key.verify(signature, payload)
+    except InvalidSignature:
+        raise LicenseError(
+            "License signature invalid -- token was not issued by this server "
+            "or has been tampered with."
+        )
+    except Exception as exc:
+        raise LicenseError(f"Could not verify license: {exc}") from exc
 
     try:
         data = json.loads(payload)
@@ -182,17 +237,18 @@ def load_cached_license(path: Path = DEFAULT_CACHE_PATH) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Entry point for server.py — call this before presenter_page() serves the QR code
+# Entry point for server.py -- call this before presenter_page() serves the QR code
 # ---------------------------------------------------------------------------
 
 def check_license(
-    secret_key: bytes,
+    public_key_b64: str,
     requested_flags: Optional[dict] = None,
     cache_path: Path = DEFAULT_CACHE_PATH,
 ) -> License:
     """
     Validate the cached license and confirm it covers every requested flag.
 
+    public_key_b64: the PUBLIC key (safe to embed/ship in the presenter app).
     requested_flags: dict of {flag_name: bool_or_value} as parsed from argv,
     e.g. {"semantic_cache": True, "glossary_file": "glossary.json", "qa": True}.
     Only flags that are truthy are checked against the license tier.
@@ -201,14 +257,14 @@ def check_license(
     if the session should not start.
     """
     token = load_cached_license(cache_path)
-    license = verify_license(token, secret_key)
+    license = verify_license(token, public_key_b64)
 
     if license.is_expired():
         if license.is_within_grace():
             print(
                 f"[license] Warning: subscription expired "
                 f"{time.strftime('%Y-%m-%d', time.localtime(license.expires_at))}. "
-                f"Running on a {GRACE_PERIOD_SECONDS // 86400}-day grace period — "
+                f"Running on a {GRACE_PERIOD_SECONDS // 86400}-day grace period -- "
                 f"please reconnect to WiFi soon and run activate.py to renew."
             )
         else:
