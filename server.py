@@ -25,7 +25,7 @@ from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 
 from accessibility import AccessibilityPreferences
-from licensing import check_license, LicenseError
+from licensing import check_license, LicenseError, License
 from pipeline import AudioSegmenter, FakeASRBackend, FakeTranslationBackend, Pipeline
 from qa_pipeline import BidirectionalTranslationBackend, FakeBidirectionalTranslationBackend, QAPipeline
 from session import Session
@@ -52,6 +52,14 @@ accessibility_prefs: dict[WebSocket, AccessibilityPreferences] = {}
 # silently interleaving audio with the first.
 host_connected = False
 
+# Set in __main__ once check_license() returns successfully; attendee_socket
+# reads current_license.max_attendees off this to enforce the tier's
+# attendee cap. Stays None if server.py is imported directly rather than
+# run as a script (e.g. `uvicorn server:app`, or tests) -- in that case no
+# license was ever checked, so no cap is enforced, matching the pre-license
+# behavior of this module.
+current_license: License | None = None
+
 # Set in __main__ if --dynamic-glossary is passed; picked up by the startup
 # event below to launch its background polling loop. None means disabled.
 dynamic_glossary_updater = None
@@ -74,6 +82,20 @@ async def attendee_socket(websocket: WebSocket, lang: str, session_param: str):
     if session_param != session.session_id:
         await websocket.close(code=4000, reason="unknown session")
         return
+
+    if current_license is not None and current_license.max_attendees is not None:
+        # Cap applies to total connected attendees across every language,
+        # not per-language -- same sum() /health already reports.
+        total_attendees = sum(len(v) for v in subscribers.values())
+        if total_attendees >= current_license.max_attendees:
+            await websocket.close(
+                code=4003,
+                reason=(
+                    f"attendee cap reached ({current_license.max_attendees} on the "
+                    f"'{current_license.tier}' plan) -- upgrade to allow more attendees"
+                ),
+            )
+            return
 
     await websocket.accept()
     subscribers.setdefault(lang, set()).add(websocket)
@@ -595,17 +617,24 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    load_dotenv()  # reads .env in the current directory (LDST_LICENSE_SIGNING_KEY) if present
+    load_dotenv()  # reads .env in the current directory (LDST_LICENSE_PUBLIC_KEY) if present
 
     # --- License check -------------------------------------------------
     # Reads the cached token written by activate.py (~/.ldst/license.token
     # by default) and confirms it's valid, not expired past the grace
     # period, and covers every flag requested above. Exits before any
     # model loading, session creation, or network binding happens if not.
-    LICENSE_SIGNING_KEY = os.environ["LDST_LICENSE_SIGNING_KEY"].encode("utf-8")
+    #
+    # Ed25519, asymmetric -- this machine only ever holds the PUBLIC key
+    # (LDST_LICENSE_PUBLIC_KEY), never the private signing key. See
+    # licensing.py's module docstring for why that split matters. The
+    # returned License is kept in current_license (module-level, set
+    # without `global` since this is top-level script code, not a
+    # function body) so attendee_socket can enforce max_attendees.
+    LICENSE_PUBLIC_KEY = os.environ["LDST_LICENSE_PUBLIC_KEY"]
     try:
-        check_license(
-            LICENSE_SIGNING_KEY,
+        current_license = check_license(
+            LICENSE_PUBLIC_KEY,
             requested_flags={
                 "semantic_cache": args.semantic_cache,
                 "glossary_file": args.glossary_file,

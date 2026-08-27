@@ -86,6 +86,15 @@ TIER_FEATURES = {
     },
 }
 
+# Default attendee cap per tier, used when a subscription row doesn't
+# specify a custom max_attendees. None = unlimited. license_server.py's
+# /activate applies this default; a specific DB value always overrides it.
+TIER_DEFAULT_MAX_ATTENDEES = {
+    "free": 20,
+    "pro": None,
+    "institution": None,
+}
+
 # Map CLI flags (as used in server.py / run.py) to the feature key that gates them.
 FLAG_TO_FEATURE = {
     "semantic_cache": "semantic-cache",

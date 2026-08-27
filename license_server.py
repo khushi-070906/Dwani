@@ -55,7 +55,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from licensing import License, sign_license, TIER_FEATURES
+from licensing import License, sign_license, TIER_FEATURES, TIER_DEFAULT_MAX_ATTENDEES
 
 load_dotenv()  # reads .env in the current directory if present, no-op if it doesn't exist
 
@@ -170,12 +170,18 @@ def activate(req: ActivateRequest):
     now = int(time.time())
     expires_at = row["current_period_end"] or (now + 30 * 24 * 60 * 60)
 
+    # A specific value in the DB always wins (lets you grant a custom cap to
+    # one presenter); otherwise fall back to the tier's default cap.
+    max_attendees = row["max_attendees"]
+    if max_attendees is None:
+        max_attendees = TIER_DEFAULT_MAX_ATTENDEES.get(row["tier"])
+
     license = License(
         tier=row["tier"],
         presenter_email=req.email,
         issued_at=now,
         expires_at=expires_at,
-        max_attendees=row["max_attendees"],
+        max_attendees=max_attendees,
     )
     token = sign_license(license, PRIVATE_KEY)
 
