@@ -6,6 +6,10 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn license_server:app --host 0.0.0.0 --port $PORT
     envVars:
+      - key: LDST_LICENSE_PRIVATE_KEY
+        sync: false
+      - key: LDST_DB_PATH
+        sync: false
       - key: RAZORPAY_KEY_ID
         sync: false
       - key: RAZORPAY_KEY_SECRET
