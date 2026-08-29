@@ -20,7 +20,9 @@ Run:
     python generate_signing_keys.py             # run ONCE, save both keys somewhere safe
     export LDST_LICENSE_PRIVATE_KEY=<the PRIVATE key it printed>
     # The PUBLIC key it printed goes on the PRESENTER's machine instead,
-    # as LDST_LICENSE_PUBLIC_KEY -- never set it here.
+    # as a constant baked into server.py -- never set it here.
+    export LDST_DB_PATH=/var/data/licenses.db   # only needed if you've attached a persistent disk;
+                                                 # otherwise licenses.db lives next to this script
     uvicorn license_server:app --host 0.0.0.0 --port 8443
 
 One-time setup in the Razorpay Dashboard (Test mode first):
@@ -96,6 +98,16 @@ STATIC_DIR = Path(__file__).parent / "static"
 @app.get("/pricing.html")
 def serve_pricing_page():
     return FileResponse(STATIC_DIR / "pricing.html")
+
+
+@app.get("/login.html")
+def serve_login_page():
+    return FileResponse(STATIC_DIR / "login.html")
+
+
+@app.get("/signup.html")
+def serve_signup_page():
+    return FileResponse(STATIC_DIR / "signup.html")
 
 
 @app.get("/")
