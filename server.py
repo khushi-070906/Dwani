@@ -620,7 +620,7 @@ if __name__ == "__main__":
     # on license_server.py's infrastructure). Baking this in means presenters
     # don't need to set an env var correctly; an env var, if set, still wins,
     # which is handy if you ever rotate the keypair without shipping a new build.
-    DEFAULT_LICENSE_PUBLIC_KEY = "YOcprxAEJH93rYZY6a_YYLxawwNN0XmGKhMyPUA5Ssg"
+    DEFAULT_LICENSE_PUBLIC_KEY = "-50neXrC2PCdrcUKNyq0cYyswqM-O23gThTebrkzC7M"
     LICENSE_PUBLIC_KEY = os.environ.get("LDST_LICENSE_PUBLIC_KEY", DEFAULT_LICENSE_PUBLIC_KEY)
     # --- License check -------------------------------------------------
     # Reads the cached token written by activate.py (~/.ldst/license.token
