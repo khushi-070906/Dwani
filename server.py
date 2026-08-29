@@ -37,6 +37,11 @@ app = FastAPI()
 # --port/--session-id when the script is run directly.
 session = Session(port=8000)
 
+# Set in __main__ after check_license() succeeds. Held here (not just used
+# once at startup) because attendee_socket() below needs license.max_attendees
+# at connection time, for every single attendee -- not just once at boot.
+active_license: License | None = None
+
 # language_code -> set of connected websockets subscribed to that language
 subscribers: dict[str, set[WebSocket]] = {}
 
@@ -51,14 +56,6 @@ accessibility_prefs: dict[WebSocket, AccessibilityPreferences] = {}
 # stream is meaningful per session, so a second one is rejected rather than
 # silently interleaving audio with the first.
 host_connected = False
-
-# Set in __main__ once check_license() returns successfully; attendee_socket
-# reads current_license.max_attendees off this to enforce the tier's
-# attendee cap. Stays None if server.py is imported directly rather than
-# run as a script (e.g. `uvicorn server:app`, or tests) -- in that case no
-# license was ever checked, so no cap is enforced, matching the pre-license
-# behavior of this module.
-current_license: License | None = None
 
 # Set in __main__ if --dynamic-glossary is passed; picked up by the startup
 # event below to launch its background polling loop. None means disabled.
@@ -83,17 +80,16 @@ async def attendee_socket(websocket: WebSocket, lang: str, session_param: str):
         await websocket.close(code=4000, reason="unknown session")
         return
 
-    if current_license is not None and current_license.max_attendees is not None:
-        # Cap applies to total connected attendees across every language,
-        # not per-language -- same sum() /health already reports.
-        total_attendees = sum(len(v) for v in subscribers.values())
-        if total_attendees >= current_license.max_attendees:
+    # Enforce the license's attendee cap (e.g. 20 on the free tier) BEFORE
+    # accepting the connection. None means unlimited (pro/institution by
+    # default -- see TIER_DEFAULT_MAX_ATTENDEES in licensing.py).
+    if active_license is not None and active_license.max_attendees is not None:
+        current_count = sum(len(v) for v in subscribers.values())
+        if current_count >= active_license.max_attendees:
             await websocket.close(
                 code=4003,
-                reason=(
-                    f"attendee cap reached ({current_license.max_attendees} on the "
-                    f"'{current_license.tier}' plan) -- upgrade to allow more attendees"
-                ),
+                reason=f"Session is full ({active_license.max_attendees} attendee limit on "
+                       f"the '{active_license.tier}' plan). Ask the presenter to upgrade.",
             )
             return
 
@@ -617,23 +613,26 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    load_dotenv()  # reads .env in the current directory (LDST_LICENSE_PUBLIC_KEY) if present
+    load_dotenv()  # reads .env in the current directory (LDST_LICENSE_PUBLIC_KEY) if present, optional
 
+    # Public key is safe to embed directly -- it can only VERIFY signatures,
+    # never forge new ones (that requires the private key, which lives only
+    # on license_server.py's infrastructure). Baking this in means presenters
+    # don't need to set an env var correctly; an env var, if set, still wins,
+    # which is handy if you ever rotate the keypair without shipping a new build.
+    DEFAULT_LICENSE_PUBLIC_KEY = "YOcprxAEJH93rYZY6a_YYLxawwNN0XmGKhMyPUA5Ssg"
+    LICENSE_PUBLIC_KEY = os.environ.get("LDST_LICENSE_PUBLIC_KEY", DEFAULT_LICENSE_PUBLIC_KEY)
     # --- License check -------------------------------------------------
     # Reads the cached token written by activate.py (~/.ldst/license.token
     # by default) and confirms it's valid, not expired past the grace
     # period, and covers every flag requested above. Exits before any
     # model loading, session creation, or network binding happens if not.
     #
-    # Ed25519, asymmetric -- this machine only ever holds the PUBLIC key
-    # (LDST_LICENSE_PUBLIC_KEY), never the private signing key. See
-    # licensing.py's module docstring for why that split matters. The
-    # returned License is kept in current_license (module-level, set
-    # without `global` since this is top-level script code, not a
-    # function body) so attendee_socket can enforce max_attendees.
-    LICENSE_PUBLIC_KEY = os.environ["LDST_LICENSE_PUBLIC_KEY"]
+    # Uses Ed25519 verification: this only needs the PUBLIC key. Never set
+    # LDST_LICENSE_PRIVATE_KEY here -- that belongs only on license_server.py's
+    # infrastructure. See licensing.py's module docstring for why.
     try:
-        current_license = check_license(
+        active_license = check_license(
             LICENSE_PUBLIC_KEY,
             requested_flags={
                 "semantic_cache": args.semantic_cache,

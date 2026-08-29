@@ -255,6 +255,74 @@
   }
   .modal button.ghost { width: 100%; border: none; background: none; color: var(--ink-faint); font-size: 0.82rem; padding: 0.4rem; }
 </style>
+
+<style>
+  /* ---------------- Auth card ---------------- */
+  .auth-wrap { display: flex; justify-content: center; padding: 2.5rem 0 5rem; position: relative; z-index: 1; }
+  .auth-card {
+    background: var(--bg-raised);
+    border-radius: 4px 26px 4px 26px;
+    padding: 2.25rem 2rem;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 20px 60px -16px rgba(44, 24, 16, 0.22);
+  }
+  .auth-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5em;
+    background: var(--bg); border: 1px solid var(--accent-deep); color: var(--accent-deep);
+    padding: 0.35em 0.85em; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.08em;
+    font-weight: 700; margin-bottom: 1.1rem; text-transform: uppercase;
+  }
+  .auth-card h1 {
+    font-family: var(--font-display); font-weight: 400; font-size: 1.7rem;
+    margin: 0 0 0.4rem; letter-spacing: -0.01em; line-height: 1.2;
+  }
+  .auth-card > p.sub { color: var(--ink-dim); font-size: 0.9rem; margin: 0 0 1.75rem; line-height: 1.5; }
+
+  .field { margin-bottom: 1.1rem; text-align: left; }
+  .field label {
+    display: block; font-size: 0.78rem; font-weight: 700; color: var(--ink-dim);
+    margin-bottom: 0.4rem; letter-spacing: 0.02em;
+  }
+  .field input {
+    width: 100%; background: var(--bg); border: 1px solid var(--bg-raised-2);
+    border-radius: 10px; padding: 0.75rem 0.9rem; font-size: 0.92rem;
+    font-family: var(--font-body); color: var(--ink); transition: border-color 0.15s ease;
+  }
+  .field input:focus { border-color: var(--accent); outline: none; }
+  .field-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; }
+  .field-row a { font-size: 0.8rem; font-weight: 600; color: var(--accent-deep); text-decoration: none; }
+  .field-row a:hover { text-decoration: underline; }
+  .field-hint { font-size: 0.76rem; color: var(--ink-faint); margin-top: 0.35rem; }
+
+  .auth-submit {
+    width: 100%; border: none; border-radius: 4px 14px 4px 14px; padding: 0.85rem 1rem;
+    font-size: 0.92rem; font-weight: 700; margin: 0.4rem 0 1.4rem;
+    background: linear-gradient(120deg, var(--accent), var(--accent-2) 55%, var(--indigo));
+    color: #fff5e6; box-shadow: 0 4px 14px -4px rgba(168, 70, 12, 0.45);
+    transition: transform 0.12s ease;
+  }
+  .auth-submit:hover { transform: translateY(-1px); }
+
+  .auth-divider {
+    display: flex; align-items: center; gap: 0.75rem; margin: 1.1rem 0;
+    color: var(--ink-faint); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: ""; flex: 1; height: 1px; background: var(--bg-raised-2);
+  }
+
+  .auth-switch { text-align: center; font-size: 0.86rem; color: var(--ink-dim); }
+  .auth-switch a { color: var(--accent-deep); font-weight: 700; text-decoration: none; }
+  .auth-switch a:hover { text-decoration: underline; }
+
+  .auth-error {
+    background: rgba(179, 38, 30, 0.08); border: 1px solid rgba(179, 38, 30, 0.25);
+    color: var(--error); font-size: 0.82rem; padding: 0.6rem 0.85rem; border-radius: 8px;
+    margin-bottom: 1.1rem; display: none;
+  }
+  .auth-error.show { display: block; }
+</style>
 </head>
 <body>
 
@@ -312,269 +380,55 @@
     <a href="pricing.html" style="text-decoration:none;"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
   </div>
   <div class="nav-links">
-    <a href="#compare">Features</a>
-    <a href="#faq">FAQ</a>
-    <a href="login.html">Log in</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="pricing.html#faq">FAQ</a>
+    <a href="signup.html">Sign up</a>
   </div>
 </nav>
 
-<header class="wrap hero">
-  <div class="eyebrow-badge"><span class="dot"></span> Offline-first · No cloud, no data leaving the room</div>
-  <h1>One activation. Zero internet at the venue.</h1>
-  <p>DwaniLive turns any laptop into a live speech-translation hub for in-person talks. Activate once online, then run the whole conference on the local network: captions, Q&amp;A, and accessibility, included per plan.</p>
-  <div class="garland" aria-hidden="true"><span></span><span class="bloom"></span><span></span><span class="bloom pink"></span><span></span><span class="bloom"></span><span></span></div>
-</header>
-
 <main class="wrap">
-  <div class="billing-toggle">
-    <span>Monthly</span>
-    <button class="switch" id="billing-switch" data-on="false" role="switch" aria-checked="false" aria-label="Toggle annual billing"></button>
-    <span>Annual <span class="save-pill">Save 2 months</span></span>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <span class="auth-eyebrow"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--live);display:inline-block;"></span> Presenter Login</span>
+      <h1>Welcome back</h1>
+      <p class="sub">Log in to manage your DwaniLive subscription and license.</p>
+
+      <div class="auth-error" id="login-error">Incorrect email or password. Please try again.</div>
+
+      <form id="login-form">
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required>
+        </div>
+        <div class="field-row" style="margin-top:-0.5rem;">
+          <span></span>
+          <a href="#">Forgot password?</a>
+        </div>
+        <button type="submit" class="auth-submit">Log in</button>
+      </form>
+
+      <p class="auth-switch">Don&rsquo;t have an account? <a href="signup.html">Sign up</a></p>
+    </div>
   </div>
-
-  <section class="pricing-grid" id="plans">
-
-    <!-- FREE -->
-    <div class="plan">
-      <h3 class="plan-name">Free</h3>
-      <p class="plan-desc">Run the core pipeline yourself. Great for a single classroom talk or trying DwaniLive out.</p>
-      <div class="plan-price"><span class="amount">₹0</span></div>
-      <p class="plan-subnote">No activation needed</p>
-      <!-- EDIT ME: point this at wherever you're distributing the app (your own site, a zip download, etc.) -->
-      <a class="plan-cta secondary" href="#" style="text-align:center; text-decoration:none; display:block;">Download</a>
-      <ul class="plan-features">
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Offline transcription + translation (Whisper + NLLB-200)</li>
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Up to 20 attendees, one presenter device</li>
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Live caption stream over local WiFi/LAN</li>
-        <li class="dim"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 3.5L10.5 10.5M10.5 3.5L3.5 10.5" stroke="#6d5c82" stroke-width="1.6" stroke-linecap="round"/></svg> Semantic translation cache</li>
-        <li class="dim"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 3.5L10.5 10.5M10.5 3.5L3.5 10.5" stroke="#6d5c82" stroke-width="1.6" stroke-linecap="round"/></svg> Conference glossary</li>
-        <li class="dim"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 3.5L10.5 10.5M10.5 3.5L3.5 10.5" stroke="#6d5c82" stroke-width="1.6" stroke-linecap="round"/></svg> Q&amp;A + accessibility mode</li>
-      </ul>
-    </div>
-
-    <!-- PRO -->
-    <div class="plan featured">
-      <span class="plan-badge">Most presenters</span>
-      <h3 class="plan-name">Pro</h3>
-      <p class="plan-desc">For recurring talks and workshops. Faster repeat translations and a glossary that keeps names and jargon correct.</p>
-      <div class="plan-price">
-        <span class="amount" data-monthly="₹199" data-annual="₹1,990">₹199</span>
-        <span class="period">/ mo, per presenter</span>
-      </div>
-      <p class="plan-subnote" data-monthly-note="Billed monthly" data-annual-note="Billed ₹1,990/yr">Billed monthly</p>
-      <button class="plan-cta primary" data-tier="pro">Subscribe with card</button>
-      <p class="plan-error" data-error-for="pro"></p>
-      <ul class="plan-features">
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Everything in Free</li>
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Unlimited attendees</li>
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Semantic translation cache (faster, cheaper repeats)</li>
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Conference glossary adaptation</li>
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Email support</li>
-        <li class="dim"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 3.5L10.5 10.5M10.5 3.5L3.5 10.5" stroke="#6d5c82" stroke-width="1.6" stroke-linecap="round"/></svg> Live Q&amp;A translation</li>
-        <li class="dim"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 3.5L10.5 10.5M10.5 3.5L3.5 10.5" stroke="#6d5c82" stroke-width="1.6" stroke-linecap="round"/></svg> Accessibility mode</li>
-      </ul>
-    </div>
-
-    <!-- INSTITUTION -->
-    <div class="plan">
-      <h3 class="plan-name">Institution</h3>
-      <p class="plan-desc">For departments and conference organizers running multi-track events with accessibility requirements.</p>
-      <div class="plan-price">
-        <span class="amount" data-monthly="₹999" data-annual="₹9,990">₹999</span>
-        <span class="period">/ mo, per venue</span>
-      </div>
-      <p class="plan-subnote" data-monthly-note="Billed monthly" data-annual-note="Billed ₹9,990/yr">Billed monthly</p>
-      <button class="plan-cta primary" data-tier="institution">Subscribe with card</button>
-      <p class="plan-error" data-error-for="institution"></p>
-      <ul class="plan-features">
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Everything in Pro</li>
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Unlimited attendees, multi-track</li>
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Live typed Q&amp;A translation, presenter panel</li>
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Accessibility mode (captions + audio narration)</li>
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Dynamic glossary + slide sync (ITDE)</li>
-        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Priority support</li>
-      </ul>
-    </div>
-  </section>
-
-  <p style="text-align:center; color: var(--ink-faint); font-size: 0.82rem; margin: 1.5rem 0 0;">
-    Prices are placeholders. Edit them in <code>pricing.html</code> and in your Razorpay Dashboard Plans to match. Need a custom seat count? <a href="mailto:khushimittal070906@gmail.com" style="color:var(--accent-deep); font-weight:600; text-decoration:none;">Email us</a>.
-  </p>
-
-  <section class="compare" id="compare">
-    <h2>Compare plans</h2>
-    <table class="compare-table">
-      <thead>
-        <tr><th></th><th>Free</th><th>Pro</th><th>Institution</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Offline transcription + translation</td><td><svg class="yes" width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td><svg class="yes" width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td><svg class="yes" width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
-        <tr><td>Attendees per session</td><td>Up to 20</td><td>Unlimited</td><td>Unlimited</td></tr>
-        <tr><td>Semantic translation cache</td><td class="no"></td><td><svg class="yes" width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td><svg class="yes" width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
-        <tr><td>Conference glossary</td><td class="no"></td><td><svg class="yes" width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td><svg class="yes" width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
-        <tr><td>Live Q&amp;A translation</td><td class="no"></td><td class="no"></td><td><svg class="yes" width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
-        <tr><td>Accessibility mode (captions + audio)</td><td class="no"></td><td class="no"></td><td><svg class="yes" width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
-        <tr><td>Dynamic glossary / slide sync</td><td class="no"></td><td class="no"></td><td><svg class="yes" width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr>
-        <tr><td>Support</td><td>Community</td><td>Email</td><td>Priority</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="faq" id="faq">
-    <h2>Frequently asked</h2>
-    <details class="faq-item" open>
-      <summary>Do I need internet during my talk?</summary>
-      <p>No. You activate once while online (the same moment you download the Whisper/NLLB models). After that, the license is cached on your laptop and every session validates locally, with no network call at the venue.</p>
-    </details>
-    <details class="faq-item">
-      <summary>What happens if my subscription lapses mid-conference?</summary>
-      <p>There's a 7-day grace period built into the license. You'll see a warning, but sessions keep running so you're never stranded mid-event.</p>
-    </details>
-    <details class="faq-item">
-      <summary>Can I cancel anytime?</summary>
-      <p>Yes. Subscriptions are billed and managed through Razorpay, and you can cancel from the confirmation email at any time. Your license stays valid until the end of the current billing period.</p>
-    </details>
-    <details class="faq-item">
-      <summary>Is my audio or transcript sent anywhere?</summary>
-      <p>No. Only the one-time activation call (email + license key) talks to our server. Every conference session itself runs entirely over your local network.</p>
-    </details>
-  </section>
 </main>
 
 <footer class="wrap">
   DwaniLive · Built for in-person academic conferences
 </footer>
 
-<!-- Checkout status modal -->
-<div class="modal-backdrop" id="modal-backdrop" hidden>
-  <div class="modal">
-    <svg width="30" height="30" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="17" cy="17" r="15.5" stroke="var(--live)" stroke-width="2"/>
-      <path d="M10 17.5L14.5 22L24 11" stroke="var(--live)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <h3 id="modal-title">Payment received</h3>
-    <p id="modal-desc">Save this license key and email. You'll enter both when you run <code>activate.py</code> once, while online.</p>
-    <div class="key-box" id="modal-key"></div>
-    <div class="status-line" id="modal-status"><span class="spinner"></span> Waiting for confirmation…</div>
-    <button class="primary" id="modal-copy">Copy license key</button>
-    <button class="ghost" id="modal-close">Close</button>
-  </div>
-</div>
-
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-  // ---- EDIT ME: point this at wherever license_server.py is deployed ----
-  // Same-origin: this page is served BY license_server.py itself
-  // (at / and /pricing.html), so requests go to whatever host it's
-  // actually running on — no hardcoded URL needed.
-  const API_BASE = "";
-
-  // Billing toggle (cosmetic: swaps displayed price only; the Razorpay Plan
-  // actually charged is whatever TIER_PERIOD_TO_PLAN resolves server-side
-  // from {tier, period}, so make sure you've created matching monthly/
-  // annual Plans in Razorpay — see the setup notes atop license_server.py).
-  const sw = document.getElementById('billing-switch');
-  let annual = false;
-  sw.addEventListener('click', () => {
-    annual = !annual;
-    sw.dataset.on = annual;
-    sw.setAttribute('aria-checked', annual);
-    document.querySelectorAll('.plan-price .amount').forEach(el => {
-      const val = annual ? el.dataset.annual : el.dataset.monthly;
-      if (val) el.textContent = val;
-    });
-    document.querySelectorAll('.plan-subnote[data-monthly-note]').forEach(el => {
-      el.textContent = annual ? el.dataset.annualNote : el.dataset.monthlyNote;
-    });
-  });
-
-  // Shows the "payment received" modal and starts polling /license-status
-  // until the webhook has landed and flipped the row to 'active'.
-  function showLicenseModal(licenseKey, email) {
-    document.getElementById('modal-key').textContent = licenseKey || '';
-    document.getElementById('modal-backdrop').hidden = false;
-
-    const statusEl = document.getElementById('modal-status');
-    statusEl.innerHTML = '<span class="spinner"></span> Waiting for confirmation…';
-
-    document.getElementById('modal-copy').onclick = () => {
-      navigator.clipboard.writeText(licenseKey || '');
-    };
-    document.getElementById('modal-close').onclick = () => {
-      document.getElementById('modal-backdrop').hidden = true;
-    };
-
-    let attempts = 0;
-    const poll = setInterval(async () => {
-      attempts++;
-      try {
-        const res = await fetch(`${API_BASE}/license-status?license_key=${encodeURIComponent(licenseKey)}&email=${encodeURIComponent(email)}`);
-        const data = await res.json();
-        if (data.status === 'active') {
-          statusEl.innerHTML = '✅ Active, ready to run <code>activate.py</code>';
-          clearInterval(poll);
-        } else if (attempts > 20) {
-          statusEl.textContent = 'Still processing. Check your email for confirmation.';
-          clearInterval(poll);
-        }
-      } catch (e) { /* keep polling */ }
-    }, 3000);
-  }
-
-  // Subscribe buttons -> create a Subscription on the license server, then
-  // open Razorpay's in-page Checkout modal to collect payment for it.
-  document.querySelectorAll('.plan-cta[data-tier]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const tier = btn.dataset.tier;
-      const period = annual ? 'annual' : 'monthly';
-      const errEl = document.querySelector(`.plan-error[data-error-for="${tier}"]`);
-      errEl.textContent = '';
-      const email = window.prompt("Email for your license (used to activate DwaniLive):");
-      if (!email) return;
-      btn.disabled = true;
-      const originalText = btn.textContent;
-      btn.textContent = 'Opening checkout…';
-      try {
-        const res = await fetch(`${API_BASE}/create-subscription`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tier, period, email }),
-        });
-        if (!res.ok) throw new Error((await res.json()).detail || 'Checkout failed');
-        const data = await res.json();
-
-        const rzp = new Razorpay({
-          key: data.key_id,
-          subscription_id: data.subscription_id,
-          name: 'DwaniLive',
-          description: `${tier[0].toUpperCase() + tier.slice(1)} plan — ${period}`,
-          prefill: { email },
-          theme: { color: '#a8460c' },
-          handler: function () {
-            // Payment succeeded client-side; the webhook flips the row to
-            // 'active' server-side shortly after — poll for it.
-            showLicenseModal(data.license_key, email);
-          },
-          modal: {
-            ondismiss: function () {
-              btn.disabled = false;
-              btn.textContent = originalText;
-            },
-          },
-        });
-        rzp.on('payment.failed', function (resp) {
-          errEl.textContent = resp.error.description || 'Payment failed, try again.';
-        });
-        rzp.open();
-        btn.disabled = false;
-        btn.textContent = originalText;
-      } catch (err) {
-        errEl.textContent = err.message || 'Something went wrong, try again.';
-        btn.disabled = false;
-        btn.textContent = originalText;
-      }
-    });
+  document.getElementById('login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    // NOTE: license_server.py has no /login endpoint yet -- this form has
+    // nothing to submit to until a real accounts system is added.
+    // Wire this up to your auth API once it exists.
+    console.log('login submitted (no backend wired up yet)');
   });
 </script>
+
 </body>
 </html>

@@ -100,15 +100,15 @@ class BidirectionalTranslationBackend:
     def __init__(
         self,
         nllb_model_dir: str,
-        tokenizer_name: str = "facebook/nllb-200-distilled-600M",
+        sentencepiece_model_path: str = "sentencepiece.bpe.model",
         device: str = "cpu",
         beam_size: int = 4,
     ) -> None:
         import ctranslate2  # deferred: heavy, optional dep -- same pattern as backends.py
-        from transformers import AutoTokenizer  # deferred: heavy, optional dep
+        from nllb_tokenizer import NllbLiteTokenizer  # deferred: sentencepiece is the only dep this pulls in -- see its docstring for why this replaced transformers.AutoTokenizer
 
         self._translator = ctranslate2.Translator(nllb_model_dir, device=device)
-        self._tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+        self._tokenizer = NllbLiteTokenizer(sentencepiece_model_path)
         self._beam_size = beam_size
 
     async def translate_between(self, text: str, source_lang: str, target_lang: str) -> str:
@@ -117,8 +117,7 @@ class BidirectionalTranslationBackend:
     def _translate_sync(self, text: str, source_lang: str, target_lang: str) -> str:
         from backends import flores_code  # reuse the existing lang-code table -- one source of truth
 
-        self._tokenizer.src_lang = flores_code(source_lang)
-        source_tokens = self._tokenizer.convert_ids_to_tokens(self._tokenizer(text).input_ids)
+        source_tokens = self._tokenizer.encode_source(text, flores_code(source_lang))
 
         result = self._translator.translate_batch(
             [source_tokens],
@@ -126,8 +125,7 @@ class BidirectionalTranslationBackend:
             beam_size=self._beam_size,
         )
         output_tokens = result[0].hypotheses[0][1:]  # drop the target-lang prefix token
-        output_ids = self._tokenizer.convert_tokens_to_ids(output_tokens)
-        return self._tokenizer.decode(output_ids, skip_special_tokens=True).strip()
+        return self._tokenizer.decode_target(output_tokens)
 
 
 class FakeBidirectionalTranslationBackend:

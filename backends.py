@@ -16,20 +16,28 @@ Both classes live here rather than in pipeline.py on purpose: importing
 pipeline.py must never require faster-whisper or ctranslate2 to be
 installed, so the Fake* backends, the segmentation logic, and the wiring
 tests in test_pipeline.py stay fast and dependency-free. Even within this
-module, the heavy imports (faster_whisper, ctranslate2, transformers) are
-deferred to each class's __init__ rather than done at module import time --
-so the language-code mapping and resampling helpers below (which
-test_backends.py exercises directly) can be imported and unit-tested with
-nothing but numpy installed, exactly like the rest of this project.
+module, the heavy imports (faster_whisper, ctranslate2, sentencepiece via
+nllb_tokenizer.py) are deferred to each class's __init__ rather than done
+at module import time -- so the language-code mapping and resampling
+helpers below (which test_backends.py exercises directly) can be imported
+and unit-tested with nothing but numpy installed, exactly like the rest
+of this project.
 
 -----------------------------------------------------------------------------
 Setup
 -----------------------------------------------------------------------------
 
-1. Install the two inference libraries on the presenter's device:
+1. Install the inference libraries on the presenter's device:
 
-       pip install faster-whisper ctranslate2 transformers sentencepiece \
+       pip install faster-whisper ctranslate2 sentencepiece \
            --break-system-packages
+
+   Note: transformers and torch are NOT needed on the presenter's device.
+   NLLB tokenization here goes through nllb_tokenizer.py's NllbLiteTokenizer
+   (plain sentencepiece), not transformers.AutoTokenizer -- see that
+   module's docstring for why. transformers/torch are only needed on
+   whichever machine does the one-time model conversion in step 3, which
+   does not have to be the presenter's laptop.
 
 2. faster-whisper downloads and caches its own compact Whisper checkpoint on
    first use (e.g. "small" or "base") -- no manual conversion step needed,
@@ -50,9 +58,11 @@ Setup
    and never touches the network at inference time -- this is the piece
    that makes the "no traffic leaves the local network" claim in Section
    4.2 hold at translation time too, not just at the WebSocket layer.
-   `AutoTokenizer.from_pretrained(...)` still needs the tokenizer files
-   cached locally; run it once with network access ahead of the session so
-   they land in the local HF cache, then it's offline from then on.
+
+   Also copy `sentencepiece.bpe.model` (the tokenizer file, NOT the
+   ctranslate2 model) alongside `nllb-200-ct2` -- see nllb_tokenizer.py's
+   docstring for the lightest way to fetch just that one file without
+   needing transformers/torch at all, even for this one-time step.
 
 -----------------------------------------------------------------------------
 Wiring into server.py
@@ -223,16 +233,16 @@ class RealNLLBBackend:
     def __init__(
         self,
         model_dir: str,
-        tokenizer_name: str = "facebook/nllb-200-distilled-600M",
+        sentencepiece_model_path: str = "sentencepiece.bpe.model",
         source_lang: str = "en",
         device: str = "cpu",
         beam_size: int = 4,
     ) -> None:
         import ctranslate2  # deferred: heavy, optional dep
-        from transformers import AutoTokenizer  # deferred: heavy, optional dep
+        from nllb_tokenizer import NllbLiteTokenizer  # deferred: sentencepiece is the only dep this pulls in
 
         self._translator = ctranslate2.Translator(model_dir, device=device)
-        self._tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+        self._tokenizer = NllbLiteTokenizer(sentencepiece_model_path)
         self._source_flores = flores_code(source_lang)
         self._beam_size = beam_size
 
@@ -243,8 +253,7 @@ class RealNLLBBackend:
 
     def _translate_sync(self, text: str, target_lang: str) -> str:
         target_flores = flores_code(target_lang)
-        self._tokenizer.src_lang = self._source_flores
-        source_tokens = self._tokenizer.convert_ids_to_tokens(self._tokenizer(text).input_ids)
+        source_tokens = self._tokenizer.encode_source(text, self._source_flores)
 
         result = self._translator.translate_batch(
             [source_tokens],
@@ -252,5 +261,4 @@ class RealNLLBBackend:
             beam_size=self._beam_size,
         )
         output_tokens = result[0].hypotheses[0][1:]  # drop the target-lang prefix token
-        output_ids = self._tokenizer.convert_tokens_to_ids(output_tokens)
-        return self._tokenizer.decode(output_ids, skip_special_tokens=True).strip()
+        return self._tokenizer.decode_target(output_tokens)

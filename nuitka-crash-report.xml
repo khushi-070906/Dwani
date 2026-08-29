@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='utf8'?>
+<nuitka-compilation-report nuitka_version="4.2" nuitka_commercial_version="not installed" mode="standalone" completion="exception">
+  <exception exception_type="OSError" exception_value="[Errno 22] Invalid argument">
+Traceback (most recent call last):
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\MainControl.py", line 1456, in main
+    _main()
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\MainControl.py", line 1273, in _main
+    main_module = _createMainModule()
+                  ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\MainControl.py", line 319, in _createMainModule
+    scanIncludedPackage(package_name)
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\importing\Recursion.py", line 704, in scanIncludedPackage
+    scanPluginPath(
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\importing\Recursion.py", line 541, in scanPluginPath
+    scanPluginSinglePath(
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\importing\Recursion.py", line 515, in scanPluginSinglePath
+    _addIncludedModule(module=module, package_only=package_only)
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\importing\Recursion.py", line 435, in _addIncludedModule
+    scanPluginSinglePath(
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\importing\Recursion.py", line 515, in scanPluginSinglePath
+    _addIncludedModule(module=module, package_only=package_only)
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\importing\Recursion.py", line 445, in _addIncludedModule
+    scanPluginSinglePath(
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\importing\Recursion.py", line 496, in scanPluginSinglePath
+    decision, decision_reason = decideRecursion(
+                                ^^^^^^^^^^^^^^^^
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\importing\Recursion.py", line 218, in decideRecursion
+    onModuleUsageLookAhead(
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\plugins\Hooks.py", line 248, in onModuleUsageLookAhead
+    return Plugins.onModuleUsageLookAhead(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\plugins\Plugins.py", line 1289, in onModuleUsageLookAhead
+    plugin.onModuleUsageLookAhead(
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\plugins\standard\ImplicitImports.py", line 878, in onModuleUsageLookAhead
+    if get_module_source() is None:
+       ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\plugins\Plugins.py", line 1278, in getModuleSourceCode
+    return readSourceCodeFromFilename(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\tree\SourceHandling.py", line 246, in readSourceCodeFromFilename
+    return readSourceCodeFromFilenameWithInformation(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\tree\SourceHandling.py", line 211, in readSourceCodeFromFilenameWithInformation
+    source_code = _readSourceCodeFromFilename3(source_filename)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\KHUSHI MITTAL\OneDrive\Desktop\ldst_scaffold\.venv\Lib\site-packages\nuitka\tree\SourceHandling.py", line 86, in _readSourceCodeFromFilename3
+    with tokenize.open(source_filename) as source_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\KHUSHI MITTAL\AppData\Local\Programs\Python\Python311\Lib\tokenize.py", line 398, in open
+    encoding, lines = detect_encoding(buffer.readline)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\KHUSHI MITTAL\AppData\Local\Programs\Python\Python311\Lib\tokenize.py", line 367, in detect_encoding
+    first = read_or_stop()
+            ^^^^^^^^^^^^^^
+  File "C:\Users\KHUSHI MITTAL\AppData\Local\Programs\Python\Python311\Lib\tokenize.py", line 325, in read_or_stop
+    return readline()
+           ^^^^^^^^^^
+OSError: [Errno 22] Invalid argument
+</exception>
+  <performance>
+    <memory_usage name="after_launch" value="49287168" />
+  </performance>
+  <data_file name="static\host.html" source="${cwd}\static\host.html" size="69720" reason="specified data dir 'static' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="static\index.html" source="${cwd}\static\index.html" size="66498" reason="specified data dir 'static' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="static\login.html" source="${cwd}\static\login.html" size="56054" reason="specified data dir 'static' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="static\pricing.html" source="${cwd}\static\pricing.html" size="70276" reason="specified data dir 'static' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="static\signup.html" source="${cwd}\static\signup.html" size="56587" reason="specified data dir 'static' on command line" tags="user,copy,data-dir-contents" />
+  <data_composer blob_size="None" />
+  <performance-totals>
+    <optimization-time pass="all" time="0.0000" module_count="0" />
+    <code-generation-time time="0.0000" module_count="0" />
+  </performance-totals>
+  <python_binary filename="DwaniLive.exe" />
+  <command_line>
+    <option value="--standalone" />
+    <option value="--assume-yes-for-downloads" />
+    <option value="--output-dir=dist" />
+    <option value="--output-filename=DwaniLive.exe" />
+    <option value="--include-package=fastapi" />
+    <option value="--include-package=uvicorn" />
+    <option value="--include-package=starlette" />
+    <option value="--include-package=faster_whisper" />
+    <option value="--include-package=ctranslate2" />
+    <option value="--include-package=licensing" />
+    <option value="--include-package=cryptography" />
+    <option value="--include-data-dir=static=static" />
+    <option value="server.py" />
+  </command_line>
+  <plugins>
+    <plugin name="anti-bloat" user_enabled="no" />
+    <plugin name="data-files" user_enabled="no" />
+    <plugin name="delvewheel" user_enabled="no" />
+    <plugin name="dll-files" user_enabled="no" />
+    <plugin name="gevent" user_enabled="no" />
+    <plugin name="gi" user_enabled="no" />
+    <plugin name="glfw" user_enabled="no" />
+    <plugin name="implicit-imports" user_enabled="no" />
+    <plugin name="kivy" user_enabled="no" />
+    <plugin name="matplotlib" user_enabled="no" />
+    <plugin name="multiprocessing" user_enabled="no" />
+    <plugin name="options-nanny" user_enabled="no" />
+    <plugin name="pbr-compat" user_enabled="no" />
+    <plugin name="pkg-resources" user_enabled="no" />
+    <plugin name="playwright" user_enabled="no" />
+    <plugin name="pywebview" user_enabled="no" />
+    <plugin name="spacy" user_enabled="no" />
+    <plugin name="torch-jit" user_enabled="no" />
+    <plugin name="transformers" user_enabled="no" />
+  </plugins>
+  <distributions />
+  <python python_exe="${sys.prefix}\Scripts\python.exe" python_flavor="CPython Official" python_version="3.11.6" os_name="Windows" os_release="11" arch_name="x86_64" filesystem_encoding="utf-8">
+    <search_path>
+      <path value="${cwd}" />
+      <path value="${sys.real_prefix}\DLLs" />
+      <path value="${sys.real_prefix}\Lib" />
+      <path value="${sys.real_prefix}" />
+      <path value="${sys.prefix}" />
+      <path value="${sys.prefix}\Lib\site-packages" />
+      <path value="${sys.prefix}\Lib\site-packages\win32" />
+      <path value="${sys.prefix}\Lib\site-packages\win32\lib" />
+      <path value="${sys.prefix}\Lib\site-packages\pythonwin" />
+    </search_path>
+  </python>
+  <output run_filename="${cwd}\dist\server.dist\DwaniLive.exe" />
+</nuitka-compilation-report>
