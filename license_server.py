@@ -43,17 +43,24 @@ One-time setup in the Razorpay Dashboard (Test mode first):
        RAZORPAY_WEBHOOK_SECRET above.
 """
 
+import json
 import os
+import secrets
 import sqlite3
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 import uuid
 from pathlib import Path
 from contextlib import contextmanager
+from typing import Optional
 
+import bcrypt
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Cookie, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -67,11 +74,24 @@ RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "")
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
 RAZORPAY_WEBHOOK_SECRET = os.environ.get("RAZORPAY_WEBHOOK_SECRET", "")
 
+# Google OAuth -- see this module's docstring for the Cloud Console setup
+# steps. GOOGLE_CLIENT_SECRET must NEVER be committed or shared outside
+# Render's environment variables -- same handling as the license signing key.
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+
+SESSION_COOKIE_NAME = "dwanilive_session"
+SESSION_LIFETIME_SECONDS = 30 * 24 * 60 * 60  # 30 days
+
 # Where the pricing page is served from. pricing.html lives in static/ and
 # is served by THIS same app (see the routes below), so this is just this
 # server's own public URL, e.g. https://dwanilive-api.onrender.com
 # Locally it's wherever you run uvicorn, e.g. http://localhost:8443
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:8443") + "/pricing.html"
+
+# Must match EXACTLY what's registered in Google Cloud Console's "Authorized
+# redirect URIs" -- Google rejects the callback otherwise.
+GOOGLE_REDIRECT_URI = os.environ.get("FRONTEND_URL", "http://localhost:8443") + "/auth/google/callback"
 
 if not PRIVATE_KEY:
     raise RuntimeError("Set LDST_LICENSE_PRIVATE_KEY before starting the server. "
@@ -110,6 +130,11 @@ def serve_signup_page():
     return FileResponse(STATIC_DIR / "signup.html")
 
 
+@app.get("/dashboard.html")
+def serve_dashboard_page():
+    return FileResponse(STATIC_DIR / "dashboard.html")
+
+
 @app.get("/")
 def serve_root():
     return FileResponse(STATIC_DIR / "pricing.html")
@@ -143,9 +168,85 @@ def init_db():
                 max_attendees INTEGER
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT UNIQUE NOT NULL,
+                password_hash TEXT,
+                google_id TEXT UNIQUE,
+                name TEXT,
+                created_at INTEGER NOT NULL
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS sessions (
+                token TEXT PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                expires_at INTEGER NOT NULL
+            )
+        """)
 
 
 init_db()
+
+
+# ---------------------------------------------------------------------------
+# Auth helpers -- password hashing, sessions, current-user lookup
+# ---------------------------------------------------------------------------
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("ascii")
+
+
+def verify_password(password: str, password_hash: str) -> bool:
+    try:
+        return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("ascii"))
+    except ValueError:
+        # Malformed hash (shouldn't happen from our own hash_password, but a
+        # corrupt/empty stored value should fail closed, not raise a 500).
+        return False
+
+
+def create_session(user_id: int) -> str:
+    token = secrets.token_urlsafe(32)
+    expires_at = int(time.time()) + SESSION_LIFETIME_SECONDS
+    with db() as conn:
+        conn.execute(
+            "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)",
+            (token, user_id, expires_at),
+        )
+    return token
+
+
+def get_current_user(session_token: Optional[str]):
+    """Returns the users-table row for a valid, unexpired session cookie, or
+    None. Never raises -- callers decide whether an anonymous request is an
+    error (protected endpoints) or just means "logged out" (e.g. a page that
+    shows different content either way).
+    """
+    if not session_token:
+        return None
+    with db() as conn:
+        row = conn.execute(
+            """
+            SELECT users.* FROM sessions
+            JOIN users ON users.id = sessions.user_id
+            WHERE sessions.token = ? AND sessions.expires_at > ?
+            """,
+            (session_token, int(time.time())),
+        ).fetchone()
+    return row
+
+
+def set_session_cookie(response: Response, token: str) -> None:
+    response.set_cookie(
+        key=SESSION_COOKIE_NAME,
+        value=token,
+        max_age=SESSION_LIFETIME_SECONDS,
+        httponly=True,       # not readable from JS -- mitigates XSS token theft
+        samesite="lax",      # sent on top-level navigation (needed for the Google redirect flow) but not cross-site POSTs
+        secure=True,         # only sent over HTTPS -- fine since Render serves HTTPS; set False if you ever test over plain http://
+    )
 
 
 def get_razorpay_client():
@@ -297,6 +398,193 @@ def license_status(license_key: str, email: str):
     if row is None:
         raise HTTPException(status_code=404, detail="Not found.")
     return {"status": row["status"], "tier": row["tier"]}
+
+
+# ---------------------------------------------------------------------------
+# Auth -- email/password signup+login, Google OAuth, session-based "/me"
+# ---------------------------------------------------------------------------
+
+class SignupRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+@app.post("/signup")
+def signup(req: SignupRequest, response: Response):
+    if len(req.password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters.")
+
+    with db() as conn:
+        existing = conn.execute("SELECT id FROM users WHERE email = ?", (req.email,)).fetchone()
+        if existing is not None:
+            raise HTTPException(status_code=409, detail="An account with this email already exists.")
+
+        cursor = conn.execute(
+            "INSERT INTO users (email, password_hash, name, created_at) VALUES (?, ?, ?, ?)",
+            (req.email, hash_password(req.password), req.name, int(time.time())),
+        )
+        user_id = cursor.lastrowid
+
+    token = create_session(user_id)
+    set_session_cookie(response, token)
+    return {"ok": True, "email": req.email, "name": req.name}
+
+
+@app.post("/login")
+def login(req: LoginRequest, response: Response):
+    with db() as conn:
+        row = conn.execute(
+            "SELECT id, password_hash FROM users WHERE email = ?", (req.email,)
+        ).fetchone()
+
+    # Same error for "no such user" and "wrong password" -- don't leak which
+    # one it was, that's a user-enumeration side channel.
+    if row is None or row["password_hash"] is None or not verify_password(req.password, row["password_hash"]):
+        raise HTTPException(status_code=401, detail="Incorrect email or password.")
+
+    token = create_session(row["id"])
+    set_session_cookie(response, token)
+    return {"ok": True}
+
+
+@app.post("/logout")
+def logout(response: Response, dwanilive_session: Optional[str] = Cookie(default=None)):
+    if dwanilive_session:
+        with db() as conn:
+            conn.execute("DELETE FROM sessions WHERE token = ?", (dwanilive_session,))
+    response.delete_cookie(SESSION_COOKIE_NAME)
+    return {"ok": True}
+
+
+@app.get("/me")
+def me(dwanilive_session: Optional[str] = Cookie(default=None)):
+    """Polled by dashboard.html to render the logged-in user's info, plus
+    whatever subscription (if any) is on file for their email -- the two
+    systems (users, subscriptions) are joined here by email address since
+    a subscription can predate an account existing at all (someone can
+    subscribe via pricing.html's Razorpay flow before ever signing up).
+    """
+    user = get_current_user(dwanilive_session)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Not logged in.")
+
+    with db() as conn:
+        subscription = conn.execute(
+            "SELECT license_key, tier, status FROM subscriptions WHERE email = ? ORDER BY rowid DESC LIMIT 1",
+            (user["email"],),
+        ).fetchone()
+
+    return {
+        "email": user["email"],
+        "name": user["name"],
+        "subscription": dict(subscription) if subscription else None,
+    }
+
+
+@app.get("/auth/google/login")
+def google_login(response: Response):
+    if not GOOGLE_CLIENT_ID:
+        raise HTTPException(status_code=500, detail="Server misconfigured: GOOGLE_CLIENT_ID not set.")
+
+    # CSRF protection: a random value we can verify came back unchanged on
+    # the callback, stored in a short-lived cookie rather than server-side
+    # state, since there's no session yet at this point in the flow.
+    state = secrets.token_urlsafe(24)
+    params = {
+        "client_id": GOOGLE_CLIENT_ID,
+        "redirect_uri": GOOGLE_REDIRECT_URI,
+        "response_type": "code",
+        "scope": "openid email profile",
+        "state": state,
+        "prompt": "select_account",
+    }
+    google_url = "https://accounts.google.com/o/oauth2/v2/auth?" + urllib.parse.urlencode(params)
+
+    redirect = RedirectResponse(url=google_url)
+    redirect.set_cookie(
+        key="dwanilive_oauth_state", value=state, max_age=600, httponly=True, samesite="lax", secure=True
+    )
+    return redirect
+
+
+@app.get("/auth/google/callback")
+def google_callback(
+    code: str = "",
+    state: str = "",
+    error: str = "",
+    dwanilive_oauth_state: Optional[str] = Cookie(default=None),
+):
+    if error:
+        raise HTTPException(status_code=400, detail=f"Google sign-in was cancelled or failed: {error}")
+
+    if not state or state != dwanilive_oauth_state:
+        raise HTTPException(status_code=400, detail="OAuth state mismatch -- please try signing in again.")
+
+    if not (GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET):
+        raise HTTPException(status_code=500, detail="Server misconfigured: Google OAuth credentials not set.")
+
+    # Exchange the authorization code for tokens. Using urllib (stdlib) here
+    # rather than adding `requests` as a new dependency -- same minimal-deps
+    # approach as activate.py.
+    token_body = urllib.parse.urlencode({
+        "code": code,
+        "client_id": GOOGLE_CLIENT_ID,
+        "client_secret": GOOGLE_CLIENT_SECRET,
+        "redirect_uri": GOOGLE_REDIRECT_URI,
+        "grant_type": "authorization_code",
+    }).encode("utf-8")
+    token_req = urllib.request.Request(
+        "https://oauth2.googleapis.com/token", data=token_body, method="POST"
+    )
+    try:
+        with urllib.request.urlopen(token_req, timeout=15) as resp:
+            token_data = json.loads(resp.read())
+    except urllib.error.HTTPError as exc:
+        raise HTTPException(status_code=400, detail=f"Google token exchange failed: {exc.read().decode()}")
+
+    access_token = token_data.get("access_token")
+    if not access_token:
+        raise HTTPException(status_code=400, detail="Google did not return an access token.")
+
+    userinfo_req = urllib.request.Request(
+        "https://www.googleapis.com/oauth2/v2/userinfo",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    with urllib.request.urlopen(userinfo_req, timeout=15) as resp:
+        userinfo = json.loads(resp.read())
+
+    google_id = userinfo.get("id")
+    email = userinfo.get("email")
+    name = userinfo.get("name", email)
+
+    if not (google_id and email):
+        raise HTTPException(status_code=400, detail="Google did not return the expected profile info.")
+
+    with db() as conn:
+        row = conn.execute("SELECT id FROM users WHERE google_id = ? OR email = ?", (google_id, email)).fetchone()
+        if row is None:
+            cursor = conn.execute(
+                "INSERT INTO users (email, google_id, name, created_at) VALUES (?, ?, ?, ?)",
+                (email, google_id, name, int(time.time())),
+            )
+            user_id = cursor.lastrowid
+        else:
+            user_id = row["id"]
+            # Link the Google account to an existing password-based user
+            # signing in with Google for the first time, matched by email.
+            conn.execute("UPDATE users SET google_id = ? WHERE id = ? AND google_id IS NULL", (google_id, user_id))
+
+    token = create_session(user_id)
+    redirect = RedirectResponse(url="/dashboard.html")
+    redirect.delete_cookie("dwanilive_oauth_state")
+    set_session_cookie(redirect, token)
+    return redirect
 
 
 # ---------------------------------------------------------------------------

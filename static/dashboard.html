@@ -290,6 +290,9 @@
     font-family: var(--font-body); color: var(--ink); transition: border-color 0.15s ease;
   }
   .field input:focus { border-color: var(--accent); outline: none; }
+  .field-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; }
+  .field-row a { font-size: 0.8rem; font-weight: 600; color: var(--accent-deep); text-decoration: none; }
+  .field-row a:hover { text-decoration: underline; }
   .field-hint { font-size: 0.76rem; color: var(--ink-faint); margin-top: 0.35rem; }
 
   .auth-submit {
@@ -301,11 +304,18 @@
   }
   .auth-submit:hover { transform: translateY(-1px); }
 
+  .auth-divider {
+    display: flex; align-items: center; gap: 0.75rem; margin: 1.1rem 0;
+    color: var(--ink-faint); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: ""; flex: 1; height: 1px; background: var(--bg-raised-2);
+  }
+
   .auth-switch { text-align: center; font-size: 0.86rem; color: var(--ink-dim); }
   .auth-switch a { color: var(--accent-deep); font-weight: 700; text-decoration: none; }
   .auth-switch a:hover { text-decoration: underline; }
 
-  .auth-divider { text-align: center; font-size: 0.76rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.06em; margin: 0.4rem 0 1.1rem; }
   .auth-google-btn {
     display: flex; align-items: center; justify-content: center; gap: 0.6rem;
     width: 100%; border: 1px solid var(--bg-raised-2); border-radius: 4px 14px 4px 14px;
@@ -314,15 +324,62 @@
   }
   .auth-google-btn:hover { border-color: var(--accent); }
 
-  .auth-terms { font-size: 0.76rem; color: var(--ink-faint); text-align: center; margin: -0.6rem 0 1.4rem; line-height: 1.5; }
-  .auth-terms a { color: var(--ink-dim); font-weight: 600; }
-
   .auth-error {
     background: rgba(179, 38, 30, 0.08); border: 1px solid rgba(179, 38, 30, 0.25);
     color: var(--error); font-size: 0.82rem; padding: 0.6rem 0.85rem; border-radius: 8px;
     margin-bottom: 1.1rem; display: none;
   }
   .auth-error.show { display: block; }
+</style>
+
+<style>
+  .dash-wrap { display: flex; justify-content: center; padding: 2.5rem 0 5rem; position: relative; z-index: 1; }
+  .dash-card {
+    background: var(--bg-raised);
+    border-radius: 4px 26px 4px 26px;
+    padding: 2.25rem 2rem;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 20px 60px -16px rgba(44, 24, 16, 0.22);
+  }
+  .dash-card h1 {
+    font-family: var(--font-display); font-weight: 400; font-size: 1.7rem;
+    margin: 0 0 0.4rem; letter-spacing: -0.01em; line-height: 1.2;
+  }
+  .dash-card > p.sub { color: var(--ink-dim); font-size: 0.9rem; margin: 0 0 1.75rem; line-height: 1.5; }
+
+  .dash-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.9rem 0; border-bottom: 1px solid var(--bg-raised-2);
+  }
+  .dash-row:last-child { border-bottom: none; }
+  .dash-row .label { font-size: 0.8rem; color: var(--ink-dim); font-weight: 600; }
+  .dash-row .value { font-size: 0.92rem; color: var(--ink); font-weight: 600; text-align: right; }
+
+  .dash-tier-badge {
+    display: inline-block; padding: 0.25em 0.8em; border-radius: 999px;
+    font-size: 0.76rem; font-weight: 700; text-transform: capitalize;
+    background: var(--bg); border: 1px solid var(--accent-deep); color: var(--accent-deep);
+  }
+  .dash-status-active { color: #1a7a4c; }
+  .dash-status-inactive, .dash-status-pending, .dash-status-past_due { color: var(--error); }
+
+  .dash-license-box {
+    font-family: monospace; background: var(--bg); border: 1px solid var(--bg-raised-2);
+    border-radius: 8px; padding: 0.7rem 0.9rem; font-size: 0.85rem; word-break: break-all;
+    margin-top: 0.4rem;
+  }
+
+  .dash-empty { text-align: center; padding: 1.5rem 0; }
+  .dash-empty p { color: var(--ink-dim); font-size: 0.9rem; margin-bottom: 1.2rem; }
+  .dash-cta {
+    display: inline-block; border-radius: 4px 14px 4px 14px; padding: 0.7rem 1.4rem;
+    font-size: 0.88rem; font-weight: 700; text-decoration: none;
+    background: linear-gradient(120deg, var(--accent), var(--accent-2) 55%, var(--indigo));
+    color: #fff5e6;
+  }
+
+  .dash-loading, .dash-error { text-align: center; padding: 2rem 0; color: var(--ink-dim); font-size: 0.9rem; }
 </style>
 </head>
 <body>
@@ -383,49 +440,14 @@
   <div class="nav-links">
     <a href="pricing.html">Pricing</a>
     <a href="pricing.html#faq">FAQ</a>
-    <a href="login.html">Log in</a>
+    <a href="#" id="logout-link">Log out</a>
   </div>
 </nav>
 
 <main class="wrap">
-  <div class="auth-wrap">
-    <div class="auth-card">
-      <span class="auth-eyebrow"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--live);display:inline-block;"></span> Create Your Account</span>
-      <h1>Get started with DwaniLive</h1>
-      <p class="sub">Set up your presenter account to manage subscriptions and license keys.</p>
-
-      <div class="auth-error" id="signup-error">Something went wrong. Please try again.</div>
-
-      <form id="signup-form">
-        <div class="field">
-          <label for="signup-name">Full name</label>
-          <input type="text" id="signup-name" name="name" placeholder="Ananya Sharma" required>
-        </div>
-        <div class="field">
-          <label for="signup-email">Email</label>
-          <input type="email" id="signup-email" name="email" placeholder="you@example.com" required>
-        </div>
-        <div class="field">
-          <label for="signup-password">Password</label>
-          <input type="password" id="signup-password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required minlength="8">
-          <p class="field-hint">At least 8 characters.</p>
-        </div>
-        <div class="field">
-          <label for="signup-confirm">Confirm password</label>
-          <input type="password" id="signup-confirm" name="confirm" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required minlength="8">
-        </div>
-        <button type="submit" class="auth-submit">Create account</button>
-      </form>
-
-      <div class="auth-divider">or</div>
-      <a href="/auth/google/login" class="auth-google-btn">
-        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.83.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.28-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.59-2.59C13.46.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
-        Continue with Google
-      </a>
-
-      <p class="auth-terms">By signing up, you agree to DwaniLive&rsquo;s <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
-
-      <p class="auth-switch">Already have an account? <a href="login.html">Log in</a></p>
+  <div class="dash-wrap">
+    <div class="dash-card" id="dash-card">
+      <div class="dash-loading" id="dash-loading">Loading your account...</div>
     </div>
   </div>
 </main>
@@ -435,40 +457,61 @@
 </footer>
 
 <script>
-  document.getElementById('signup-form').addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const name = document.getElementById('signup-name').value;
-    const email = document.getElementById('signup-email').value;
-    const pw = document.getElementById('signup-password').value;
-    const confirm = document.getElementById('signup-confirm').value;
-    const errorBox = document.getElementById('signup-error');
-
-    if (pw !== confirm) {
-      errorBox.textContent = "Passwords don't match.";
-      errorBox.classList.add('show');
-      return;
-    }
-    errorBox.classList.remove('show');
-
+  async function loadDashboard() {
+    const card = document.getElementById('dash-card');
     try {
-      const res = await fetch('/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ name, email, password: pw }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        errorBox.textContent = data.detail || 'Something went wrong. Please try again.';
-        errorBox.classList.add('show');
+      const res = await fetch('/me', { credentials: 'include' });
+      if (res.status === 401) {
+        window.location.href = '/login.html';
         return;
       }
-      window.location.href = '/dashboard.html';
+      if (!res.ok) throw new Error('Failed to load account');
+      const data = await res.json();
+
+      let subscriptionHtml;
+      if (data.subscription) {
+        const sub = data.subscription;
+        const statusClass = 'dash-status-' + sub.status;
+        subscriptionHtml = `
+          <div class="dash-row">
+            <span class="label">Plan</span>
+            <span class="value"><span class="dash-tier-badge">${sub.tier}</span></span>
+          </div>
+          <div class="dash-row">
+            <span class="label">Status</span>
+            <span class="value ${statusClass}">${sub.status}</span>
+          </div>
+          <div class="dash-row" style="flex-direction:column; align-items:flex-start; gap:0.4rem;">
+            <span class="label">License key</span>
+            <div class="dash-license-box">${sub.license_key}</div>
+          </div>
+        `;
+      } else {
+        subscriptionHtml = `
+          <div class="dash-empty">
+            <p>You don&rsquo;t have an active subscription yet.</p>
+            <a href="pricing.html" class="dash-cta">View plans</a>
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <h1>Welcome, ${data.name || data.email}</h1>
+        <p class="sub">${data.email}</p>
+        ${subscriptionHtml}
+      `;
     } catch (err) {
-      errorBox.textContent = 'Could not reach the server. Check your connection and try again.';
-      errorBox.classList.add('show');
+      card.innerHTML = '<div class="dash-error">Could not load your account. Please refresh or log in again.</div>';
     }
+  }
+
+  document.getElementById('logout-link').addEventListener('click', async function (e) {
+    e.preventDefault();
+    await fetch('/logout', { method: 'POST', credentials: 'include' });
+    window.location.href = '/login.html';
   });
+
+  loadDashboard();
 </script>
 
 </body>
