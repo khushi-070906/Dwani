@@ -2,11 +2,19 @@
 .env
 .env.*
 
+*.token
+licenses.db
+__pycache__/
+.venv/
+
 # Local database
 licenses.db
 *.db
 *.sqlite3
-
+build/
+dist/
+dwani-models/
+dwani-models.zip
 # Python
 __pycache__/
 *.py[cod]

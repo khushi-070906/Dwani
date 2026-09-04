@@ -27,16 +27,17 @@ from licensing import save_cached_license, DEFAULT_CACHE_PATH
 REQUEST_TIMEOUT_SECONDS = 60
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--license-key", required=True, help="From your purchase confirmation popup")
-    parser.add_argument("--server", required=True, help="License server base URL, e.g. https://dhwanilive-api.onrender.com")
-    parser.add_argument("--email", required=True, help="Presenter email associated with the subscription")
-    args = parser.parse_args()
-
-    body = json.dumps({"license_key": args.license_key, "email": args.email}).encode("utf-8")
+def activate(license_key: str, server: str, email: str) -> bool:
+    """
+    Does the actual activation: calls the license server, caches the token
+    on success. Returns True/False rather than calling sys.exit(), so
+    callers other than this file's own CLI entry point (e.g. launcher.py,
+    prompting interactively on first run) can retry or fall back to their
+    own UI instead of the process just dying.
+    """
+    body = json.dumps({"license_key": license_key, "email": email}).encode("utf-8")
     req = urllib.request.Request(
-        f"{args.server}/activate",
+        f"{server}/activate",
         data=body,
         headers={"Content-Type": "application/json"},
         method="POST",
@@ -52,11 +53,10 @@ def main():
         )
         print(
             "This often means the server was cold (idle and slow to wake up) rather than "
-            "actually broken -- try running this exact command again once more before "
-            "digging further.",
+            "actually broken -- try again once more before digging further.",
             file=sys.stderr,
         )
-        sys.exit(1)
+        return False
     except urllib.error.HTTPError as exc:
         # The server responded, just not with success -- read its actual
         # error message rather than just printing the generic HTTP code,
@@ -69,26 +69,39 @@ def main():
             detail = str(exc)
         print(f"Activation failed ({exc.code}): {detail}", file=sys.stderr)
         if exc.code == 404:
-            print("-> Double check --license-key and --email match exactly what you used at checkout.", file=sys.stderr)
+            print("-> Double check the license key and email match exactly what you used at checkout.", file=sys.stderr)
         elif exc.code == 402:
-            print("-> The subscription isn't active yet -- check Razorpay/Render logs to confirm the webhook fired.", file=sys.stderr)
-        sys.exit(1)
+            print("-> The subscription isn't active yet -- check that payment went through.", file=sys.stderr)
+        return False
     except urllib.error.URLError as exc:
-        print(f"Activation failed: couldn't reach {args.server} -- {exc.reason}", file=sys.stderr)
-        print("Check the --server URL is correct and that you have an internet connection.", file=sys.stderr)
-        sys.exit(1)
+        print(f"Activation failed: couldn't reach {server} -- {exc.reason}", file=sys.stderr)
+        print("Check the server URL is correct and that you have an internet connection.", file=sys.stderr)
+        return False
     except Exception as exc:
         print(f"Activation failed: {exc}", file=sys.stderr)
         print("Check your internet connection and license key, then try again.", file=sys.stderr)
-        sys.exit(1)
+        return False
 
     if "token" not in data:
         print(f"Activation failed: {data.get('error', 'unknown error')}", file=sys.stderr)
-        sys.exit(1)
+        return False
 
     save_cached_license(data["token"])
     print(f"Activated. License cached at {DEFAULT_CACHE_PATH}")
     print(f"Tier: {data.get('tier')}  Expires: {data.get('expires_at_human')}")
+    return True
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--license-key", required=True, help="From your purchase confirmation popup")
+    parser.add_argument("--server", required=True, help="License server base URL, e.g. https://dhwanilive-api.onrender.com")
+    parser.add_argument("--email", required=True, help="Presenter email associated with the subscription")
+    args = parser.parse_args()
+
+    if not activate(args.license_key, args.server, args.email):
+        sys.exit(1)
+
     print("You can now run server.py fully offline until then.")
 
 

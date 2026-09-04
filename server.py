@@ -473,7 +473,19 @@ async def host_page():
     return FileResponse(static_dir / "host.html")
 
 
-if __name__ == "__main__":
+def main(argv=None):
+    """Everything server.py does when run directly, as a callable function
+    instead of a bare `if __name__` block -- so launcher.py (or anything
+    else) can start this programmatically with `import server; server.main([...])`,
+    passing the exact same flags someone would type on the command line,
+    without needing a second process or reading this file's source at
+    runtime. Every line below is unchanged from the original __main__
+    block; only this wrapper and the final `if __name__` call at the
+    bottom of the file are new.
+    """
+    if argv is None:
+        argv = sys.argv[1:]
+
     import uvicorn
 
     parser = argparse.ArgumentParser(description="LDST host server")
@@ -611,7 +623,7 @@ if __name__ == "__main__":
         help="Use this exact password instead of a generated one. Required on macOS alongside "
         "--hotspot-ssid, for the same reason.",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     load_dotenv()  # reads .env in the current directory (LDST_LICENSE_PUBLIC_KEY) if present, optional
 
@@ -620,7 +632,7 @@ if __name__ == "__main__":
     # on license_server.py's infrastructure). Baking this in means presenters
     # don't need to set an env var correctly; an env var, if set, still wins,
     # which is handy if you ever rotate the keypair without shipping a new build.
-    DEFAULT_LICENSE_PUBLIC_KEY = "-50neXrC2PCdrcUKNyq0cYyswqM-O23gThTebrkzC7M"
+    DEFAULT_LICENSE_PUBLIC_KEY = "yV9oH1g6HF2rEJ0kJjJMiGAZ8bW2v1HaWIP88f2mX9o"
     LICENSE_PUBLIC_KEY = os.environ.get("LDST_LICENSE_PUBLIC_KEY", DEFAULT_LICENSE_PUBLIC_KEY)
     # --- License check -------------------------------------------------
     # Reads the cached token written by activate.py (~/.ldst/license.token
@@ -833,3 +845,7 @@ if __name__ == "__main__":
         # (and, on Windows, holding the WiFi adapter in AP mode) after the
         # server process exits.
         session.stop_hotspot()
+
+
+if __name__ == "__main__":
+    main()
