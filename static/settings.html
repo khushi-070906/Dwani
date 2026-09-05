@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DwaniLive Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf6e7;
+    --bg-raised: #fffdf6;
+    --bg-raised-2: #f4e9cf;
+    --ink: #2c1810;
+    --ink-dim: #5c4433;
+    --ink-faint: #83694f;
+    --accent: #e2790f;
+    --accent-deep: #a8460c;
+    --accent-2: #c81e5e;
+    --accent-3: #0d6e5c;
+    --accent-4: #3d3096;
+    --indigo: #223367;
+    --mehndi: #4c6b1f;
+    --live: #2f7a3a;
+    --error: #b3261e;
+    --focus: #a8460c;
+    --shadow: 0 1px 2px rgba(44, 24, 16, 0.08), 0 10px 26px -8px rgba(44, 24, 16, 0.20);
+    --font-display: "Rozha One", "Noto Serif Devanagari", Georgia, serif;
+    --font-body: "Mukta", "Noto Sans", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; }
+
+  body {
+    background:
+      radial-gradient(circle at 1px 1px, rgba(168, 70, 12, 0.11) 1px, transparent 0) 0 0 / 22px 22px,
+      radial-gradient(circle at 11px 11px, rgba(61, 48, 150, 0.06) 1px, transparent 0) 0 0 / 22px 22px,
+      radial-gradient(ellipse at 50% -10%, rgba(200, 30, 94, 0.07), transparent 55%),
+      radial-gradient(ellipse at 100% 110%, rgba(13, 110, 92, 0.05), transparent 50%),
+      var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  a { color: inherit; }
+  button { font-family: inherit; cursor: pointer; }
+  button:focus-visible, a:focus-visible, input:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+
+  nav.wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 1.5rem; padding-bottom: 1.5rem;
+  }
+  .brand-row { display: flex; align-items: center; gap: 0.55rem; }
+  .brand-name { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; letter-spacing: -0.01em; }
+  .brand-name .dwani {
+    background: linear-gradient(120deg, var(--accent-deep), var(--accent-2), var(--indigo));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .brand-name .live { color: var(--ink-dim); font-family: var(--font-body); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; vertical-align: 1px; margin-left: 0.15em; }
+  .nav-links { display: flex; gap: 1.75rem; font-size: 0.9rem; font-weight: 600; color: var(--ink-dim); }
+  .nav-links a { text-decoration: none; }
+  .nav-links a:hover { color: var(--accent-deep); }
+  .nav-links a.active { color: var(--accent-deep); }
+  @media (max-width: 620px) { .nav-links { display: none; } }
+
+  .dash-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.4rem; padding: 2.5rem 0 5rem; position: relative; z-index: 1; }
+  .dash-card {
+    width: 100%; max-width: 480px; background: var(--bg-raised); border: 1px solid var(--bg-raised-2);
+    border-radius: 4px 28px 4px 28px; box-shadow: var(--shadow); padding: 2.2rem 2rem;
+  }
+  .dash-card h1 { font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; margin: 0 0 0.3rem; }
+  .dash-card h2 { font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; margin: 0 0 1rem; }
+  .dash-card > p.sub { color: var(--ink-dim); font-size: 0.85rem; margin: 0 0 1.5rem; line-height: 1.5; }
+
+  .field { margin-bottom: 1.1rem; text-align: left; }
+  .field label {
+    display: block; font-size: 0.78rem; font-weight: 700; color: var(--ink-dim);
+    margin-bottom: 0.4rem; letter-spacing: 0.02em;
+  }
+  .field input {
+    width: 100%; background: var(--bg); border: 1px solid var(--bg-raised-2);
+    border-radius: 10px; padding: 0.75rem 0.9rem; font-size: 0.92rem;
+    font-family: var(--font-body); color: var(--ink); transition: border-color 0.15s ease;
+  }
+  .field input:focus { border-color: var(--accent); outline: none; }
+  .field-hint { font-size: 0.76rem; color: var(--ink-faint); margin-top: 0.35rem; }
+
+  .btn-primary {
+    width: 100%; border: none; border-radius: 4px 14px 4px 14px; padding: 0.8rem 1rem;
+    font-size: 0.9rem; font-weight: 700; margin: 0.3rem 0 0.2rem;
+    background: linear-gradient(120deg, var(--accent), var(--accent-2) 55%, var(--indigo));
+    color: #fff5e6; box-shadow: 0 4px 14px -4px rgba(168, 70, 12, 0.45);
+    transition: transform 0.12s ease;
+  }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+  .btn-danger {
+    width: 100%; border: 1px solid rgba(179, 38, 30, 0.35); border-radius: 4px 14px 4px 14px;
+    padding: 0.75rem 1rem; font-size: 0.88rem; font-weight: 700; margin-top: 0.2rem;
+    background: rgba(179, 38, 30, 0.06); color: var(--error);
+  }
+  .btn-danger:hover { background: rgba(179, 38, 30, 0.12); }
+  .btn-danger:disabled { opacity: 0.6; cursor: default; }
+
+  .msg { font-size: 0.82rem; padding: 0.6rem 0.85rem; border-radius: 8px; margin-bottom: 1rem; display: none; }
+  .msg-error { background: rgba(179, 38, 30, 0.08); border: 1px solid rgba(179, 38, 30, 0.25); color: var(--error); }
+  .msg-success { background: rgba(13, 110, 92, 0.08); border: 1px solid rgba(13, 110, 92, 0.25); color: var(--accent-3); }
+
+  .dash-row { display: flex; justify-content: space-between; align-items: center; padding: 0.7rem 0; border-bottom: 1px solid var(--bg-raised-2); }
+  .dash-row:last-child { border-bottom: none; }
+  .dash-row .label { font-size: 0.8rem; color: var(--ink-dim); font-weight: 600; }
+  .dash-row .value { font-size: 0.9rem; color: var(--ink); font-weight: 600; text-align: right; }
+  .dash-status-active { color: #1a7a4c; }
+  .dash-status-inactive, .dash-status-past_due, .dash-status-canceled { color: var(--error); }
+  .dash-status-cancelling { color: var(--accent-deep); }
+
+  .divider { height: 1px; background: var(--bg-raised-2); margin: 1.6rem 0; }
+  .dash-loading, .dash-error { text-align: center; padding: 2rem 0; color: var(--ink-dim); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<nav class="wrap">
+  <div class="brand-row">
+    <a href="pricing.html" style="text-decoration:none;"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
+  </div>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="settings.html" class="active">Settings</a>
+    <a href="#" id="logout-link">Log out</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="dash-wrap">
+
+    <!-- Account info -->
+    <div class="dash-card" id="account-card">
+      <div class="dash-loading" id="account-loading">Loading your account...</div>
+    </div>
+
+    <!-- Change password -->
+    <div class="dash-card" id="password-card" style="display:none;">
+      <h2>Change password</h2>
+      <div class="msg msg-error" id="password-error"></div>
+      <div class="msg msg-success" id="password-success"></div>
+      <form id="password-form">
+        <div class="field" id="current-password-field">
+          <label for="current-password">Current password</label>
+          <input type="password" id="current-password" autocomplete="current-password">
+        </div>
+        <div class="field">
+          <label for="new-password">New password</label>
+          <input type="password" id="new-password" autocomplete="new-password" minlength="8" required>
+          <p class="field-hint">At least 8 characters.</p>
+        </div>
+        <div class="field">
+          <label for="confirm-password">Confirm new password</label>
+          <input type="password" id="confirm-password" autocomplete="new-password" minlength="8" required>
+        </div>
+        <button type="submit" class="btn-primary" id="password-submit">Update password</button>
+      </form>
+    </div>
+
+    <!-- Subscription management -->
+    <div class="dash-card" id="subscription-card" style="display:none;">
+      <h2>Subscription</h2>
+      <div class="msg msg-error" id="cancel-error"></div>
+      <div class="msg msg-success" id="cancel-success"></div>
+      <div id="subscription-details"></div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="wrap" style="padding-bottom:2rem; color:var(--ink-faint); font-size:0.85rem;">
+  DwaniLive · Built for in-person academic conferences
+</footer>
+
+<script>
+  let currentUser = null;
+
+  async function loadSettings() {
+    const accountCard = document.getElementById('account-card');
+    try {
+      const res = await fetch('/me', { credentials: 'include' });
+      if (res.status === 401) {
+        window.location.href = '/login.html';
+        return;
+      }
+      if (!res.ok) throw new Error('Failed to load account');
+      currentUser = await res.json();
+
+      // ---- Account info + name edit ----
+      accountCard.innerHTML = `
+        <h1>Account</h1>
+        <div class="msg msg-error" id="name-error"></div>
+        <div class="msg msg-success" id="name-success"></div>
+        <div class="field">
+          <label for="account-email">Email</label>
+          <input type="email" id="account-email" value="${currentUser.email}" disabled>
+          <p class="field-hint">Email can't be changed here. Contact support if you need this updated.</p>
+        </div>
+        <form id="name-form">
+          <div class="field">
+            <label for="account-name">Name</label>
+            <input type="text" id="account-name" value="${currentUser.name || ''}" required>
+          </div>
+          <button type="submit" class="btn-primary">Save name</button>
+        </form>
+      `;
+
+      document.getElementById('name-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const name = document.getElementById('account-name').value.trim();
+        const errEl = document.getElementById('name-error');
+        const okEl = document.getElementById('name-success');
+        errEl.style.display = 'none';
+        okEl.style.display = 'none';
+        try {
+          const res = await fetch('/account', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ name }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail || 'Could not save name.');
+          okEl.textContent = 'Saved.';
+          okEl.style.display = 'block';
+        } catch (err) {
+          errEl.textContent = err.message;
+          errEl.style.display = 'block';
+        }
+      });
+
+      // ---- Password form: hide "current password" field for Google-only accounts ----
+      if (!currentUser.has_password) {
+        document.getElementById('current-password-field').style.display = 'none';
+      }
+      document.getElementById('password-card').style.display = 'block';
+
+      // ---- Subscription section ----
+      renderSubscription(currentUser.subscription);
+      document.getElementById('subscription-card').style.display = 'block';
+
+    } catch (err) {
+      accountCard.innerHTML = '<div class="dash-error">Could not load your account. Please refresh or log in again.</div>';
+    }
+  }
+
+  function renderSubscription(sub) {
+    const container = document.getElementById('subscription-details');
+    if (!sub) {
+      container.innerHTML = `
+        <p style="color:var(--ink-dim); font-size:0.9rem;">You don't have a subscription yet.</p>
+        <a href="pricing.html" class="btn-primary" style="display:block; text-align:center; text-decoration:none;">View plans</a>
+      `;
+      return;
+    }
+    const statusClass = 'dash-status-' + sub.status;
+    const canCancel = sub.status === 'active' || sub.status === 'pending';
+    container.innerHTML = `
+      <div class="dash-row">
+        <span class="label">Plan</span>
+        <span class="value">${sub.tier}</span>
+      </div>
+      <div class="dash-row">
+        <span class="label">Status</span>
+        <span class="value ${statusClass}">${sub.status}</span>
+      </div>
+      ${canCancel ? '<button class="btn-danger" id="cancel-btn" style="margin-top:1rem;">Cancel subscription</button>' : ''}
+      ${sub.status === 'cancelling' ? '<p style="font-size:0.82rem; color:var(--ink-faint); margin-top:0.8rem;">Your subscription is set to end at the close of the current billing period -- DwaniLive stays usable until then.</p>' : ''}
+    `;
+
+    const cancelBtn = document.getElementById('cancel-btn');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', async () => {
+        const confirmed = window.confirm(
+          "Cancel your subscription? You'll keep access until the end of your current billing period, then it won't renew."
+        );
+        if (!confirmed) return;
+
+        const errEl = document.getElementById('cancel-error');
+        const okEl = document.getElementById('cancel-success');
+        errEl.style.display = 'none';
+        okEl.style.display = 'none';
+        cancelBtn.disabled = true;
+        cancelBtn.textContent = 'Cancelling…';
+
+        try {
+          const res = await fetch('/cancel-subscription', { method: 'POST', credentials: 'include' });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail || 'Could not cancel subscription.');
+          okEl.textContent = 'Subscription set to cancel at period end.';
+          okEl.style.display = 'block';
+          // Refresh /me to pick up the new status rather than hand-editing the DOM.
+          const meRes = await fetch('/me', { credentials: 'include' });
+          const meData = await meRes.json();
+          renderSubscription(meData.subscription);
+        } catch (err) {
+          errEl.textContent = err.message;
+          errEl.style.display = 'block';
+          cancelBtn.disabled = false;
+          cancelBtn.textContent = 'Cancel subscription';
+        }
+      });
+    }
+  }
+
+  document.getElementById('password-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const currentPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    const errEl = document.getElementById('password-error');
+    const okEl = document.getElementById('password-success');
+    errEl.style.display = 'none';
+    okEl.style.display = 'none';
+
+    if (newPassword !== confirmPassword) {
+      errEl.textContent = "New passwords don't match.";
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const submitBtn = document.getElementById('password-submit');
+    submitBtn.disabled = true;
+    try {
+      const res = await fetch('/account/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ current_password: currentPassword || null, new_password: newPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Could not update password.');
+      okEl.textContent = 'Password updated.';
+      okEl.style.display = 'block';
+      document.getElementById('password-form').reset();
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.style.display = 'block';
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  document.getElementById('logout-link').addEventListener('click', async function (e) {
+    e.preventDefault();
+    await fetch('/logout', { method: 'POST', credentials: 'include' });
+    window.location.href = '/login.html';
+  });
+
+  loadSettings();
+</script>
+
+</body>
+</html>
