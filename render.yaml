@@ -28,7 +28,19 @@ services:
         sync: false
       - key: RAZORPAY_PLAN_INSTITUTION_ANNUAL
         sync: false
+      # Comma-separated list of allowed origins for CORS, e.g.
+      # "https://dhwani-elit.onrender.com". Leave unset (or empty) to allow
+      # any origin -- fine as long as pricing/login/dashboard stay served
+      # from this same app, since then no request is actually cross-origin.
       - key: ALLOWED_ORIGINS
+        sync: false
+      # Gmail address + a 16-character "App Password" (NOT your normal Gmail
+      # password) used to send password-reset OTP emails. Generate one at
+      # myaccount.google.com/apppasswords (requires 2-Step Verification on
+      # that Google account).
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
         sync: false
     disk:
       name: license-db
