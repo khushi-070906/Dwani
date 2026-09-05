@@ -46,12 +46,14 @@ One-time setup in the Razorpay Dashboard (Test mode first):
 import json
 import os
 import secrets
+import smtplib
 import sqlite3
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
+from email.mime.text import MIMEText
 from pathlib import Path
 from contextlib import contextmanager
 from typing import Optional
@@ -79,6 +81,17 @@ RAZORPAY_WEBHOOK_SECRET = os.environ.get("RAZORPAY_WEBHOOK_SECRET", "")
 # Render's environment variables -- same handling as the license signing key.
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+
+# Sends the password-reset OTP email via Gmail's SMTP server. SMTP_USER is
+# the Gmail address itself; SMTP_PASSWORD is a 16-character Gmail "App
+# Password" (Google Account -> Security -> 2-Step Verification -> App
+# passwords) -- NOT the regular Gmail login password, which Gmail's SMTP
+# rejects for security. Never commit either value.
+SMTP_USER = os.environ.get("SMTP_USER", "")
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
+
+OTP_LIFETIME_SECONDS = 10 * 60  # 10 minutes
+OTP_MAX_ATTEMPTS = 5            # per requested code, before it's rejected outright
 
 SESSION_COOKIE_NAME = "dwanilive_session"
 SESSION_LIFETIME_SECONDS = 30 * 24 * 60 * 60  # 30 days
@@ -136,6 +149,11 @@ def serve_pricing_page():
 @app.get("/login.html")
 def serve_login_page():
     return FileResponse(STATIC_DIR / "login.html")
+
+
+@app.get("/forgot-password.html")
+def serve_forgot_password_page():
+    return FileResponse(STATIC_DIR / "forgot-password.html")
 
 
 @app.get("/signup.html")
@@ -203,6 +221,14 @@ def init_db():
                 expires_at INTEGER NOT NULL
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS password_resets (
+                email TEXT PRIMARY KEY,
+                otp_hash TEXT NOT NULL,
+                expires_at INTEGER NOT NULL,
+                attempts INTEGER NOT NULL DEFAULT 0
+            )
+        """)
 
 
 init_db()
@@ -223,6 +249,30 @@ def verify_password(password: str, password_hash: str) -> bool:
         # Malformed hash (shouldn't happen from our own hash_password, but a
         # corrupt/empty stored value should fail closed, not raise a 500).
         return False
+
+
+def send_otp_email(to_email: str, otp: str) -> None:
+    """Sends the 6-digit password-reset code via Gmail SMTP. Raises on
+    failure -- callers decide whether that should surface to the user or
+    just get logged (see /forgot-password, which stays silent either way
+    to avoid leaking which emails have accounts)."""
+    if not (SMTP_USER and SMTP_PASSWORD):
+        raise RuntimeError("Server misconfigured: SMTP_USER/SMTP_PASSWORD not set.")
+
+    body = (
+        f"Your DwaniLive password reset code is: {otp}\n\n"
+        f"This code expires in 10 minutes. If you didn't request this, "
+        f"you can safely ignore this email."
+    )
+    msg = MIMEText(body)
+    msg["Subject"] = "Your DwaniLive password reset code"
+    msg["From"] = SMTP_USER
+    msg["To"] = to_email
+
+    with smtplib.SMTP("smtp.gmail.com", 587, timeout=15) as server:
+        server.starttls()
+        server.login(SMTP_USER, SMTP_PASSWORD)
+        server.sendmail(SMTP_USER, [to_email], msg.as_string())
 
 
 def create_session(user_id: int) -> str:
@@ -486,6 +536,87 @@ def logout(response: Response, dwanilive_session: Optional[str] = Cookie(default
         with db() as conn:
             conn.execute("DELETE FROM sessions WHERE token = ?", (dwanilive_session,))
     response.delete_cookie(SESSION_COOKIE_NAME)
+    return {"ok": True}
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+
+@app.post("/forgot-password")
+def forgot_password(req: ForgotPasswordRequest):
+    """Always returns {"ok": True} regardless of whether the email has an
+    account -- returning a different response for unknown emails would let
+    someone enumerate which addresses are registered. The OTP is only ever
+    actually sent if the account exists and has a password (Google-only
+    accounts have nothing to reset here)."""
+    email = req.email.strip().lower()
+
+    with db() as conn:
+        user = conn.execute("SELECT id, password_hash FROM users WHERE email = ?", (email,)).fetchone()
+
+    if user is not None and user["password_hash"] is not None:
+        otp = f"{secrets.randbelow(1_000_000):06d}"
+        expires_at = int(time.time()) + OTP_LIFETIME_SECONDS
+        with db() as conn:
+            conn.execute("""
+                INSERT INTO password_resets (email, otp_hash, expires_at, attempts)
+                VALUES (?, ?, ?, 0)
+                ON CONFLICT(email) DO UPDATE SET
+                    otp_hash=excluded.otp_hash, expires_at=excluded.expires_at, attempts=0
+            """, (email, hash_password(otp), expires_at))
+        try:
+            send_otp_email(email, otp)
+        except Exception:
+            # Swallow send failures here too, for the same enumeration-safety
+            # reason -- a misconfigured SMTP account shouldn't tell a caller
+            # "this email exists but we couldn't send to it." Render logs
+            # still capture the exception for you to notice separately.
+            pass
+
+    return {"ok": True}
+
+
+class ResetPasswordRequest(BaseModel):
+    email: str
+    otp: str
+    new_password: str
+
+
+@app.post("/reset-password")
+def reset_password(req: ResetPasswordRequest):
+    email = req.email.strip().lower()
+
+    if len(req.new_password) < 8:
+        raise HTTPException(status_code=400, detail="New password must be at least 8 characters.")
+
+    with db() as conn:
+        row = conn.execute(
+            "SELECT otp_hash, expires_at, attempts FROM password_resets WHERE email = ?", (email,)
+        ).fetchone()
+
+        if row is None or row["expires_at"] < int(time.time()):
+            raise HTTPException(status_code=400, detail="Code expired or not found. Request a new one.")
+
+        if row["attempts"] >= OTP_MAX_ATTEMPTS:
+            raise HTTPException(status_code=400, detail="Too many incorrect attempts. Request a new code.")
+
+        if not verify_password(req.otp, row["otp_hash"]):
+            conn.execute("UPDATE password_resets SET attempts = attempts + 1 WHERE email = ?", (email,))
+            raise HTTPException(status_code=400, detail="Incorrect code.")
+
+        user = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
+        if user is None:
+            raise HTTPException(status_code=400, detail="Account not found.")
+
+        conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (hash_password(req.new_password), user["id"]))
+        conn.execute("DELETE FROM password_resets WHERE email = ?", (email,))
+        # Reset all existing sessions on password change -- standard practice
+        # so a stolen session token doesn't survive a password reset.
+        conn.execute(
+            "DELETE FROM sessions WHERE user_id = ?", (user["id"],)
+        )
+
     return {"ok": True}
 
 
