@@ -521,60 +521,111 @@
     }, 3000);
   }
 
-  // Subscribe buttons -> create a Subscription on the license server, then
-  // open Razorpay's in-page Checkout modal to collect payment for it.
+  // Subscribe buttons require a logged-in account first: a subscription is
+  // permanently tied to the email on the account, so we ask the person to
+  // log in (or create an account) *before* opening Razorpay checkout,
+  // rather than trusting a free-text email prompt.
+  const PENDING_PLAN_KEY = 'dwanilive_pending_plan';
+
+  async function getCurrentUser() {
+    try {
+      const res = await fetch(`${API_BASE}/me`, { credentials: 'include' });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Actually creates the Razorpay subscription + opens checkout, once we
+  // know who the logged-in user is.
+  async function startCheckout(tier, period, email, btn) {
+    const errEl = document.querySelector(`.plan-error[data-error-for="${tier}"]`);
+    if (errEl) errEl.textContent = '';
+    const originalText = btn ? btn.textContent : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Opening checkout…';
+    }
+    try {
+      const res = await fetch(`${API_BASE}/create-subscription`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ tier, period, email }),
+      });
+      if (!res.ok) throw new Error((await res.json()).detail || 'Checkout failed');
+      const data = await res.json();
+
+      const rzp = new Razorpay({
+        key: data.key_id,
+        subscription_id: data.subscription_id,
+        name: 'DwaniLive',
+        description: `${tier[0].toUpperCase() + tier.slice(1)} plan — ${period}`,
+        prefill: { email },
+        theme: { color: '#a8460c' },
+        handler: function () {
+          // Payment succeeded client-side; the webhook flips the row to
+          // 'active' server-side shortly after — poll for it.
+          showLicenseModal(data.license_key, email);
+        },
+        modal: {
+          ondismiss: function () {
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = originalText;
+            }
+          },
+        },
+      });
+      rzp.on('payment.failed', function (resp) {
+        if (errEl) errEl.textContent = resp.error.description || 'Payment failed, try again.';
+      });
+      rzp.open();
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    } catch (err) {
+      if (errEl) errEl.textContent = err.message || 'Something went wrong, try again.';
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+  }
+
+  // Subscribe buttons -> must be logged in first. If not, remember which
+  // plan was picked and send the person to log in (or sign up), then come
+  // straight back here afterward.
   document.querySelectorAll('.plan-cta[data-tier]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const tier = btn.dataset.tier;
       const period = annual ? 'annual' : 'monthly';
-      const errEl = document.querySelector(`.plan-error[data-error-for="${tier}"]`);
-      errEl.textContent = '';
-      const email = window.prompt("Email for your license (used to activate DwaniLive):");
-      if (!email) return;
-      btn.disabled = true;
-      const originalText = btn.textContent;
-      btn.textContent = 'Opening checkout…';
-      try {
-        const res = await fetch(`${API_BASE}/create-subscription`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tier, period, email }),
-        });
-        if (!res.ok) throw new Error((await res.json()).detail || 'Checkout failed');
-        const data = await res.json();
-
-        const rzp = new Razorpay({
-          key: data.key_id,
-          subscription_id: data.subscription_id,
-          name: 'DwaniLive',
-          description: `${tier[0].toUpperCase() + tier.slice(1)} plan — ${period}`,
-          prefill: { email },
-          theme: { color: '#a8460c' },
-          handler: function () {
-            // Payment succeeded client-side; the webhook flips the row to
-            // 'active' server-side shortly after — poll for it.
-            showLicenseModal(data.license_key, email);
-          },
-          modal: {
-            ondismiss: function () {
-              btn.disabled = false;
-              btn.textContent = originalText;
-            },
-          },
-        });
-        rzp.on('payment.failed', function (resp) {
-          errEl.textContent = resp.error.description || 'Payment failed, try again.';
-        });
-        rzp.open();
-        btn.disabled = false;
-        btn.textContent = originalText;
-      } catch (err) {
-        errEl.textContent = err.message || 'Something went wrong, try again.';
-        btn.disabled = false;
-        btn.textContent = originalText;
+      const user = await getCurrentUser();
+      if (!user) {
+        sessionStorage.setItem(PENDING_PLAN_KEY, JSON.stringify({ tier, period }));
+        window.location.href = '/login.html?next=' + encodeURIComponent('/pricing.html');
+        return;
       }
+      startCheckout(tier, period, user.email, btn);
     });
   });
+
+  // On page load: if the person just came back from logging in and had a
+  // plan picked out beforehand, resume checkout automatically instead of
+  // making them click Subscribe a second time.
+  (async () => {
+    const pending = sessionStorage.getItem(PENDING_PLAN_KEY);
+    if (!pending) return;
+    const user = await getCurrentUser();
+    if (!user) return; // still not logged in for some reason; leave it queued
+    sessionStorage.removeItem(PENDING_PLAN_KEY);
+    const { tier, period } = JSON.parse(pending);
+    if (period === 'annual' && !annual) sw.click();
+    const btn = document.querySelector(`.plan-cta[data-tier="${tier}"]`);
+    startCheckout(tier, period, user.email, btn);
+  })();
 </script>
 </body>
 </html>
