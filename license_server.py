@@ -148,6 +148,11 @@ def serve_dashboard_page():
     return FileResponse(STATIC_DIR / "dashboard.html")
 
 
+@app.get("/settings.html")
+def serve_settings_page():
+    return FileResponse(STATIC_DIR / "settings.html")
+
+
 @app.get("/")
 def serve_root():
     return FileResponse(STATIC_DIR / "pricing.html")
@@ -505,8 +510,94 @@ def me(dwanilive_session: Optional[str] = Cookie(default=None)):
     return {
         "email": user["email"],
         "name": user["name"],
+        "has_password": user["password_hash"] is not None,
         "subscription": dict(subscription) if subscription else None,
     }
+
+
+class UpdateAccountRequest(BaseModel):
+    name: str
+
+
+@app.put("/account")
+def update_account(req: UpdateAccountRequest, dwanilive_session: Optional[str] = Cookie(default=None)):
+    user = get_current_user(dwanilive_session)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Not logged in.")
+
+    name = req.name.strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="Name can't be empty.")
+
+    with db() as conn:
+        conn.execute("UPDATE users SET name = ? WHERE id = ?", (name, user["id"]))
+
+    return {"ok": True, "name": name}
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: Optional[str] = None
+    new_password: str
+
+
+@app.post("/account/password")
+def change_password(req: ChangePasswordRequest, dwanilive_session: Optional[str] = Cookie(default=None)):
+    user = get_current_user(dwanilive_session)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Not logged in.")
+
+    if len(req.new_password) < 8:
+        raise HTTPException(status_code=400, detail="New password must be at least 8 characters.")
+
+    # A Google-only account has no password_hash yet -- let them set one
+    # without needing to prove a "current" password that never existed.
+    # Anyone who already has a password must prove they know it first.
+    if user["password_hash"] is not None:
+        if not req.current_password or not verify_password(req.current_password, user["password_hash"]):
+            raise HTTPException(status_code=401, detail="Current password is incorrect.")
+
+    with db() as conn:
+        conn.execute(
+            "UPDATE users SET password_hash = ? WHERE id = ?",
+            (hash_password(req.new_password), user["id"]),
+        )
+
+    return {"ok": True}
+
+
+@app.post("/cancel-subscription")
+def cancel_subscription(dwanilive_session: Optional[str] = Cookie(default=None)):
+    user = get_current_user(dwanilive_session)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Not logged in.")
+
+    with db() as conn:
+        row = conn.execute(
+            "SELECT license_key, razorpay_subscription_id, status FROM subscriptions "
+            "WHERE email = ? ORDER BY rowid DESC LIMIT 1",
+            (user["email"],),
+        ).fetchone()
+
+    if row is None or row["status"] not in ("active", "pending"):
+        raise HTTPException(status_code=400, detail="No active subscription to cancel.")
+
+    if row["razorpay_subscription_id"]:
+        client = get_razorpay_client()
+        try:
+            # cancel_at_cycle_end=1 keeps DwaniLive usable through the period
+            # already paid for, matching pricing.html's FAQ promise that
+            # cancelling doesn't cut you off mid-billing-cycle.
+            client.subscription.cancel(row["razorpay_subscription_id"], {"cancel_at_cycle_end": 1})
+        except Exception as exc:
+            raise HTTPException(status_code=502, detail=f"Razorpay cancellation failed: {exc}")
+
+    with db() as conn:
+        conn.execute(
+            "UPDATE subscriptions SET status = 'cancelling' WHERE license_key = ?",
+            (row["license_key"],),
+        )
+
+    return {"ok": True}
 
 
 def _safe_next_path(next_path: str) -> str:
