@@ -96,12 +96,6 @@ OTP_MAX_ATTEMPTS = 5            # per requested code, before it's rejected outri
 SESSION_COOKIE_NAME = "dwanilive_session"
 SESSION_LIFETIME_SECONDS = 30 * 24 * 60 * 60  # 30 days
 
-# Where the pricing page is served from. pricing.html lives in static/ and
-# is served by THIS same app (see the routes below), so this is just this
-# server's own public URL, e.g. https://dwanilive-api.onrender.com
-# Locally it's wherever you run uvicorn, e.g. http://localhost:8443
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:8443") + "/pricing.html"
-
 
 def _external_base_url(request: Request) -> str:
     """The scheme+host this request actually arrived on, from the browser's
@@ -129,9 +123,16 @@ app = FastAPI(title="DwaniLive License Server")
 # pricing.html), so cross-origin requests shouldn't normally happen. CORS is
 # kept here only in case you later split the page back out to a separate
 # static host — lock allow_origins down to that domain if so.
+# pricing.html), so cross-origin requests shouldn't normally happen. Set
+# ALLOWED_ORIGINS (comma-separated) if you ever split the page back out to
+# a separate static host -- defaults to "*" (any origin) since none of these
+# endpoints rely on cookies being sent cross-origin anyway.
+_allowed_origins_env = os.environ.get("ALLOWED_ORIGINS", "").strip()
+ALLOWED_ORIGINS = [o.strip() for o in _allowed_origins_env.split(",") if o.strip()] or ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
