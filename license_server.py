@@ -89,9 +89,22 @@ SESSION_LIFETIME_SECONDS = 30 * 24 * 60 * 60  # 30 days
 # Locally it's wherever you run uvicorn, e.g. http://localhost:8443
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:8443") + "/pricing.html"
 
-# Must match EXACTLY what's registered in Google Cloud Console's "Authorized
-# redirect URIs" -- Google rejects the callback otherwise.
-GOOGLE_REDIRECT_URI = os.environ.get("FRONTEND_URL", "http://localhost:8443") + "/auth/google/callback"
+
+def _external_base_url(request: Request) -> str:
+    """The scheme+host this request actually arrived on, from the browser's
+    point of view -- NOT request.url, which behind Render's reverse proxy
+    reports the internal http:// connection rather than the public https://
+    one. Render (like most PaaS reverse proxies) sets X-Forwarded-Proto /
+    X-Forwarded-Host, so we prefer those when present.
+
+    This means Google's redirect_uri is always correct for whatever domain
+    is actually serving the request -- no need to keep a FRONTEND_URL env
+    var in sync with the real domain (and no more redirect_uri_mismatch if
+    it's ever missing, wrong, or the domain changes).
+    """
+    proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+    host = request.headers.get("x-forwarded-host", request.headers.get("host", request.url.netloc))
+    return f"{proto}://{host}"
 
 if not PRIVATE_KEY:
     raise RuntimeError("Set LDST_LICENSE_PRIVATE_KEY before starting the server. "
@@ -506,9 +519,11 @@ def _safe_next_path(next_path: str) -> str:
 
 
 @app.get("/auth/google/login")
-def google_login(response: Response, next: str = "/dashboard.html"):
+def google_login(request: Request, response: Response, next: str = "/dashboard.html"):
     if not GOOGLE_CLIENT_ID:
         raise HTTPException(status_code=500, detail="Server misconfigured: GOOGLE_CLIENT_ID not set.")
+
+    redirect_uri = _external_base_url(request) + "/auth/google/callback"
 
     # CSRF protection: a random value we can verify came back unchanged on
     # the callback, stored in a short-lived cookie rather than server-side
@@ -516,7 +531,7 @@ def google_login(response: Response, next: str = "/dashboard.html"):
     state = secrets.token_urlsafe(24)
     params = {
         "client_id": GOOGLE_CLIENT_ID,
-        "redirect_uri": GOOGLE_REDIRECT_URI,
+        "redirect_uri": redirect_uri,
         "response_type": "code",
         "scope": "openid email profile",
         "state": state,
@@ -539,6 +554,7 @@ def google_login(response: Response, next: str = "/dashboard.html"):
 
 @app.get("/auth/google/callback")
 def google_callback(
+    request: Request,
     code: str = "",
     state: str = "",
     error: str = "",
@@ -554,6 +570,8 @@ def google_callback(
     if not (GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET):
         raise HTTPException(status_code=500, detail="Server misconfigured: Google OAuth credentials not set.")
 
+    redirect_uri = _external_base_url(request) + "/auth/google/callback"
+
     # Exchange the authorization code for tokens. Using urllib (stdlib) here
     # rather than adding `requests` as a new dependency -- same minimal-deps
     # approach as activate.py.
@@ -561,7 +579,7 @@ def google_callback(
         "code": code,
         "client_id": GOOGLE_CLIENT_ID,
         "client_secret": GOOGLE_CLIENT_SECRET,
-        "redirect_uri": GOOGLE_REDIRECT_URI,
+        "redirect_uri": redirect_uri,
         "grant_type": "authorization_code",
     }).encode("utf-8")
     token_req = urllib.request.Request(
