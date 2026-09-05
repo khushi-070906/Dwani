@@ -343,11 +343,20 @@ TOTAL_COUNT_BY_PERIOD = {
 class CreateSubscriptionRequest(BaseModel):
     tier: str      # "pro" or "institution"
     period: str    # "monthly" or "annual"
-    email: str
+    email: Optional[str] = None  # ignored if logged in -- kept for older callers
 
 
 @app.post("/create-subscription")
-def create_subscription(req: CreateSubscriptionRequest):
+def create_subscription(req: CreateSubscriptionRequest, dwanilive_session: Optional[str] = Cookie(default=None)):
+    # Subscriptions are now created only for a logged-in account, so the
+    # email on the row always matches who actually paid -- never trust a
+    # client-supplied email, since that'd let someone create a subscription
+    # under a different person's address via devtools.
+    user = get_current_user(dwanilive_session)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Please log in before subscribing.")
+    email = user["email"]
+
     client = get_razorpay_client()
 
     plan_id = TIER_PERIOD_TO_PLAN.get((req.tier, req.period))
@@ -371,13 +380,13 @@ def create_subscription(req: CreateSubscriptionRequest):
             INSERT INTO subscriptions (license_key, email, tier, status)
             VALUES (?, ?, ?, 'pending')
             ON CONFLICT(license_key) DO NOTHING
-        """, (license_key, req.email, req.tier))
+        """, (license_key, email, req.tier))
 
     subscription = client.subscription.create({
         "plan_id": plan_id,
         "customer_notify": 1,
         "total_count": TOTAL_COUNT_BY_PERIOD.get(req.period, 120),
-        "notes": {"license_key": license_key, "email": req.email},
+        "notes": {"license_key": license_key, "email": email},
     })
 
     return {
@@ -487,8 +496,17 @@ def me(dwanilive_session: Optional[str] = Cookie(default=None)):
     }
 
 
+def _safe_next_path(next_path: str) -> str:
+    """Only allow same-site relative paths (e.g. '/pricing.html') as a post-
+    login redirect target -- rejects absolute URLs and protocol-relative
+    '//evil.com' paths so this can't be turned into an open redirect."""
+    if next_path and next_path.startswith("/") and not next_path.startswith("//"):
+        return next_path
+    return "/dashboard.html"
+
+
 @app.get("/auth/google/login")
-def google_login(response: Response):
+def google_login(response: Response, next: str = "/dashboard.html"):
     if not GOOGLE_CLIENT_ID:
         raise HTTPException(status_code=500, detail="Server misconfigured: GOOGLE_CLIENT_ID not set.")
 
@@ -510,6 +528,12 @@ def google_login(response: Response):
     redirect.set_cookie(
         key="dwanilive_oauth_state", value=state, max_age=600, httponly=True, samesite="lax", secure=True
     )
+    # Where to send the user after a successful callback -- e.g. back to
+    # pricing.html so they can resume a subscription they started pre-login.
+    redirect.set_cookie(
+        key="dwanilive_oauth_next", value=_safe_next_path(next), max_age=600,
+        httponly=True, samesite="lax", secure=True,
+    )
     return redirect
 
 
@@ -519,6 +543,7 @@ def google_callback(
     state: str = "",
     error: str = "",
     dwanilive_oauth_state: Optional[str] = Cookie(default=None),
+    dwanilive_oauth_next: Optional[str] = Cookie(default=None),
 ):
     if error:
         raise HTTPException(status_code=400, detail=f"Google sign-in was cancelled or failed: {error}")
@@ -581,8 +606,9 @@ def google_callback(
             conn.execute("UPDATE users SET google_id = ? WHERE id = ? AND google_id IS NULL", (google_id, user_id))
 
     token = create_session(user_id)
-    redirect = RedirectResponse(url="/dashboard.html")
+    redirect = RedirectResponse(url=_safe_next_path(dwanilive_oauth_next or "/dashboard.html"))
     redirect.delete_cookie("dwanilive_oauth_state")
+    redirect.delete_cookie("dwanilive_oauth_next")
     set_session_cookie(redirect, token)
     return redirect
 
