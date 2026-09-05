@@ -472,6 +472,35 @@
       if (data.subscription) {
         const sub = data.subscription;
         const statusClass = 'dash-status-' + sub.status;
+        const serverUrl = window.location.origin;
+        const activateCmd =
+          `activate.exe --license-key ${sub.license_key} --server ${serverUrl} --email ${data.email}`;
+
+        let setupHtml = '';
+        if (sub.status === 'active') {
+          setupHtml = `
+            <div class="dash-row" style="flex-direction:column; align-items:flex-start; gap:0.6rem; margin-top:1rem;">
+              <span class="label">Get DwaniLive running</span>
+              <p style="margin:0; font-size:0.9rem; color:var(--ink-faint);">
+                Do this once, while you still have internet. After that, DwaniLive works fully offline.
+              </p>
+              <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                <a class="dash-cta" href="https://github.com/khushi-070906/Dwani/releases/download/v1.0.0/launcher.exe">Download DwaniLive (launcher.exe)</a>
+                <a class="dash-cta" href="https://github.com/khushi-070906/Dwani/releases/download/v1.0.0/activate.exe">Download activate.exe</a>
+              </div>
+              <p style="margin:0.4rem 0 0; font-size:0.9rem;">1. Run <code>activate.exe</code> once, from a command prompt, in the same folder you downloaded it to:</p>
+              <div class="dash-license-box" style="user-select:all;">${activateCmd}</div>
+              <p style="margin:0.4rem 0 0; font-size:0.9rem;">2. Then double-click <code>launcher.exe</code> any time to start a session -- no internet needed.</p>
+            </div>
+          `;
+        } else {
+          setupHtml = `
+            <p style="margin-top:1rem; font-size:0.9rem; color:var(--ink-faint);">
+              Your download links and setup command will appear here once payment is confirmed (usually within a minute).
+            </p>
+          `;
+        }
+
         subscriptionHtml = `
           <div class="dash-row">
             <span class="label">Plan</span>
@@ -485,6 +514,7 @@
             <span class="label">License key</span>
             <div class="dash-license-box">${sub.license_key}</div>
           </div>
+          ${setupHtml}
         `;
       } else {
         subscriptionHtml = `
