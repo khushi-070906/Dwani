@@ -229,6 +229,7 @@ def init_db():
     with db() as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS subscriptions (
+                id SERIAL,
                 license_key TEXT PRIMARY KEY,
                 email TEXT NOT NULL,
                 razorpay_subscription_id TEXT,
@@ -239,6 +240,12 @@ def init_db():
                 max_attendees INTEGER
             )
         """)
+        # For a subscriptions table that already existed before "id" was
+        # added above (CREATE TABLE IF NOT EXISTS is a no-op on an existing
+        # table, so it wouldn't otherwise get this column) -- lets /me and
+        # /cancel-subscription order by "most recently created" without
+        # relying on SQLite's implicit, Postgres-nonexistent "rowid".
+        conn.execute("ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS id SERIAL")
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
@@ -669,7 +676,7 @@ def me(dwanilive_session: Optional[str] = Cookie(default=None)):
 
     with db() as conn:
         subscription = conn.execute(
-            "SELECT license_key, tier, status FROM subscriptions WHERE email = ? ORDER BY rowid DESC LIMIT 1",
+            "SELECT license_key, tier, status FROM subscriptions WHERE email = ? ORDER BY id DESC LIMIT 1",
             (user["email"],),
         ).fetchone()
 
@@ -740,7 +747,7 @@ def cancel_subscription(dwanilive_session: Optional[str] = Cookie(default=None))
     with db() as conn:
         row = conn.execute(
             "SELECT license_key, razorpay_subscription_id, status FROM subscriptions "
-            "WHERE email = ? ORDER BY rowid DESC LIMIT 1",
+            "WHERE email = ? ORDER BY id DESC LIMIT 1",
             (user["email"],),
         ).fetchone()
 
