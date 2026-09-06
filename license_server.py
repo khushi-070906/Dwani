@@ -49,6 +49,7 @@ One-time setup in the Razorpay Dashboard (Test mode first):
 """
 
 import json
+import logging
 import os
 import secrets
 import smtplib
@@ -615,11 +616,11 @@ def forgot_password(req: ForgotPasswordRequest):
         try:
             send_otp_email(email, otp)
         except Exception:
-            # Swallow send failures here too, for the same enumeration-safety
-            # reason -- a misconfigured SMTP account shouldn't tell a caller
-            # "this email exists but we couldn't send to it." Render logs
-            # still capture the exception for you to notice separately.
-            pass
+            # Don't let the caller learn from a different response whether
+            # sending failed (enumeration-safety, see docstring above), but
+            # DO log it -- otherwise a misconfigured SMTP account fails
+            # forever with zero visibility anywhere.
+            logging.exception("Failed to send password-reset OTP email to %s", email)
 
     return {"ok": True}
 
