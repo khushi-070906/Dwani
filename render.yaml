@@ -2,13 +2,17 @@ services:
   - type: web
     name: dwanilive-license-server
     env: python
-    plan: starter
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn license_server:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: LDST_LICENSE_PRIVATE_KEY
         sync: false
-      - key: LDST_DB_PATH
+      # Supabase "Session pooler" connection string (Dashboard -> Connect ->
+      # Session pooler, port 5432). See license_server.py's module docstring
+      # for why this one specifically, not the Direct or Transaction pooler
+      # connection strings Supabase also offers.
+      - key: DATABASE_URL
         sync: false
       - key: GOOGLE_CLIENT_ID
         sync: false
@@ -42,7 +46,3 @@ services:
         sync: false
       - key: SMTP_PASSWORD
         sync: false
-    disk:
-      name: license-db
-      mountPath: /var/data
-      sizeGB: 1
