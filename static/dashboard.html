@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DwaniLive Pricing</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Ccircle%20cx%3D%2732%27%20cy%3D%2732%27%20r%3D%2732%27%20fill%3D%27%23a8460c%27/%3E%3Ctext%20x%3D%2733%27%20y%3D%2745%27%20font-family%3D%27Georgia%2C%20serif%27%20font-size%3D%2734%27%20fill%3D%27%23fdf6e7%27%20text-anchor%3D%27middle%27%3E%26%232343%3B%3C/text%3E%3C/svg%3E">
+<title>DwaniLive — Dashboard</title>
+<meta name="description" content="Manage your DwaniLive subscription, license key, and account from your dashboard.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -123,7 +125,36 @@
   }
   .nav-icon-btn:hover { background: var(--bg-raised-2); }
   .nav-icon-btn.active { background: rgba(168, 70, 12, 0.1); color: var(--accent-deep); border-color: transparent; }
-  @media (max-width: 760px) { .nav-links { display: none; } }
+    .nav-hamburger {
+    display: none;
+    width: 2.15rem; height: 2.15rem; border-radius: 50%;
+    align-items: center; justify-content: center;
+    background: var(--bg); border: 1px solid var(--bg-raised-2);
+    font-size: 1.05rem; color: var(--ink-dim); flex-shrink: 0;
+  }
+  .nav-hamburger:hover { background: var(--bg-raised-2); }
+  @media (max-width: 760px) {
+    .nav-hamburger { display: flex; }
+    .nav-shell { position: relative; }
+    .nav-links {
+      display: none;
+      position: absolute;
+      top: calc(100% + 0.6rem);
+      left: 0.7rem; right: 0.7rem;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.15rem;
+      background: var(--bg-raised);
+      border: 1px solid var(--bg-raised-2);
+      border-radius: 16px;
+      padding: 0.5rem;
+      box-shadow: var(--shadow);
+      z-index: 40;
+      justify-self: auto;
+    }
+    .nav-links.open { display: flex; }
+    .nav-links a { padding: 0.75rem 1rem; border-radius: 10px; }
+  }
 
   /* ---------------- Hero ---------------- */
   .hero { text-align: center; padding: 3.5rem 0 2.5rem; }
@@ -416,6 +447,31 @@
 
   .dash-loading, .dash-error { text-align: center; padding: 2rem 0; color: var(--ink-dim); font-size: 0.9rem; }
 </style>
+
+<style>
+  /* ---------------- Login/signup modal ---------------- */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(44, 24, 16, 0.45);
+    align-items: center; justify-content: center;
+    padding: 1.5rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-card {
+    background: var(--bg-raised); border-radius: 4px 26px 4px 26px;
+    padding: 2.1rem 2rem; max-width: 400px; width: 100%;
+    box-shadow: 0 24px 70px -16px rgba(44, 24, 16, 0.4);
+    position: relative; max-height: 90vh; overflow-y: auto;
+  }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1rem; width: 2rem; height: 2rem;
+    border-radius: 50%; border: none; background: var(--bg); color: var(--ink-dim);
+    font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close:hover { background: var(--bg-raised-2); }
+  .modal-card h1 { font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; margin: 0 0 0.3rem; }
+  .modal-card > p.sub { color: var(--ink-dim); font-size: 0.88rem; margin: 0 0 1.4rem; line-height: 1.5; }
+</style>
 </head>
 <body>
 
@@ -473,20 +529,47 @@
   <div class="brand-row">
     <a href="pricing.html" style="text-decoration:none;"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
   </div>
-  <div class="nav-links">
+  <div class="nav-links" id="nav-links">
     <a href="how-it-works.html">How it works</a>
     <a href="pricing.html">Pricing</a>
   </div>
   <div class="nav-right">
+    <button type="button" class="nav-hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">&#9776;</button>
     <div class="nav-account" id="nav-account" style="display:none;">
       <img class="nav-avatar" id="nav-avatar" alt="">
       <span id="nav-name-label"></span>
     </div>
-    <a href="settings.html" class="nav-icon-btn" title="Settings">&#9881;</a>
+    <a href="settings.html" class="nav-icon-btn" id="nav-settings-btn" title="Settings">&#9881;</a>
     <a href="#" id="logout-link" class="nav-icon-btn" title="Log out">&#9211;</a>
+    <a href="#" class="nav-cta" id="nav-login-cta" style="display:none;">Log in</a>
   </div>
 </nav>
 </header>
+
+<script>
+  (function () {
+    var btn = document.getElementById('nav-hamburger');
+    var menu = document.getElementById('nav-links');
+    if (!btn || !menu) return;
+    btn.addEventListener('click', function () {
+      var open = !menu.classList.contains('open');
+      menu.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', function (e) {
+      if (!menu.classList.contains('open')) return;
+      if (menu.contains(e.target) || btn.contains(e.target)) return;
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+    menu.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  })();
+</script>
 
 <main class="wrap">
   <div class="dash-wrap">
@@ -509,6 +592,16 @@
       'https://api.dicebear.com/10.x/adventurer/svg?seed=' + encodeURIComponent(email);
     document.getElementById('nav-name-label').textContent = label;
     document.getElementById('nav-account').style.display = 'flex';
+    document.getElementById('nav-settings-btn').style.display = 'flex';
+    document.getElementById('logout-link').style.display = 'flex';
+    document.getElementById('nav-login-cta').style.display = 'none';
+  }
+
+  function showLoggedOutNav() {
+    document.getElementById('nav-account').style.display = 'none';
+    document.getElementById('nav-settings-btn').style.display = 'none';
+    document.getElementById('logout-link').style.display = 'none';
+    document.getElementById('nav-login-cta').style.display = 'inline-block';
   }
 
   async function loadDashboard() {
@@ -516,7 +609,11 @@
     try {
       const res = await fetch('/me', { credentials: 'include' });
       if (res.status === 401) {
-        window.location.href = '/login.html';
+        // Not logged in -- pop the login modal in place instead of
+        // navigating away to a separate page.
+        showLoggedOutNav();
+        card.innerHTML = '<div class="dash-error">Log in to see your dashboard.</div>';
+        openAuthModal('login');
         return;
       }
       if (!res.ok) throw new Error('Failed to load account');
@@ -593,10 +690,159 @@
   document.getElementById('logout-link').addEventListener('click', async function (e) {
     e.preventDefault();
     await fetch('/logout', { method: 'POST', credentials: 'include' });
-    window.location.href = '/login.html';
+    window.location.href = '/pricing.html';
   });
 
   loadDashboard();
+</script>
+
+<!-- Login / signup modal: shown in place of a redirect when the /me check
+     comes back 401, so an expired session doesn't bounce you off the page. -->
+<div class="modal-overlay" id="auth-modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <button type="button" class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
+
+    <div id="modal-login-view">
+      <h1 id="modal-login-title">Log in</h1>
+      <p class="sub">Log in to see your dashboard.</p>
+      <div class="auth-error" id="modal-login-error"></div>
+      <form id="modal-login-form">
+        <div class="field">
+          <label for="modal-login-email">Email</label>
+          <input type="email" id="modal-login-email" required>
+        </div>
+        <div class="field">
+          <label for="modal-login-password">Password</label>
+          <input type="password" id="modal-login-password" required>
+        </div>
+        <button type="submit" class="auth-submit">Log in</button>
+      </form>
+      <div class="auth-divider">or</div>
+      <a href="#" id="modal-google-login-link" class="auth-google-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.83.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.28-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.59-2.59C13.46.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </a>
+      <p class="auth-switch">Don&rsquo;t have an account? <a href="#" id="switch-to-signup">Sign up</a></p>
+      <p class="auth-switch" style="margin-top:0.5rem;"><a href="forgot-password.html">Forgot password?</a></p>
+    </div>
+
+    <div id="modal-signup-view" style="display:none;">
+      <h1 id="modal-signup-title">Create your account</h1>
+      <p class="sub">One account covers your subscription and DwaniLive activation.</p>
+      <div class="auth-error" id="modal-signup-error"></div>
+      <form id="modal-signup-form">
+        <div class="field">
+          <label for="modal-signup-name">Name</label>
+          <input type="text" id="modal-signup-name" required>
+        </div>
+        <div class="field">
+          <label for="modal-signup-email">Email</label>
+          <input type="email" id="modal-signup-email" required>
+        </div>
+        <div class="field">
+          <label for="modal-signup-password">Password</label>
+          <input type="password" id="modal-signup-password" minlength="8" required>
+        </div>
+        <button type="submit" class="auth-submit">Create account</button>
+      </form>
+      <div class="auth-divider">or</div>
+      <a href="#" id="modal-google-signup-link" class="auth-google-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.83.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.28-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.59-2.59C13.46.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </a>
+      <p class="auth-switch">Already have an account? <a href="#" id="switch-to-login">Log in</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- Modal open/close ----
+  const authModal = document.getElementById('auth-modal');
+  const modalCard = authModal.querySelector('.modal-card');
+  const loginView = document.getElementById('modal-login-view');
+  const signupView = document.getElementById('modal-signup-view');
+  let lastFocusedBeforeModal = null;
+
+  function openAuthModal(view = 'login') {
+    lastFocusedBeforeModal = document.activeElement;
+    authModal.classList.add('open');
+    authModal.setAttribute('aria-hidden', 'false');
+    modalCard.setAttribute('aria-labelledby', view === 'login' ? 'modal-login-title' : 'modal-signup-title');
+    loginView.style.display = view === 'login' ? 'block' : 'none';
+    signupView.style.display = view === 'signup' ? 'block' : 'none';
+    const nextPath = window.location.pathname;
+    document.getElementById('modal-google-login-link').href =
+      '/auth/google/login?next=' + encodeURIComponent(nextPath);
+    document.getElementById('modal-google-signup-link').href =
+      '/auth/google/login?next=' + encodeURIComponent(nextPath);
+    const firstField = (view === 'login' ? loginView : signupView).querySelector('input, button, a');
+    if (firstField) firstField.focus();
+  }
+  function closeAuthModal() {
+    authModal.classList.remove('open');
+    authModal.setAttribute('aria-hidden', 'true');
+    if (lastFocusedBeforeModal) lastFocusedBeforeModal.focus();
+  }
+  document.getElementById('modal-close-btn').addEventListener('click', closeAuthModal);
+  authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && authModal.classList.contains('open')) closeAuthModal();
+  });
+  document.getElementById('switch-to-signup').addEventListener('click', (e) => { e.preventDefault(); openAuthModal('signup'); });
+  document.getElementById('switch-to-login').addEventListener('click', (e) => { e.preventDefault(); openAuthModal('login'); });
+
+  document.getElementById('nav-login-cta').addEventListener('click', (e) => {
+    e.preventDefault();
+    openAuthModal('login');
+  });
+
+  // After a successful login/signup: close the modal and re-run the same
+  // dashboard load that ran on page load, now that there's a session.
+  async function onAuthSuccess() {
+    closeAuthModal();
+    await loadDashboard();
+  }
+
+  document.getElementById('modal-login-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const email = document.getElementById('modal-login-email').value;
+    const password = document.getElementById('modal-login-password').value;
+    const errEl = document.getElementById('modal-login-error');
+    errEl.classList.remove('show');
+    try {
+      const res = await fetch('/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Incorrect email or password.');
+      await onAuthSuccess();
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.classList.add('show');
+    }
+  });
+
+  document.getElementById('modal-signup-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const name = document.getElementById('modal-signup-name').value;
+    const email = document.getElementById('modal-signup-email').value;
+    const password = document.getElementById('modal-signup-password').value;
+    const errEl = document.getElementById('modal-signup-error');
+    errEl.classList.remove('show');
+    try {
+      const res = await fetch('/signup', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', body: JSON.stringify({ name, email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Could not create account.');
+      await onAuthSuccess();
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.classList.add('show');
+    }
+  });
 </script>
 
 </body>

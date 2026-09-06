@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Ccircle%20cx%3D%2732%27%20cy%3D%2732%27%20r%3D%2732%27%20fill%3D%27%23a8460c%27/%3E%3Ctext%20x%3D%2733%27%20y%3D%2745%27%20font-family%3D%27Georgia%2C%20serif%27%20font-size%3D%2734%27%20fill%3D%27%23fdf6e7%27%20text-anchor%3D%27middle%27%3E%26%232343%3B%3C/text%3E%3C/svg%3E">
 <title>DwaniLive Pricing</title>
+<meta name="description" content="Simple, one-time pricing for DwaniLive real-time captioning at academic conferences and lectures.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -123,7 +125,36 @@
   }
   .nav-icon-btn:hover { background: var(--bg-raised-2); }
   .nav-icon-btn.active { background: rgba(168, 70, 12, 0.1); color: var(--accent-deep); border-color: transparent; }
-  @media (max-width: 760px) { .nav-links { display: none; } }
+    .nav-hamburger {
+    display: none;
+    width: 2.15rem; height: 2.15rem; border-radius: 50%;
+    align-items: center; justify-content: center;
+    background: var(--bg); border: 1px solid var(--bg-raised-2);
+    font-size: 1.05rem; color: var(--ink-dim); flex-shrink: 0;
+  }
+  .nav-hamburger:hover { background: var(--bg-raised-2); }
+  @media (max-width: 760px) {
+    .nav-hamburger { display: flex; }
+    .nav-shell { position: relative; }
+    .nav-links {
+      display: none;
+      position: absolute;
+      top: calc(100% + 0.6rem);
+      left: 0.7rem; right: 0.7rem;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.15rem;
+      background: var(--bg-raised);
+      border: 1px solid var(--bg-raised-2);
+      border-radius: 16px;
+      padding: 0.5rem;
+      box-shadow: var(--shadow);
+      z-index: 40;
+      justify-self: auto;
+    }
+    .nav-links.open { display: flex; }
+    .nav-links a { padding: 0.75rem 1rem; border-radius: 10px; }
+  }
 
   /* ---------------- Hero ---------------- */
   .hero { text-align: center; padding: 3.5rem 0 2.5rem; }
@@ -408,12 +439,13 @@
   <div class="brand-row">
     <a href="pricing.html" style="text-decoration:none;"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
   </div>
-  <div class="nav-links">
+  <div class="nav-links" id="nav-links">
     <a href="how-it-works.html">How it works</a>
     <a href="#compare">Features</a>
     <a href="#faq">FAQ</a>
   </div>
   <div class="nav-right">
+    <button type="button" class="nav-hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">&#9776;</button>
     <div class="nav-account" id="nav-account" style="display:none;">
       <img class="nav-avatar" id="nav-avatar" alt="">
       <span id="nav-name-label"></span>
@@ -423,6 +455,31 @@
   </div>
 </nav>
 </header>
+
+<script>
+  (function () {
+    var btn = document.getElementById('nav-hamburger');
+    var menu = document.getElementById('nav-links');
+    if (!btn || !menu) return;
+    btn.addEventListener('click', function () {
+      var open = !menu.classList.contains('open');
+      menu.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', function (e) {
+      if (!menu.classList.contains('open')) return;
+      if (menu.contains(e.target) || btn.contains(e.target)) return;
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+    menu.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  })();
+</script>
 
 <header class="wrap hero">
   <div class="eyebrow-badge"><span class="dot"></span> Offline-first · No cloud, no data leaving the room</div>
@@ -446,8 +503,8 @@
       <p class="plan-desc">Run the core pipeline yourself. Great for a single classroom talk or trying DwaniLive out.</p>
       <div class="plan-price"><span class="amount">₹0</span></div>
       <p class="plan-subnote">No activation needed</p>
-      <!-- EDIT ME: point this at wherever you're distributing the app (your own site, a zip download, etc.) -->
-      <a class="plan-cta secondary" href="#" style="text-align:center; text-decoration:none; display:block;">Download</a>
+      <!-- Points at the same GitHub release used by the dashboard's download links. -->
+      <a class="plan-cta secondary" href="https://github.com/khushi-070906/Dwani/releases/download/v1.0.0/launcher.exe" style="text-align:center; text-decoration:none; display:block;">Download</a>
       <ul class="plan-features">
         <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Offline transcription + translation (Whisper + NLLB-200)</li>
         <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Up to 20 attendees, one presenter device</li>
@@ -503,10 +560,6 @@
     </div>
   </section>
 
-  <p style="text-align:center; color: var(--ink-faint); font-size: 0.82rem; margin: 1.5rem 0 0;">
-    Prices are placeholders. Edit them in <code>pricing.html</code> and in your Razorpay Dashboard Plans to match. Need a custom seat count? <a href="mailto:khushimittal070906@gmail.com" style="color:var(--accent-deep); font-weight:600; text-decoration:none;">Email us</a>.
-  </p>
-
   <section class="compare" id="compare">
     <h2>Compare plans</h2>
     <table class="compare-table">
@@ -553,7 +606,7 @@
 
 <!-- Checkout status modal -->
 <div class="modal-backdrop" id="modal-backdrop" hidden>
-  <div class="modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
     <svg width="30" height="30" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="17" cy="17" r="15.5" stroke="var(--live)" stroke-width="2"/>
       <path d="M10 17.5L14.5 22L24 11" stroke="var(--live)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -736,12 +789,12 @@
 
 <!-- Login / signup modal: opened in-place instead of navigating to a
      separate page, so picking a plan and logging in feels like one flow. -->
-<div class="modal-overlay" id="auth-modal">
-  <div class="modal-card">
+<div class="modal-overlay" id="auth-modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true">
     <button type="button" class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
 
     <div id="modal-login-view">
-      <h1>Log in</h1>
+      <h1 id="modal-login-title">Log in</h1>
       <p class="sub">Log in to subscribe or manage your account.</p>
       <div class="auth-error" id="modal-login-error"></div>
       <form id="modal-login-form">
@@ -765,7 +818,7 @@
     </div>
 
     <div id="modal-signup-view" style="display:none;">
-      <h1>Create your account</h1>
+      <h1 id="modal-signup-title">Create your account</h1>
       <p class="sub">One account covers your subscription and DwaniLive activation.</p>
       <div class="auth-error" id="modal-signup-error"></div>
       <form id="modal-signup-form">
@@ -796,11 +849,16 @@
 <script>
   // ---- Modal open/close ----
   const authModal = document.getElementById('auth-modal');
+  const modalCard = authModal.querySelector('.modal-card');
   const loginView = document.getElementById('modal-login-view');
   const signupView = document.getElementById('modal-signup-view');
+  let lastFocusedBeforeModal = null;
 
   function openAuthModal(view = 'login') {
+    lastFocusedBeforeModal = document.activeElement;
     authModal.classList.add('open');
+    authModal.setAttribute('aria-hidden', 'false');
+    modalCard.setAttribute('aria-labelledby', view === 'login' ? 'modal-login-title' : 'modal-signup-title');
     loginView.style.display = view === 'login' ? 'block' : 'none';
     signupView.style.display = view === 'signup' ? 'block' : 'none';
     const nextPath = window.location.pathname;
@@ -808,12 +866,19 @@
       '/auth/google/login?next=' + encodeURIComponent(nextPath);
     document.getElementById('modal-google-signup-link').href =
       '/auth/google/login?next=' + encodeURIComponent(nextPath);
+    const firstField = (view === 'login' ? loginView : signupView).querySelector('input, button, a');
+    if (firstField) firstField.focus();
   }
   function closeAuthModal() {
     authModal.classList.remove('open');
+    authModal.setAttribute('aria-hidden', 'true');
+    if (lastFocusedBeforeModal) lastFocusedBeforeModal.focus();
   }
   document.getElementById('modal-close-btn').addEventListener('click', closeAuthModal);
   authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && authModal.classList.contains('open')) closeAuthModal();
+  });
   document.getElementById('switch-to-signup').addEventListener('click', (e) => { e.preventDefault(); openAuthModal('signup'); });
   document.getElementById('switch-to-login').addEventListener('click', (e) => { e.preventDefault(); openAuthModal('login'); });
 
