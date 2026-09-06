@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How DwaniLive Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf6e7;
+    --bg-raised: #fffdf6;
+    --bg-raised-2: #f4e9cf;
+    --ink: #2c1810;
+    --ink-dim: #5c4433;
+    --ink-faint: #83694f;
+    --accent: #e2790f;
+    --accent-deep: #a8460c;
+    --accent-2: #c81e5e;
+    --accent-3: #0d6e5c;
+    --indigo: #223367;
+    --live: #2f7a3a;
+    --shadow: 0 1px 2px rgba(44, 24, 16, 0.08), 0 10px 26px -8px rgba(44, 24, 16, 0.20);
+    --font-display: "Rozha One", "Noto Serif Devanagari", Georgia, serif;
+    --font-body: "Mukta", "Noto Sans", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background:
+      radial-gradient(circle at 1px 1px, rgba(168, 70, 12, 0.11) 1px, transparent 0) 0 0 / 22px 22px,
+      radial-gradient(circle at 11px 11px, rgba(61, 48, 150, 0.06) 1px, transparent 0) 0 0 / 22px 22px,
+      radial-gradient(ellipse at 50% -10%, rgba(200, 30, 94, 0.07), transparent 55%),
+      radial-gradient(ellipse at 100% 110%, rgba(13, 110, 92, 0.05), transparent 50%),
+      var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 0 1.5rem; }
+
+  nav.wrap { display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 0; max-width: 1080px; }
+  .brand-row { display: flex; align-items: center; gap: 0.55rem; }
+  .brand-name { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; letter-spacing: -0.01em; }
+  .brand-name .dwani { background: linear-gradient(120deg, var(--accent-deep), var(--accent-2), var(--indigo)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .brand-name .live { color: var(--ink-dim); font-family: var(--font-body); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; vertical-align: 1px; margin-left: 0.15em; }
+  .nav-links { display: flex; gap: 1.75rem; font-size: 0.9rem; font-weight: 600; color: var(--ink-dim); }
+  .nav-links a { text-decoration: none; }
+  .nav-links a:hover, .nav-links a.active { color: var(--accent-deep); }
+  @media (max-width: 620px) { .nav-links { display: none; } }
+
+  header.hero { text-align: center; padding: 2.5rem 0 1rem; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5em; background: var(--bg-raised);
+    border: 1px solid var(--accent-deep); color: var(--accent-deep); padding: 0.35em 0.9em;
+    border-radius: 999px; font-size: 0.75rem; letter-spacing: 0.08em; font-weight: 700;
+    text-transform: uppercase; margin-bottom: 1.2rem;
+  }
+  h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.8rem, 4vw, 2.6rem); margin: 0 0 0.6rem; letter-spacing: -0.01em; }
+  header.hero p { color: var(--ink-dim); font-size: 1.02rem; max-width: 560px; margin: 0 auto; line-height: 1.6; }
+
+  .steps { display: flex; flex-direction: column; gap: 1.1rem; padding: 2.5rem 0 1rem; }
+  .step {
+    display: flex; gap: 1.1rem; background: var(--bg-raised); border: 1px solid var(--bg-raised-2);
+    border-radius: 4px 22px 4px 22px; box-shadow: var(--shadow); padding: 1.4rem 1.5rem;
+  }
+  .step-num {
+    flex-shrink: 0; width: 2.2rem; height: 2.2rem; border-radius: 50%;
+    background: linear-gradient(120deg, var(--accent), var(--accent-2) 55%, var(--indigo));
+    color: #fff5e6; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1rem;
+  }
+  .step-body h2 { font-size: 1.05rem; margin: 0.15rem 0 0.35rem; font-weight: 800; }
+  .step-body p { margin: 0; color: var(--ink-dim); font-size: 0.92rem; line-height: 1.6; }
+  .step-body .note {
+    display: inline-block; margin-top: 0.6rem; font-size: 0.8rem; color: var(--accent-3);
+    background: rgba(13, 110, 92, 0.08); border: 1px solid rgba(13, 110, 92, 0.2);
+    padding: 0.25rem 0.7rem; border-radius: 999px; font-weight: 700;
+  }
+  .step-body .note.offline { color: var(--accent-deep); background: rgba(168, 70, 12, 0.08); border-color: rgba(168, 70, 12, 0.2); }
+
+  .divider-label {
+    text-align: center; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-faint); margin: 1rem 0 0.2rem;
+  }
+
+  .attendee-note {
+    background: var(--bg-raised); border: 1px dashed var(--accent-deep); border-radius: 4px 22px 4px 22px;
+    padding: 1.4rem 1.5rem; margin-top: 1.5rem; font-size: 0.9rem; color: var(--ink-dim); line-height: 1.6;
+  }
+  .attendee-note strong { color: var(--ink); }
+
+  .cta-row { display: flex; gap: 1rem; justify-content: center; padding: 2.5rem 0 4rem; flex-wrap: wrap; }
+  .btn-primary, .btn-secondary {
+    text-decoration: none; padding: 0.85rem 1.6rem; border-radius: 4px 14px 4px 14px;
+    font-weight: 700; font-size: 0.92rem; display: inline-block;
+  }
+  .btn-primary {
+    background: linear-gradient(120deg, var(--accent), var(--accent-2) 55%, var(--indigo));
+    color: #fff5e6; box-shadow: 0 4px 14px -4px rgba(168, 70, 12, 0.45);
+  }
+  .btn-secondary { background: var(--bg-raised); border: 1px solid var(--bg-raised-2); color: var(--ink); }
+</style>
+</head>
+<body>
+
+<nav class="wrap">
+  <div class="brand-row">
+    <a href="pricing.html" style="text-decoration:none;"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
+  </div>
+  <div class="nav-links">
+    <a href="how-it-works.html" class="active">How it works</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="login.html">Log in</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <header class="hero">
+    <span class="eyebrow"><span style="width:6px;height:6px;border-radius:50%;background:var(--live);display:inline-block;"></span> How it works</span>
+    <h1>From subscribing to live captions in a room, in five steps</h1>
+    <p>DwaniLive runs on your own laptop during the talk -- so it keeps working even on flaky conference Wi-Fi. Here's the whole flow, start to finish.</p>
+  </header>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h2>Subscribe to a plan</h2>
+        <p>Pick Pro or Institution on the <a href="pricing.html" style="color:var(--accent-deep); font-weight:700;">pricing page</a> and complete checkout. You'll be asked to create an account (or log in) first, since your subscription is tied to your account.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h2>Open your dashboard</h2>
+        <p>Once payment goes through, your <a href="dashboard.html" style="color:var(--accent-deep); font-weight:700;">dashboard</a> shows your license key and two downloads: the DwaniLive app itself, and a small one-time activation tool.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h2>Activate once, while online</h2>
+        <p>Run the activation tool with the command shown on your dashboard (your license key and email are already filled in). It checks your subscription with our server and saves a signed pass on your laptop.</p>
+        <span class="note">Needs internet -- one time only</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h2>Start a session before you present</h2>
+        <p>Double-click the DwaniLive app. It checks the pass saved in step 3 (no server call needed), asks for microphone access, and gives you a join link and a QR code to display on your title slide.</p>
+        <span class="note offline">Works fully offline from here</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h2>Present -- captions appear live for the room</h2>
+        <p>As you speak, live captions (translated, if you've set that up) stream to everyone who joined. You can watch how many attendees are connected and see questions they send in, right from your own screen.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="attendee-note">
+    <strong>What attendees do:</strong> nothing to install. They scan the QR code or open the link with their phone's camera or browser, and captions appear immediately in their language. Everything stays on the venue's local network -- no data leaves the building.
+  </div>
+
+  <div class="cta-row">
+    <a href="pricing.html" class="btn-primary">View plans</a>
+    <a href="login.html" class="btn-secondary">Log in to your dashboard</a>
+  </div>
+
+</main>
+
+<footer class="wrap" style="text-align:center; padding:1rem 0 3rem; color:var(--ink-faint); font-size:0.8rem;">
+  DwaniLive · Built for in-person academic conferences
+</footer>
+
+</body>
+</html>
