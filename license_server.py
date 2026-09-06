@@ -8,12 +8,13 @@ Runs on YOUR infrastructure, not the presenter's laptop. Two jobs:
 2. /activate endpoint: presenter's activate.py calls this once while online;
    we look up their subscription status and hand back a signed token.
 
-This is intentionally minimal (SQLite, no auth on top of the license key
-itself) — enough to run a real pilot, not a production billing system.
-Swap SQLite for Postgres and add rate limiting before scaling this up.
+This uses PostgreSQL (via Supabase's free tier) rather than a local SQLite
+file, since Render's free instance plan doesn't support persistent disks --
+without one, a local SQLite file gets wiped every time the free instance
+spins down from inactivity and back up again.
 
 Run:
-    pip install fastapi uvicorn razorpay python-dotenv cryptography --break-system-packages
+    pip install fastapi uvicorn razorpay python-dotenv cryptography psycopg2-binary --break-system-packages
     export RAZORPAY_KEY_ID=rzp_test_...
     export RAZORPAY_KEY_SECRET=...
     export RAZORPAY_WEBHOOK_SECRET=...          # set when you add the webhook in the Dashboard
@@ -21,8 +22,12 @@ Run:
     export LDST_LICENSE_PRIVATE_KEY=<the PRIVATE key it printed>
     # The PUBLIC key it printed goes on the PRESENTER's machine instead,
     # as a constant baked into server.py -- never set it here.
-    export LDST_DB_PATH=/var/data/licenses.db   # only needed if you've attached a persistent disk;
-                                                 # otherwise licenses.db lives next to this script
+    export DATABASE_URL=postgres://...          # Supabase "Session pooler" connection string
+                                                 # (Dashboard -> Connect -> Session pooler, port 5432 --
+                                                 # NOT the Transaction pooler on 6543, which needs extra
+                                                 # psycopg2 config to disable prepared statements, and
+                                                 # NOT the Direct connection, which is IPv6-only unless
+                                                 # you've bought the IPv4 add-on)
     uvicorn license_server:app --host 0.0.0.0 --port 8443
 
 One-time setup in the Razorpay Dashboard (Test mode first):
@@ -47,7 +52,6 @@ import json
 import os
 import secrets
 import smtplib
-import sqlite3
 import time
 import urllib.error
 import urllib.parse
@@ -59,6 +63,8 @@ from contextlib import contextmanager
 from typing import Optional
 
 import bcrypt
+import psycopg2
+import psycopg2.extras
 from dotenv import load_dotenv
 from fastapi import Cookie, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -70,7 +76,11 @@ from licensing import License, sign_license, TIER_FEATURES, TIER_DEFAULT_MAX_ATT
 
 load_dotenv()  # reads .env in the current directory if present, no-op if it doesn't exist
 
-DB_PATH = Path(os.environ.get("LDST_DB_PATH", str(Path(__file__).parent / "licenses.db")))
+# Supabase's "Session pooler" connection string -- see this module's
+# docstring for exactly which of Supabase's three connection strings to use
+# and why. Something like:
+#   postgres://postgres.[project-ref]:[password]@aws-[region].pooler.supabase.com:5432/postgres
+DATABASE_URL = os.environ.get("DATABASE_URL", "")
 PRIVATE_KEY = os.environ.get("LDST_LICENSE_PRIVATE_KEY", "")
 RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "")
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
@@ -180,15 +190,39 @@ def serve_root():
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
+class _DBWrapper:
+    """Makes a psycopg2 connection behave like the sqlite3.Connection this
+    file was originally written against, so every existing conn.execute(...)
+    call site elsewhere in this file works completely unchanged:
+      - .execute(query, params) translates SQLite's "?" placeholders to
+        psycopg2's "%s" and returns a dict-cursor (so row["email"] works,
+        same as sqlite3.Row did) with .fetchone()/.fetchall() as normal.
+      - .commit() / .close() pass straight through.
+    """
+    def __init__(self, conn):
+        self._conn = conn
+
+    def execute(self, query, params=()):
+        cur = self._conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(query.replace("?", "%s"), params)
+        return cur
+
+    def commit(self):
+        self._conn.commit()
+
+    def close(self):
+        self._conn.close()
+
+
 @contextmanager
 def db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = psycopg2.connect(DATABASE_URL)
+    wrapper = _DBWrapper(conn)
     try:
-        yield conn
-        conn.commit()
+        yield wrapper
+        wrapper.commit()
     finally:
-        conn.close()
+        wrapper.close()
 
 
 def init_db():
@@ -207,7 +241,7 @@ def init_db():
         """)
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 email TEXT UNIQUE NOT NULL,
                 password_hash TEXT,
                 google_id TEXT UNIQUE,
@@ -504,10 +538,10 @@ def signup(req: SignupRequest, response: Response):
             raise HTTPException(status_code=409, detail="An account with this email already exists.")
 
         cursor = conn.execute(
-            "INSERT INTO users (email, password_hash, name, created_at) VALUES (?, ?, ?, ?)",
+            "INSERT INTO users (email, password_hash, name, created_at) VALUES (?, ?, ?, ?) RETURNING id",
             (req.email, hash_password(req.password), req.name, int(time.time())),
         )
-        user_id = cursor.lastrowid
+        user_id = cursor.fetchone()["id"]
 
     token = create_session(user_id)
     set_session_cookie(response, token)
@@ -836,10 +870,10 @@ def google_callback(
         row = conn.execute("SELECT id FROM users WHERE google_id = ? OR email = ?", (google_id, email)).fetchone()
         if row is None:
             cursor = conn.execute(
-                "INSERT INTO users (email, google_id, name, created_at) VALUES (?, ?, ?, ?)",
+                "INSERT INTO users (email, google_id, name, created_at) VALUES (?, ?, ?, ?) RETURNING id",
                 (email, google_id, name, int(time.time())),
             )
-            user_id = cursor.lastrowid
+            user_id = cursor.fetchone()["id"]
         else:
             user_id = row["id"]
             # Link the Google account to an existing password-based user
