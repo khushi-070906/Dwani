@@ -167,6 +167,11 @@ def serve_forgot_password_page():
     return FileResponse(STATIC_DIR / "forgot-password.html")
 
 
+@app.get("/how-it-works.html")
+def serve_how_it_works_page():
+    return FileResponse(STATIC_DIR / "how-it-works.html")
+
+
 @app.get("/signup.html")
 def serve_signup_page():
     return FileResponse(STATIC_DIR / "signup.html")
