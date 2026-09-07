@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Ccircle%20cx%3D%2732%27%20cy%3D%2732%27%20r%3D%2732%27%20fill%3D%27%23a8460c%27/%3E%3Ctext%20x%3D%2733%27%20y%3D%2745%27%20font-family%3D%27Georgia%2C%20serif%27%20font-size%3D%2734%27%20fill%3D%27%23fdf6e7%27%20text-anchor%3D%27middle%27%3E%26%232343%3B%3C/text%3E%3C/svg%3E">
-<title>DwaniLive — Dashboard</title>
-<meta name="description" content="Manage your DwaniLive subscription, license key, and account from your dashboard.">
+<title>DwaniLive Pricing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -125,36 +123,7 @@
   }
   .nav-icon-btn:hover { background: var(--bg-raised-2); }
   .nav-icon-btn.active { background: rgba(168, 70, 12, 0.1); color: var(--accent-deep); border-color: transparent; }
-    .nav-hamburger {
-    display: none;
-    width: 2.15rem; height: 2.15rem; border-radius: 50%;
-    align-items: center; justify-content: center;
-    background: var(--bg); border: 1px solid var(--bg-raised-2);
-    font-size: 1.05rem; color: var(--ink-dim); flex-shrink: 0;
-  }
-  .nav-hamburger:hover { background: var(--bg-raised-2); }
-  @media (max-width: 760px) {
-    .nav-hamburger { display: flex; }
-    .nav-shell { position: relative; }
-    .nav-links {
-      display: none;
-      position: absolute;
-      top: calc(100% + 0.6rem);
-      left: 0.7rem; right: 0.7rem;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.15rem;
-      background: var(--bg-raised);
-      border: 1px solid var(--bg-raised-2);
-      border-radius: 16px;
-      padding: 0.5rem;
-      box-shadow: var(--shadow);
-      z-index: 40;
-      justify-self: auto;
-    }
-    .nav-links.open { display: flex; }
-    .nav-links a { padding: 0.75rem 1rem; border-radius: 10px; }
-  }
+  @media (max-width: 760px) { .nav-links { display: none; } }
 
   /* ---------------- Hero ---------------- */
   .hero { text-align: center; padding: 3.5rem 0 2.5rem; }
@@ -451,18 +420,23 @@
 <style>
   /* ---------------- Login/signup modal ---------------- */
   .modal-overlay {
-    display: none; position: fixed; inset: 0; z-index: 100;
+    display: flex; position: fixed; inset: 0; z-index: 100;
     background: rgba(44, 24, 16, 0.45);
     align-items: center; justify-content: center;
     padding: 1.5rem;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
   }
-  .modal-overlay.open { display: flex; }
+  .modal-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
   .modal-card {
     background: var(--bg-raised); border-radius: 4px 26px 4px 26px;
     padding: 2.1rem 2rem; max-width: 400px; width: 100%;
     box-shadow: 0 24px 70px -16px rgba(44, 24, 16, 0.4);
     position: relative; max-height: 90vh; overflow-y: auto;
+    transform: translateY(14px) scale(0.98);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
+  .modal-overlay.open .modal-card { transform: translateY(0) scale(1); }
   .modal-close {
     position: absolute; top: 1rem; right: 1rem; width: 2rem; height: 2rem;
     border-radius: 50%; border: none; background: var(--bg); color: var(--ink-dim);
@@ -529,12 +503,12 @@
   <div class="brand-row">
     <a href="pricing.html" style="text-decoration:none;"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
   </div>
-  <div class="nav-links" id="nav-links">
+  <div class="nav-links">
     <a href="how-it-works.html">How it works</a>
     <a href="pricing.html">Pricing</a>
+    <a href="pricing.html#faq">FAQ</a>
   </div>
   <div class="nav-right">
-    <button type="button" class="nav-hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">&#9776;</button>
     <div class="nav-account" id="nav-account" style="display:none;">
       <img class="nav-avatar" id="nav-avatar" alt="">
       <span id="nav-name-label"></span>
@@ -545,31 +519,6 @@
   </div>
 </nav>
 </header>
-
-<script>
-  (function () {
-    var btn = document.getElementById('nav-hamburger');
-    var menu = document.getElementById('nav-links');
-    if (!btn || !menu) return;
-    btn.addEventListener('click', function () {
-      var open = !menu.classList.contains('open');
-      menu.classList.toggle('open', open);
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
-    document.addEventListener('click', function (e) {
-      if (!menu.classList.contains('open')) return;
-      if (menu.contains(e.target) || btn.contains(e.target)) return;
-      menu.classList.remove('open');
-      btn.setAttribute('aria-expanded', 'false');
-    });
-    menu.querySelectorAll('a').forEach(function (a) {
-      a.addEventListener('click', function () {
-        menu.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-      });
-    });
-  })();
-</script>
 
 <main class="wrap">
   <div class="dash-wrap">
@@ -698,12 +647,12 @@
 
 <!-- Login / signup modal: shown in place of a redirect when the /me check
      comes back 401, so an expired session doesn't bounce you off the page. -->
-<div class="modal-overlay" id="auth-modal" aria-hidden="true">
-  <div class="modal-card" role="dialog" aria-modal="true">
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal-card">
     <button type="button" class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
 
     <div id="modal-login-view">
-      <h1 id="modal-login-title">Log in</h1>
+      <h1>Log in</h1>
       <p class="sub">Log in to see your dashboard.</p>
       <div class="auth-error" id="modal-login-error"></div>
       <form id="modal-login-form">
@@ -727,7 +676,7 @@
     </div>
 
     <div id="modal-signup-view" style="display:none;">
-      <h1 id="modal-signup-title">Create your account</h1>
+      <h1>Create your account</h1>
       <p class="sub">One account covers your subscription and DwaniLive activation.</p>
       <div class="auth-error" id="modal-signup-error"></div>
       <form id="modal-signup-form">
@@ -758,16 +707,11 @@
 <script>
   // ---- Modal open/close ----
   const authModal = document.getElementById('auth-modal');
-  const modalCard = authModal.querySelector('.modal-card');
   const loginView = document.getElementById('modal-login-view');
   const signupView = document.getElementById('modal-signup-view');
-  let lastFocusedBeforeModal = null;
 
   function openAuthModal(view = 'login') {
-    lastFocusedBeforeModal = document.activeElement;
     authModal.classList.add('open');
-    authModal.setAttribute('aria-hidden', 'false');
-    modalCard.setAttribute('aria-labelledby', view === 'login' ? 'modal-login-title' : 'modal-signup-title');
     loginView.style.display = view === 'login' ? 'block' : 'none';
     signupView.style.display = view === 'signup' ? 'block' : 'none';
     const nextPath = window.location.pathname;
@@ -775,19 +719,12 @@
       '/auth/google/login?next=' + encodeURIComponent(nextPath);
     document.getElementById('modal-google-signup-link').href =
       '/auth/google/login?next=' + encodeURIComponent(nextPath);
-    const firstField = (view === 'login' ? loginView : signupView).querySelector('input, button, a');
-    if (firstField) firstField.focus();
   }
   function closeAuthModal() {
     authModal.classList.remove('open');
-    authModal.setAttribute('aria-hidden', 'true');
-    if (lastFocusedBeforeModal) lastFocusedBeforeModal.focus();
   }
   document.getElementById('modal-close-btn').addEventListener('click', closeAuthModal);
   authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && authModal.classList.contains('open')) closeAuthModal();
-  });
   document.getElementById('switch-to-signup').addEventListener('click', (e) => { e.preventDefault(); openAuthModal('signup'); });
   document.getElementById('switch-to-login').addEventListener('click', (e) => { e.preventDefault(); openAuthModal('login'); });
 
