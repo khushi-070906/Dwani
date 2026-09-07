@@ -177,8 +177,19 @@ async def host_socket(websocket: WebSocket, session_param: str):
     await websocket.accept()
     host_connected = True
     # Fresh segmenter per connection so a previous presenter session's
-    # half-open segment (if any) never bleeds into this one.
-    pipeline.segmenter = AudioSegmenter()
+    # half-open segment (if any) never bleeds into this one -- but keep
+    # whatever tuning (energy_threshold/min_silence_seconds/etc, set via
+    # --energy-threshold and friends) the existing segmenter was built
+    # with, rather than silently dropping back to AudioSegmenter()'s
+    # untuned defaults on every reconnect.
+    old_segmenter = pipeline.segmenter
+    pipeline.segmenter = AudioSegmenter(
+        sample_rate=old_segmenter.sample_rate,
+        energy_threshold=old_segmenter.energy_threshold,
+        min_voiced_seconds=old_segmenter.min_voiced_seconds,
+        min_silence_seconds=old_segmenter.min_silence_seconds,
+        max_segment_seconds=old_segmenter.max_segment_seconds,
+    )
     try:
         while True:
             data = await websocket.receive_bytes()
@@ -528,6 +539,61 @@ def main(argv=None):
         "and the NLLB source language.",
     )
     parser.add_argument(
+        "--asr-beam-size",
+        type=int,
+        default=5,
+        help="faster-whisper beam size (default: 5, matching faster-whisper's own default). "
+        "Higher can improve accuracy slightly at the cost of ASR latency -- use "
+        "evaluate_accuracy.py's --asr-beam-size to measure the trade on your own audio "
+        "before changing this from the default.",
+    )
+    parser.add_argument(
+        "--asr-glossary-prompt",
+        action="store_true",
+        help="Bias Whisper's decoding toward the loaded glossary's terms (Glossary.as_whisper_prompt, "
+        "see glossary.py) -- helps recognition of technical vocabulary Whisper would otherwise mishear "
+        "as a similar-sounding common word. Only has an effect alongside --whisper-model and one of "
+        "--glossary-file/--dynamic-glossary/--persistent-glossary-path.",
+    )
+    parser.add_argument(
+        "--nllb-beam-size",
+        type=int,
+        default=4,
+        help="ctranslate2 translation beam size (default: 4, matching RealNLLBBackend's own default). "
+        "Higher can improve translation quality slightly at the cost of MT latency -- use "
+        "evaluate_accuracy.py's --nllb-beam-size to measure the trade on your own audio before "
+        "changing this from the default.",
+    )
+    parser.add_argument(
+        "--energy-threshold",
+        type=float,
+        default=0.02,
+        help="AudioSegmenter's RMS voice-activity threshold, audio normalized to [-1, 1] (default: "
+        "0.02, matching AudioSegmenter's own default). Too high and quiet speech/a distant mic never "
+        "registers as voiced; too low and background noise keeps segments open. Tune against your "
+        "actual venue, not a quiet room.",
+    )
+    parser.add_argument(
+        "--min-voiced-seconds",
+        type=float,
+        default=0.3,
+        help="AudioSegmenter: ignore voiced blips shorter than this (default: 0.3s).",
+    )
+    parser.add_argument(
+        "--min-silence-seconds",
+        type=float,
+        default=0.6,
+        help="AudioSegmenter: pause length that closes a caption segment (default: 0.6s). Raise this "
+        "if a presenter's mid-sentence pauses are splitting segments and hurting ASR context/accuracy.",
+    )
+    parser.add_argument(
+        "--max-segment-seconds",
+        type=float,
+        default=15.0,
+        help="AudioSegmenter: force a cut after this many seconds of continuous voiced audio, so one "
+        "run-on sentence doesn't block captions indefinitely (default: 15.0s).",
+    )
+    parser.add_argument(
         "--semantic-cache",
         action="store_true",
         help="Enable the semantic translation cache (translation_cache.SemanticCache): skips "
@@ -687,17 +753,11 @@ def main(argv=None):
     if args.whisper_model or args.nllb_model_dir:
         from backends import RealNLLBBackend, RealWhisperBackend
 
-        asr = (
-            RealWhisperBackend(model_size=args.whisper_model, language=args.presenter_language)
-            if args.whisper_model
-            else FakeASRBackend(default_transcript="[no --whisper-model given]")
-        )
-        translator = (
-            RealNLLBBackend(model_dir=args.nllb_model_dir, source_lang=args.presenter_language)
-            if args.nllb_model_dir
-            else FakeTranslationBackend()
-        )
-
+        # Glossary is loaded before the ASR backend (rather than after, as
+        # in the original ordering) specifically so --asr-glossary-prompt
+        # below can hand its terms to RealWhisperBackend as initial_prompt --
+        # translator-side glossary wrapping further down is unaffected by
+        # this reordering.
         if args.glossary_file or args.dynamic_glossary or args.persistent_glossary_path or args.itde:
             from glossary import Glossary
 
@@ -735,6 +795,40 @@ def main(argv=None):
                 )
         else:
             glossary = None
+
+        asr_initial_prompt = None
+        if args.asr_glossary_prompt:
+            if glossary is not None and len(glossary) > 0:
+                asr_initial_prompt = glossary.as_whisper_prompt()
+                print(f"ASR glossary-prompt biasing enabled ({len(glossary)} term(s) available to Whisper).")
+            else:
+                print(
+                    "--asr-glossary-prompt was given but no glossary terms are loaded yet -- "
+                    "nothing to bias with (pass --glossary-file with some terms already in it). "
+                    "Note --dynamic-glossary terms discovered mid-session do NOT retroactively "
+                    "update this prompt -- initial_prompt is fixed when RealWhisperBackend is "
+                    "constructed, before the session starts."
+                )
+
+        asr = (
+            RealWhisperBackend(
+                model_size=args.whisper_model,
+                language=args.presenter_language,
+                beam_size=args.asr_beam_size,
+                initial_prompt=asr_initial_prompt,
+            )
+            if args.whisper_model
+            else FakeASRBackend(default_transcript="[no --whisper-model given]")
+        )
+        translator = (
+            RealNLLBBackend(
+                model_dir=args.nllb_model_dir,
+                source_lang=args.presenter_language,
+                beam_size=args.nllb_beam_size,
+            )
+            if args.nllb_model_dir
+            else FakeTranslationBackend()
+        )
 
         if args.itde:
             from decision_engine import IntelligentTranslationDecisionEngine
@@ -775,7 +869,16 @@ def main(argv=None):
                     + "."
                 )
 
-        pipeline = Pipeline(asr, translator, broadcast_caption, lambda: subscribers.keys(), cache=cache)
+        segmenter = AudioSegmenter(
+            energy_threshold=args.energy_threshold,
+            min_voiced_seconds=args.min_voiced_seconds,
+            min_silence_seconds=args.min_silence_seconds,
+            max_segment_seconds=args.max_segment_seconds,
+        )
+        pipeline = Pipeline(
+            asr, translator, broadcast_caption, lambda: subscribers.keys(),
+            segmenter=segmenter, cache=cache,
+        )
         print(f"Using real backends: whisper={args.whisper_model or '(none)'} nllb_dir={args.nllb_model_dir or '(none)'}")
     else:
         print("No --whisper-model/--nllb-model-dir given -- broadcasting placeholder transcripts/translations.")

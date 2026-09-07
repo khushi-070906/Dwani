@@ -165,6 +165,27 @@ class Glossary:
         ]
         Path(path).write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
 
+    # -- ASR biasing -------------------------------------------------------
+
+    def as_whisper_prompt(self, max_terms: int = 50) -> str:
+        """A comma-separated term list suitable for RealWhisperBackend's
+        `initial_prompt` (backends.py) -- feeding glossary terms to Whisper
+        as preceding context measurably improves recognition of technical
+        vocabulary it would otherwise mishear as a similar-sounding common
+        word (e.g. "NLLB" heard as "and LLB").
+
+        `max_terms` caps the list because Whisper only attends to roughly
+        the last ~224 tokens of prompt context -- past that point, earlier
+        terms in the prompt stop influencing decoding, so an unbounded
+        glossary dump wastes tokens rather than helping. Terms are already
+        stored longest-first (see __init__); that ordering is unrelated to
+        importance, so if your glossary is large, curate the highest-value
+        terms into their own smaller glossary for prompting rather than
+        relying on this truncation to pick well for you.
+        """
+        terms = [t.term for t in self._terms[:max_terms]]
+        return ", ".join(terms)
+
     # -- protect / restore -------------------------------------------------
 
     def protect(self, text: str) -> tuple[str, dict[str, tuple[GlossaryTerm, str]]]:

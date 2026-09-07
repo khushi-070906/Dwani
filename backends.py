@@ -186,6 +186,8 @@ class RealWhisperBackend:
         compute_type: str = "int8",
         language: Optional[str] = "en",
         target_sample_rate: int = 16_000,
+        beam_size: int = 5,
+        initial_prompt: Optional[str] = None,
     ) -> None:
         """`language` pins Whisper to the presenter's spoken language rather
         than letting it auto-detect per segment: auto-detection on short,
@@ -194,12 +196,31 @@ class RealWhisperBackend:
         is known ahead of time. Pass language=None to fall back to
         per-segment auto-detection instead (e.g. for a presenter who
         code-switches between languages).
+
+        `beam_size` mirrors faster-whisper's own default (5) -- raise it
+        for a small accuracy gain at the cost of per-segment ASR latency
+        (see evaluate_accuracy.py's --asr-beam-size to measure the trade
+        for your actual model/device before changing this from a session's
+        default).
+
+        `initial_prompt` biases decoding toward specific vocabulary --
+        faster-whisper feeds it to Whisper as preceding context, which
+        measurably helps recognition of proper nouns, acronyms, and
+        technical terms it would otherwise mishear as a similar-sounding
+        common word. server.py builds this automatically from glossary.json
+        when --glossary-file and --asr-glossary-prompt are both given; pass
+        it directly here for any other source of domain vocabulary (e.g. a
+        paper abstract). Whisper only uses roughly the last ~224 tokens of
+        this as context, so keep it to the highest-value terms rather than
+        a full glossary dump.
         """
         from faster_whisper import WhisperModel  # deferred: heavy, optional dep
 
         self._model = WhisperModel(model_size, device=device, compute_type=compute_type)
         self._language = language
         self._target_sample_rate = target_sample_rate
+        self._beam_size = beam_size
+        self._initial_prompt = initial_prompt
 
     async def transcribe(self, segment: "AudioSegment") -> str:
         # faster-whisper's transcribe() is a blocking, synchronous call --
@@ -212,6 +233,8 @@ class RealWhisperBackend:
         segments, _info = self._model.transcribe(
             audio,
             language=self._language,
+            beam_size=self._beam_size,
+            initial_prompt=self._initial_prompt,
             # AudioSegmenter already isolated this to one voiced utterance
             # with pause boundaries on either side -- re-running VAD inside
             # Whisper on top of that would just risk it disagreeing with the
