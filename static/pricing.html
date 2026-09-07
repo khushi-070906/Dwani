@@ -8,13 +8,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  @view-transition {
+    navigation: auto;
+  }
+
   :root {
     --bg: #fdf6e7;
     --bg-raised: #fffdf6;
     --bg-raised-2: #f4e9cf;
     --ink: #2c1810;
-    --ink-dim: #5c4433;
-    --ink-faint: #83694f;
+    --ink-dim: #4a3629;
+    --ink-faint: #69543f;
     --accent: #e2790f;
     --accent-deep: #a8460c;
     --accent-2: #c81e5e;
@@ -65,7 +69,7 @@
     height: 95vmin;
     margin-top: -47.5vmin;
     margin-left: -47.5vmin;
-    opacity: 0.26;
+    opacity: 0.16;
     pointer-events: none;
     z-index: 0;
     animation: mandala-spin 220s linear infinite;
@@ -137,6 +141,35 @@
   .eyebrow-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--live); }
   .hero h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(2.1rem, 5.8vw, 3.3rem); letter-spacing: -0.01em; margin: 0 0 0.75rem; line-height: 1.15; }
   .hero p { color: var(--ink-dim); font-size: 1.05rem; max-width: 46ch; margin: 0 auto; line-height: 1.6; }
+
+  /* ---------------- How it works ---------------- */
+  .how-it-works-section { padding: 1rem 0 3rem; scroll-margin-top: 1.5rem; }
+  .hiw-title { text-align: center; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 0.6rem; letter-spacing: -0.01em; }
+  .hiw-intro { text-align: center; color: var(--ink-dim); font-size: 1rem; max-width: 560px; margin: 0 auto; line-height: 1.6; }
+  .steps { display: flex; flex-direction: column; gap: 1.1rem; padding: 2.5rem 0 1rem; }
+  .step {
+    display: flex; gap: 1.1rem; background: var(--bg-raised); border: 1px solid var(--bg-raised-2);
+    border-radius: 4px 22px 4px 22px; box-shadow: var(--shadow); padding: 1.4rem 1.5rem;
+  }
+  .step-num {
+    flex-shrink: 0; width: 2.2rem; height: 2.2rem; border-radius: 50%;
+    background: linear-gradient(120deg, var(--accent), var(--accent-2) 55%, var(--indigo));
+    color: #fff5e6; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1rem;
+  }
+  .step-body h3 { font-size: 1.05rem; margin: 0.15rem 0 0.35rem; font-weight: 800; }
+  .step-body p { margin: 0; color: var(--ink-dim); font-size: 0.92rem; line-height: 1.6; }
+  .step-body .note {
+    display: inline-block; margin-top: 0.6rem; font-size: 0.8rem; color: var(--accent-3);
+    background: rgba(13, 110, 92, 0.08); border: 1px solid rgba(13, 110, 92, 0.2);
+    padding: 0.25rem 0.7rem; border-radius: 999px; font-weight: 700;
+  }
+  .step-body .note.offline { color: var(--accent-deep); background: rgba(168, 70, 12, 0.08); border-color: rgba(168, 70, 12, 0.2); }
+  .attendee-note {
+    background: var(--bg-raised); border: 1px dashed var(--accent-deep); border-radius: 4px 22px 4px 22px;
+    padding: 1.4rem 1.5rem; margin-top: 1.5rem; font-size: 0.9rem; color: var(--ink-dim); line-height: 1.6;
+  }
+  .attendee-note strong { color: var(--ink); }
   .garland {
     display: flex; align-items: flex-end; justify-content: center; gap: 3px; margin: 2.25rem 0 0;
     position: relative; height: 34px;
@@ -415,7 +448,7 @@
     <a href="pricing.html" style="text-decoration:none;"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
   </div>
   <div class="nav-links">
-    <a href="how-it-works.html">How it works</a>
+    <a href="#how-it-works">How it works</a>
     <a href="pricing.html" class="active">Pricing</a>
     <a href="pricing.html#faq">FAQ</a>
   </div>
@@ -436,6 +469,62 @@
   <p>DwaniLive turns any laptop into a live speech-translation hub for in-person talks. Activate once online, then run the whole conference on the local network: captions, Q&amp;A, and accessibility, included per plan.</p>
   <div class="garland" aria-hidden="true"><span></span><span class="bloom"></span><span></span><span class="bloom pink"></span><span></span><span class="bloom"></span><span></span></div>
 </header>
+
+<section class="how-it-works-section wrap" id="how-it-works">
+  <div class="eyebrow-badge"><span class="dot"></span> How it works</div>
+  <h2 class="hiw-title">From subscribing to live captions in a room, in five steps</h2>
+  <p class="hiw-intro">DwaniLive runs on your own laptop during the talk -- so it keeps working even on flaky conference Wi-Fi. Here's the whole flow, start to finish.</p>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Subscribe to a plan</h3>
+        <p>Pick Pro or Institution <a href="#plans" style="color:var(--accent-deep); font-weight:700;">below</a> and complete checkout. You'll be asked to create an account (or log in) first, since your subscription is tied to your account.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Open your dashboard</h3>
+        <p>Once payment goes through, your <a href="dashboard.html" style="color:var(--accent-deep); font-weight:700;">dashboard</a> shows your license key and two downloads: the DwaniLive app itself, and a small one-time activation tool.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Activate once, while online</h3>
+        <p>Run the activation tool with the command shown on your dashboard (your license key and email are already filled in). It checks your subscription with our server and saves a signed pass on your laptop.</p>
+        <span class="note">Needs internet -- one time only</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Start a session before you present</h3>
+        <p>Double-click the DwaniLive app. It checks the pass saved in step 3 (no server call needed), asks for microphone access, and gives you a join link and a QR code to display on your title slide.</p>
+        <span class="note offline">Works fully offline from here</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>Present -- captions appear live for the room</h3>
+        <p>As you speak, live captions (translated, if you've set that up) stream to everyone who joined. You can watch how many attendees are connected and see questions they send in, right from your own screen.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="attendee-note">
+    <strong>What attendees do:</strong> nothing to install. They scan the QR code or open the link with their phone's camera or browser, and captions appear immediately in their language. Everything stays on the venue's local network -- no data leaves the building.
+  </div>
+</section>
 
 <main class="wrap">
   <div class="billing-toggle">
@@ -831,13 +920,25 @@
 
   // ---- Nav account display: show avatar+name once logged in ----
   function populateNavAccount(name, email) {
+    // Preload the avatar image and wait for it before showing anything --
+    // otherwise nav-right reveals with an empty circle that then pops in
+    // once the DiceBear request finishes, which reads as another "switch".
     const label = (name && name.trim()) ? name.trim() : email;
-    document.getElementById('nav-avatar').src =
-      'https://api.dicebear.com/10.x/adventurer/svg?seed=' + encodeURIComponent(email);
-    document.getElementById('nav-name-label').textContent = label;
-    document.getElementById('nav-account').style.display = 'flex';
-    document.getElementById('nav-dashboard-btn').style.display = 'flex';
-    document.getElementById('nav-login-cta').style.display = 'none';
+    const avatarUrl = 'https://api.dicebear.com/10.x/adventurer/svg?seed=' + encodeURIComponent(email);
+    return new Promise((resolve) => {
+      const preload = new Image();
+      const finish = () => {
+        document.getElementById('nav-avatar').src = avatarUrl;
+        document.getElementById('nav-name-label').textContent = label;
+        document.getElementById('nav-account').style.display = 'flex';
+        document.getElementById('nav-dashboard-btn').style.display = 'flex';
+        document.getElementById('nav-login-cta').style.display = 'none';
+        resolve();
+      };
+      preload.onload = finish;
+      preload.onerror = finish; // don't block the whole nav forever if DiceBear is unreachable
+      preload.src = avatarUrl;
+    });
   }
 
   // After a successful login/signup in the modal: close it, update the nav,
@@ -845,7 +946,7 @@
   async function onAuthSuccess() {
     closeAuthModal();
     const user = await getCurrentUser();
-    if (user) populateNavAccount(user.name, user.email);
+    if (user) await populateNavAccount(user.name, user.email);
 
     const pending = sessionStorage.getItem(PENDING_PLAN_KEY);
     if (pending && user) {
@@ -905,9 +1006,32 @@
   // avoids the "Log in" button flashing for a moment before snapping to
   // the account avatar on every load.
   (async () => {
-    const user = await getCurrentUser();
-    if (user) populateNavAccount(user.name, user.email);
+    // Instant paint from what we already knew about this tab, so the nav
+    // doesn't visibly change on every page load -- then quietly re-check
+    // with the server and correct it if the cached state is stale.
+    const CACHE_KEY = 'dwani_nav_user';
+    let cached = null;
+    try { cached = JSON.parse(sessionStorage.getItem(CACHE_KEY)); } catch (e) {}
+    if (cached) await populateNavAccount(cached.name, cached.email);
     document.getElementById('nav-right').classList.add('ready');
+
+    const user = await getCurrentUser();
+    if (user) {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ name: user.name, email: user.email }));
+      if (!cached || cached.email !== user.email || cached.name !== user.name) {
+        await populateNavAccount(user.name, user.email);
+      }
+    } else if (cached) {
+      // Cached state was stale (session actually expired) -- revert quietly.
+      sessionStorage.removeItem(CACHE_KEY);
+      document.getElementById('nav-account').style.display = 'none';
+      const dashBtn = document.getElementById('nav-dashboard-btn');
+      if (dashBtn) dashBtn.style.display = 'none';
+      const loginCta = document.getElementById('nav-login-cta');
+      if (loginCta) loginCta.style.display = '';
+      const signupCta = document.getElementById('nav-signup-cta');
+      if (signupCta) signupCta.style.display = '';
+    }
   })();
 </script>
 </body>

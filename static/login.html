@@ -8,13 +8,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  @view-transition {
+    navigation: auto;
+  }
+
   :root {
     --bg: #fdf6e7;
     --bg-raised: #fffdf6;
     --bg-raised-2: #f4e9cf;
     --ink: #2c1810;
-    --ink-dim: #5c4433;
-    --ink-faint: #83694f;
+    --ink-dim: #4a3629;
+    --ink-faint: #69543f;
     --accent: #e2790f;
     --accent-deep: #a8460c;
     --accent-2: #c81e5e;
@@ -65,7 +69,7 @@
     height: 95vmin;
     margin-top: -47.5vmin;
     margin-left: -47.5vmin;
-    opacity: 0.26;
+    opacity: 0.16;
     pointer-events: none;
     z-index: 0;
     animation: mandala-spin 220s linear infinite;
@@ -455,7 +459,7 @@
     <a href="pricing.html" style="text-decoration:none;"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
   </div>
   <div class="nav-links">
-    <a href="how-it-works.html">How it works</a>
+    <a href="pricing.html#how-it-works">How it works</a>
     <a href="pricing.html">Pricing</a>
     <a href="pricing.html#faq">FAQ</a>
   </div>
@@ -655,20 +659,32 @@
 
   // ---- Nav account display: show avatar+name once logged in ----
   function populateNavAccount(name, email) {
+    // Preload the avatar image and wait for it before showing anything --
+    // otherwise nav-right reveals with an empty circle that then pops in
+    // once the DiceBear request finishes, which reads as another "switch".
     const label = (name && name.trim()) ? name.trim() : email;
-    document.getElementById('nav-avatar').src =
-      'https://api.dicebear.com/10.x/adventurer/svg?seed=' + encodeURIComponent(email);
-    document.getElementById('nav-name-label').textContent = label;
-    document.getElementById('nav-account').style.display = 'flex';
-    document.getElementById('nav-dashboard-btn').style.display = 'flex';
-    if (navLoginCta) navLoginCta.style.display = 'none';
-    if (navSignupCta) navSignupCta.style.display = 'none';
+    const avatarUrl = 'https://api.dicebear.com/10.x/adventurer/svg?seed=' + encodeURIComponent(email);
+    return new Promise((resolve) => {
+      const preload = new Image();
+      const finish = () => {
+        document.getElementById('nav-avatar').src = avatarUrl;
+        document.getElementById('nav-name-label').textContent = label;
+        document.getElementById('nav-account').style.display = 'flex';
+        document.getElementById('nav-dashboard-btn').style.display = 'flex';
+        if (navLoginCta) navLoginCta.style.display = 'none';
+        if (navSignupCta) navSignupCta.style.display = 'none';
+        resolve();
+      };
+      preload.onload = finish;
+      preload.onerror = finish; // don't block the whole nav forever if DiceBear is unreachable
+      preload.src = avatarUrl;
+    });
   }
 
   async function onAuthSuccess() {
     closeAuthModal();
     const user = await getCurrentUser();
-    if (user) populateNavAccount(user.name, user.email);
+    if (user) await populateNavAccount(user.name, user.email);
   }
 
   document.getElementById('modal-login-form').addEventListener('submit', async function (e) {
@@ -719,9 +735,32 @@
   // avoids the "Log in" button flashing for a moment before snapping to
   // the account avatar on every load.
   (async () => {
-    const user = await getCurrentUser();
-    if (user) populateNavAccount(user.name, user.email);
+    // Instant paint from what we already knew about this tab, so the nav
+    // doesn't visibly change on every page load -- then quietly re-check
+    // with the server and correct it if the cached state is stale.
+    const CACHE_KEY = 'dwani_nav_user';
+    let cached = null;
+    try { cached = JSON.parse(sessionStorage.getItem(CACHE_KEY)); } catch (e) {}
+    if (cached) await populateNavAccount(cached.name, cached.email);
     document.getElementById('nav-right').classList.add('ready');
+
+    const user = await getCurrentUser();
+    if (user) {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ name: user.name, email: user.email }));
+      if (!cached || cached.email !== user.email || cached.name !== user.name) {
+        await populateNavAccount(user.name, user.email);
+      }
+    } else if (cached) {
+      // Cached state was stale (session actually expired) -- revert quietly.
+      sessionStorage.removeItem(CACHE_KEY);
+      document.getElementById('nav-account').style.display = 'none';
+      const dashBtn = document.getElementById('nav-dashboard-btn');
+      if (dashBtn) dashBtn.style.display = 'none';
+      const loginCta = document.getElementById('nav-login-cta');
+      if (loginCta) loginCta.style.display = '';
+      const signupCta = document.getElementById('nav-signup-cta');
+      if (signupCta) signupCta.style.display = '';
+    }
   })();
 </script>
 </body>
