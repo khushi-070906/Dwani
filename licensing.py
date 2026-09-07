@@ -175,13 +175,6 @@ def _load_private_key(private_key_b64: str) -> Ed25519PrivateKey:
 
 def _load_public_key(public_key_b64: str) -> Ed25519PublicKey:
     decoded = _b64decode(public_key_b64)
-    # --- TEMPORARY DEBUG -----------------------------------------------
-    # Remove this print once the "32 bytes" error is resolved. It shows
-    # exactly what string reached this function and how many bytes it
-    # decoded to, which is the fastest way to see whether a wrong/empty
-    # env var, stray quote, or truncated default is the cause.
-    print(f"[license-debug] raw='{public_key_b64}' len(decoded)={len(decoded)}")
-    # ---------------------------------------------------------------------
     return Ed25519PublicKey.from_public_bytes(decoded)
 
 
