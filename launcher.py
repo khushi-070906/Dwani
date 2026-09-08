@@ -4,13 +4,21 @@ launcher.py
 The thing a presenter actually double-clicks (after this gets compiled to
 DwaniLive.exe via PyArmor + PyInstaller -- see build steps in the project's
 packaging notes). Build with --name so the output .exe is what the presenter
-sees in Downloads/Desktop, not the source filename:
+sees in Downloads/Desktop, not the source filename. The UI is now a real
+window (see gui.py), not the console, so build --windowed rather than
+--console, and make sure pywebview's Windows backend is actually bundled
+(see gui.py's module docstring for why --collect-submodules is required
+here, not optional):
 
-    pyinstaller --name DwaniLive --onefile --console launcher.py
+    pyinstaller --name DwaniLive --onefile --windowed \
+        --collect-submodules webview --collect-submodules clr_loader \
+        launcher.py
 
-(swap --console for --windowed only if the console UI below is ever
-replaced with a real GUI -- right now the console IS the UI, so hiding it
-would hide the setup/activation prompts and progress bar too.)
+If gui.py or pywebview is ever missing/broken at runtime, main() below
+falls back to the original plain-console flow automatically -- that
+fallback is why setup_models_if_needed()/prompt_for_activation_if_needed()/
+setup_firewall_if_needed() below are still console-flavored (input(),
+print(), ANSI colour) rather than removed outright.
 No Python source, no terminal commands, no manual model setup.
 
 What it does, in order:
@@ -154,7 +162,10 @@ def models_already_present() -> bool:
     return NLLB_MODEL_DIR.is_dir() and SENTENCEPIECE_MODEL.is_file()
 
 
-def download_with_progress(url: str, dest_path: Path) -> None:
+def download_with_progress(url: str, dest_path: Path, progress_cb=None) -> None:
+    """progress_cb, if given, is called as progress_cb(pct, mb_done, mb_total)
+    instead of printing a console progress bar -- used by gui.py to drive
+    the window's progress bar. Console behavior (default) is unchanged."""
     def _report(block_num, block_size, total_size):
         if total_size <= 0:
             return
@@ -162,24 +173,39 @@ def download_with_progress(url: str, dest_path: Path) -> None:
         pct = min(100, downloaded * 100 // total_size)
         mb_done = downloaded / (1024 * 1024)
         mb_total = total_size / (1024 * 1024)
-        print(_render_progress_bar(pct, mb_done, mb_total), end="", flush=True)
+        if progress_cb:
+            progress_cb(pct, mb_done, mb_total)
+        else:
+            print(_render_progress_bar(pct, mb_done, mb_total), end="", flush=True)
 
-    print(_yellow("First run: downloading translation models (one-time, ~few hundred MB)..."))
+    if not progress_cb:
+        print(_yellow("First run: downloading translation models (one-time, ~few hundred MB)..."))
     urllib.request.urlretrieve(url, dest_path, reporthook=_report)
-    print()  # newline after the progress line
+    if not progress_cb:
+        print()  # newline after the progress line
 
 
-def setup_models_if_needed() -> None:
+def setup_models_if_needed(progress_cb=None, interactive_on_error: bool = True) -> None:
+    """progress_cb, if given, is forwarded to download_with_progress() and
+    console banners/prints are skipped (gui.py drives its own progress bar
+    and status text instead). interactive_on_error controls what happens
+    on failure: True (console default) prints and blocks on input() before
+    exiting, same as before; False (GUI) re-raises instead, since a
+    --windowed build has no console to type "Enter" into -- see gui.py's
+    _run_pipeline(), which catches this and shows the error view.
+    """
     if models_already_present():
         return
 
-    _banner("DwaniLive -- First-Run Setup")
+    if not progress_cb:
+        _banner("DwaniLive -- First-Run Setup")
 
     zip_path = APP_DIR / "_dwanilive_models_tmp.zip"
     try:
-        download_with_progress(MODEL_BUNDLE_URL, zip_path)
+        download_with_progress(MODEL_BUNDLE_URL, zip_path, progress_cb=progress_cb)
 
-        print("Extracting models...")
+        if not progress_cb:
+            print("Extracting models...")
         with zipfile.ZipFile(zip_path) as zf:
             zf.extractall(APP_DIR)
 
@@ -210,12 +236,15 @@ def setup_models_if_needed() -> None:
                 "level or nested inside a single wrapper folder."
             )
 
-        print(_green("Setup complete. This only happens once.\n"))
+        if not progress_cb:
+            print(_green("Setup complete. This only happens once.\n"))
     except Exception as exc:
         print(_red(f"\nSetup failed: {exc}"), file=sys.stderr)
         print("Check your internet connection and try running DwaniLive again.", file=sys.stderr)
-        input("Press Enter to exit...")
-        sys.exit(1)
+        if interactive_on_error:
+            input("Press Enter to exit...")
+            sys.exit(1)
+        raise
     finally:
         if zip_path.exists():
             zip_path.unlink()
@@ -401,6 +430,33 @@ def main() -> None:
     global _ANSI_ENABLED
     _ANSI_ENABLED = _enable_ansi()
     _set_console_title("DwaniLive")
+
+    # Prefer the real GUI window (gui.py, styled to match the website) --
+    # falls back to the plain console flow below if pywebview isn't
+    # installed, or its native backend fails to initialize on this
+    # machine (e.g. WebView2 missing/broken). That fallback matters: it's
+    # what keeps this runnable on a dev machine without pywebview set up,
+    # and it's what keeps a presenter's session from being blocked
+    # entirely by a GUI-layer problem rather than a real one.
+    try:
+        import gui as _gui
+    except Exception:
+        _gui = None
+
+    if _gui is not None:
+        try:
+            _gui.run(
+                setup_models_if_needed=setup_models_if_needed,
+                setup_firewall_if_needed=setup_firewall_if_needed,
+                app_dir=APP_DIR,
+                nllb_model_dir=NLLB_MODEL_DIR,
+                whisper_model_size=WHISPER_MODEL_SIZE,
+                server_port=SERVER_PORT,
+                license_server_url=LICENSE_SERVER_URL,
+            )
+            return
+        except Exception as exc:
+            print(_yellow(f"GUI window failed to start ({exc}); falling back to the console."), file=sys.stderr)
 
     setup_models_if_needed()
     prompt_for_activation_if_needed()
