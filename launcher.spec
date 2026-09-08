@@ -1,22 +1,19 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_submodules
+from PyInstaller.utils.hooks import collect_all
 
-hidden_fastapi = collect_submodules('fastapi')
-hidden_starlette = collect_submodules('starlette')
-hidden_uvicorn = collect_submodules('uvicorn')
+datas = [('static', 'static'), ('dwani-models/sentencepiece.bpe.model', '.')]
+binaries = []
+hiddenimports = ['ctranslate2', 'faster_whisper', 'uvicorn.logging', 'uvicorn.loops', 'uvicorn.loops.auto', 'uvicorn.protocols', 'uvicorn.protocols.http', 'uvicorn.protocols.http.auto', 'uvicorn.protocols.websockets', 'uvicorn.protocols.websockets.auto', 'uvicorn.lifespan', 'uvicorn.lifespan.on']
+tmp_ret = collect_all('cryptography')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+
 
 a = Analysis(
-    ['protected/launcher.py'],
+    ['server.py'],
     pathex=[],
-    binaries=[],
-    datas=[('static', 'static'), ('protected/pyarmor_runtime_000000', 'pyarmor_runtime_000000')],
-    hiddenimports=[
-        'server', 'licensing', 'backends', 'qa_pipeline', 'nllb_tokenizer',
-        'pipeline', 'session', 'glossary', 'accessibility', 'decision_engine',
-        'dynamic_glossary', 'persistent_memory', 'translation_cache', 'activate',
-        'faster_whisper', 'ctranslate2', 'sentencepiece', 'cryptography',
-        'fastapi.staticfiles', 'starlette.staticfiles', 'aiofiles',
-    ] + hidden_fastapi + hidden_starlette + hidden_uvicorn,
+    binaries=binaries,
+    datas=datas,
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -25,6 +22,7 @@ a = Analysis(
     optimize=0,
 )
 pyz = PYZ(a.pure)
+
 exe = EXE(
     pyz,
     a.scripts,
