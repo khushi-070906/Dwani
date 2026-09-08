@@ -270,8 +270,31 @@ def check_license(
     Raises LicenseError with a message safe to print directly to the presenter
     if the session should not start.
     """
-    token = load_cached_license(cache_path)
-    license = verify_license(token, public_key_b64)
+    try:
+        token = load_cached_license(cache_path)
+    except LicenseError:
+        # No cached token at all -- this is expected and fine for a
+        # presenter who never ran activate.py, since the Free tier is
+        # advertised as "no activation needed" on the pricing page.
+        # Fall back to a local, unsigned Free license instead of
+        # blocking startup. Pro/Institution features remain gated below
+        # (features()/max_attendees on this fallback are Free's), so a
+        # presenter genuinely needs a real activated token to unlock them.
+        now = int(time.time())
+        license = License(
+            tier="free",
+            presenter_email="",
+            issued_at=now,
+            expires_at=now + 10 * 365 * 24 * 60 * 60,  # effectively unlimited
+            max_attendees=TIER_DEFAULT_MAX_ATTENDEES["free"],
+        )
+    else:
+        # A token WAS found on disk -- this presenter (or a previous run)
+        # went through activate.py, so hold it to the same bar as before:
+        # it must carry a genuine signature from the license server. This
+        # is what stops a tampered/forged token file from being accepted;
+        # it's only the *absence* of a token that's treated leniently above.
+        license = verify_license(token, public_key_b64)
 
     if license.is_expired():
         if license.is_within_grace():
