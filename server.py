@@ -922,7 +922,15 @@ def main(argv=None):
             print("--hotspot-ssid/--hotspot-password given alongside --no-hotspot; ignoring them.\n")
         join_url = session.announce()
 
-    host_url = join_url.replace(f"/?session=", "/host?session=")
+    # Deliberately NOT derived from join_url: join_url uses the LAN IP so
+    # attendees on other devices can reach it, but the presenter's own mic
+    # page is opened in a browser on THIS SAME machine as the server, so
+    # localhost always works -- and, unlike a plain http://<lan-ip> URL,
+    # browsers treat http://localhost as a secure context, which is what
+    # getUserMedia() (the presenter's mic) requires. This sidesteps needing
+    # --https just for the presenter to be able to speak.
+    host_scheme = "https" if args.https else "http"
+    host_url = f"{host_scheme}://localhost:{resolved_port}/host?session={session.session_id}"
     print(f"Presenter mic page: {host_url}\n")
 
     ssl_kwargs = {}
