@@ -589,6 +589,112 @@ def _print_summary(results: dict) -> None:
         print(f"ITDE veto rate: {results['itde_veto_rate']:.2%}")
 
 
+def _parse_float_list(spec: str) -> list[float]:
+    return [float(x.strip()) for x in spec.split(",") if x.strip()]
+
+
+def _parse_int_list(spec: str) -> list[int]:
+    return [int(x.strip()) for x in spec.split(",") if x.strip()]
+
+
+async def run_sweep(args: argparse.Namespace) -> list[dict]:
+    """Runs run_evaluation() once per combination of swept parameter values
+    (only over parameters given a --sweep-* list; every other CLI arg stays
+    fixed at what was passed) against the SAME audio+references, tagging
+    each result with the swept values used. This is what actually answers
+    "what --energy-threshold/beam-size should I use for my venue" -- one
+    command sweeping candidate values, instead of manually re-invoking the
+    script per value and eyeballing separate JSON files.
+
+    Note: RealWhisperBackend/RealNLLBBackend get reconstructed (i.e.
+    reloaded from disk) for every combination, since this reuses
+    run_evaluation() as-is rather than restructuring model lifetime
+    management. With --whisper-model/--nllb-model-dir, model load time will
+    dominate wall-clock for anything beyond a handful of values -- keep
+    grids small rather than crossing many values across all three sweep
+    parameters at once.
+    """
+    import copy
+
+    energy_values = _parse_float_list(args.sweep_energy_threshold) if args.sweep_energy_threshold else [args.energy_threshold]
+    asr_beam_values = _parse_int_list(args.sweep_asr_beam_size) if args.sweep_asr_beam_size else [args.asr_beam_size]
+    nllb_beam_values = _parse_int_list(args.sweep_nllb_beam_size) if args.sweep_nllb_beam_size else [args.nllb_beam_size]
+
+    combos = [
+        (energy, asr_beam, nllb_beam)
+        for energy in energy_values
+        for asr_beam in asr_beam_values
+        for nllb_beam in nllb_beam_values
+    ]
+
+    print(
+        f"Sweeping {len(combos)} configuration(s): {len(energy_values)} energy-threshold x "
+        f"{len(asr_beam_values)} asr-beam-size x {len(nllb_beam_values)} nllb-beam-size\n"
+    )
+
+    all_results = []
+    for i, (energy, asr_beam, nllb_beam) in enumerate(combos, 1):
+        run_args = copy.copy(args)
+        run_args.energy_threshold = energy
+        run_args.asr_beam_size = asr_beam
+        run_args.nllb_beam_size = nllb_beam
+        print(f"--- [{i}/{len(combos)}] energy_threshold={energy}  asr_beam_size={asr_beam}  nllb_beam_size={nllb_beam} ---")
+        result = await run_evaluation(run_args)
+        result["sweep_params"] = {
+            "energy_threshold": energy,
+            "asr_beam_size": asr_beam,
+            "nllb_beam_size": nllb_beam,
+        }
+        all_results.append(result)
+        print()
+
+    return all_results
+
+
+def _print_sweep_table(results: list[dict]) -> None:
+    def _mean_bleu(r: dict) -> float | None:
+        scores = [e["bleu"] for e in r["translation"].values() if e.get("bleu") is not None]
+        return statistics.mean(scores) if scores else None
+
+    rows = []
+    for r in results:
+        p = r["sweep_params"]
+        rows.append({
+            "energy_threshold": p["energy_threshold"],
+            "asr_beam_size": p["asr_beam_size"],
+            "nllb_beam_size": p["nllb_beam_size"],
+            "wer": r["asr"]["wer"]["wer"],
+            "mean_bleu": _mean_bleu(r),
+            "asr_p95_latency": r["latency"]["asr_model_only_seconds"]["p95"],
+            "segments_detected": r["segments_detected"],
+        })
+
+    # Lower WER first (accuracy is the primary axis you're choosing between);
+    # ASR p95 latency as the tiebreaker, since that's the direct cost of a
+    # higher beam size or a threshold that fragments segments more.
+    rows.sort(key=lambda x: (x["wer"], x["asr_p95_latency"]))
+
+    print("\n--- Sweep comparison (best WER first) ---")
+    header = f"{'energy':>8} {'asr_beam':>9} {'nllb_beam':>10} {'WER':>8} {'mean BLEU':>10} {'ASR p95':>9} {'segments':>9}"
+    print(header)
+    print("-" * len(header))
+    for row in rows:
+        bleu_str = f"{row['mean_bleu']:.2f}" if row["mean_bleu"] is not None else "n/a"
+        print(
+            f"{row['energy_threshold']:>8} {row['asr_beam_size']:>9} {row['nllb_beam_size']:>10} "
+            f"{row['wer']:>8.2%} {bleu_str:>10} {row['asr_p95_latency']:>9.3f} {row['segments_detected']:>9}"
+        )
+    zero_segment_rows = [r for r in rows if r["segments_detected"] == 0]
+    if zero_segment_rows:
+        values = ", ".join(str(r["energy_threshold"]) for r in zero_segment_rows)
+        print(
+            f"\nNOTE: energy_threshold={{{values}}} detected 0 segments (nothing was transcribed "
+            "at all -- those rows show WER=100% by construction, not a real accuracy comparison). "
+            "If EVERY row shows 0 segments, none of the swept thresholds registered your clip as "
+            "voiced -- try lower values, not just the lowest one you already tried."
+        )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="End-to-end (audio-in) accuracy (WER/BLEU/chrF) and latency evaluation for the LDST pipeline."
@@ -618,13 +724,36 @@ def main() -> None:
     parser.add_argument("--max-segment-seconds", type=float, default=15.0)
     parser.add_argument("--case-sensitive", action="store_true", help="Don't lowercase before computing WER")
     parser.add_argument("--output", default="evaluate_accuracy_results.json")
+    parser.add_argument(
+        "--sweep-energy-threshold", default=None, metavar="V1,V2,...",
+        help="Comma-separated --energy-threshold values to sweep, e.g. 0.01,0.02,0.03,0.05. Runs "
+        "the full evaluation once per value against the SAME --audio-file/--reference-transcript "
+        "and prints a ranked comparison table instead of one summary -- this is what actually "
+        "answers 'what threshold should I use', rather than re-invoking the script by hand and "
+        "eyeballing separate JSON files. Presence of any --sweep-* flag switches to sweep mode.",
+    )
+    parser.add_argument(
+        "--sweep-asr-beam-size", default=None, metavar="V1,V2,...",
+        help="Comma-separated --asr-beam-size values to sweep (see --sweep-energy-threshold).",
+    )
+    parser.add_argument(
+        "--sweep-nllb-beam-size", default=None, metavar="V1,V2,...",
+        help="Comma-separated --nllb-beam-size values to sweep (see --sweep-energy-threshold).",
+    )
     args = parser.parse_args()
 
-    results = asyncio.run(run_evaluation(args))
-    _print_summary(results)
+    is_sweep = args.sweep_energy_threshold or args.sweep_asr_beam_size or args.sweep_nllb_beam_size
 
-    Path(args.output).write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"\nWrote {args.output}")
+    if is_sweep:
+        results = asyncio.run(run_sweep(args))
+        _print_sweep_table(results)
+        Path(args.output).write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
+        print(f"\nWrote {args.output} ({len(results)} configuration(s) -- full per-segment detail for each)")
+    else:
+        results = asyncio.run(run_evaluation(args))
+        _print_summary(results)
+        Path(args.output).write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
+        print(f"\nWrote {args.output}")
 
     if args.whisper_model is None or args.nllb_model_dir is None:
         print(
