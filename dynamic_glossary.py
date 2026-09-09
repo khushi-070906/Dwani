@@ -130,7 +130,7 @@ class DynamicGlossaryUpdater:
         self._on_term_added = on_term_added
 
         self._accumulated_text: list[str] = []
-        self._last_slide_hash: Optional[str] = None
+        self._seen_slide_hashes: set[str] = set()
         self._known_terms: set[str] = {t.term for t in glossary}
         self.log: list[TermAddedEvent] = []
         self._poll_count = 0
@@ -146,7 +146,19 @@ class DynamicGlossaryUpdater:
         self._start_time = time.monotonic()
         self._stopped.clear()
         while not self._stopped.is_set():
-            await self.poll_once_async()
+            try:
+                await self.poll_once_async()
+            except Exception as exc:
+                # A single bad capture/OCR cycle (monitor unplugged,
+                # Tesseract transiently busy, a permissions hiccup)
+                # shouldn't permanently kill dynamic glossary updates for
+                # the rest of the session. This is launched fire-and-forget
+                # (asyncio.create_task per the wiring example), so an
+                # uncaught exception here would silently stop protecting
+                # new terms for the rest of the presenter's session with no
+                # visible sign anything went wrong -- log and keep polling
+                # on the next interval instead.
+                print(f"[dynamic_glossary] poll failed, will retry next interval: {exc}")
             try:
                 await asyncio.wait_for(self._stopped.wait(), timeout=self.poll_interval_seconds)
             except asyncio.TimeoutError:
@@ -167,9 +179,17 @@ class DynamicGlossaryUpdater:
         text = self._ocr_fn()
 
         slide_hash = hashlib.sha256(text.encode("utf-8", errors="ignore")).hexdigest()
-        if text.strip() and slide_hash != self._last_slide_hash:
+        if text.strip() and slide_hash not in self._seen_slide_hashes:
+            # Checked against the full set of hashes seen this session, not
+            # just the previous capture -- otherwise A -> B -> A (presenter
+            # goes back to an earlier slide) would re-count slide A's terms
+            # a second time. That's not "a genuinely different slide"
+            # reappearing (the case this dedup is meant to allow through),
+            # it's the same slide shown again, and double-counting it could
+            # push a term over min_occurrences purely from a revisit rather
+            # than real recurrence across distinct slides.
             self._accumulated_text.append(text)
-            self._last_slide_hash = slide_hash
+            self._seen_slide_hashes.add(slide_hash)
 
         if not self._accumulated_text:
             return []
