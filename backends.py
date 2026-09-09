@@ -260,11 +260,28 @@ class RealNLLBBackend:
         source_lang: str = "en",
         device: str = "cpu",
         beam_size: int = 4,
+        inter_threads: int = 2,
     ) -> None:
+        """`inter_threads` sets ctranslate2.Translator's own parallel-
+        translation worker count. pipeline.py's Pipeline now dispatches one
+        translate() call per subscribed language *concurrently* (see
+        Pipeline._process_segment) specifically so multiple languages'
+        translations overlap instead of queueing one after another -- but
+        ctranslate2.Translator defaults inter_threads to 1, which would
+        silently flatten those concurrent Python-thread calls right back
+        into a single-file queue inside the C++ layer regardless of how
+        many threads call in at once (see CTranslate2's own parallel-
+        execution docs: concurrent calls from multiple Python threads is an
+        explicitly supported case, gated by this parameter). Set this to
+        roughly the number of distinct languages you expect attendees to
+        request concurrently -- each worker also consumes its own memory
+        and CPU budget, so this isn't free; profile before raising much
+        past 2-4 on a typical presenter laptop.
+        """
         import ctranslate2  # deferred: heavy, optional dep
         from nllb_tokenizer import NllbLiteTokenizer  # deferred: sentencepiece is the only dep this pulls in
 
-        self._translator = ctranslate2.Translator(model_dir, device=device)
+        self._translator = ctranslate2.Translator(model_dir, device=device, inter_threads=inter_threads)
         self._tokenizer = NllbLiteTokenizer(sentencepiece_model_path)
         self._source_flores = flores_code(source_lang)
         self._beam_size = beam_size
