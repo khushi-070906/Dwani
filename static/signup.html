@@ -105,7 +105,7 @@
   .nav-links { justify-self: center; display: flex; align-items: center; gap: 0.25rem; font-size: 0.94rem; font-weight: 600; color: var(--ink-dim); }
   .nav-links a { padding: 0.5rem 1rem; border-radius: 999px; transition: background 0.15s ease, color 0.15s ease; }
   .nav-links a:hover { color: var(--accent-deep); }
-  .nav-links a.active { color: var(--accent-deep); text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 2px; }
+  .nav-links a.active, .nav-links span.active { color: var(--accent-deep); background: rgba(168, 70, 12, 0.1); font-weight: 700; cursor: default; }
   .nav-right { justify-self: end; display: flex; align-items: center; gap: 0.6rem; opacity: 0; transition: opacity 0.2s ease; }
   .nav-right.ready { opacity: 1; }
   .nav-cta {
@@ -128,7 +128,26 @@
   }
   .nav-icon-btn:hover { background: var(--bg-raised-2); }
   .nav-icon-btn.active { background: rgba(168, 70, 12, 0.1); color: var(--accent-deep); border-color: transparent; }
-  @media (max-width: 760px) { .nav-links { display: none; } }
+  .nav-hamburger {
+    display: none;
+    width: 2.15rem; height: 2.15rem; border-radius: 50%; flex-shrink: 0;
+    align-items: center; justify-content: center;
+    background: var(--bg); border: 1px solid var(--bg-raised-2);
+    font-size: 1.1rem; color: var(--ink-dim); cursor: pointer;
+  }
+  .nav-hamburger:hover { background: var(--bg-raised-2); }
+  @media (max-width: 760px) {
+    .nav-links {
+      display: none; position: absolute; top: 100%; left: 0; right: 0;
+      flex-direction: column; align-items: stretch; gap: 0; z-index: 40;
+      background: var(--bg-raised); border-bottom: 1px solid var(--bg-raised-2);
+      box-shadow: var(--shadow); padding: 0.5rem;
+    }
+    .nav-links.mobile-open { display: flex; }
+    .nav-links a, .nav-links span.active { padding: 0.85rem 1rem; border-radius: 10px; text-align: left; }
+    .nav-hamburger { display: flex; }
+    .site-header .nav-shell { position: relative; }
+  }
 
   /* ---------------- Hero ---------------- */
   .hero { text-align: center; padding: 3.5rem 0 2.5rem; }
@@ -324,12 +343,12 @@
     display: block; font-size: 0.78rem; font-weight: 700; color: var(--ink-dim);
     margin-bottom: 0.4rem; letter-spacing: 0.02em;
   }
-  .field input {
+  .field input, .field select {
     width: 100%; background: var(--bg); border: 1px solid var(--bg-raised-2);
     border-radius: 10px; padding: 0.75rem 0.9rem; font-size: 0.92rem;
     font-family: var(--font-body); color: var(--ink); transition: border-color 0.15s ease;
   }
-  .field input:focus { border-color: var(--accent); outline: none; }
+  .field input:focus, .field select:focus { border-color: var(--accent); outline: none; }
   .field-hint { font-size: 0.76rem; color: var(--ink-faint); margin-top: 0.35rem; }
 
   .auth-submit {
@@ -451,11 +470,12 @@
   <div class="brand-row">
     <a href="pricing.html" style="text-decoration:none;"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
   </div>
-  <div class="nav-links">
+  <div class="nav-links" id="nav-links">
     <a href="pricing.html#how-it-works">How it works</a>
     <a href="pricing.html">Pricing</a>
     <a href="pricing.html#faq">FAQ</a>
   </div>
+  <button type="button" class="nav-hamburger" id="nav-hamburger" aria-label="Menu" aria-expanded="false">&#9776;</button>
   <div class="nav-right" id="nav-right">
     <div class="nav-account" id="nav-account" style="display:none;">
       <img class="nav-avatar" id="nav-avatar" alt="">
@@ -484,6 +504,14 @@
         <div class="field">
           <label for="signup-email">Email</label>
           <input type="email" id="signup-email" name="email" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label for="signup-gender">Gender <span style="font-weight:400; color:var(--ink-faint);">(only used to pick your avatar)</span></label>
+          <select id="signup-gender" name="gender">
+            <option value="">Prefer not to say</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+          </select>
         </div>
         <div class="field">
           <label for="signup-password">Password</label>
@@ -525,6 +553,7 @@
     e.preventDefault();
     const name = document.getElementById('signup-name').value;
     const email = document.getElementById('signup-email').value;
+    const gender = document.getElementById('signup-gender').value;
     const pw = document.getElementById('signup-password').value;
     const confirm = document.getElementById('signup-confirm').value;
     const errorBox = document.getElementById('signup-error');
@@ -541,7 +570,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ name, email, password: pw }),
+        body: JSON.stringify({ name, email, password: pw, gender }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -602,6 +631,14 @@
           <input type="email" id="modal-signup-email" required>
         </div>
         <div class="field">
+          <label for="modal-signup-gender">Gender <span style="font-weight:400; color:var(--ink-faint);">(only used to pick your avatar)</span></label>
+          <select id="modal-signup-gender">
+            <option value="">Prefer not to say</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="modal-signup-password">Password</label>
           <input type="password" id="modal-signup-password" minlength="8" required>
         </div>
@@ -639,6 +676,30 @@
   document.getElementById('modal-close-btn').addEventListener('click', closeAuthModal);
   authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
   document.getElementById('switch-to-signup').addEventListener('click', (e) => { e.preventDefault(); openAuthModal('signup'); });
+
+  // ---- Mobile nav (hamburger) ----
+  const navLinksEl = document.getElementById('nav-links');
+  const navHamburger = document.getElementById('nav-hamburger');
+  if (navHamburger && navLinksEl) {
+    navHamburger.addEventListener('click', () => {
+      const open = navLinksEl.classList.toggle('mobile-open');
+      navHamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    // Close after picking a link, and on outside click, so it doesn't
+    // linger open over the page content once the visitor has navigated.
+    navLinksEl.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A') {
+        navLinksEl.classList.remove('mobile-open');
+        navHamburger.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!navLinksEl.classList.contains('mobile-open')) return;
+      if (navLinksEl.contains(e.target) || navHamburger.contains(e.target)) return;
+      navLinksEl.classList.remove('mobile-open');
+      navHamburger.setAttribute('aria-expanded', 'false');
+    });
+  }
   document.getElementById('switch-to-login').addEventListener('click', (e) => { e.preventDefault(); openAuthModal('login'); });
 
   // Any nav CTA that should open the modal instead of navigating to a
@@ -660,12 +721,25 @@
   }
 
   // ---- Nav account display: show avatar+name once logged in ----
-  function populateNavAccount(name, email) {
+  function populateNavAccount(name, email, gender) {
     // Preload the avatar image and wait for it before showing anything --
     // otherwise nav-right reveals with an empty circle that then pops in
     // once the DiceBear request finishes, which reads as another "switch".
     const label = (name && name.trim()) ? name.trim() : email;
-    const avatarUrl = 'https://api.dicebear.com/10.x/adventurer/svg?seed=' + encodeURIComponent(email);
+    // avataaars: a flatter, simpler style than the old "adventurer" one.
+    // Hairstyle pool (and facial-hair odds) are picked from `gender` when
+    // known, so male/female accounts get a matching-presenting avatar;
+    // unset/other falls back to the style's full default pool.
+    const MASC_TOP = 'shortCurly,shortFlat,shortRound,shortWaved,sides,theCaesar,theCaesarAndSidePart,frizzle,dreads01,dreads02';
+    const FEM_TOP = 'bigHair,bob,bun,curly,curvy,frida,fro,longButNotTooLong,miaWallace,shaggyMullet,straight01,straight02,straightAndStrand';
+    let avatarUrl = 'https://api.dicebear.com/10.x/avataaars/svg?seed=' + encodeURIComponent(email);
+    if (gender === 'male') {
+      avatarUrl += '&top[]=' + MASC_TOP + '&facialHairProbability=30';
+    } else if (gender === 'female') {
+      avatarUrl += '&top[]=' + FEM_TOP + '&facialHairProbability=0';
+    } else {
+      avatarUrl += '&facialHairProbability=10';
+    }
     return new Promise((resolve) => {
       const preload = new Image();
       const finish = () => {
@@ -686,7 +760,7 @@
   async function onAuthSuccess() {
     closeAuthModal();
     const user = await getCurrentUser();
-    if (user) await populateNavAccount(user.name, user.email);
+    if (user) await populateNavAccount(user.name, user.email, user.gender);
   }
 
   document.getElementById('modal-login-form').addEventListener('submit', async function (e) {
@@ -713,13 +787,14 @@
     e.preventDefault();
     const name = document.getElementById('modal-signup-name').value;
     const email = document.getElementById('modal-signup-email').value;
+    const gender = document.getElementById('modal-signup-gender').value;
     const password = document.getElementById('modal-signup-password').value;
     const errEl = document.getElementById('modal-signup-error');
     errEl.classList.remove('show');
     try {
       const res = await fetch('/signup', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', body: JSON.stringify({ name, email, password }),
+        credentials: 'include', body: JSON.stringify({ name, email, password, gender }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Could not create account.');
@@ -743,14 +818,14 @@
     const CACHE_KEY = 'dwani_nav_user';
     let cached = null;
     try { cached = JSON.parse(sessionStorage.getItem(CACHE_KEY)); } catch (e) {}
-    if (cached) await populateNavAccount(cached.name, cached.email);
+    if (cached) await populateNavAccount(cached.name, cached.email, cached.gender);
     document.getElementById('nav-right').classList.add('ready');
 
     const user = await getCurrentUser();
     if (user) {
-      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ name: user.name, email: user.email }));
-      if (!cached || cached.email !== user.email || cached.name !== user.name) {
-        await populateNavAccount(user.name, user.email);
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ name: user.name, email: user.email, gender: user.gender }));
+      if (!cached || cached.email !== user.email || cached.name !== user.name || cached.gender !== user.gender) {
+        await populateNavAccount(user.name, user.email, user.gender);
       }
     } else if (cached) {
       // Cached state was stale (session actually expired) -- revert quietly.
