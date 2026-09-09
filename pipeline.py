@@ -47,6 +47,7 @@ Usage sketch from server.py:
 
 from __future__ import annotations
 
+import asyncio
 import time
 from dataclasses import dataclass, field
 from typing import Awaitable, Callable, Iterable, Protocol
@@ -342,7 +343,8 @@ class Pipeline:
         # Snapshot languages once per segment: translating once per language
         # here is what keeps MT cost independent of attendee count.
         languages = list(dict.fromkeys(self.subscribed_languages()))
-        for lang in languages:
+
+        async def _translate_and_broadcast(lang: str) -> None:
             cached = await self.cache.get(transcript, lang)
             if cached is not None:
                 translated = cached
@@ -359,6 +361,39 @@ class Pipeline:
                 if record is not None:
                     record(elapsed)
             await self.broadcast(lang, translated, True)
+
+        # Fan out across subscribed languages CONCURRENTLY instead of one at
+        # a time: with N distinct languages in the room, per-attendee
+        # caption latency used to scale as N * (avg MT call time) -- last
+        # attendee's language waited behind every other language's full
+        # translate() call first. Each translate() call already hops onto
+        # its own worker thread (see RealWhisperBackend/RealNLLBBackend's
+        # asyncio.to_thread), and ctranslate2's Translator is explicitly
+        # designed to accept concurrent calls from multiple Python threads
+        # (see backends.py's inter_threads) -- so gathering these is safe
+        # and turns that N * time into roughly max(time) instead. Safe
+        # w.r.t. shared state too: each task only touches its own (text,
+        # lang) cache key and broadcasts to its own language's subscribers,
+        # and Python's GIL means the only real parallelism happening is
+        # inside the C++ translate_batch call itself while it's off the
+        # event loop -- nothing here needs a lock.
+        #
+        # return_exceptions=True is deliberate: previously, one language's
+        # translate() call raising (a real possibility -- a transient MT
+        # error, an unmapped language code) silently killed every other
+        # language's caption for that segment too, since the old for-loop
+        # would raise straight out of _process_segment before reaching the
+        # remaining languages. Now a single language's failure only drops
+        # that language's caption for this one segment; everyone else still
+        # gets theirs.
+        if languages:
+            results = await asyncio.gather(
+                *(_translate_and_broadcast(lang) for lang in languages),
+                return_exceptions=True,
+            )
+            for lang, result in zip(languages, results):
+                if isinstance(result, Exception):
+                    print(f"[pipeline] translation/broadcast failed for {lang!r}: {result}")
 
         return transcript
 
