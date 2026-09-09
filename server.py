@@ -565,6 +565,17 @@ def main(argv=None):
         "changing this from the default.",
     )
     parser.add_argument(
+        "--nllb-inter-threads",
+        type=int,
+        default=2,
+        help="ctranslate2 Translator's parallel-translation worker count (default: 2). Pipeline "
+        "now translates each subscribed language concurrently rather than one at a time -- this "
+        "is what lets those concurrent calls actually run in parallel inside ctranslate2 instead "
+        "of queueing right back up single-file. Raise toward the number of distinct languages "
+        "you expect attendees to request at once; each worker has its own CPU/memory cost, so "
+        "don't raise this past what your presenter laptop can actually run concurrently.",
+    )
+    parser.add_argument(
         "--energy-threshold",
         type=float,
         default=0.02,
@@ -825,6 +836,7 @@ def main(argv=None):
                 model_dir=args.nllb_model_dir,
                 source_lang=args.presenter_language,
                 beam_size=args.nllb_beam_size,
+                inter_threads=args.nllb_inter_threads,
             )
             if args.nllb_model_dir
             else FakeTranslationBackend()
