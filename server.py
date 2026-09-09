@@ -970,5 +970,55 @@ def main(argv=None):
         session.stop_hotspot()
 
 
+def _report_fatal_startup_error(exc: BaseException) -> None:
+    """DwaniLive.exe is built with the GUI (windowed) PyInstaller subsystem,
+    so there's no console attached -- every print()/sys.exit() message that
+    main() emits on a startup failure (bad license, port conflict, missing
+    model files, etc.) was previously just disappearing, making the app look
+    like it "doesn't open" with zero explanation. This writes the failure to
+    a log file next to the exe AND pops up a message box (Windows) so it's
+    never silent again."""
+    import traceback
+
+    log_path = (
+        Path(sys.executable).parent / "dwanilive_error.log"
+        if getattr(sys, "frozen", False)
+        else Path(__file__).resolve().parent / "dwanilive_error.log"
+    )
+
+    message = f"{exc}\n\n{traceback.format_exc()}"
+    try:
+        log_path.write_text(message, encoding="utf-8")
+    except Exception:
+        pass  # best-effort -- still try to show the message box below
+
+    print(message, file=sys.stderr)  # harmless no-op if there's no console; helps when run from cmd/PowerShell
+
+    if sys.platform == "win32":
+        try:
+            import ctypes
+
+            ctypes.windll.user32.MessageBoxW(
+                0,
+                f"DwaniLive failed to start:\n\n{exc}\n\nDetails written to:\n{log_path}",
+                "DwaniLive - Startup Error",
+                0x10,  # MB_ICONERROR
+            )
+        except Exception:
+            pass
+
+
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit as e:
+        # sys.exit(...)/raise SystemExit(...) calls elsewhere in main() (license
+        # failure, bad --port range, missing --https cert, etc.) still exit with
+        # the same code -- just visibly now, instead of vanishing.
+        if e.code not in (0, None):
+            _report_fatal_startup_error(e)
+        raise
+    except BaseException as e:  # noqa: BLE001 -- deliberately broad: this is the
+        # last line of defense before the process disappears with no trace.
+        _report_fatal_startup_error(e)
+        raise
