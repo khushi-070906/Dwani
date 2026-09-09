@@ -80,12 +80,36 @@ import argparse
 import asyncio
 import csv
 import json
+import re
 import statistics
 import sys
 from pathlib import Path
 
 from glossary import Glossary, GlossaryAwareTranslationBackend
 from pipeline import FakeTranslationBackend
+
+# Scripts that don't delimit words with whitespace -- a word-boundary match
+# is less meaningful there than for space-delimited scripts (CJK text isn't
+# space-separated, so a term appearing mid-run of other characters is often
+# a correct match, not a false positive the way "ML" inside "HTML" is for
+# Latin/Indic/Cyrillic script). Fall back to plain substring matching for
+# just these, same behavior as before this fix.
+_NO_WORD_BOUNDARY_LANGS = {"zh", "ja"}
+
+
+def _term_present(expected: str, hypothesis: str, lang: str) -> bool:
+    """Whether `expected` genuinely appears in `hypothesis` as its own term,
+    not merely as a substring of some other word. A bare `expected in
+    hypothesis` check false-positives on short/common glossary terms --
+    exactly the kind a technical-talk glossary is built to protect (e.g.
+    "ML" matching inside the unrelated word "HTML", or "AI" inside
+    "explains") -- which would silently inflate glossary_term_accuracy, the
+    number this whole script exists to report honestly for the paper's
+    research question.
+    """
+    if lang in _NO_WORD_BOUNDARY_LANGS or not expected:
+        return expected in hypothesis
+    return re.search(rf"\b{re.escape(expected)}\b", hypothesis) is not None
 
 
 def load_manifest(path: Path) -> list[dict]:
@@ -174,8 +198,8 @@ async def evaluate(args: argparse.Namespace) -> None:
 
             term_expectations = [gt.translation_for(lang, matched) for gt, matched in matched_terms]
             terms_total = len(term_expectations)
-            baseline_terms_correct = sum(1 for expected in term_expectations if expected in baseline_hyp)
-            glossary_terms_correct = sum(1 for expected in term_expectations if expected in glossary_hyp)
+            baseline_terms_correct = sum(1 for expected in term_expectations if _term_present(expected, baseline_hyp, lang))
+            glossary_terms_correct = sum(1 for expected in term_expectations if _term_present(expected, glossary_hyp, lang))
 
             row = {
                 "source": source,
