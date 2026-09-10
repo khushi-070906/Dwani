@@ -78,31 +78,85 @@ class AudioSegmenter:
     """
     Buffers streaming audio and yields an AudioSegment each time it detects a
     natural pause boundary -- i.e. enough voiced audio followed by enough
-    silence. This is a simple energy-threshold VAD rather than a dedicated
-    VAD library (e.g. webrtcvad): it has no external dependency, and its
-    behavior is fully deterministic and easy to unit test with synthetic
-    tone/silence buffers. Swap in a proper VAD model here without touching
-    any other part of the pipeline if accuracy on real-world noisy venues
-    turns out to need it.
+    silence.
+
+    Two VAD backends are available (`vad_backend`):
+      "energy"    -- default. A plain RMS-amplitude threshold. No external
+                     dependency, fully deterministic, easy to unit test with
+                     synthetic tone/silence buffers -- but crude on a real
+                     venue: background noise can keep segments open (feeding
+                     Whisper long noisy stretches it may hallucinate on),
+                     and a quiet/distant mic can fail to register as voiced
+                     at all (dropped words).
+      "webrtcvad" -- Google's WebRTC voice activity detector (`pip install
+                     webrtcvad`), a real speech-vs-non-speech classifier
+                     rather than a bare energy threshold -- meaningfully
+                     more robust to background noise without needing a full
+                     ML VAD model. Requires sample_rate in
+                     {8000, 16000, 32000, 48000}.
 
     Frames are fed in fixed-size chunks via `push`; a completed segment is
     returned from `push` when a pause boundary is crossed, or `None`
     otherwise. Call `flush` at end-of-stream to force out any buffered
     voiced audio that hasn't yet been followed by silence.
+
+    `interim_interval_seconds`, if set, additionally makes `should_emit_interim()`
+    return True periodically during a long, still-open voiced run, so
+    Pipeline can broadcast an unfinalized "here's what's been said so far"
+    caption well before the segment actually closes (on a pause, or the
+    max_segment_seconds force-cut) -- see Pipeline._process_segment's
+    is_final param. This is NOT true incremental/streaming ASR: each
+    interim tick re-transcribes the entire buffered-so-far audio from
+    scratch (the only kind of "streaming" a batch ASR backend like Whisper
+    supports without a custom incremental decoder), so it trades CPU for
+    lower perceived latency -- left off (None) by default for exactly that
+    reason; enable and watch CPU load on your actual presenter hardware
+    before shipping it on.
     """
 
     sample_rate: int = 16_000
-    energy_threshold: float = 0.02          # RMS amplitude, audio normalized to [-1, 1]
+    energy_threshold: float = 0.02          # RMS amplitude, audio normalized to [-1, 1] -- only used by vad_backend="energy"
     min_voiced_seconds: float = 0.3         # ignore blips shorter than this
     min_silence_seconds: float = 0.6        # pause length that closes a segment
     max_segment_seconds: float = 15.0       # force a cut so one run-on sentence
     #                                          doesn't block captions indefinitely
+    max_trailing_silence_seconds: float = 0.3
+    # The pause-detection logic needs up to min_silence_seconds of real
+    # silence to reliably *decide* a segment has ended -- but feeding Whisper
+    # all of that silence as audio is a known hallucination trigger (Whisper
+    # sometimes invents repeated phrases when a chunk trails off into pure
+    # silence with nothing more to transcribe). _close_segment() below keeps
+    # only up to this much trailing silence in the actual audio handed to
+    # ASR -- still enough that the last word isn't clipped, just not the
+    # full pause-detection window. Independent of min_silence_seconds: raising
+    # the pause threshold for better sentence-boundary detection no longer
+    # also means feeding ASR more silence.
+    vad_backend: str = "energy"             # "energy" or "webrtcvad"
+    webrtcvad_aggressiveness: int = 2       # 0 (most permissive) - 3 (most aggressive filtering); only used by vad_backend="webrtcvad"
+    interim_interval_seconds: float | None = None  # None = disabled; see class docstring
 
     _voiced_chunks: list[np.ndarray] = field(default_factory=list, init=False)
     _voiced_duration: float = field(default=0.0, init=False)
     _silence_duration: float = field(default=0.0, init=False)
     _segment_start_ts: float | None = field(default=None, init=False)
     _clock: float = field(default=0.0, init=False)
+    _last_interim_voiced_duration: float = field(default=0.0, init=False)
+    _vad: object = field(default=None, init=False, repr=False)
+    _vad_leftover: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=np.float32), init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        if self.vad_backend not in ("energy", "webrtcvad"):
+            raise ValueError(f"vad_backend must be 'energy' or 'webrtcvad', got {self.vad_backend!r}")
+        if self.vad_backend == "webrtcvad":
+            if self.sample_rate not in (8000, 16000, 32000, 48000):
+                raise ValueError(
+                    f"webrtcvad only supports sample rates of 8000/16000/32000/48000 Hz, "
+                    f"got {self.sample_rate}. This module's own default (16000) already "
+                    f"matches what the rest of the pipeline expects."
+                )
+            import webrtcvad  # deferred: optional dep, only needed for this backend
+
+            self._vad = webrtcvad.Vad(self.webrtcvad_aggressiveness)
 
     def _chunk_duration(self, chunk: np.ndarray) -> float:
         return len(chunk) / self.sample_rate
@@ -110,8 +164,69 @@ class AudioSegmenter:
     def _is_voiced(self, chunk: np.ndarray) -> bool:
         if len(chunk) == 0:
             return False
+        if self.vad_backend == "webrtcvad":
+            return self._is_voiced_webrtcvad(chunk)
         rms = float(np.sqrt(np.mean(np.square(chunk))))
         return rms >= self.energy_threshold
+
+    def _is_voiced_webrtcvad(self, chunk: np.ndarray) -> bool:
+        """webrtcvad requires exact 10/20/30ms frames of 16-bit PCM.
+        Incoming chunks (whatever size the client happens to send over the
+        WebSocket) rarely divide evenly into that, so leftover samples are
+        carried over and prepended to the next call rather than dropped or
+        zero-padded -- no audio silently skipped from VAD's view. A chunk
+        counts as voiced if ANY of its 30ms sub-frames does (30ms = the
+        largest, and so fewest-frames-per-chunk, valid webrtcvad frame
+        size) -- matching this class's existing bias toward not missing
+        short voiced blips (min_voiced_seconds already filters those out
+        downstream), rather than requiring the whole chunk to be voiced,
+        which would make this backend less sensitive than the energy
+        threshold it's replacing.
+        """
+        frame_samples = int(self.sample_rate * 0.03)
+        combined = np.concatenate([self._vad_leftover, chunk])
+        n_frames = len(combined) // frame_samples
+        usable = combined[: n_frames * frame_samples]
+        self._vad_leftover = combined[n_frames * frame_samples:].copy()
+
+        if n_frames == 0:
+            return False  # not enough buffered yet to form even one 30ms frame
+
+        pcm16 = np.clip(usable * 32767.0, -32768, 32767).astype(np.int16)
+        for i in range(n_frames):
+            frame_bytes = pcm16[i * frame_samples:(i + 1) * frame_samples].tobytes()
+            if self._vad.is_speech(frame_bytes, self.sample_rate):
+                return True
+        return False
+
+    def should_emit_interim(self) -> bool:
+        """True if interim captions are enabled and enough new voiced audio
+        has accumulated since the last interim/final emission to justify
+        re-transcribing the buffer so far. Doesn't close or mutate the
+        segment -- call current_partial_segment() to get the audio itself,
+        then mark_interim_emitted() after actually processing it."""
+        if self.interim_interval_seconds is None or not self._voiced_chunks:
+            return False
+        return (self._voiced_duration - self._last_interim_voiced_duration) >= self.interim_interval_seconds
+
+    def mark_interim_emitted(self) -> None:
+        self._last_interim_voiced_duration = self._voiced_duration
+
+    def current_partial_segment(self) -> AudioSegment | None:
+        """A snapshot of the audio buffered so far, without closing the
+        segment -- used for interim captions. Unlike _close_segment(), this
+        does NOT trim trailing silence (there typically isn't much yet --
+        an interim tick fires because enough new *voiced* audio arrived,
+        not because a pause was detected) and does not reset any state."""
+        if not self._voiced_chunks:
+            return None
+        samples = np.concatenate(self._voiced_chunks)
+        return AudioSegment(
+            samples=samples,
+            sample_rate=self.sample_rate,
+            start_ts=self._segment_start_ts,
+            end_ts=self._clock,
+        )
 
     def push(self, chunk: np.ndarray) -> AudioSegment | None:
         """Feed one chunk of mono float32 audio in [-1, 1]. Returns a completed
@@ -152,11 +267,23 @@ class AudioSegmenter:
             self._voiced_duration = 0.0
             self._silence_duration = 0.0
             self._segment_start_ts = None
+            self._last_interim_voiced_duration = 0.0
             return None
         return self._close_segment()
 
     def _close_segment(self) -> AudioSegment:
         samples = np.concatenate(self._voiced_chunks)
+        if self._silence_duration > self.max_trailing_silence_seconds:
+            trim_seconds = self._silence_duration - self.max_trailing_silence_seconds
+            trim_samples = int(trim_seconds * self.sample_rate)
+            if 0 < trim_samples < len(samples):
+                samples = samples[:-trim_samples]
+            # end_ts intentionally still reflects the FULL wall-clock span
+            # (including the untrimmed silence) -- duration_seconds is used
+            # elsewhere (realtime-factor reporting in evaluate_accuracy.py)
+            # to mean "how long did this utterance, including its natural
+            # trailing pause, actually take", which is a different question
+            # from "how many audio samples got sent to ASR".
         segment = AudioSegment(
             samples=samples,
             sample_rate=self.sample_rate,
@@ -167,6 +294,7 @@ class AudioSegmenter:
         self._voiced_duration = 0.0
         self._silence_duration = 0.0
         self._segment_start_ts = None
+        self._last_interim_voiced_duration = 0.0
         return segment
 
 
@@ -324,20 +452,32 @@ class Pipeline:
     async def handle_audio_chunk(self, chunk: np.ndarray) -> str | None:
         """Feed one chunk of live audio in. If it closes out a segment, runs
         ASR + per-language MT + broadcast and returns the transcript (mainly
-        useful for logging/tests); otherwise returns None."""
+        useful for logging/tests); otherwise returns None. If interim
+        captions are enabled on the segmenter (interim_interval_seconds) and
+        this chunk crosses an interim tick without closing a segment, also
+        runs ASR + MT + broadcast for the buffered-so-far audio as a
+        non-final caption -- see AudioSegmenter's docstring for what that
+        does and doesn't mean."""
         segment = self.segmenter.push(chunk)
-        if segment is None:
-            return None
-        return await self._process_segment(segment)
+        if segment is not None:
+            return await self._process_segment(segment, is_final=True)
+
+        if self.segmenter.should_emit_interim():
+            partial = self.segmenter.current_partial_segment()
+            if partial is not None:
+                await self._process_segment(partial, is_final=False)
+            self.segmenter.mark_interim_emitted()
+
+        return None
 
     async def flush(self) -> str | None:
         """Force out and process any trailing buffered audio at session end."""
         segment = self.segmenter.flush()
         if segment is None:
             return None
-        return await self._process_segment(segment)
+        return await self._process_segment(segment, is_final=True)
 
-    async def _process_segment(self, segment: AudioSegment) -> str:
+    async def _process_segment(self, segment: AudioSegment, is_final: bool = True) -> str:
         transcript = await self.asr.transcribe(segment)
 
         # Snapshot languages once per segment: translating once per language
@@ -360,7 +500,7 @@ class Pipeline:
                 record = getattr(self.cache, "record_miss_translate_seconds", None)
                 if record is not None:
                     record(elapsed)
-            await self.broadcast(lang, translated, True)
+            await self.broadcast(lang, translated, is_final)
 
         # Fan out across subscribed languages CONCURRENTLY instead of one at
         # a time: with N distinct languages in the room, per-attendee
