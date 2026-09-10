@@ -426,6 +426,24 @@ def setup_firewall_if_needed() -> None:
         print("this laptop, only from the router/hotspot settings.\n")
 
 
+def _has_interactive_console() -> bool:
+    """Whether stdin is actually usable for input() right now. A --windowed
+    PyInstaller build has no console attached at all -- sys.stdin is either
+    None or a non-interactive stream. Falling back to the plain console
+    flow (prompt_for_activation_if_needed()'s input() calls) in that case
+    doesn't raise an exception -- it just blocks forever waiting for input
+    that can never arrive. That is exactly what "the exe opens to
+    literally nothing, no error, no window, forever" looks like from a
+    presenter's side, with nothing in Task Manager to even hint what's
+    wrong. Checked before falling back below, specifically to turn that
+    silent hang into a loud, logged, message-boxed failure instead.
+    """
+    try:
+        return sys.stdin is not None and sys.stdin.isatty()
+    except Exception:
+        return False
+
+
 def main() -> None:
     global _ANSI_ENABLED
     _ANSI_ENABLED = _enable_ansi()
@@ -438,10 +456,12 @@ def main() -> None:
     # what keeps this runnable on a dev machine without pywebview set up,
     # and it's what keeps a presenter's session from being blocked
     # entirely by a GUI-layer problem rather than a real one.
+    gui_error: Exception | None = None
     try:
         import gui as _gui
-    except Exception:
+    except Exception as exc:
         _gui = None
+        gui_error = exc
 
     if _gui is not None:
         try:
@@ -456,7 +476,23 @@ def main() -> None:
             )
             return
         except Exception as exc:
+            gui_error = exc
             print(_yellow(f"GUI window failed to start ({exc}); falling back to the console."), file=sys.stderr)
+
+    if gui_error is not None and not _has_interactive_console():
+        # No GUI, AND no console to fall back to either -- see
+        # _has_interactive_console()'s docstring. Fail loudly right here
+        # instead of silently hanging on input() below forever. The
+        # __main__ wrapper at the bottom of this file turns this into
+        # dwanilive_error.log + a message box, so this is the actual
+        # thing a presenter sees instead of nothing.
+        raise RuntimeError(
+            f"The DwaniLive window failed to start ({gui_error}), and this build has no "
+            f"console to fall back to for the usual setup prompts. Most likely cause: the "
+            f"Microsoft Edge WebView2 Runtime is missing on this computer -- install it "
+            f"from https://developer.microsoft.com/microsoft-edge/webview2/ and try again. "
+            f"If that doesn't fix it, send dwanilive_error.log (next to this exe) for help."
+        )
 
     setup_models_if_needed()
     prompt_for_activation_if_needed()
@@ -489,5 +525,58 @@ def main() -> None:
     ])
 
 
+def _report_fatal_startup_error(exc: BaseException) -> None:
+    """DwaniLive.exe is built with the GUI (windowed) PyInstaller subsystem
+    (see the module docstring's build command), so there's no console
+    attached -- every print()/exception that reaches here would otherwise
+    just disappear, making the app look like it "doesn't open" with zero
+    explanation. This writes the failure to a log file next to the exe AND
+    pops up a message box (Windows) so it's never silent again.
+
+    This belongs HERE, in launcher.py's own __main__ block, not
+    server.py's -- launcher.py is PyInstaller's actual entry point
+    (`pyinstaller ... launcher.py`); server.py is only ever imported
+    (`import server` in main() above), so a copy of this wrapper living in
+    server.py's own `if __name__ == "__main__":` block would never run for
+    the compiled exe at all, regardless of how correct it is in isolation.
+    """
+    import traceback
+
+    log_path = APP_DIR / "dwanilive_error.log"
+    message = f"{exc}\n\n{traceback.format_exc()}"
+    try:
+        log_path.write_text(message, encoding="utf-8")
+    except Exception:
+        pass  # best-effort -- still try the message box below
+
+    print(message, file=sys.stderr)  # harmless no-op with no console; helps when run from cmd/PowerShell
+
+    if sys.platform == "win32":
+        try:
+            import ctypes
+
+            ctypes.windll.user32.MessageBoxW(
+                0,
+                f"DwaniLive failed to start:\n\n{exc}\n\nDetails written to:\n{log_path}",
+                "DwaniLive - Startup Error",
+                0x10,  # MB_ICONERROR
+            )
+        except Exception:
+            pass
+
+
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit as e:
+        # sys.exit(...)/raise SystemExit(...) calls elsewhere in main()
+        # (license failure, model-setup failure with interactive_on_error,
+        # etc.) still exit with the same code -- just visibly now, instead
+        # of vanishing.
+        if e.code not in (0, None):
+            _report_fatal_startup_error(e)
+        raise
+    except BaseException as e:  # noqa: BLE001 -- deliberately broad: this is
+        # the last line of defense before the process disappears with no trace.
+        _report_fatal_startup_error(e)
+        raise
