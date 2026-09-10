@@ -189,6 +189,10 @@ async def host_socket(websocket: WebSocket, session_param: str):
         min_voiced_seconds=old_segmenter.min_voiced_seconds,
         min_silence_seconds=old_segmenter.min_silence_seconds,
         max_segment_seconds=old_segmenter.max_segment_seconds,
+        max_trailing_silence_seconds=old_segmenter.max_trailing_silence_seconds,
+        vad_backend=old_segmenter.vad_backend,
+        webrtcvad_aggressiveness=old_segmenter.webrtcvad_aggressiveness,
+        interim_interval_seconds=old_segmenter.interim_interval_seconds,
     )
     try:
         while True:
@@ -605,6 +609,66 @@ def main(argv=None):
         "run-on sentence doesn't block captions indefinitely (default: 15.0s).",
     )
     parser.add_argument(
+        "--vad-backend",
+        choices=["energy", "webrtcvad"],
+        default="energy",
+        help="AudioSegmenter's voice-activity detector (default: energy). 'energy' is a bare RMS "
+        "threshold (--energy-threshold) -- no extra dependency, but crude on a real venue: "
+        "background noise can keep segments open (Whisper hallucination risk on noisy audio), and "
+        "a quiet/distant mic can fail to register as voiced at all (dropped words). 'webrtcvad' is "
+        "a real speech classifier (pip install webrtcvad), meaningfully more robust to background "
+        "noise; --energy-threshold is ignored when this is set.",
+    )
+    parser.add_argument(
+        "--webrtcvad-aggressiveness",
+        type=int,
+        choices=[0, 1, 2, 3],
+        default=2,
+        help="Only used with --vad-backend webrtcvad. 0 = most permissive (fewer missed words, more "
+        "false positives on noise), 3 = most aggressive filtering (default: 2).",
+    )
+    parser.add_argument(
+        "--max-trailing-silence-seconds",
+        type=float,
+        default=0.3,
+        help="Cap on how much trailing silence actually reaches ASR at the end of a segment "
+        "(default: 0.3s), independent of --min-silence-seconds (which still controls how much "
+        "silence is needed to *detect* a pause). Whisper can hallucinate repeated/invented text "
+        "when fed a chunk trailing off into pure silence -- this trims that tail down before "
+        "transcription while --min-silence-seconds keeps controlling segmentation itself.",
+    )
+    parser.add_argument(
+        "--interim-caption-interval-seconds",
+        type=float,
+        default=None,
+        help="If set, broadcast a non-final 'here's what's been said so far' caption roughly this "
+        "often (in seconds of new voiced audio) during a long, still-open utterance, instead of "
+        "attendees only seeing captions once a full pause-bounded segment closes (up to "
+        "--max-segment-seconds later in the worst case). NOT true streaming ASR -- each tick "
+        "re-transcribes the entire buffered-so-far audio from scratch, trading CPU for lower "
+        "perceived latency. Off by default; test actual CPU load on your presenter hardware before "
+        "enabling, especially alongside --qa (a second concurrent ASR/MT pipeline).",
+    )
+    parser.add_argument(
+        "--asr-cpu-threads",
+        type=int,
+        default=4,
+        help="faster-whisper's own intra-op CPU thread count (default: 4). Left to ctranslate2's own "
+        "auto-detection, this competes unpredictably with --nllb-inter-threads x "
+        "--nllb-intra-threads on the same presenter laptop -- see that flag's help text.",
+    )
+    parser.add_argument(
+        "--nllb-intra-threads",
+        type=int,
+        default=2,
+        help="ctranslate2 Translator's OpenMP thread count per worker (default: 2). Total NLLB CPU "
+        "footprint is --nllb-inter-threads x this value -- left at ctranslate2's own default "
+        "(auto-detect, roughly 4), that multiplies against --nllb-inter-threads to as many as 8 "
+        "threads for translation alone, competing with --asr-cpu-threads on the same machine. "
+        "Defaults here (2 x 2 = 4) match --asr-cpu-threads's default for a predictable combined "
+        "ASR+MT thread budget; profile on your actual hardware before raising either.",
+    )
+    parser.add_argument(
         "--semantic-cache",
         action="store_true",
         help="Enable the semantic translation cache (translation_cache.SemanticCache): skips "
@@ -827,6 +891,7 @@ def main(argv=None):
                 language=args.presenter_language,
                 beam_size=args.asr_beam_size,
                 initial_prompt=asr_initial_prompt,
+                cpu_threads=args.asr_cpu_threads,
             )
             if args.whisper_model
             else FakeASRBackend(default_transcript="[no --whisper-model given]")
@@ -837,6 +902,7 @@ def main(argv=None):
                 source_lang=args.presenter_language,
                 beam_size=args.nllb_beam_size,
                 inter_threads=args.nllb_inter_threads,
+                intra_threads=args.nllb_intra_threads,
             )
             if args.nllb_model_dir
             else FakeTranslationBackend()
@@ -886,6 +952,10 @@ def main(argv=None):
             min_voiced_seconds=args.min_voiced_seconds,
             min_silence_seconds=args.min_silence_seconds,
             max_segment_seconds=args.max_segment_seconds,
+            max_trailing_silence_seconds=args.max_trailing_silence_seconds,
+            vad_backend=args.vad_backend,
+            webrtcvad_aggressiveness=args.webrtcvad_aggressiveness,
+            interim_interval_seconds=args.interim_caption_interval_seconds,
         )
         pipeline = Pipeline(
             asr, translator, broadcast_caption, lambda: subscribers.keys(),
@@ -905,7 +975,7 @@ def main(argv=None):
         if args.whisper_model:
             from backends import RealWhisperBackend
 
-            qa_asr = RealWhisperBackend(model_size=args.whisper_model, language=None)
+            qa_asr = RealWhisperBackend(model_size=args.whisper_model, language=None, cpu_threads=args.asr_cpu_threads)
         else:
             qa_asr = FakeASRBackend(default_transcript="[no --whisper-model given]")
 
