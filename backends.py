@@ -188,6 +188,7 @@ class RealWhisperBackend:
         target_sample_rate: int = 16_000,
         beam_size: int = 5,
         initial_prompt: Optional[str] = None,
+        cpu_threads: int = 4,
     ) -> None:
         """`language` pins Whisper to the presenter's spoken language rather
         than letting it auto-detect per segment: auto-detection on short,
@@ -213,10 +214,22 @@ class RealWhisperBackend:
         paper abstract). Whisper only uses roughly the last ~224 tokens of
         this as context, so keep it to the highest-value terms rather than
         a full glossary dump.
+
+        `cpu_threads` sets faster-whisper's own intra-op CPU thread count
+        for this model (it's built on ctranslate2 too, same engine as
+        RealNLLBBackend). Left unset, ctranslate2 would default to reading
+        OMP_NUM_THREADS or otherwise grabbing available cores on its own --
+        on a typical presenter laptop that competes directly with
+        RealNLLBBackend's own intra_threads x inter_threads footprint (see
+        that class's inter_threads docstring) for the same CPU. Explicit
+        default of 4 here keeps ASR's footprint bounded and predictable
+        rather than letting two separately-configured ctranslate2 engines
+        each assume they own the whole machine; profile on your actual
+        presenter hardware before changing it.
         """
         from faster_whisper import WhisperModel  # deferred: heavy, optional dep
 
-        self._model = WhisperModel(model_size, device=device, compute_type=compute_type)
+        self._model = WhisperModel(model_size, device=device, compute_type=compute_type, cpu_threads=cpu_threads)
         self._language = language
         self._target_sample_rate = target_sample_rate
         self._beam_size = beam_size
@@ -261,6 +274,7 @@ class RealNLLBBackend:
         device: str = "cpu",
         beam_size: int = 4,
         inter_threads: int = 2,
+        intra_threads: int = 2,
     ) -> None:
         """`inter_threads` sets ctranslate2.Translator's own parallel-
         translation worker count. pipeline.py's Pipeline now dispatches one
@@ -277,11 +291,28 @@ class RealNLLBBackend:
         request concurrently -- each worker also consumes its own memory
         and CPU budget, so this isn't free; profile before raising much
         past 2-4 on a typical presenter laptop.
+
+        `intra_threads` sets the OpenMP thread count PER worker -- total
+        CPU threads this backend can use is inter_threads * intra_threads
+        (CTranslate2's own formula). Left at ctranslate2's own default (0 =
+        auto-detect, which resolves to roughly 4 in most environments),
+        that multiplies against inter_threads=2 to as many as 8 threads for
+        translation alone, on the same presenter laptop RealWhisperBackend
+        is also running on (also ctranslate2-based -- see its own
+        cpu_threads param). Explicit default of 2 here keeps this backend's
+        total footprint at inter_threads x intra_threads = 4, matching
+        RealWhisperBackend's cpu_threads=4 default, for a predictable
+        combined ASR+MT thread budget instead of two separately-configured
+        ctranslate2 engines each auto-detecting as if they own the whole
+        machine. Profile on your actual presenter hardware before raising
+        either past these defaults.
         """
         import ctranslate2  # deferred: heavy, optional dep
         from nllb_tokenizer import NllbLiteTokenizer  # deferred: sentencepiece is the only dep this pulls in
 
-        self._translator = ctranslate2.Translator(model_dir, device=device, inter_threads=inter_threads)
+        self._translator = ctranslate2.Translator(
+            model_dir, device=device, inter_threads=inter_threads, intra_threads=intra_threads
+        )
         self._tokenizer = NllbLiteTokenizer(sentencepiece_model_path)
         self._source_flores = flores_code(source_lang)
         self._beam_size = beam_size
