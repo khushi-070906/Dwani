@@ -52,7 +52,7 @@ class TestAttendeeSocketAuth:
         with client.websocket_connect("/ws?lang=en&session_param=testsession"):
             assert len(server.subscribers["en"]) == 1
         # context manager exit disconnects; server should have pruned it
-        assert len(server.subscribers["en"]) == 0
+        assert len(server.subscribers.get("en", set())) == 0  # empty languages are now pruned
 
     def test_two_attendees_same_language_both_registered(self, client):
         with client.websocket_connect("/ws?lang=fr&session_param=testsession") as ws1:

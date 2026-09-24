@@ -287,7 +287,11 @@ def prompt_for_activation_if_needed() -> None:
             sys.exit(1)
 
 
-FIREWALL_RULE_NAME = "DwaniLive"
+# Renamed from "DwaniLive" (which only opened port 8000): server.py falls back
+# to 8001-8010 when 8000 is busy, and phones then got silently blocked. New
+# name forces the wider rule to be added once on machines that had the old one.
+FIREWALL_RULE_NAME = "DwaniLive LAN"
+FIREWALL_PORT_RANGE = f"{SERVER_PORT}-{SERVER_PORT + 10}"
 
 
 def _is_admin() -> bool:
@@ -325,7 +329,7 @@ def _add_firewall_rule() -> bool:
                 "netsh", "advfirewall", "firewall", "add", "rule",
                 f"name={FIREWALL_RULE_NAME}",
                 "dir=in", "action=allow", "protocol=TCP",
-                f"localport={SERVER_PORT}",
+                f"localport={FIREWALL_PORT_RANGE}", "profile=any",
             ],
             capture_output=True, text=True, timeout=10,
         )
@@ -373,7 +377,7 @@ def _elevate_and_add_firewall_rule() -> bool:
 
     params = (
         f'advfirewall firewall add rule name="{FIREWALL_RULE_NAME}" '
-        f'dir=in action=allow protocol=TCP localport={SERVER_PORT}'
+        f'dir=in action=allow protocol=TCP localport={FIREWALL_PORT_RANGE} profile=any'
     )
     info = _SHELLEXECUTEINFOW()
     info.cbSize = ctypes.sizeof(_SHELLEXECUTEINFOW)
@@ -418,7 +422,7 @@ def setup_firewall_if_needed() -> None:
         print("either re-run DwaniLive and allow the prompt, or run this once")
         print("yourself in an admin Command Prompt:")
         print(_bold(f'  netsh advfirewall firewall add rule name="{FIREWALL_RULE_NAME}" '
-              f'dir=in action=allow protocol=TCP localport={SERVER_PORT}'))
+              f'dir=in action=allow protocol=TCP localport={FIREWALL_PORT_RANGE} profile=any'))
         print()
         print("Note: even with this rule in place, some venue/hotel WiFi and")
         print("phone hotspots block device-to-device traffic entirely ('client")
@@ -521,7 +525,7 @@ def main() -> None:
         "--port", str(SERVER_PORT),
         "--whisper-model", WHISPER_MODEL_SIZE,
         "--nllb-model-dir", str(NLLB_MODEL_DIR),
-        "--qa",
+        *server.licensed_launcher_flags(),
     ])
 
 

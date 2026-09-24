@@ -73,6 +73,10 @@ qa_pipeline_instance: QAPipeline | None = None
 # broadcast_caption already uses for attendees.
 qa_listeners: set[WebSocket] = set()
 
+# A phone that can't accept a caption within this long is treated as gone
+# (it reconnects on its own when it comes back -- see index.html).
+BROADCAST_SEND_TIMEOUT_SECONDS = 5.0
+
 
 @app.websocket("/ws")
 async def attendee_socket(websocket: WebSocket, lang: str, session_param: str):
@@ -117,23 +121,55 @@ async def attendee_socket(websocket: WebSocket, lang: str, session_param: str):
                 )
     except WebSocketDisconnect:
         pass
+    except Exception:
+        # e.g. a phone sending a binary frame, or the socket dying mid-receive
+        # when the screen locks -- just treat it as a disconnect.
+        pass
     finally:
-        subscribers[lang].discard(websocket)
+        _unsubscribe(lang, websocket)
         accessibility_prefs.pop(websocket, None)
+
+
+def _unsubscribe(lang: str, websocket: WebSocket) -> None:
+    """Drop an attendee, and drop the language entirely once its last
+    attendee leaves -- otherwise the pipeline keeps translating (and
+    /session-info keeps advertising) every language anyone EVER picked."""
+    group = subscribers.get(lang)
+    if group is None:
+        return
+    group.discard(websocket)
+    if not group:
+        subscribers.pop(lang, None)
 
 
 async def broadcast_caption(lang: str, text: str, is_final: bool = True):
     """Called by the ASR/MT pipeline (module 2/3) once per language, per segment."""
-    dead = []
-    # snapshot the set before awaiting inside the loop -- a concurrent disconnect
-    # mutating subscribers[lang] mid-iteration would otherwise raise RuntimeError
-    for ws in list(subscribers.get(lang, set())):
+    # Snapshot the set before awaiting -- a concurrent disconnect mutating
+    # subscribers[lang] mid-iteration would otherwise raise RuntimeError.
+    targets = list(subscribers.get(lang, set()))
+    if not targets:
+        return
+    message = {"text": text, "final": is_final}
+
+    async def _send(ws: WebSocket) -> bool:
         try:
-            await ws.send_json({"text": text, "final": is_final})
+            # Sent concurrently + with a timeout: previously sends went one by
+            # one, so a single phone on weak WiFi (or with its screen locked)
+            # stalled captions for every attendee behind it.
+            await asyncio.wait_for(ws.send_json(message), timeout=BROADCAST_SEND_TIMEOUT_SECONDS)
+            return True
         except Exception:
-            dead.append(ws)
-    for ws in dead:
-        subscribers[lang].discard(ws)
+            return False
+
+    results = await asyncio.gather(*(_send(ws) for ws in targets))
+    for ws, ok in zip(targets, results):
+        if not ok:
+            _unsubscribe(lang, ws)
+            accessibility_prefs.pop(ws, None)
+            try:
+                await ws.close()
+            except Exception:
+                pass
 
 
 def _default_pipeline() -> Pipeline:
@@ -488,6 +524,27 @@ async def host_page():
     return FileResponse(static_dir / "host.html")
 
 
+DEFAULT_LICENSE_PUBLIC_KEY = "yV9oH1g6HF2rEJ0kJjJMiGAZ8bW2v1HaWIP88f2mX9o"
+
+
+def _license_public_key() -> str:
+    return os.environ.get("LDST_LICENSE_PUBLIC_KEY", DEFAULT_LICENSE_PUBLIC_KEY)
+
+
+def licensed_launcher_flags() -> list[str]:
+    """Optional feature flags the desktop app (launcher.py / gui.py) should
+    pass for THIS presenter's license. Both used to hard-code "--qa", but Q&A
+    is Institution-only, so check_license() rejected it and the server exited
+    before starting for every Free/Pro presenter -- nobody could join at all.
+    Anything unlicensed is simply left off instead of blocking startup."""
+    load_dotenv()
+    try:
+        license = check_license(_license_public_key())
+    except LicenseError:
+        return []  # main() re-runs the check and reports the real error
+    return ["--qa"] if "qa" in license.features() else []
+
+
 def main(argv=None):
     """Everything server.py does when run directly, as a callable function
     instead of a bare `if __name__` block -- so launcher.py (or anything
@@ -498,6 +555,15 @@ def main(argv=None):
     block; only this wrapper and the final `if __name__` call at the
     bottom of the file are new.
     """
+    # These are module-level state that the route handlers above read at
+    # request time. Without this line every assignment below created a
+    # LOCAL variable instead, so the handlers kept using the import-time
+    # defaults: /ws checked phones against a DIFFERENT random session_id
+    # than the one in the printed QR (-> every phone rejected with 4000
+    # "unknown session"), the real Whisper/NLLB pipeline was never used,
+    # --qa stayed disabled, and the license attendee cap was never applied.
+    global session, active_license, pipeline, qa_pipeline_instance, dynamic_glossary_updater
+
     if argv is None:
         argv = sys.argv[1:]
 
@@ -773,8 +839,7 @@ def main(argv=None):
     # on license_server.py's infrastructure). Baking this in means presenters
     # don't need to set an env var correctly; an env var, if set, still wins,
     # which is handy if you ever rotate the keypair without shipping a new build.
-    DEFAULT_LICENSE_PUBLIC_KEY = "yV9oH1g6HF2rEJ0kJjJMiGAZ8bW2v1HaWIP88f2mX9o"
-    LICENSE_PUBLIC_KEY = os.environ.get("LDST_LICENSE_PUBLIC_KEY", DEFAULT_LICENSE_PUBLIC_KEY)
+    LICENSE_PUBLIC_KEY = _license_public_key()
     # --- License check -------------------------------------------------
     # Reads the cached token written by activate.py (~/.ldst/license.token
     # by default) and confirms it's valid, not expired past the grace

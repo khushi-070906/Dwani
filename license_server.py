@@ -144,7 +144,7 @@ ALLOWED_ORIGINS = [o.strip() for o in _allowed_origins_env.split(",") if o.strip
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PUT"],
     allow_headers=["*"],
 )
 
@@ -170,7 +170,19 @@ def serve_forgot_password_page():
 
 @app.get("/how-it-works.html")
 def serve_how_it_works_page():
-    return FileResponse(STATIC_DIR / "how-it-works.html")
+    # static/how-it-works.html doesn't exist (the section lives on the pricing
+    # page), so this route used to crash with a 500.
+    return RedirectResponse(url="/pricing.html#how-it-works")
+
+
+@app.get("/privacy.html")
+def serve_privacy_page():
+    return FileResponse(STATIC_DIR / "privacy.html")
+
+
+@app.get("/terms.html")
+def serve_terms_page():
+    return FileResponse(STATIC_DIR / "terms.html")
 
 
 @app.get("/signup.html")
@@ -222,13 +234,30 @@ class _DBWrapper:
 
 @contextmanager
 def db():
-    conn = psycopg2.connect(DATABASE_URL)
+    if not DATABASE_URL:
+        raise RuntimeError("Set DATABASE_URL (Supabase Session pooler connection string).")
+    # connect_timeout: without it, a Supabase hiccup left requests hanging
+    # until Render's proxy gave up, which on phones looks like a dead page.
+    conn = psycopg2.connect(DATABASE_URL, connect_timeout=10)
     wrapper = _DBWrapper(conn)
     try:
         yield wrapper
         wrapper.commit()
+    except Exception:
+        conn.rollback()
+        raise
     finally:
         wrapper.close()
+
+
+# Which subscription row "counts" for an account. Previously the newest row
+# always won, so abandoning a checkout (a 'pending' row) hid an already
+# ACTIVE subscription on the dashboard and made /cancel-subscription target
+# the wrong row.
+_SUBSCRIPTION_PRIORITY_ORDER = (
+    "ORDER BY CASE status WHEN 'active' THEN 0 WHEN 'cancelling' THEN 1 "
+    "WHEN 'past_due' THEN 2 WHEN 'pending' THEN 3 ELSE 4 END, id DESC"
+)
 
 
 def init_db():
@@ -286,6 +315,15 @@ init_db()
 # Auth helpers -- password hashing, sessions, current-user lookup
 # ---------------------------------------------------------------------------
 
+def normalize_email(email: str) -> str:
+    """Phone keyboards auto-capitalize the first letter and autofill often
+    adds a trailing space ("Khushi@gmail.com "), so an account created on a
+    laptop couldn't log in from a phone (and vice versa). Every email is
+    compared trimmed + lowercased; queries also use LOWER(email) so rows
+    stored with mixed case before this fix still match."""
+    return (email or "").strip().lower()
+
+
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("ascii")
 
@@ -325,8 +363,11 @@ def send_otp_email(to_email: str, otp: str) -> None:
 
 def create_session(user_id: int) -> str:
     token = secrets.token_urlsafe(32)
-    expires_at = int(time.time()) + SESSION_LIFETIME_SECONDS
+    now = int(time.time())
+    expires_at = now + SESSION_LIFETIME_SECONDS
     with db() as conn:
+        # Housekeeping: expired sessions were never removed.
+        conn.execute("DELETE FROM sessions WHERE expires_at < ?", (now,))
         conn.execute(
             "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)",
             (token, user_id, expires_at),
@@ -386,14 +427,17 @@ class ActivateRequest(BaseModel):
 def activate(req: ActivateRequest):
     with db() as conn:
         row = conn.execute(
-            "SELECT * FROM subscriptions WHERE license_key = ? AND email = ?",
-            (req.license_key, req.email),
+            "SELECT * FROM subscriptions WHERE license_key = ? AND LOWER(email) = ?",
+            (req.license_key.strip(), normalize_email(req.email)),
         ).fetchone()
 
     if row is None:
         raise HTTPException(status_code=404, detail="License key / email combination not found.")
 
-    if row["status"] != "active":
+    # 'cancelling' = cancelled at cycle end but still paid up; it used to be
+    # refused here, cutting presenters off the moment they clicked Cancel
+    # despite the pricing page promising access until the period ends.
+    if row["status"] not in ("active", "cancelling"):
         raise HTTPException(status_code=402, detail=f"Subscription status is '{row['status']}', not active.")
 
     now = int(time.time())
@@ -407,7 +451,7 @@ def activate(req: ActivateRequest):
 
     license = License(
         tier=row["tier"],
-        presenter_email=req.email,
+        presenter_email=normalize_email(req.email),
         issued_at=now,
         expires_at=expires_at,
         max_attendees=max_attendees,
@@ -471,7 +515,7 @@ def create_subscription(req: CreateSubscriptionRequest, dwanilive_session: Optio
     user = get_current_user(dwanilive_session)
     if user is None:
         raise HTTPException(status_code=401, detail="Please log in before subscribing.")
-    email = user["email"]
+    email = normalize_email(user["email"])
 
     client = get_razorpay_client()
 
@@ -498,12 +542,28 @@ def create_subscription(req: CreateSubscriptionRequest, dwanilive_session: Optio
             ON CONFLICT(license_key) DO NOTHING
         """, (license_key, email, req.tier))
 
-    subscription = client.subscription.create({
-        "plan_id": plan_id,
-        "customer_notify": 1,
-        "total_count": TOTAL_COUNT_BY_PERIOD.get(req.period, 120),
-        "notes": {"license_key": license_key, "email": email},
-    })
+    try:
+        subscription = client.subscription.create({
+            "plan_id": plan_id,
+            "customer_notify": 1,
+            "total_count": TOTAL_COUNT_BY_PERIOD.get(req.period, 120),
+            "notes": {"license_key": license_key, "email": email},
+        })
+    except Exception as exc:
+        # Don't leave an orphan 'pending' row behind for a checkout that
+        # never even opened.
+        with db() as conn:
+            conn.execute("DELETE FROM subscriptions WHERE license_key = ?", (license_key,))
+        logging.exception("Razorpay subscription.create failed")
+        raise HTTPException(status_code=502, detail=f"Couldn't start checkout with Razorpay: {exc}")
+
+    # Stored immediately (not only when the webhook lands) so cancelling
+    # before the first webhook, and webhook fallbacks, can find this row.
+    with db() as conn:
+        conn.execute(
+            "UPDATE subscriptions SET razorpay_subscription_id = ? WHERE license_key = ?",
+            (subscription["id"], license_key),
+        )
 
     return {
         "subscription_id": subscription["id"],
@@ -517,8 +577,8 @@ def license_status(license_key: str, email: str):
     """Polled by the pricing page's success screen until the webhook lands."""
     with db() as conn:
         row = conn.execute(
-            "SELECT status, tier FROM subscriptions WHERE license_key = ? AND email = ?",
-            (license_key, email),
+            "SELECT status, tier FROM subscriptions WHERE license_key = ? AND LOWER(email) = ?",
+            (license_key.strip(), normalize_email(email)),
         ).fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail="Not found.")
@@ -542,30 +602,35 @@ class LoginRequest(BaseModel):
 
 @app.post("/signup")
 def signup(req: SignupRequest, response: Response):
+    email = normalize_email(req.email)
+    name = (req.name or "").strip()
+    if "@" not in email:
+        raise HTTPException(status_code=400, detail="Enter a valid email address.")
     if len(req.password) < 8:
         raise HTTPException(status_code=400, detail="Password must be at least 8 characters.")
 
     with db() as conn:
-        existing = conn.execute("SELECT id FROM users WHERE email = ?", (req.email,)).fetchone()
+        existing = conn.execute("SELECT id FROM users WHERE LOWER(email) = ?", (email,)).fetchone()
         if existing is not None:
             raise HTTPException(status_code=409, detail="An account with this email already exists.")
 
         cursor = conn.execute(
             "INSERT INTO users (email, password_hash, name, created_at) VALUES (?, ?, ?, ?) RETURNING id",
-            (req.email, hash_password(req.password), req.name, int(time.time())),
+            (email, hash_password(req.password), name, int(time.time())),
         )
         user_id = cursor.fetchone()["id"]
 
     token = create_session(user_id)
     set_session_cookie(response, token)
-    return {"ok": True, "email": req.email, "name": req.name}
+    return {"ok": True, "email": email, "name": name}
 
 
 @app.post("/login")
 def login(req: LoginRequest, response: Response):
     with db() as conn:
         row = conn.execute(
-            "SELECT id, password_hash FROM users WHERE email = ?", (req.email,)
+            "SELECT id, password_hash FROM users WHERE LOWER(email) = ? ORDER BY id LIMIT 1",
+            (normalize_email(req.email),),
         ).fetchone()
 
     # Same error for "no such user" and "wrong password" -- don't leak which
@@ -598,10 +663,10 @@ def forgot_password(req: ForgotPasswordRequest):
     someone enumerate which addresses are registered. The OTP is only ever
     actually sent if the account exists and has a password (Google-only
     accounts have nothing to reset here)."""
-    email = req.email.strip().lower()
+    email = normalize_email(req.email)
 
     with db() as conn:
-        user = conn.execute("SELECT id, password_hash FROM users WHERE email = ?", (email,)).fetchone()
+        user = conn.execute("SELECT id, password_hash FROM users WHERE LOWER(email) = ?", (email,)).fetchone()
 
     if user is not None and user["password_hash"] is not None:
         otp = f"{secrets.randbelow(1_000_000):06d}"
@@ -633,7 +698,7 @@ class ResetPasswordRequest(BaseModel):
 
 @app.post("/reset-password")
 def reset_password(req: ResetPasswordRequest):
-    email = req.email.strip().lower()
+    email = normalize_email(req.email)
 
     if len(req.new_password) < 8:
         raise HTTPException(status_code=400, detail="New password must be at least 8 characters.")
@@ -653,7 +718,7 @@ def reset_password(req: ResetPasswordRequest):
             conn.execute("UPDATE password_resets SET attempts = attempts + 1 WHERE email = ?", (email,))
             raise HTTPException(status_code=400, detail="Incorrect code.")
 
-        user = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
+        user = conn.execute("SELECT id FROM users WHERE LOWER(email) = ?", (email,)).fetchone()
         if user is None:
             raise HTTPException(status_code=400, detail="Account not found.")
 
@@ -682,8 +747,9 @@ def me(dwanilive_session: Optional[str] = Cookie(default=None)):
 
     with db() as conn:
         subscription = conn.execute(
-            "SELECT license_key, tier, status FROM subscriptions WHERE email = ? ORDER BY id DESC LIMIT 1",
-            (user["email"],),
+            "SELECT license_key, tier, status FROM subscriptions WHERE LOWER(email) = ? "
+            + _SUBSCRIPTION_PRIORITY_ORDER + " LIMIT 1",
+            (normalize_email(user["email"]),),
         ).fetchone()
 
     return {
@@ -753,8 +819,8 @@ def cancel_subscription(dwanilive_session: Optional[str] = Cookie(default=None))
     with db() as conn:
         row = conn.execute(
             "SELECT license_key, razorpay_subscription_id, status FROM subscriptions "
-            "WHERE email = ? ORDER BY id DESC LIMIT 1",
-            (user["email"],),
+            "WHERE LOWER(email) = ? " + _SUBSCRIPTION_PRIORITY_ORDER + " LIMIT 1",
+            (normalize_email(user["email"]),),
         ).fetchone()
 
     if row is None or row["status"] not in ("active", "pending"):
@@ -873,14 +939,14 @@ def google_callback(
         userinfo = json.loads(resp.read())
 
     google_id = userinfo.get("id")
-    email = userinfo.get("email")
-    name = userinfo.get("name", email)
+    email = normalize_email(userinfo.get("email"))
+    name = userinfo.get("name") or email
 
     if not (google_id and email):
         raise HTTPException(status_code=400, detail="Google did not return the expected profile info.")
 
     with db() as conn:
-        row = conn.execute("SELECT id FROM users WHERE google_id = ? OR email = ?", (google_id, email)).fetchone()
+        row = conn.execute("SELECT id FROM users WHERE google_id = ? OR LOWER(email) = ? ORDER BY id LIMIT 1", (google_id, email)).fetchone()
         if row is None:
             cursor = conn.execute(
                 "INSERT INTO users (email, google_id, name, created_at) VALUES (?, ?, ?, ?) RETURNING id",
@@ -952,7 +1018,7 @@ async def razorpay_webhook(request: Request):
 
     notes = sub_payload.get("notes") or {}
     license_key = notes.get("license_key")
-    email = notes.get("email")
+    email = normalize_email(notes.get("email")) or None
 
     tier = PLAN_TO_TIER.get(plan_id, "free")
     status = STATUS_MAP.get(rp_status, rp_status or "inactive")

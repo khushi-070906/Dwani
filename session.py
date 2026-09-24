@@ -92,12 +92,62 @@ class Session:
 
     # -- network discovery -------------------------------------------------
 
+    # Address ranges that are almost never the network a phone is actually on:
+    # VirtualBox host-only, Docker/WSL/Hyper-V vEthernet, VPN/overlay tools.
+    # They used to win purely because candidate_local_ips() was sorted as
+    # strings, so the QR code pointed phones at an unreachable adapter.
+    @staticmethod
+    def _ip_rank(ip: str) -> int:
+        """Lower = more likely to be the WiFi/hotspot phones are on."""
+        try:
+            a, b, c, _ = (int(x) for x in ip.split("."))
+        except ValueError:
+            return 99
+        if a == 127 or (a == 169 and b == 254):
+            return 90                                   # loopback / link-local (no DHCP)
+        if a == 192 and b == 168 and c == 56:
+            return 80                                   # VirtualBox host-only
+        if a == 172 and b == 20 and c == 10:
+            return 0                                    # iPhone Personal Hotspot
+        if a == 192 and b == 168 and c in (43, 137):
+            return 0                                    # Android hotspot / Windows ICS hotspot
+        if a == 192 and b == 168:
+            return 1                                    # typical home/venue/phone WiFi
+        if a == 10:
+            return 2                                    # newer Android hotspots, many venues
+        if a == 172 and 16 <= b <= 31:
+            return 70                                   # Docker / WSL / Hyper-V vEthernet
+        if a in (25, 26) or (a == 100 and 64 <= b <= 127):
+            return 75                                   # Hamachi / Radmin / Tailscale (CGNAT)
+        return 50
+
+    @staticmethod
+    def _route_ips() -> list[str]:
+        """Source IP(s) the OS would use to reach the internet or a LAN.
+        No packet is sent for a UDP connect -- this only resolves routing.
+        The private-range targets make this work on an OFFLINE phone hotspot
+        too (no internet route, but still a default route via the phone)."""
+        found: list[str] = []
+        for target in ("8.8.8.8", "10.255.255.255", "192.168.255.255", "172.31.255.255"):
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                try:
+                    s.connect((target, 80))
+                    ip = s.getsockname()[0]
+                finally:
+                    s.close()
+            except OSError:
+                continue
+            if ip and not ip.startswith(("127.", "0.")) and ip not in found:
+                found.append(ip)
+        return found
+
     def candidate_local_ips(self) -> list[str]:
         """
-        All non-loopback IPv4 addresses on this machine. Laptops with VPN/Ethernet/
-        WiFi active simultaneously can have several -- the venue WiFi one isn't
-        always first, so callers get the full list and can confirm rather than
-        silently guessing.
+        All non-loopback IPv4 addresses on this machine, BEST FIRST: the
+        default-route interface (the WiFi / phone hotspot actually in use)
+        leads, then the rest ranked by how likely a phone can reach them.
+        Laptops with VPN/Ethernet/WiFi/virtual adapters can have several.
         """
         ips: set[str] = set()
         try:
@@ -108,23 +158,20 @@ class Session:
         except socket.gaierror:
             pass
 
-        # Fallback: the interface that would be used to reach the open internet.
-        # No packet is actually sent for a UDP socket -- this only resolves routing.
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect(("8.8.8.8", 80))
-            ips.add(s.getsockname()[0])
-            s.close()
-        except OSError:
-            pass
+        route_ips = self._route_ips()
+        ips.update(route_ips)
 
-        return sorted(ips) or ["127.0.0.1"]
+        def key(ip: str):
+            # Default-route IP wins unless it's itself a virtual/VPN adapter
+            # (e.g. a full-tunnel VPN) -- then normal ranking decides.
+            is_route = ip in route_ips and self._ip_rank(ip) < 50
+            return (0 if is_route else 1, self._ip_rank(ip), tuple(int(p) for p in ip.split(".")))
+
+        return sorted(ips, key=key) or ["127.0.0.1"]
 
     def primary_ip(self) -> str:
-        # Once we're broadcasting our own hotspot, that's the address attendees
-        # actually connect to -- prefer it over whatever candidate_local_ips()
-        # would otherwise pick first (which no longer means anything once we're
-        # not relying on the venue's network at all).
+        # Once we're broadcasting our own hotspot (and its IP was verified to
+        # actually exist on this machine), that's what attendees connect to.
         if self.hotspot_active and self.hotspot_ip:
             return self.hotspot_ip
         return self.candidate_local_ips()[0]
@@ -167,9 +214,40 @@ class Session:
         # this works the same way regardless of platform-specific defaults
         # (Windows ICS typically uses 192.168.137.1, nmcli typically 10.42.0.1),
         # so we don't have to hardcode or parse either.
-        time.sleep(2)
-        new_ips = sorted(set(self.candidate_local_ips()) - before)
-        self.hotspot_ip = new_ips[0] if new_ips else self._fallback_hotspot_ip(system)
+        # Poll up to ~8s rather than a single 2s sleep -- Windows' hosted
+        # network adapter often takes longer than that to get its address.
+        hotspot_ip = None
+        for _ in range(8):
+            time.sleep(1)
+            current = set(self.candidate_local_ips())
+            # 169.254.x means the hosted-network adapter came up with no DHCP
+            # (Windows without ICS) -- phones can't get an address from it.
+            new_ips = sorted(
+                (ip for ip in current - before if self._ip_rank(ip) < 80),
+                key=lambda ip: (self._ip_rank(ip), ip),
+            )
+            if new_ips:
+                hotspot_ip = new_ips[0]
+                break
+            fallback = self._fallback_hotspot_ip(system)
+            if fallback and fallback in current and fallback not in before:
+                hotspot_ip = fallback
+                break
+
+        if hotspot_ip is None:
+            # Previously this blindly used 192.168.137.1 / 10.42.0.1 even when
+            # that address didn't exist on this machine, so the QR code sent
+            # phones to a dead IP (the "works on laptop, not on phone" bug when
+            # the laptop is itself connected to a phone hotspot or venue WiFi).
+            self.hotspot_active = True   # so stop_hotspot() actually tears it down
+            self.stop_hotspot()
+            raise HotspotError(
+                "The hotspot command ran but no hotspot IP address appeared on this machine "
+                "(common when the WiFi adapter is already connected to another network or "
+                "doesn't support Hosted Network)."
+            )
+
+        self.hotspot_ip = hotspot_ip
         self.hotspot_active = True
 
         return self.hotspot_ssid, self.hotspot_password
@@ -346,7 +424,8 @@ class Session:
 
         print(f"\nSession ID: {self.session_id}")
         if len(ips) > 1:
-            print("Multiple network interfaces detected -- confirm which one is the venue WiFi:")
+            print("Multiple network interfaces detected -- the QR uses the first one (the active")
+            print("WiFi/hotspot). If a phone can't open it, try the others on that phone:")
             for ip in ips:
                 print(f"  {self.url_for(ip)}")
         # Always printed, regardless of interface count -- run.py (and any other

@@ -587,7 +587,7 @@ class LauncherGUI:
                 "--port", str(self.server_port),
                 "--whisper-model", self.whisper_model_size,
                 "--nllb-model-dir", str(self.nllb_model_dir),
-                "--qa",
+                *server.licensed_launcher_flags(),
             ])
         except Exception as exc:
             traceback.print_exc()

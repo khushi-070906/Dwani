@@ -768,7 +768,14 @@
       if (manuallyDisconnected) return;
       if (event.code === 4000) {
         setStatus("down", "Session not found");
-        showReconnectBanner("This session code isn't recognized by the presenter's device anymore.");
+        showReconnectBanner("This session code isn't recognized by the presenter's device anymore. Re-scan the presenter's QR code.");
+        return;
+      }
+      if (event.code === 4003) {
+        // Attendee cap reached -- retrying every 8s forever just hammers the
+        // presenter's laptop and never succeeds until someone leaves.
+        setStatus("down", "Session full");
+        showReconnectBanner(event.reason || "This session is full. Tap Reconnect to try again later.");
         return;
       }
       setStatus("down", "Disconnected");
@@ -788,6 +795,22 @@
       if (!manuallyDisconnected) connect();
     }, delay);
   }
+
+  // Phones kill background WebSockets when the screen locks or the user
+  // switches apps; without this, captions only came back after the backoff
+  // timer (up to 8s) fired. Reconnect immediately on return / network back.
+  function reconnectNowIfDropped() {
+    if (manuallyDisconnected || liveScreen.hidden) return;
+    if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) return;
+    clearTimeout(reconnectTimer);
+    reconnectAttempt = 0;
+    connect();
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") reconnectNowIfDropped();
+  });
+  window.addEventListener("online", reconnectNowIfDropped);
+  window.addEventListener("pageshow", function (e) { if (e.persisted) reconnectNowIfDropped(); });
 
   reconnectBtn.addEventListener("click", function () {
     clearTimeout(reconnectTimer);
