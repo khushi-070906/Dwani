@@ -49,7 +49,7 @@ APP_FOLDER = DIST / APP_NAME            # final folder that gets zipped / instal
 ICON = ROOT / "assets" / "dwanilive.ico"
 
 LOCAL_MODULES = [
-    "appenv", "model_setup", "updater", "gui", "server", "session", "pipeline", "backends", "qa_pipeline",
+    "appenv", "model_setup", "updater", "phone_mic", "gui", "server", "session", "pipeline", "backends", "qa_pipeline",
     "nllb_tokenizer", "licensing", "activate", "accessibility", "glossary", "translation_cache",
     "decision_engine", "dynamic_glossary", "persistent_memory",
 ]

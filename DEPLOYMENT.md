@@ -67,3 +67,11 @@ runs it with `/SILENT` after DwaniLive exits, and the installer reopens the app.
 So a release = bump `APP_VERSION` + push a matching tag. **Tag and APP_VERSION must match**, or users get
 an endless "update available" loop. Disable on lab machines with `DWANI_NO_UPDATE_CHECK=1`.
 Users on 1.1.x have no updater yet, so they need to download 1.2.0 once by hand.
+
+## Phone as presenter mic (1.3.0+)
+The desktop app starts the server with `--phone-mic`: attendees stay on `http://<ip>:8000`, and the presenter
+page is also served over HTTPS on the next free port (8001-8010, covered by the firewall rule) with a
+self-signed certificate made offline in `%LOCALAPPDATA%\DwaniLive\runtime`. The cert is reused while the
+laptop's IP is unchanged, so a phone only taps "Advanced -> Proceed" once per network.
+`/host-ws` from any non-localhost device requires the per-session presenter key in the phone QR. That QR is
+only served to localhost (`/qr-phone-mic.png`).

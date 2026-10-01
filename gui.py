@@ -221,6 +221,9 @@ _HTML = r"""<!DOCTYPE html>
   .hint { font-size: 0.76rem; color: var(--ink-faint); margin-top: 0.5rem; }
   button.danger { margin-top: 0.6rem; width: 100%; padding: 0.6rem; border-radius: 10px; border: 1.5px solid #f0c8c3;
     background: transparent; color: var(--error); font-family: var(--font-body); font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+  details.phone-mic summary { cursor: pointer; font-weight: 700; font-size: 0.86rem; color: var(--accent-deep); }
+  .phone-steps { margin: 0.6rem 0 0; padding-left: 1.1rem; font-size: 0.8rem; color: var(--ink-dim); }
+  .phone-steps li { margin-bottom: 0.25rem; }
   .version { margin-top: 0.6rem; font-size: 0.7rem; color: var(--ink-faint); }
   .update-banner { display: none; width: 100%; max-width: 380px; margin: -0.5rem 0 0.9rem; padding: 0.6rem 0.8rem;
     border-radius: 12px; background: var(--indigo); color: #fffdf6; font-size: 0.84rem; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
@@ -292,6 +295,19 @@ _HTML = r"""<!DOCTYPE html>
     <div class="join-box"><span id="join-url">…</span><button id="copy-join" type="button">Copy</button></div>
     <img class="qr" id="join-qr" alt="Join QR code">
     <p class="hint">Phones can't connect? They must be on the same Wi-Fi. Some college/hotel Wi-Fi blocks phone-to-laptop traffic — use your phone's hotspot for the laptop and attendees instead.</p>
+    <div id="phone-mic-box" style="display:none;">
+      <div class="section-label">Or use your phone as the mic</div>
+      <details class="phone-mic">
+        <summary>Show phone QR</summary>
+        <img class="qr" id="phone-qr" alt="Phone mic QR code">
+        <ol class="phone-steps">
+          <li>Phone on the <b>same Wi-Fi</b>, scan this QR.</li>
+          <li>"Connection not private" appears once: tap <b>Advanced → Proceed</b>. It's this laptop's own certificate.</li>
+          <li>Tap <b>Start</b> and allow the microphone. Keep the screen on.</li>
+        </ol>
+        <p class="hint">Only scan this on the presenter's phone; it can broadcast to the room. Stop the mic on the laptop page first if it's running.</p>
+      </details>
+    </div>
     <button class="danger" id="stop-btn" type="button">Stop session &amp; quit</button>
     <button class="log-toggle" data-log="ready-log">Show details</button>
     <div class="log-panel" id="ready-log"></div>
@@ -383,6 +399,8 @@ _HTML = r"""<!DOCTYPE html>
       presenterUrl = s.presenter_url;
       $('join-url').textContent = s.join_url || '(see details)';
       if (s.qr_url && $('join-qr').getAttribute('src') !== s.qr_url) $('join-qr').src = s.qr_url;
+      $('phone-mic-box').style.display = s.phone_qr_url ? 'block' : 'none';
+      if (s.phone_qr_url && $('phone-qr').getAttribute('src') !== s.phone_qr_url) $('phone-qr').src = s.phone_qr_url;
       $('tier-line').textContent = (s.tier ? s.tier + ' plan · ' : '') + 'Keep this window open during the session.';
       if (!openedPresenter && s.auto_open) { openedPresenter = true; api('open', { what: 'presenter' }); }
     }
@@ -491,6 +509,7 @@ class LauncherState:
         self.auto_open = False
         self.last_seen = time.monotonic()
         self.closed_at: Optional[float] = None
+        self.phone_mic = False
         self.update: Optional[dict] = None        # {version, notes_url, state, pct, error}
 
     def set(self, **kw) -> None:
@@ -502,10 +521,12 @@ class LauncherState:
         seq, lines = appenv.LOG.snapshot(since)
         with self.lock:
             qr = f"http://127.0.0.1:{self.server_port}/qr.png" if self.server_port and self.phase == "ready" else ""
+            phone_qr = (f"http://127.0.0.1:{self.server_port}/qr-phone-mic.png"
+                        if qr and self.phone_mic else "")
             return {
                 "phase": self.phase, "status": self.status, "progress": self.progress,
                 "warnings": self.warnings, "error": self.error, "license_problem": self.license_problem,
-                "presenter_url": self.presenter_url, "join_url": self.join_url, "qr_url": qr,
+                "presenter_url": self.presenter_url, "join_url": self.join_url, "qr_url": qr, "phone_qr_url": phone_qr,
                 "tier": self.tier, "auto_open": self.auto_open, "update": self.update,
                 "version": appenv.APP_VERSION, "seq": seq, "logs": lines,
             }
@@ -724,7 +745,9 @@ class LauncherApp:
 
     # -------------------------------------------------------------- pipeline
     def _on_log_line(self, line: str) -> None:
-        if "Presenter mic page:" in line:
+        if "Presenter phone mic page:" in line:
+            self.state.set(phone_mic=True)
+        elif "Presenter mic page:" in line:
             url = line.split("Presenter mic page:", 1)[1].strip().split()[0]
             self.state.set(presenter_url=url)
             try:
@@ -806,6 +829,7 @@ class LauncherApp:
             "--whisper-model", str(model_setup.WHISPER_DIR),
             "--nllb-model-dir", str(model_setup.NLLB_DIR),
             "--no-hotspot",
+            "--phone-mic",
             *server.licensed_launcher_flags(),
             *self.extra_server_args,
         ]

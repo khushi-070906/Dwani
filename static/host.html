@@ -459,6 +459,12 @@
 </style>
 </head>
 <body>
+<div id="phone-hint" style="display:none; background:#223367; color:#fffdf6; font-size:0.85rem; padding:0.55rem 0.9rem; text-align:center;">
+  Using your phone as the mic: keep this screen open and unlocked, and silence calls &amp; notifications during the talk.
+</div>
+<script>
+  if (/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)) document.getElementById("phone-hint").style.display = "block";
+</script>
 <svg class="mandala-bg" viewBox="0 0 680 680" aria-hidden="true" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
     <linearGradient id="mandalaGrad" x1="15%" y1="10%" x2="85%" y2="90%">
@@ -937,6 +943,8 @@
   function connectSocket() {
     var protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     var url = protocol + "//" + window.location.host + "/host-ws?session_param=" + encodeURIComponent(sessionId);
+    var presenterKey = new URLSearchParams(window.location.search).get("key");
+    if (presenterKey) url += "&key=" + encodeURIComponent(presenterKey);
     socket = new WebSocket(url);
     socket.binaryType = "arraybuffer";
 
@@ -950,7 +958,9 @@
       if (event.code === 4000) {
         setStatus("This session code isn't recognized by the server anymore.", "error");
       } else if (event.code === 4001) {
-        setStatus("Another presenter is already streaming for this session.", "error");
+        setStatus("Another presenter is already streaming for this session (stop the mic on the other device first).", "error");
+      } else if (event.code === 4003) {
+        setStatus("This link can't stream audio. Scan the 'Use your phone as the mic' QR in the DwaniLive window on the laptop.", "error");
       } else if (wasPresenting) {
         setStatus("Disconnected from the server.", "error");
       }
@@ -1001,6 +1011,7 @@
     micBtn.classList.add("live");
     micBtnLabel.textContent = "Stop";
     setStatus("Live — streaming to attendees", "live");
+    requestWakeLock();
   }
 
   function updateSpeakingIndicator(samples) {
@@ -1025,7 +1036,22 @@
     return result;
   }
 
+  // Phones stop the microphone when the screen turns off, so keep it on
+  // while presenting (needs a secure context: https or localhost).
+  var wakeLock = null;
+  function requestWakeLock() {
+    if (!("wakeLock" in navigator)) return;
+    navigator.wakeLock.request("screen").then(function (lock) { wakeLock = lock; }).catch(function () {});
+  }
+  function releaseWakeLock() {
+    if (wakeLock) { try { wakeLock.release(); } catch (e) {} wakeLock = null; }
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible" && isPresenting) requestWakeLock();
+  });
+
   function stopPresenting() {
+    releaseWakeLock();
     setStatus("Stopping…", null);
     if (socket) socket.close(1000, "presenter stopped");
     teardownAudio();

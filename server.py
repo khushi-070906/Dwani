@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -196,21 +196,33 @@ pipeline = _default_pipeline()
 
 
 @app.websocket("/host-ws")
-async def host_socket(websocket: WebSocket, session_param: str):
+async def host_socket(websocket: WebSocket, session_param: str, key: str = ""):
     """Presenter mic stream (see static/host.html): receives raw float32,
     16kHz, mono PCM chunks as binary WebSocket frames and runs each one
     through `pipeline`, which handles segmentation, ASR, per-language
     translation, and broadcast to attendees on its own (Section 4.3)."""
     global host_connected
 
+    # Accept before rejecting: closing an un-accepted WebSocket becomes a bare
+    # HTTP 403 and the browser only sees code 1006, so host.html could never
+    # show WHY (unknown session / already streaming / missing presenter key).
+    await websocket.accept()
     if session_param != session.session_id:
         await websocket.close(code=4000, reason="unknown session")
+        return
+    # From another device (the presenter's phone over the HTTPS port) the
+    # per-session presenter key is required, otherwise any attendee on the
+    # Wi-Fi could open /host and take over the microphone.
+    import phone_mic
+
+    client_host = websocket.client.host if websocket.client else None
+    if not phone_mic.is_loopback(client_host) and key != phone_mic.PRESENTER_KEY:
+        await websocket.close(code=4003, reason="presenter key required")
         return
     if host_connected:
         await websocket.close(code=4001, reason="a presenter is already connected")
         return
 
-    await websocket.accept()
     host_connected = True
     # Fresh segmenter per connection so a previous presenter session's
     # half-open segment (if any) never bleeds into this one -- but keep
@@ -369,6 +381,20 @@ async def qa_answer(question_id: str):
 @app.get("/session-info")
 async def session_info():
     return {"session_id": session.session_id, "languages_available": list(subscribers.keys())}
+
+
+phone_mic_url: str | None = None  # set by main() when --phone-mic is on
+
+
+@app.get("/qr-phone-mic.png")
+async def qr_phone_mic(request: Request):
+    """QR for the presenter's phone. Contains the presenter key, so it is only
+    served to the laptop itself (the launcher window), never over the LAN."""
+    import phone_mic
+
+    if not phone_mic_url or not phone_mic.is_loopback(request.client.host if request.client else None):
+        return Response(status_code=404)
+    return Response(phone_mic.qr_png(phone_mic_url), media_type="image/png", headers={"Cache-Control": "no-store"})
 
 
 @app.get("/presenter-info")
@@ -595,7 +621,7 @@ def main(argv=None):
     # than the one in the printed QR (-> every phone rejected with 4000
     # "unknown session"), the real Whisper/NLLB pipeline was never used,
     # --qa stayed disabled, and the license attendee cap was never applied.
-    global session, active_license, pipeline, qa_pipeline_instance, dynamic_glossary_updater
+    global session, active_license, pipeline, qa_pipeline_instance, dynamic_glossary_updater, phone_mic_url
 
     if argv is None:
         argv = sys.argv[1:]
@@ -613,6 +639,12 @@ def main(argv=None):
         "browsers only allow microphone access on a secure context (https://, or http://localhost), "
         "and a plain http://<lan-ip> join URL doesn't qualify. Not needed if every device using the mic "
         "features is on http://localhost (e.g. testing on the presenter's own machine).",
+    )
+    parser.add_argument(
+        "--phone-mic",
+        action="store_true",
+        help="Also serve the presenter page over HTTPS (self-signed, generated offline) on a second port, "
+        "so the presenter can use their PHONE as the microphone. Attendees keep the plain http:// link.",
     )
     parser.add_argument(
         "--qa-mic",
@@ -1132,6 +1164,19 @@ def main(argv=None):
     host_url = f"{host_scheme}://localhost:{resolved_port}/host?session={session.session_id}"
     print(f"Presenter mic page: {host_url}\n")
 
+    phone_cfg = None
+    if args.phone_mic:
+        try:
+            import phone_mic
+
+            phone_port = phone_mic.pick_port(exclude=resolved_port)
+            cert_path, key_path = phone_mic.ensure_cert(session.candidate_local_ips())
+            phone_mic_url = phone_mic.phone_url(session.primary_ip(), phone_port, session.session_id)
+            phone_cfg = (phone_port, str(cert_path), str(key_path))
+            print(f"Presenter phone mic page: {phone_mic_url}\n")
+        except Exception as exc:  # never block the session over the optional phone mic
+            print(f"(Phone-as-mic unavailable: {exc})")
+
     ssl_kwargs = {}
     if args.https:
         cert_path, key_path = Path("cert.pem"), Path("key.pem")
@@ -1149,7 +1194,23 @@ def main(argv=None):
         )
 
     try:
-        uvicorn.run(app, host="0.0.0.0", port=resolved_port, **ssl_kwargs)
+        if phone_cfg is None:
+            uvicorn.run(app, host="0.0.0.0", port=resolved_port, **ssl_kwargs)
+        else:
+            # Same app on two ports: plain http for attendees, https for the
+            # presenter's phone. lifespan only on the first so startup tasks
+            # (e.g. the dynamic glossary poller) don't run twice.
+            port2, cert2, key2 = phone_cfg
+            servers = [
+                uvicorn.Server(uvicorn.Config(app, host="0.0.0.0", port=resolved_port, **ssl_kwargs)),
+                uvicorn.Server(uvicorn.Config(app, host="0.0.0.0", port=port2, ssl_certfile=cert2,
+                                              ssl_keyfile=key2, lifespan="off", log_level="warning")),
+            ]
+
+            async def _serve_all():
+                await asyncio.gather(*(srv.serve() for srv in servers))
+
+            asyncio.run(_serve_all())
     finally:
         # Best-effort: if we started a hotspot, don't leave it broadcasting
         # (and, on Windows, holding the WiFi adapter in AP mode) after the

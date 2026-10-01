@@ -243,6 +243,7 @@ def run_console() -> None:
         "--whisper-model", str(model_setup.WHISPER_DIR),
         "--nllb-model-dir", str(model_setup.NLLB_DIR),
         "--no-hotspot",
+        "--phone-mic",
         *server.licensed_launcher_flags(),
     ])
 
@@ -257,7 +258,7 @@ SELF_TEST_IMPORTS = [
     "tokenizers", "certifi",
     "licensing", "activate", "session", "pipeline", "backends", "qa_pipeline",
     "nllb_tokenizer", "accessibility", "glossary", "translation_cache", "server",
-    "gui", "model_setup", "updater",
+    "gui", "model_setup", "updater", "phone_mic",
 ]
 
 
