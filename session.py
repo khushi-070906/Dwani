@@ -48,6 +48,8 @@ import subprocess
 import time
 import uuid
 from dataclasses import dataclass, field
+import tempfile
+import os
 from pathlib import Path
 
 
@@ -57,6 +59,17 @@ class HotspotError(RuntimeError):
     with AP-mode support, or a subprocess call failing for any other reason.
     Callers (see announce_with_hotspot) are expected to catch this and fall
     back to venue-WiFi discovery rather than crash the whole session."""
+
+
+def _writable_output_dir() -> Path:
+    try:
+        import appenv
+
+        appenv.RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
+        return appenv.RUNTIME_DIR
+    except Exception:
+        here = Path(__file__).resolve().parent
+        return here if os.access(here, os.W_OK) else Path(tempfile.gettempdir())
 
 
 @dataclass
@@ -85,10 +98,14 @@ class Session:
     def __post_init__(self) -> None:
         if self.session_id is None:
             self.session_id = uuid.uuid4().hex[:8]
+        # QR PNGs go in the per-user data folder, not next to this file: in
+        # an installed/compiled build that folder can be read-only (Program
+        # Files) and the PermissionError killed the server at startup.
+        out_dir = _writable_output_dir()
         if self.qr_image_path is None:
-            self.qr_image_path = Path(__file__).parent / "session_qr.png"
+            self.qr_image_path = out_dir / "session_qr.png"
         if self.wifi_qr_image_path is None:
-            self.wifi_qr_image_path = Path(__file__).parent / "session_qr_wifi.png"
+            self.wifi_qr_image_path = out_dir / "session_qr_wifi.png"
 
     # -- network discovery -------------------------------------------------
 
@@ -364,7 +381,13 @@ class Session:
         except Exception:
             print("(Skipping terminal QR display.)")
 
-        qrcode.make(url).save(self.qr_image_path)
+        try:
+            qrcode.make(url).save(self.qr_image_path)
+        except OSError as exc:
+            fallback = Path(tempfile.gettempdir()) / self.qr_image_path.name
+            print(f"(Couldn't write QR to {self.qr_image_path}: {exc}; using {fallback})")
+            self.qr_image_path = fallback
+            qrcode.make(url).save(self.qr_image_path)
         return self.qr_image_path
 
     @staticmethod
@@ -407,7 +430,11 @@ class Session:
         except Exception:
             print("(Skipping terminal WiFi QR display.)")
 
-        qrcode.make(payload).save(self.wifi_qr_image_path)
+        try:
+            qrcode.make(payload).save(self.wifi_qr_image_path)
+        except OSError:
+            self.wifi_qr_image_path = Path(tempfile.gettempdir()) / self.wifi_qr_image_path.name
+            qrcode.make(payload).save(self.wifi_qr_image_path)
         return self.wifi_qr_image_path
 
     # -- top-level entry point ------------------------------------------------
