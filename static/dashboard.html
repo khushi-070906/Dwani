@@ -621,26 +621,28 @@
       if (data.subscription) {
         const sub = data.subscription;
         const statusClass = 'dash-status-' + sub.status;
-        const serverUrl = window.location.origin;
-        const activateCmd =
-          `activate.exe --license-key ${sub.license_key} --server ${serverUrl} --email ${data.email}`;
+        // Stable "latest" URLs: publish a new GitHub release and every
+        // dashboard picks it up -- no more hard-coded v1.0.1 links going stale.
+        const RELEASES = 'https://github.com/khushi-070906/Dwani/releases/latest/download/';
+        const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
         let setupHtml = '';
         if (sub.status === 'active') {
           setupHtml = `
             <div class="dash-row" style="flex-direction:column; align-items:flex-start; gap:0.6rem; margin-top:1rem;">
-              <span class="label">Get DwaniLive running</span>
-              <p style="margin:0; font-size:0.9rem; color:var(--ink-faint);">
-                Do this once, while you still have internet. After that, DwaniLive works fully offline.
-              </p>
-              <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-                <a class="dash-cta" href="https://github.com/khushi-070906/Dwani/releases/download/v1.0.1/DwaniLive.zip">Download DwaniLive (.zip)</a>
-                <a class="dash-cta" href="https://github.com/khushi-070906/Dwani/releases/download/v1.0.0/activate.exe">Download activate.exe</a>
+              <span class="label">Get DwaniLive running (Windows 10/11, 64-bit)</span>
+              <div style="display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center;">
+                <a class="dash-cta" href="${RELEASES}DwaniLive-Setup.exe">Download DwaniLive</a>
+                <a href="${RELEASES}DwaniLive-win64.zip" style="font-size:0.85rem; color:var(--ink-faint);">or portable .zip</a>
               </div>
-              <p style="margin:0.4rem 0 0; font-size:0.9rem;">1. Unzip DwaniLive.zip -- keep the whole extracted folder together, it contains files <code>DwaniLive.exe</code> needs.</p>
-              <p style="margin:0.4rem 0 0; font-size:0.9rem;">2. Run <code>activate.exe</code> once, from a command prompt, in that same folder:</p>
-              <div class="dash-license-box" style="user-select:all;">${activateCmd}</div>
-              <p style="margin:0.4rem 0 0; font-size:0.9rem;">3. Then double-click <code>DwaniLive.exe</code> inside the unzipped folder any time to start a session -- no internet needed. (If Windows shows a SmartScreen warning, click "More info" then "Run anyway" -- this is normal for an unsigned app.)</p>
+              <p style="margin:0.4rem 0 0; font-size:0.9rem;"><b>1.</b> Run <code>DwaniLive-Setup.exe</code>. If Windows shows "Windows protected your PC", click <b>More info &rarr; Run anyway</b> (normal for new apps).</p>
+              <p style="margin:0.4rem 0 0; font-size:0.9rem;"><b>2.</b> DwaniLive opens and downloads its models once (~1.1&nbsp;GB, resumes if your internet drops). Then it asks for your license &mdash; paste this key and your email <b>${esc(data.email)}</b>:</p>
+              <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                <div class="dash-license-box" id="dash-key" style="user-select:all;">${esc(sub.license_key)}</div>
+                <button type="button" class="dash-cta" id="dash-copy-key" style="border:none; cursor:pointer;">Copy key</button>
+              </div>
+              <p style="margin:0.4rem 0 0; font-size:0.9rem;"><b>3.</b> Allow the Windows network prompt so phones can join. After this first run, DwaniLive works fully offline &mdash; just open it from the Start menu.</p>
+              <p style="margin:0.4rem 0 0; font-size:0.82rem; color:var(--ink-faint);">Stuck? In the DwaniLive window click <b>Copy error report</b> and send it to us.</p>
             </div>
           `;
         } else {
@@ -680,6 +682,16 @@
         <p class="sub">${data.email}</p>
         ${subscriptionHtml}
       `;
+      const copyBtn = document.getElementById('dash-copy-key');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+          const key = document.getElementById('dash-key').textContent.trim();
+          navigator.clipboard.writeText(key).then(() => {
+            copyBtn.textContent = 'Copied ✓';
+            setTimeout(() => { copyBtn.textContent = 'Copy key'; }, 1800);
+          }).catch(() => {});
+        });
+      }
     } catch (err) {
       card.innerHTML = '<div class="dash-error">Could not load your account. Please refresh or log in again.</div>';
     } finally {
