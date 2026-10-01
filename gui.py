@@ -59,6 +59,7 @@ _HTML = r"""<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DwaniLive</title>
+<link rel="icon" type="image/png" href="/favicon.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
 <style>
   :root {
@@ -566,6 +567,11 @@ class LauncherApp:
                 from urllib.parse import parse_qs, urlparse
 
                 u = urlparse(self.path)
+                if u.path == "/favicon.png":  # browsers fetch this without our token
+                    try:
+                        return self._send(200, (appenv.STATIC_DIR / "favicon.png").read_bytes(), "image/png")
+                    except OSError:
+                        return self._send(404, b"", "text/plain")
                 if not self._authed():
                     return self._send(403, b"Forbidden", "text/plain")
                 if u.path == "/":
