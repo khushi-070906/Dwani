@@ -103,13 +103,23 @@ class BidirectionalTranslationBackend:
         sentencepiece_model_path: str = "sentencepiece.bpe.model",
         device: str = "cpu",
         beam_size: int = 4,
+        shared_translator=None,
+        shared_tokenizer=None,
     ) -> None:
+        """shared_translator/shared_tokenizer: pass the forward pipeline's
+        already-loaded ctranslate2.Translator + tokenizer (same NLLB model)
+        instead of loading a second ~650MB copy into RAM. ctranslate2
+        Translators are safe to call from multiple threads."""
+        self._beam_size = beam_size
+        if shared_translator is not None and shared_tokenizer is not None:
+            self._translator = shared_translator
+            self._tokenizer = shared_tokenizer
+            return
         import ctranslate2  # deferred: heavy, optional dep -- same pattern as backends.py
         from nllb_tokenizer import NllbLiteTokenizer  # deferred: sentencepiece is the only dep this pulls in -- see its docstring for why this replaced transformers.AutoTokenizer
 
         self._translator = ctranslate2.Translator(nllb_model_dir, device=device)
         self._tokenizer = NllbLiteTokenizer(sentencepiece_model_path)
-        self._beam_size = beam_size
 
     async def translate_between(self, text: str, source_lang: str, target_lang: str) -> str:
         return await asyncio.to_thread(self._translate_sync, text, source_lang, target_lang)
