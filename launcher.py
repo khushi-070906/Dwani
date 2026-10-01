@@ -1,290 +1,44 @@
-"""
-launcher.py
+r"""
+launcher.py -- what DwaniLive.exe runs.
 
-The thing a presenter actually double-clicks (after this gets compiled to
-DwaniLive.exe via PyArmor + PyInstaller -- see build steps in the project's
-packaging notes). Build with --name so the output .exe is what the presenter
-sees in Downloads/Desktop, not the source filename. The UI is now a real
-window (see gui.py), not the console, so build --windowed rather than
---console, and make sure pywebview's Windows backend is actually bundled
-(see gui.py's module docstring for why --collect-submodules is required
-here, not optional):
+    DwaniLive.exe                 normal start: control window + setup + server
+    DwaniLive.exe --console       same flow in a terminal (no window)
+    DwaniLive.exe --self-test     verify the build (imports, DLLs, static files);
+                                  exit code 0 = OK. build_exe.py runs this on
+                                  every build so a broken exe never ships.
+    DwaniLive.exe --diagnose      print an error report (system, models, log tail)
+    DwaniLive.exe --reset-models  delete downloaded models, then start normally
 
-    pyinstaller --name DwaniLive --onefile --windowed \
-        --collect-submodules webview --collect-submodules clr_loader \
-        launcher.py
-
-If gui.py or pywebview is ever missing/broken at runtime, main() below
-falls back to the original plain-console flow automatically -- that
-fallback is why setup_models_if_needed()/prompt_for_activation_if_needed()/
-setup_firewall_if_needed() below are still console-flavored (input(),
-print(), ANSI colour) rather than removed outright.
-No Python source, no terminal commands, no manual model setup.
-
-What it does, in order:
-    1. First run only: checks whether nllb-200-ct2/ and
-       sentencepiece.bpe.model already exist next to the exe. If not,
-       downloads a single zip bundle (pre-converted by YOU, the developer,
-       on a machine with transformers+torch -- see backends.py's docstring
-       for why that conversion can't happen on the presenter's machine)
-       and extracts it, with a visible progress bar so a multi-hundred-MB
-       download doesn't look frozen.
-    2. faster-whisper handles its OWN model download/caching automatically
-       the first time it's used -- nothing extra needed here for that part.
-    3. Starts server.py's actual FastAPI app (imported directly, not
-       subprocessed, so this is one single compiled binary rather than a
-       launcher that shells out to a second script sitting next to it in
-       plain text).
-    4. Opens the presenter's default browser to the local host page once
-       the server's actually listening, so there's no "now go type
-       localhost:8000 yourself" step either.
-
-Configure MODEL_BUNDLE_URL below before building -- point it at wherever
-you've uploaded the zip (GitHub Releases is the easiest free option, and
-supports files up to 2GB, which comfortably covers an int8-quantized
-NLLB-200-distilled-600M bundle).
+Order of operations (see gui.py / model_setup.py for details):
+    1. stdio made safe for a windowed build, logging to
+       %LOCALAPPDATA%\DwaniLive\logs\dwanilive.log
+    2. single-instance check -- a second launch just re-opens the window
+    3. preflight (writable data dir, app files present, RAM warning)
+    4. models: resumable, verified download into %LOCALAPPDATA%\DwaniLive\models
+    5. license: cached token, or activate in the window, or Free plan
+    6. Windows Firewall rule (one UAC prompt, once)
+    7. server.main(...) with absolute model paths
 """
 
 from __future__ import annotations
 
 import ctypes
-import shutil
+import json
 import subprocess
 import sys
-import urllib.request
-import zipfile
+import time
 from pathlib import Path
 
-# ---------------------------------------------------------------------------
-# Console UI helpers
-# ---------------------------------------------------------------------------
-# Windows 10+ consoles support ANSI colour codes, but only after explicitly
-# opting in via SetConsoleMode -- older/plain cmd.exe windows otherwise print
-# raw escape-code garbage instead of colour. _ansi_enabled() does that
-# opt-in and reports whether it's safe to use colour at all; every colour
-# helper below degrades to plain text if it isn't.
-_ANSI_ENABLED = False
+import appenv
 
-
-def _enable_ansi() -> bool:
-    if sys.platform != "win32":
-        return sys.stdout.isatty()
-    try:
-        ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
-        kernel32 = ctypes.windll.kernel32
-        handle = kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
-        mode = ctypes.c_ulong()
-        if not kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
-            return False
-        return bool(kernel32.SetConsoleMode(handle, mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING))
-    except Exception:
-        return False
-
-
-def _set_console_title(title: str) -> None:
-    if sys.platform != "win32":
-        return
-    try:
-        ctypes.windll.kernel32.SetConsoleTitleW(title)
-    except Exception:
-        pass  # cosmetic only -- never worth interrupting startup for
-
-
-def _c(code: str, text: str) -> str:
-    """Wraps text in an ANSI colour code if colour is available, else
-    returns it unchanged. Never lets a display nicety raise or crash."""
-    if not _ANSI_ENABLED:
-        return text
-    return f"\033[{code}m{text}\033[0m"
-
-
-def _cyan(text: str) -> str:
-    return _c("36", text)
-
-
-def _green(text: str) -> str:
-    return _c("32", text)
-
-
-def _yellow(text: str) -> str:
-    return _c("33", text)
-
-
-def _red(text: str) -> str:
-    return _c("31", text)
-
-
-def _bold(text: str) -> str:
-    return _c("1", text)
-
-
-def _banner(title: str) -> None:
-    width = 70
-    line = "\u2500" * (width - 2)
-    print(_cyan(f"\u250c{line}\u2510"))
-    print(_cyan("\u2502") + _bold(title.center(width - 2)) + _cyan("\u2502"))
-    print(_cyan(f"\u2514{line}\u2518"))
-
-
-def _render_progress_bar(pct: int, mb_done: float, mb_total: float, bar_width: int = 32) -> str:
-    filled = int(bar_width * pct / 100)
-    bar = "\u2588" * filled + "\u2591" * (bar_width - filled)
-    return f"\r  [{_green(bar)}] {pct:3d}%  ({mb_done:6.1f} / {mb_total:6.1f} MB)"
-
-# ---------------------------------------------------------------------------
-# Configure before building
-# ---------------------------------------------------------------------------
-
-# Point this at your hosted zip containing nllb-200-ct2/ (the whole folder)
-# and sentencepiece.bpe.model at its top level. GitHub Releases direct-asset
-# URLs look like:
-#   https://github.com/<you>/<repo>/releases/download/<tag>/models.zip
-MODEL_BUNDLE_URL = "https://github.com/khushi-070906/Dwani-models/releases/download/v1.0/dwani-models.zip"
-
-# PyInstaller's own recommended pattern: when frozen (compiled), sys.argv[0]
-# can be unreliable depending on how the exe was launched (a shortcut, a
-# different working directory, etc.) -- sys.executable is the safe,
-# documented way to find where the actual .exe lives. This matters a lot
-# here specifically because APP_DIR is where downloaded models get saved
-# PERSISTENTLY -- getting this wrong would mean re-downloading the ~580MB
-# model bundle on every single launch instead of just the first one.
-if getattr(sys, "frozen", False):
-    APP_DIR = Path(sys.executable).resolve().parent
-else:
-    APP_DIR = Path(__file__).resolve().parent
-NLLB_MODEL_DIR = APP_DIR / "nllb-200-ct2"
-SENTENCEPIECE_MODEL = APP_DIR / "sentencepiece.bpe.model"
-WHISPER_MODEL_SIZE = "small"
 SERVER_PORT = 8000
-
-
-def models_already_present() -> bool:
-    return NLLB_MODEL_DIR.is_dir() and SENTENCEPIECE_MODEL.is_file()
-
-
-def download_with_progress(url: str, dest_path: Path, progress_cb=None) -> None:
-    """progress_cb, if given, is called as progress_cb(pct, mb_done, mb_total)
-    instead of printing a console progress bar -- used by gui.py to drive
-    the window's progress bar. Console behavior (default) is unchanged."""
-    def _report(block_num, block_size, total_size):
-        if total_size <= 0:
-            return
-        downloaded = block_num * block_size
-        pct = min(100, downloaded * 100 // total_size)
-        mb_done = downloaded / (1024 * 1024)
-        mb_total = total_size / (1024 * 1024)
-        if progress_cb:
-            progress_cb(pct, mb_done, mb_total)
-        else:
-            print(_render_progress_bar(pct, mb_done, mb_total), end="", flush=True)
-
-    if not progress_cb:
-        print(_yellow("First run: downloading translation models (one-time, ~few hundred MB)..."))
-    urllib.request.urlretrieve(url, dest_path, reporthook=_report)
-    if not progress_cb:
-        print()  # newline after the progress line
-
-
-def setup_models_if_needed(progress_cb=None, interactive_on_error: bool = True) -> None:
-    """progress_cb, if given, is forwarded to download_with_progress() and
-    console banners/prints are skipped (gui.py drives its own progress bar
-    and status text instead). interactive_on_error controls what happens
-    on failure: True (console default) prints and blocks on input() before
-    exiting, same as before; False (GUI) re-raises instead, since a
-    --windowed build has no console to type "Enter" into -- see gui.py's
-    _run_pipeline(), which catches this and shows the error view.
-    """
-    if models_already_present():
-        return
-
-    if not progress_cb:
-        _banner("DwaniLive -- First-Run Setup")
-
-    zip_path = APP_DIR / "_dwanilive_models_tmp.zip"
-    try:
-        download_with_progress(MODEL_BUNDLE_URL, zip_path, progress_cb=progress_cb)
-
-        if not progress_cb:
-            print("Extracting models...")
-        with zipfile.ZipFile(zip_path) as zf:
-            zf.extractall(APP_DIR)
-
-        if not models_already_present():
-            # Common real-world case: whoever zipped the bundle selected a
-            # single parent folder (e.g. "dwani-models/") rather than its
-            # contents directly, so everything landed one level deeper than
-            # expected -- APP_DIR/dwani-models/nllb-200-ct2/ instead of
-            # APP_DIR/nllb-200-ct2/. Auto-detect and fix rather than making
-            # every zip re-upload get the exact structure right by hand.
-            candidate_dirs = [p for p in APP_DIR.iterdir() if p.is_dir() and p.name not in {"__pycache__"}]
-            for candidate in candidate_dirs:
-                nested_nllb = candidate / "nllb-200-ct2"
-                nested_spm = candidate / "sentencepiece.bpe.model"
-                if nested_nllb.is_dir() and nested_spm.is_file():
-                    print(f"(Found models nested inside '{candidate.name}/' -- moving up one level.)")
-                    shutil.move(str(nested_nllb), str(NLLB_MODEL_DIR))
-                    shutil.move(str(nested_spm), str(SENTENCEPIECE_MODEL))
-                    shutil.rmtree(candidate, ignore_errors=True)
-                    break
-
-        if not models_already_present():
-            raise RuntimeError(
-                "Download completed but expected files weren't found after extraction, "
-                "even after checking one level of nesting. The bundle's contents may not "
-                "match what this launcher expects -- check MODEL_BUNDLE_URL points at a "
-                "zip containing nllb-200-ct2/ and sentencepiece.bpe.model, at its top "
-                "level or nested inside a single wrapper folder."
-            )
-
-        if not progress_cb:
-            print(_green("Setup complete. This only happens once.\n"))
-    except Exception as exc:
-        print(_red(f"\nSetup failed: {exc}"), file=sys.stderr)
-        print("Check your internet connection and try running DwaniLive again.", file=sys.stderr)
-        if interactive_on_error:
-            input("Press Enter to exit...")
-            sys.exit(1)
-        raise
-    finally:
-        if zip_path.exists():
-            zip_path.unlink()
-
-
 LICENSE_SERVER_URL = "https://dhwani-elit.onrender.com"
 
 
-def prompt_for_activation_if_needed() -> None:
-    """A double-clicked .exe has no terminal args to pass --license-key
-    into, and no bundled activate.py a presenter could run themselves --
-    so if there's no cached token yet, ask for the two things activation
-    needs right here, in plain console prompts, and activate on the spot.
-    """
-    from licensing import DEFAULT_CACHE_PATH
-
-    if DEFAULT_CACHE_PATH.exists():
-        return  # already activated on a previous run
-
-    from activate import activate
-
-    _banner("Welcome to DwaniLive")
-    print("This looks like the first time you're running DwaniLive on this")
-    print("computer. Enter your license details once (from your purchase")
-    print("confirmation) -- after this, it works fully offline.")
-    print()
-
-    while True:
-        license_key = input(_bold("License key: ")).strip()
-        email = input(_bold("Email (used at checkout): ")).strip()
-        print()
-        if activate(license_key, LICENSE_SERVER_URL, email):
-            print(_green("Activated successfully.\n"))
-            break
-        print(_red("Activation failed.\n"))
-        retry = input("Try again? (y/n): ").strip().lower()
-        if retry != "y":
-            print("Cannot continue without activation. Exiting.")
-            input("Press Enter to exit...")
-            sys.exit(1)
+def _yellow(t): return t
+def _green(t): return t
+def _red(t): return t
+def _bold(t): return t
 
 
 # Renamed from "DwaniLive" (which only opened port 8000): server.py falls back
@@ -308,13 +62,13 @@ def _firewall_rule_exists() -> bool:
     try:
         result = subprocess.run(
             ["netsh", "advfirewall", "firewall", "show", "rule", f"name={FIREWALL_RULE_NAME}"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True, text=True, errors="replace", timeout=10,
         )
         # netsh prints "No rules match the specified criteria." (localized
         # in non-English Windows, but the return code is reliable) when
         # nothing matches -- return code 0 with actual rule fields present
         # is the "it's there" case.
-        return result.returncode == 0 and "Rule Name" in result.stdout
+        return result.returncode == 0 and FIREWALL_RULE_NAME in (result.stdout or "")
     except Exception:
         return False
 
@@ -331,7 +85,7 @@ def _add_firewall_rule() -> bool:
                 "dir=in", "action=allow", "protocol=TCP",
                 f"localport={FIREWALL_PORT_RANGE}", "profile=any",
             ],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True, text=True, errors="replace", timeout=10,
         )
         return result.returncode == 0
     except Exception:
@@ -410,7 +164,17 @@ def setup_firewall_if_needed() -> None:
     print(_yellow("Setting up local network access so phones/other devices on"))
     print(_yellow("the same WiFi can join the session (one-time)..."))
 
+    declined = appenv.RUNTIME_DIR / "firewall_declined"
+    if declined.exists() and time.time() - declined.stat().st_mtime < 24 * 3600:
+        print("Skipping firewall prompt (declined earlier today). Phones may not be able to join.")
+        return
+
     added = _add_firewall_rule() if _is_admin() else _elevate_and_add_firewall_rule()
+    if not added:
+        try:
+            declined.write_text("1", encoding="utf-8")
+        except OSError:
+            pass
 
     if added:
         print(_green("Done -- other devices on this network can now reach DwaniLive.\n"))
@@ -430,157 +194,204 @@ def setup_firewall_if_needed() -> None:
         print("this laptop, only from the router/hotspot settings.\n")
 
 
-def _has_interactive_console() -> bool:
-    """Whether stdin is actually usable for input() right now. A --windowed
-    PyInstaller build has no console attached at all -- sys.stdin is either
-    None or a non-interactive stream. Falling back to the plain console
-    flow (prompt_for_activation_if_needed()'s input() calls) in that case
-    doesn't raise an exception -- it just blocks forever waiting for input
-    that can never arrive. That is exactly what "the exe opens to
-    literally nothing, no error, no window, forever" looks like from a
-    presenter's side, with nothing in Task Manager to even hint what's
-    wrong. Checked before falling back below, specifically to turn that
-    silent hang into a loud, logged, message-boxed failure instead.
-    """
-    try:
-        return sys.stdin is not None and sys.stdin.isatty()
-    except Exception:
-        return False
 
 
-def main() -> None:
-    global _ANSI_ENABLED
-    _ANSI_ENABLED = _enable_ansi()
-    _set_console_title("DwaniLive")
+# ---------------------------------------------------------------------------
+# Console (no-window) flow
+# ---------------------------------------------------------------------------
 
-    # Prefer the real GUI window (gui.py, styled to match the website) --
-    # falls back to the plain console flow below if pywebview isn't
-    # installed, or its native backend fails to initialize on this
-    # machine (e.g. WebView2 missing/broken). That fallback matters: it's
-    # what keeps this runnable on a dev machine without pywebview set up,
-    # and it's what keeps a presenter's session from being blocked
-    # entirely by a GUI-layer problem rather than a real one.
-    gui_error: Exception | None = None
-    try:
-        import gui as _gui
-    except Exception as exc:
-        _gui = None
-        gui_error = exc
+def _console_progress(p) -> None:
+    if p.note:
+        print(f"  {p.note}")
+        return
+    if p.total_bytes:
+        bar = int(p.pct / 3.2)
+        speed = f"{p.speed_bps / 1048576:5.1f} MB/s" if p.speed_bps else ""
+        print(f"\r  {p.label:<28} [{'#' * bar}{'.' * (32 - bar)}] {p.pct:3d}% {speed}   ", end="", flush=True)
 
-    if _gui is not None:
-        try:
-            _gui.run(
-                setup_models_if_needed=setup_models_if_needed,
-                setup_firewall_if_needed=setup_firewall_if_needed,
-                app_dir=APP_DIR,
-                nllb_model_dir=NLLB_MODEL_DIR,
-                whisper_model_size=WHISPER_MODEL_SIZE,
-                server_port=SERVER_PORT,
-                license_server_url=LICENSE_SERVER_URL,
-            )
-            return
-        except Exception as exc:
-            gui_error = exc
-            print(_yellow(f"GUI window failed to start ({exc}); falling back to the console."), file=sys.stderr)
 
-    if gui_error is not None and not _has_interactive_console():
-        # No GUI, AND no console to fall back to either -- see
-        # _has_interactive_console()'s docstring. Fail loudly right here
-        # instead of silently hanging on input() below forever. The
-        # __main__ wrapper at the bottom of this file turns this into
-        # dwanilive_error.log + a message box, so this is the actual
-        # thing a presenter sees instead of nothing.
-        raise RuntimeError(
-            f"The DwaniLive window failed to start ({gui_error}), and this build has no "
-            f"console to fall back to for the usual setup prompts. Most likely cause: the "
-            f"Microsoft Edge WebView2 Runtime is missing on this computer -- install it "
-            f"from https://developer.microsoft.com/microsoft-edge/webview2/ and try again. "
-            f"If that doesn't fix it, send dwanilive_error.log (next to this exe) for help."
-        )
+def run_console() -> None:
+    import model_setup
 
-    setup_models_if_needed()
-    prompt_for_activation_if_needed()
-    setup_firewall_if_needed()
-
-    # Imported here, not at module top, so the (potentially slow) model
-    # setup above always runs first and prints its own clear progress
-    # before server.py's own heavier imports (faster_whisper, ctranslate2)
-    # start loading.
-    import server
-
-    _banner("DwaniLive is starting")
-    print("The link to open (and the QR code for attendees) will be")
-    print("printed below by the server itself in a moment.")
+    for w in appenv.preflight():
+        print(f"WARNING: {w}")
+    if not model_setup.all_installed():
+        print("First run: downloading models (one-time, ~1.1 GB, resumes if interrupted)...")
+    model_setup.ensure_models(_console_progress)
     print()
 
-    # server.main() takes the exact same flags you'd type on the command
-    # line, as a list -- this is the real, tested argparse path server.py
-    # already uses, not a separate/guessed entry point. NOTE: auto-opening
-    # the browser directly to the right page isn't done here, because the
-    # actual host URL includes a session ID generated at runtime inside
-    # Session (session.py) -- guessing that URL format without seeing that
-    # file would risk opening a broken link instead of just telling the
-    # presenter to click the one server.py already prints below.
+    from licensing import DEFAULT_CACHE_PATH
+
+    if not DEFAULT_CACHE_PATH.exists() and sys.stdin and sys.stdin.isatty():
+        print("No license activated -- press Enter twice to continue on the Free plan.")
+        key = input("License key: ").strip()
+        email = input("Email: ").strip() if key else ""
+        if key and email:
+            from activate import activate
+
+            if not activate(key, LICENSE_SERVER_URL, email):
+                print("Activation failed -- continuing on the Free plan.")
+
+    setup_firewall_if_needed()
+
+    import os
+    import server
+
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
     server.main([
         "--port", str(SERVER_PORT),
-        "--whisper-model", WHISPER_MODEL_SIZE,
-        "--nllb-model-dir", str(NLLB_MODEL_DIR),
+        "--whisper-model", str(model_setup.WHISPER_DIR),
+        "--nllb-model-dir", str(model_setup.NLLB_DIR),
+        "--no-hotspot",
         *server.licensed_launcher_flags(),
     ])
 
 
-def _report_fatal_startup_error(exc: BaseException) -> None:
-    """DwaniLive.exe is built with the GUI (windowed) PyInstaller subsystem
-    (see the module docstring's build command), so there's no console
-    attached -- every print()/exception that reaches here would otherwise
-    just disappear, making the app look like it "doesn't open" with zero
-    explanation. This writes the failure to a log file next to the exe AND
-    pops up a message box (Windows) so it's never silent again.
+# ---------------------------------------------------------------------------
+# --self-test: catches "works on my machine" before a release ships
+# ---------------------------------------------------------------------------
 
-    This belongs HERE, in launcher.py's own __main__ block, not
-    server.py's -- launcher.py is PyInstaller's actual entry point
-    (`pyinstaller ... launcher.py`); server.py is only ever imported
-    (`import server` in main() above), so a copy of this wrapper living in
-    server.py's own `if __name__ == "__main__":` block would never run for
-    the compiled exe at all, regardless of how correct it is in isolation.
-    """
+SELF_TEST_IMPORTS = [
+    "numpy", "fastapi", "starlette", "uvicorn", "websockets", "pydantic", "dotenv",
+    "qrcode", "PIL", "cryptography", "sentencepiece", "ctranslate2", "faster_whisper",
+    "av", "tokenizers", "onnxruntime", "certifi",
+    "licensing", "activate", "session", "pipeline", "backends", "qa_pipeline",
+    "nllb_tokenizer", "accessibility", "glossary", "translation_cache", "server",
+    "gui", "model_setup",
+]
+
+
+def self_test() -> int:
+    import importlib
+
+    results = {"system": appenv.system_summary(), "imports": {}, "checks": {}}
+    ok = True
+    for mod in SELF_TEST_IMPORTS:
+        try:
+            importlib.import_module(mod)
+            results["imports"][mod] = "ok"
+        except Exception as exc:  # noqa: BLE001
+            results["imports"][mod] = f"FAIL: {exc.__class__.__name__}: {exc}"
+            ok = False
+
+    def check(name, fn):
+        nonlocal ok
+        try:
+            fn()
+            results["checks"][name] = "ok"
+        except Exception as exc:  # noqa: BLE001
+            results["checks"][name] = f"FAIL: {exc}"
+            ok = False
+
+    def _static():
+        for f in ("index.html", "host.html"):
+            if not (appenv.STATIC_DIR / f).is_file():
+                raise FileNotFoundError(appenv.STATIC_DIR / f)
+
+    def _ct2():
+        import ctranslate2
+
+        ctranslate2.get_cuda_device_count()  # forces the native library to load
+        if not ctranslate2.get_supported_compute_types("cpu"):
+            raise RuntimeError("ctranslate2 reports no CPU compute types")
+
+    def _fw_assets():
+        import faster_whisper
+
+        assets = Path(faster_whisper.__file__).parent / "assets"
+        if not any(assets.glob("*.onnx")):
+            raise FileNotFoundError(f"faster_whisper VAD assets missing in {assets}")
+
+    check("static_files", _static)
+    check("ctranslate2_native", _ct2)
+    check("faster_whisper_assets", _fw_assets)
+    check("data_dir_writable", appenv.preflight)
+    results["ok"] = ok
+    print(json.dumps(results, indent=2))
+    try:
+        (appenv.LOGS_DIR / "self_test.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
+    except OSError:
+        pass
+    return 0 if ok else 1
+
+
+# ---------------------------------------------------------------------------
+# Entry
+# ---------------------------------------------------------------------------
+
+def _report_fatal(exc: BaseException) -> None:
     import traceback
 
-    log_path = APP_DIR / "dwanilive_error.log"
-    message = f"{exc}\n\n{traceback.format_exc()}"
-    try:
-        log_path.write_text(message, encoding="utf-8")
-    except Exception:
-        pass  # best-effort -- still try the message box below
-
-    print(message, file=sys.stderr)  # harmless no-op with no console; helps when run from cmd/PowerShell
-
+    print("".join(traceback.format_exception(type(exc), exc, exc.__traceback__)), file=sys.stderr)
     if sys.platform == "win32":
         try:
-            import ctypes
-
             ctypes.windll.user32.MessageBoxW(
                 0,
-                f"DwaniLive failed to start:\n\n{exc}\n\nDetails written to:\n{log_path}",
-                "DwaniLive - Startup Error",
-                0x10,  # MB_ICONERROR
+                f"DwaniLive couldn't start:\n\n{appenv.friendly_error(exc)}\n\nLog file:\n{appenv.LOG_FILE}",
+                "DwaniLive",
+                0x10,
             )
         except Exception:
             pass
 
 
+def main(argv=None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    appenv.install_safe_streams()
+    appenv.suppress_child_console_windows()
+    try:
+        appenv.ensure_dirs()
+    except OSError:
+        pass
+
+    if "--self-test" in argv:
+        return self_test()
+    if "--diagnose" in argv:
+        import gui
+
+        print(gui.diagnostics_text())
+        return 0
+    if "--reset-models" in argv:
+        import model_setup
+
+        model_setup.reset_models()
+        print("Models deleted; they'll be downloaded again on next start.")
+
+    if not appenv.acquire_single_instance():
+        # Already running: just bring its control window back.
+        try:
+            url = appenv.INSTANCE_FILE.read_text(encoding="utf-8").strip()
+            import gui
+
+            gui.open_app_window(url)
+            return 0
+        except OSError:
+            if "--after-restart" not in argv:
+                raise RuntimeError("DwaniLive is already running (check the taskbar).")
+            time.sleep(3)  # previous instance is still exiting after a restart
+            if not appenv.acquire_single_instance():
+                raise RuntimeError("DwaniLive is already running (check the taskbar).")
+
+    if "--console" in argv:
+        run_console()
+        return 0
+
+    import gui
+
+    gui.LauncherApp(
+        setup_firewall_if_needed=setup_firewall_if_needed,
+        server_port=SERVER_PORT,
+        license_server_url=LICENSE_SERVER_URL,
+    ).run(open_window="--no-window" not in argv)
+    return 0
+
+
 if __name__ == "__main__":
     try:
-        main()
-    except SystemExit as e:
-        # sys.exit(...)/raise SystemExit(...) calls elsewhere in main()
-        # (license failure, model-setup failure with interactive_on_error,
-        # etc.) still exit with the same code -- just visibly now, instead
-        # of vanishing.
-        if e.code not in (0, None):
-            _report_fatal_startup_error(e)
+        code = main()
+    except SystemExit:
         raise
-    except BaseException as e:  # noqa: BLE001 -- deliberately broad: this is
-        # the last line of defense before the process disappears with no trace.
-        _report_fatal_startup_error(e)
-        raise
+    except BaseException as e:  # noqa: BLE001 -- last line of defense; never vanish silently
+        _report_fatal(e)
+        code = 1
+    sys.exit(code)
