@@ -10,7 +10,11 @@ Implements the four modules from Section 4 of the proposal, mapped directly to c
 | 4.4 Attendee Client | `static/attendee.html` — dropdown language picker + live caption stream over `/ws/captions`, no app install |
 | Option 1 / Option 2 extensions | Semantic translation cache and conference glossary adaptation — both opt-in, see [Optional extensions](#optional-extensions) below |
 
-## Setup
+## Desktop app (end users)
+
+Users install `DwaniLive-Setup.exe` from the dashboard, and nothing else is needed. To build and ship it, see **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+
+## Setup (developers)
 
 ```bash
 cd ldst
