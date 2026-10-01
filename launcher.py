@@ -257,7 +257,7 @@ SELF_TEST_IMPORTS = [
     "tokenizers", "certifi",
     "licensing", "activate", "session", "pipeline", "backends", "qa_pipeline",
     "nllb_tokenizer", "accessibility", "glossary", "translation_cache", "server",
-    "gui", "model_setup",
+    "gui", "model_setup", "updater",
 ]
 
 

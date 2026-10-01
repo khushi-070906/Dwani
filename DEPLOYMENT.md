@@ -59,3 +59,11 @@ and set `DWANI_WHISPER_BASE_URL=https://github.com/.../releases/download/<tag>/{
 - `--qa` no longer loads a second Whisper and a second NLLB. Typed questions share the main model. Voice questions need the new `--qa-mic` flag.
 - The desktop app passes `--no-hotspot`, so it uses the venue Wi-Fi or a phone hotspot. Windows' hosted-network API is unsupported on most modern drivers.
 - `activate.exe` is no longer needed. Activation happens inside the app window, or users can choose the Free plan.
+
+## In-app updates (1.2.0+)
+On launch DwaniLive checks `api.github.com/repos/khushi-070906/Dwani/releases/latest` (silently skipped offline).
+If the tag is newer than `APP_VERSION`, the window shows **"Update now"**: it downloads `DwaniLive-Setup.exe`,
+runs it with `/SILENT` after DwaniLive exits, and the installer reopens the app. Models and license are untouched.
+So a release = bump `APP_VERSION` + push a matching tag. **Tag and APP_VERSION must match**, or users get
+an endless "update available" loop. Disable on lab machines with `DWANI_NO_UPDATE_CHECK=1`.
+Users on 1.1.x have no updater yet, so they need to download 1.2.0 once by hand.

@@ -48,6 +48,7 @@ from typing import Callable, Optional
 
 import appenv
 import model_setup
+import updater
 
 HEARTBEAT_TIMEOUT_S = 120
 CLOSE_GRACE_S = 6
@@ -220,10 +221,23 @@ _HTML = r"""<!DOCTYPE html>
   button.danger { margin-top: 0.6rem; width: 100%; padding: 0.6rem; border-radius: 10px; border: 1.5px solid #f0c8c3;
     background: transparent; color: var(--error); font-family: var(--font-body); font-weight: 700; font-size: 0.85rem; cursor: pointer; }
   .version { margin-top: 0.6rem; font-size: 0.7rem; color: var(--ink-faint); }
+  .update-banner { display: none; width: 100%; max-width: 380px; margin: -0.5rem 0 0.9rem; padding: 0.6rem 0.8rem;
+    border-radius: 12px; background: var(--indigo); color: #fffdf6; font-size: 0.84rem; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+  .update-banner.show { display: flex; }
+  .update-banner span { flex: 1; min-width: 150px; }
+  .update-banner button { border: none; border-radius: 8px; padding: 0.4rem 0.75rem; background: #fffdf6; color: var(--indigo);
+    font-family: var(--font-body); font-weight: 800; font-size: 0.8rem; cursor: pointer; }
+  .update-banner button:disabled { opacity: 0.7; cursor: default; }
+  .update-err { width: 100%; font-size: 0.76rem; color: #ffd6d1; }
 </style>
 </head>
 <body>
 <span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span>
+<div class="update-banner" id="update-banner">
+  <span id="update-text">A new version is available.</span>
+  <button type="button" id="update-btn">Update now</button>
+  <div class="update-err" id="update-err"></div>
+</div>
 <div class="card">
 
   <section class="view active" id="view-splash">
@@ -372,7 +386,26 @@ _HTML = r"""<!DOCTYPE html>
       if (!openedPresenter && s.auto_open) { openedPresenter = true; api('open', { what: 'presenter' }); }
     }
     if (s.phase === 'error') $('error-message').textContent = s.error || 'Unknown error.';
+    renderUpdate(s.update);
     if (s.phase !== phase) { phase = s.phase; showView(phase === 'preflight' ? 'splash' : phase); }
+  }
+
+  function renderUpdate(u) {
+    var b = $('update-banner');
+    if (!u) { b.classList.remove('show'); return; }
+    b.classList.add('show');
+    var btn = $('update-btn');
+    if (u.state === 'downloading') {
+      $('update-text').textContent = 'Downloading DwaniLive ' + u.version + '… ' + (u.pct || 0) + '%';
+      btn.disabled = true; btn.textContent = 'Please wait';
+    } else if (u.state === 'installing') {
+      $('update-text').textContent = 'Installing ' + u.version + ' — DwaniLive will reopen by itself.';
+      btn.disabled = true; btn.textContent = 'Installing…';
+    } else {
+      $('update-text').textContent = 'DwaniLive ' + u.version + ' is available (you have ' + $('version').textContent + ').';
+      btn.disabled = false; btn.textContent = 'Update now';
+    }
+    $('update-err').textContent = u.error || '';
   }
 
   function poll() {
@@ -398,6 +431,10 @@ _HTML = r"""<!DOCTYPE html>
       if (!r.ok) { err.textContent = r.error || 'Activation failed.'; err.classList.add('show'); }
     }).catch(function () { err.textContent = 'Lost contact with DwaniLive. Reopen the app.'; err.classList.add('show'); })
       .finally(function () { btn.disabled = false; btn.textContent = 'Activate'; });
+  });
+  $('update-btn').addEventListener('click', function () {
+    if (phase === 'ready' && !confirm('Updating will stop the current session. Update now?')) return;
+    api('update', {});
   });
   $('free-btn').addEventListener('click', function () { api('continue_free', {}); });
   $('open-presenter-btn').addEventListener('click', function (e) { e.preventDefault(); api('open', { what: 'presenter' }); });
@@ -453,6 +490,7 @@ class LauncherState:
         self.auto_open = False
         self.last_seen = time.monotonic()
         self.closed_at: Optional[float] = None
+        self.update: Optional[dict] = None        # {version, notes_url, state, pct, error}
 
     def set(self, **kw) -> None:
         with self.lock:
@@ -467,7 +505,7 @@ class LauncherState:
                 "phase": self.phase, "status": self.status, "progress": self.progress,
                 "warnings": self.warnings, "error": self.error, "license_problem": self.license_problem,
                 "presenter_url": self.presenter_url, "join_url": self.join_url, "qr_url": qr,
-                "tier": self.tier, "auto_open": self.auto_open,
+                "tier": self.tier, "auto_open": self.auto_open, "update": self.update,
                 "version": appenv.APP_VERSION, "seq": seq, "logs": lines,
             }
 
@@ -574,6 +612,8 @@ class LauncherApp:
         if route == "/api/closed":
             self.state.set(closed_at=time.monotonic())
             return {"ok": True}
+        if route == "/api/update":
+            return self._start_update()
         if route == "/api/quit":
             threading.Timer(0.3, self.shutdown).start()
             return {"ok": True}
@@ -634,6 +674,47 @@ class LauncherApp:
                 os.startfile(str(folder))  # type: ignore[attr-defined]
             else:
                 webbrowser.open(folder.as_uri())
+
+    # ---------------------------------------------------------------- update
+    def _check_update(self) -> None:
+        updater.cleanup_old_installers()
+        info = updater.check_for_update()
+        if info:
+            self._update_info = info
+            print(f"Update available: v{info.version}")
+            self.state.set(update={"version": info.version, "notes_url": info.notes_url, "state": "available",
+                                   "pct": 0, "error": ""})
+
+    def _start_update(self) -> dict:
+        info = getattr(self, "_update_info", None)
+        if info is None:
+            return {"ok": False, "error": "No update available."}
+        if sys.platform != "win32":
+            webbrowser.open(info.notes_url)
+            return {"ok": True}
+        upd = dict(self.state.update or {})
+        if upd.get("state") == "downloading":
+            return {"ok": True}
+
+        def work():
+            def prog(p):
+                cur = dict(self.state.update or {})
+                cur.update(state="downloading", pct=p.pct, error=p.note or "")
+                self.state.set(update=cur)
+            try:
+                self.state.set(update={**upd, "state": "downloading", "pct": 0, "error": ""})
+                path = updater.download_installer(info, prog)
+                self.state.set(update={**upd, "state": "installing", "pct": 100, "error": ""})
+                print(f"Starting installer for v{info.version}; DwaniLive will reopen when it finishes.")
+                updater.launch_installer(path)
+                threading.Timer(0.8, self.shutdown).start()
+            except Exception as exc:  # noqa: BLE001
+                traceback.print_exc()
+                self.state.set(update={**upd, "state": "available", "pct": 0,
+                                       "error": "Update failed: " + appenv.friendly_error(exc)})
+
+        threading.Thread(target=work, name="dwani-update", daemon=True).start()
+        return {"ok": True}
 
     # -------------------------------------------------------------- pipeline
     def _on_log_line(self, line: str) -> None:
@@ -792,6 +873,7 @@ class LauncherApp:
             pass
         print(f"Launcher UI: http://127.0.0.1:{port}/")
         self._start_pipeline()
+        threading.Thread(target=self._check_update, name="dwani-update-check", daemon=True).start()
         threading.Thread(target=self._watchdog, daemon=True).start()
         if open_window:
             self.open_window()

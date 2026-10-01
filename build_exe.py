@@ -49,7 +49,7 @@ APP_FOLDER = DIST / APP_NAME            # final folder that gets zipped / instal
 ICON = ROOT / "assets" / "dwanilive.ico"
 
 LOCAL_MODULES = [
-    "appenv", "model_setup", "gui", "server", "session", "pipeline", "backends", "qa_pipeline",
+    "appenv", "model_setup", "updater", "gui", "server", "session", "pipeline", "backends", "qa_pipeline",
     "nllb_tokenizer", "licensing", "activate", "accessibility", "glossary", "translation_cache",
     "decision_engine", "dynamic_glossary", "persistent_memory",
 ]
@@ -177,8 +177,10 @@ def make_installer() -> Path | None:
     if not iscc:
         print("Inno Setup not found -- skipping installer (install from https://jrsoftware.org/isdl.php).")
         return None
-    run([iscc, f"/DAppVersion={APP_VERSION}", f"/DSourceDir={APP_FOLDER}", f"/DOutputDir={RELEASE}",
-         str(ROOT / "installer" / "DwaniLive.iss")])
+    defines = [f"/DAppVersion={APP_VERSION}", f"/DSourceDir={APP_FOLDER}", f"/DOutputDir={RELEASE}"]
+    if ICON.is_file():
+        defines.append(f"/DIconFile={ICON}")
+    run([iscc, *defines, str(ROOT / "installer" / "DwaniLive.iss")])
     out = RELEASE / f"{APP_NAME}-Setup.exe"
     print(f"Installer: {out}")
     return out

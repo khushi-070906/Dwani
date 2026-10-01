@@ -37,8 +37,8 @@ WizardStyle=modern
 AppMutex=Local\DwaniLiveSingleInstance
 CloseApplications=yes
 UninstallDisplayIcon={app}\DwaniLive.exe
-#ifexist "..\assets\dwanilive.ico"
-SetupIconFile=..\assets\dwanilive.ico
+#ifdef IconFile
+SetupIconFile={#IconFile}
 #endif
 
 [Tasks]
@@ -59,6 +59,8 @@ Name: "{userdesktop}\DwaniLive"; Filename: "{app}\DwaniLive.exe"; WorkingDir: "{
 
 [Run]
 Filename: "{app}\DwaniLive.exe"; Description: "Start DwaniLive now"; Flags: nowait postinstall skipifsilent
+; In-app updates run setup with /SILENT: reopen DwaniLive automatically afterwards.
+Filename: "{app}\DwaniLive.exe"; Flags: nowait; Check: WizardSilent
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
