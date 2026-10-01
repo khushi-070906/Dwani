@@ -8,7 +8,8 @@
 <meta name="description" content="Run live captions for your talk or lecture. Start a session and let your audience follow along on their own devices.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Non-blocking: venues are often offline; a blocking font request delays the whole page until it times out. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
 <style>
   @view-transition {
     navigation: auto;
