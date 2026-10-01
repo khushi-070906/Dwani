@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DwaniLive Pricing</title>
+<title>DwaniLive: offline live translation for in-person talks</title>
 <link rel="icon" type="image/png" href="/static/favicon.png">
 <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -107,7 +107,10 @@
   .nav-links { justify-self: center; display: flex; align-items: center; gap: 0.25rem; font-size: 0.94rem; font-weight: 600; color: var(--ink-dim); }
   .nav-links a { padding: 0.5rem 1rem; border-radius: 999px; transition: background 0.15s ease, color 0.15s ease; }
   .nav-links a:hover { color: var(--accent-deep); }
-  .nav-links a.active, .nav-links span.active { color: var(--accent-deep); background: rgba(168, 70, 12, 0.1); font-weight: 700; cursor: default; }
+  .nav-links a.active, .nav-links span.active { color: var(--accent-deep); background: rgba(168, 70, 12, 0.1); font-weight: 700; }
+  .nav-links span.active { cursor: default; }
+  /* Sticky header must not cover a section's heading when jumping to it */
+  #how-it-works, #plans, #compare, #faq { scroll-margin-top: 6rem; }
   .nav-right { justify-self: end; display: flex; align-items: center; gap: 0.6rem; opacity: 0; transition: opacity 0.2s ease; }
   .nav-right.ready { opacity: 1; }
   .nav-cta {
@@ -466,12 +469,12 @@
 <header class="site-header">
 <nav class="nav-shell">
   <div class="brand-row">
-    <a href="pricing.html" style="text-decoration:none;"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
+    <a href="/" style="text-decoration:none;"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
   </div>
   <div class="nav-links" id="nav-links">
-    <a href="#how-it-works">How it works</a>
-    <span class="active" aria-current="page">Pricing</span>
-    <a href="pricing.html#faq">FAQ</a>
+    <a href="#how-it-works" data-section="how-it-works">How it works</a>
+    <a href="#plans" data-section="plans">Pricing</a>
+    <a href="#faq" data-section="faq">FAQ</a>
   </div>
   <button type="button" class="nav-hamburger" id="nav-hamburger" aria-label="Menu" aria-expanded="false">&#9776;</button>
   <div class="nav-right" id="nav-right">
@@ -935,6 +938,29 @@
   document.getElementById('modal-close-btn').addEventListener('click', closeAuthModal);
   authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
   document.getElementById('switch-to-signup').addEventListener('click', (e) => { e.preventDefault(); openAuthModal('signup'); });
+
+  // ---- Nav: highlight the section in view (this page is the site's home) ----
+  (() => {
+    const links = [...document.querySelectorAll('#nav-links a[data-section]')];
+    const sections = links.map((a) => document.getElementById(a.dataset.section)).filter(Boolean);
+    if (!sections.length) return;
+    const setActive = (id) => links.forEach((a) => {
+      const on = a.dataset.section === id;
+      a.classList.toggle('active', on);
+      if (on) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current');
+    });
+    const update = () => {
+      const probe = window.scrollY + window.innerHeight * 0.35;
+      let current = null;
+      for (const sec of sections) if (sec.offsetTop <= probe) current = sec.id;
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) current = sections[sections.length - 1].id;
+      setActive(current);  // null at the hero = nothing highlighted
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    window.addEventListener('hashchange', update);
+    update();
+  })();
 
   // ---- Mobile nav (hamburger) ----
   const navLinksEl = document.getElementById('nav-links');
