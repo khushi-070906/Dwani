@@ -1,0 +1,28 @@
+# Desktop app (DwaniLive.exe) build environment.
+# Use Python 3.11 or 3.12 (NOT 3.13/3.14) in a fresh venv, outside OneDrive:
+#   py -3.12 -m venv .venv-build && .venv-build\Scripts\activate
+#   pip install -r requirements-desktop.txt
+#   python build_exe.py
+# Pinned to the versions the frozen build + --self-test were verified with.
+# Bump deliberately, one at a time, and re-run build_exe.py (it self-tests).
+ctranslate2==4.8.2
+faster-whisper==1.2.1
+sentencepiece==0.2.2
+numpy==2.4.4
+fastapi==0.142.2
+starlette==1.7.0
+uvicorn==0.54.0
+websockets==17.1
+httptools==0.8.0
+pydantic==2.13.5
+python-dotenv==1.2.2
+qrcode==8.2
+pillow==12.1.1
+cryptography==46.0.6
+certifi==2026.2.25
+# optional VAD backend (server --vad-backend webrtcvad)
+# webrtcvad-wheels
+
+# build tools (pick one; build_exe.py --backend nuitka|pyinstaller)
+nuitka==4.2
+pyinstaller==6.22.3
