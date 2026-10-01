@@ -1,0 +1,67 @@
+# Builds DwaniLive.exe + DwaniLive-Setup.exe on a real Windows machine (GitHub's),
+# runs the frozen --self-test, and attaches everything to a GitHub Release.
+#
+# Release:      git tag v1.1.0 && git push origin v1.1.0
+# Just a build: GitHub -> Actions -> "Windows release" -> Run workflow
+#               (download the result from the run's "Artifacts" section)
+
+name: Windows release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      backend:
+        description: "Build backend"
+        type: choice
+        options: [pyinstaller, nuitka]
+        default: pyinstaller
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-desktop.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-desktop.txt
+
+      - name: Ensure Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) { choco install innosetup -y --no-progress }
+
+      - name: Build + self-test + package
+        shell: pwsh
+        run: |
+          $backend = "${{ github.event.inputs.backend }}"
+          if (-not $backend) { $backend = "pyinstaller" }
+          python build_exe.py --backend $backend
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: DwaniLive-windows
+          path: release/*
+          if-no-files-found: error
+
+      - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          make_latest: true
+          generate_release_notes: true
