@@ -1,80 +1,64 @@
 """
 gui.py
 
-Native window shell for the DwaniLive launcher, replacing the plain console
-prompts (progress bar, "License key:" input, etc.) with a window styled to
-match the DwaniLive website -- same colour palette and fonts as
-logo.html/privacy.html/terms.html ("Rozha One" display font + "Mukta" body
-font, the warm cream background, the gradient ध्वनि wordmark).
+DwaniLive's launcher window.
 
-Built with pywebview (`pip install pywebview`) rather than tkinter: the
-brand is already expressed as HTML/CSS across the site, so this window is
-just that same HTML/CSS reused, instead of a second, tkinter-shaped
-approximation of it. On Windows, pywebview renders through Microsoft Edge
-WebView2 (Chromium) -- present by default on Windows 10 21H2+ / Windows 11,
-so no extra runtime install for most presenters.
+WHY THIS NO LONGER USES PYWEBVIEW
+  The previous version rendered through pywebview -> pythonnet -> WebView2.
+  That chain is the single most fragile part of a frozen Windows build:
+  pywebview's backend is imported dynamically (PyInstaller/Nuitka miss it),
+  pythonnet needs Python.Runtime.dll + clr_loader shipped exactly right,
+  and WebView2 must exist on the machine. The shipped v1.0.1 zip contained
+  none of webview/clr_loader at all -- every user silently got the console
+  fallback, or (in a windowed build) nothing.
 
-PyInstaller note: pywebview's Windows backend (webview.platforms.winforms)
-is imported dynamically from inside pywebview itself, so PyInstaller's
-static import analysis misses it unless told -- skip this and the build
-silently falls back to opening a normal browser tab instead of a real app
-window, with no error printed. Build with:
+  Now: a tiny stdlib HTTP server on 127.0.0.1 serves the same branded UI,
+  opened as a chromeless app window with Microsoft Edge (`msedge --app=`,
+  present on every Windows 10/11 machine), falling back to Chrome, then
+  the default browser. Zero extra dependencies, nothing to bundle.
 
-    pyinstaller --name DwaniLive --onefile --windowed \
-        --collect-submodules webview --collect-submodules clr_loader \
-        launcher.py
+  Security: bound to 127.0.0.1 only, every API call needs a per-launch
+  random token (so a random website can't POST to it), and the HTML
+  is served from the same origin.
 
-(--windowed, not --console: the console is no longer the UI. Anything the
-underlying pipeline still print()s -- setup_models_if_needed(), server.py's
-own output, etc. -- gets captured by the stdout tee below and shown inside
-the window's "technical log" panel instead of a terminal.)
-
-Design: this module owns ALL view transitions (view-splash -> view-download
--> view-activate -> view-starting -> view-ready, or -> view-error at any
-point). launcher.py's main() calls run(...) with the actual pipeline
-pieces (setup_models_if_needed, setup_firewall_if_needed, the constants) --
-gui.py doesn't import launcher.py itself, to avoid a circular import.
-
-Two things this module deliberately does NOT try to parse or guess:
-  - The exact join-URL/QR format session.py produces. session.py wasn't
-    available while writing this, so rather than fabricate its shape,
-    whatever it actually prints is shown verbatim in the "ready" view's
-    log panel (same information the console gave before, same wording,
-    just inside the window instead of a terminal).
-  - Anything about server.py's internals beyond what its own module
-    docstring/prints already confirm -- e.g. the "ready" transition is
-    triggered by literally seeing server.py's own
-    `print(f"Presenter mic page: {host_url}")` line go by, not by calling
-    into server.py's internals directly.
+LIFECYCLE
+  The window polls /api/state every second. Closing it sends a beacon; if
+  no new poll arrives within a few seconds (i.e. it wasn't just a reload)
+  the app shuts down cleanly. If the beacon is lost, a 120s heartbeat
+  timeout does the same. Re-launching DwaniLive while it's running just
+  re-opens this window (single-instance, see launcher.py).
 """
 
 from __future__ import annotations
 
-import re
+import json
+import os
+import secrets
+import shutil
+import subprocess
 import sys
 import threading
+import time
 import traceback
+import urllib.request
 import webbrowser
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Callable, Optional
 
-import webview
+import appenv
+import model_setup
 
-# ---------------------------------------------------------------------------
-# Brand styling -- lifted directly from the website's :root variables (see
-# logo.html / privacy.html / terms.html) so this window matches instead of
-# inventing a second, different-looking palette.
-# ---------------------------------------------------------------------------
+HEARTBEAT_TIMEOUT_S = 120
+CLOSE_GRACE_S = 6
 
-_HTML = r"""
-<!DOCTYPE html>
+_HTML = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DwaniLive</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
 <style>
   :root {
     --bg: #fdf6e7;
@@ -211,419 +195,683 @@ _HTML = r"""
     color: var(--ink-dim); font-family: var(--font-body); font-weight: 600;
     font-size: 0.88rem; cursor: pointer;
   }
+  html, body { overflow: auto; }
+  .steps { list-style: none; padding: 0; margin: 0 0 1rem; }
+  .steps li { display: flex; gap: 0.55rem; align-items: center; font-size: 0.88rem; color: var(--ink-faint); padding: 0.18rem 0; }
+  .steps li .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--bg-raised-2); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #fff; }
+  .steps li.active { color: var(--ink); font-weight: 600; }
+  .steps li.active .dot { border-color: var(--accent-deep); border-top-color: transparent; animation: spin 0.8s linear infinite; }
+  .steps li.done { color: var(--ink-dim); }
+  .steps li.done .dot { background: var(--live); border-color: var(--live); }
+  .note { margin-top: 0.6rem; font-size: 0.8rem; color: var(--accent-deep); min-height: 1.2em; }
+  .warn { margin: 0 0 0.9rem; padding: 0.55rem 0.7rem; border-radius: 8px; background: #fff1d6; color: #7a4a00; font-size: 0.8rem; }
+  .linkish { background: none; border: none; color: var(--accent-deep); font-family: var(--font-body);
+    font-size: 0.86rem; font-weight: 600; cursor: pointer; padding: 0; margin-top: 0.9rem; text-decoration: underline; }
+  .row { display: flex; gap: 0.5rem; }
+  .row > * { flex: 1; }
+  .join-box { display: flex; gap: 0.4rem; align-items: center; background: var(--bg); border: 1.5px solid var(--bg-raised-2);
+    border-radius: 10px; padding: 0.45rem 0.55rem; font-size: 0.8rem; word-break: break-all; }
+  .join-box span { flex: 1; }
+  .join-box button { border: none; background: var(--bg-raised-2); border-radius: 6px; padding: 0.3rem 0.55rem;
+    font-family: var(--font-body); font-weight: 700; font-size: 0.75rem; cursor: pointer; color: var(--ink); }
+  .qr { display: block; margin: 0.6rem auto 0; width: 150px; height: 150px; image-rendering: pixelated; border-radius: 8px; background: #fff; }
+  .hint { font-size: 0.76rem; color: var(--ink-faint); margin-top: 0.5rem; }
+  button.danger { margin-top: 0.6rem; width: 100%; padding: 0.6rem; border-radius: 10px; border: 1.5px solid #f0c8c3;
+    background: transparent; color: var(--error); font-family: var(--font-body); font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+  .version { margin-top: 0.6rem; font-size: 0.7rem; color: var(--ink-faint); }
 </style>
 </head>
 <body>
-
 <span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span>
-
 <div class="card">
 
-  <section class="view" id="view-splash">
-    <div class="status-line">Starting…</div>
+  <section class="view active" id="view-splash">
+    <div class="spinner-row"><div class="spinner"></div><div class="status-line">Starting…</div></div>
   </section>
 
   <section class="view" id="view-download">
     <h1>Setting up DwaniLive</h1>
-    <p class="subtitle">Downloading translation models (one-time, ~few hundred MB). This won't happen again on this computer.</p>
+    <p class="subtitle">One-time download (~1.1 GB). If the internet drops, it resumes where it stopped — just leave this open.</p>
+    <div id="warnings-dl"></div>
+    <ul class="steps">
+      <li id="step-whisper"><span class="dot"></span>Speech recognition model</li>
+      <li id="step-nllb"><span class="dot"></span>Translation model</li>
+      <li id="step-extract"><span class="dot"></span>Unpacking</li>
+    </ul>
     <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-    <div class="progress-stats"><span id="progress-pct">0%</span><span id="progress-mb">0.0 / 0.0 MB</span></div>
+    <div class="progress-stats"><span id="progress-pct">0%</span><span id="progress-mb"></span></div>
+    <div class="note" id="progress-note"></div>
   </section>
 
   <section class="view" id="view-activate">
     <h1>Activate DwaniLive</h1>
-    <p class="subtitle">Enter your license details once, from your purchase confirmation. After this, it works fully offline.</p>
+    <p class="subtitle">Paste the license key from your dashboard. One-time; after this it runs fully offline.</p>
+    <div class="error-banner" id="license-problem"></div>
     <form id="activate-form">
       <label for="license-key">License key</label>
-      <input type="text" id="license-key" autocomplete="off" required>
+      <input type="text" id="license-key" autocomplete="off" spellcheck="false" required>
       <label for="license-email">Email (used at checkout)</label>
-      <input type="email" id="license-email" autocomplete="off" required>
+      <input type="email" id="license-email" autocomplete="email" required>
       <div class="error-banner" id="activate-error"></div>
       <button type="submit" class="primary" id="activate-btn">Activate</button>
     </form>
-    <div class="fine-print">This is a one-time step. Needs internet now; the session itself runs fully offline.</div>
+    <button class="linkish" id="free-btn" type="button">Continue with the Free plan instead</button>
   </section>
 
   <section class="view" id="view-starting">
     <h1>Starting DwaniLive…</h1>
+    <div id="warnings-st"></div>
     <div class="spinner-row"><div class="spinner"></div><div class="status-line" id="starting-status">Getting things ready…</div></div>
-    <button class="log-toggle" id="starting-log-toggle">Show details</button>
+    <p class="hint">Loading the models takes 20–60 seconds on most laptops. If Windows asks about network access, click <b>Allow</b> — that's what lets phones join.</p>
+    <button class="log-toggle" data-log="starting-log">Show details</button>
     <div class="log-panel" id="starting-log"></div>
   </section>
 
   <section class="view" id="view-ready">
     <div class="ok-badge">&#10003;</div>
     <h1>DwaniLive is running</h1>
-    <p class="subtitle">Keep this window open for the length of the session.</p>
-    <div class="section-label">Presenter</div>
-    <a href="#" class="link-button" id="open-presenter-btn">Open presenter mic page ↗</a>
-    <div class="section-label">Attendees</div>
-    <p class="subtitle" style="margin-bottom:0.4rem;">Share the link and QR code below (same as before — just shown here instead of a terminal window):</p>
-    <div class="log-panel show" id="ready-log" style="flex:1;"></div>
+    <p class="subtitle" id="tier-line">Keep this window open during the session.</p>
+    <a href="#" class="link-button" id="open-presenter-btn">Open presenter page ↗</a>
+    <div class="section-label">Attendees join here (same Wi-Fi)</div>
+    <div class="join-box"><span id="join-url">…</span><button id="copy-join" type="button">Copy</button></div>
+    <img class="qr" id="join-qr" alt="Join QR code">
+    <p class="hint">Phones can't connect? They must be on the same Wi-Fi. Some college/hotel Wi-Fi blocks phone-to-laptop traffic — use your phone's hotspot for the laptop and attendees instead.</p>
+    <button class="danger" id="stop-btn" type="button">Stop session &amp; quit</button>
+    <button class="log-toggle" data-log="ready-log">Show details</button>
+    <div class="log-panel" id="ready-log"></div>
   </section>
 
   <section class="view" id="view-error">
     <div class="error-icon">&#9888;</div>
     <h1>Something went wrong</h1>
     <p class="subtitle" id="error-message">Unknown error.</p>
-    <button class="secondary" id="quit-btn">Quit</button>
-    <button class="log-toggle" id="error-log-toggle">Show details</button>
+    <button class="primary" id="retry-btn" type="button">Try again</button>
+    <div class="row">
+      <button class="secondary" id="diag-btn" type="button">Copy error report</button>
+      <button class="secondary" id="logs-btn" type="button">Open log folder</button>
+    </div>
+    <button class="secondary" id="redownload-btn" type="button">Re-download models</button>
+    <button class="secondary" id="quit-btn" type="button">Quit</button>
+    <button class="log-toggle" data-log="error-log">Show details</button>
     <div class="log-panel" id="error-log"></div>
   </section>
 
+  <div class="version" id="version"></div>
 </div>
 
 <script>
+(function () {
+  var TOKEN = new URLSearchParams(location.search).get('t') || '';
+  var seq = 0, phase = '', presenterUrl = '', openedPresenter = false, closing = false;
+
+  function api(path, body) {
+    return fetch('/api/' + path + '?t=' + encodeURIComponent(TOKEN), {
+      method: body === undefined ? 'GET' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: body === undefined ? undefined : JSON.stringify(body)
+    }).then(function (r) { return r.json(); });
+  }
+  function $(id) { return document.getElementById(id); }
   function showView(name) {
     document.querySelectorAll('.view').forEach(function (el) {
       el.classList.toggle('active', el.id === 'view-' + name);
     });
   }
-
-  function appendLog(elId, line) {
-    var el = document.getElementById(elId);
-    el.textContent += (el.textContent ? "\n" : "") + line;
-    el.scrollTop = el.scrollHeight;
+  function fmtBytes(b) { return b >= 1073741824 ? (b / 1073741824).toFixed(2) + ' GB' : (b / 1048576).toFixed(0) + ' MB'; }
+  function fmtEta(s) {
+    if (s === null || s === undefined || !isFinite(s)) return '';
+    s = Math.round(s); return s >= 60 ? Math.floor(s / 60) + 'm ' + (s % 60) + 's left' : s + 's left';
+  }
+  function warningsHtml(list) {
+    return (list || []).map(function (w) { var d = document.createElement('div'); d.className = 'warn'; d.textContent = w; return d.outerHTML; }).join('');
+  }
+  function appendLogs(lines) {
+    ['starting-log', 'ready-log', 'error-log'].forEach(function (id) {
+      var el = $(id), atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 8;
+      lines.forEach(function (l) { el.textContent += l + '\n'; });
+      if (el.textContent.length > 60000) el.textContent = el.textContent.slice(-50000);
+      if (atBottom) el.scrollTop = el.scrollHeight;
+    });
+  }
+  function setStep(stage) {
+    var order = ['whisper', 'nllb', 'extract'], idx = order.indexOf(stage === 'verify' ? 'extract' : stage);
+    order.forEach(function (s, i) {
+      var li = $('step-' + s);
+      li.className = i < idx ? 'done' : (i === idx ? 'active' : '');
+    });
   }
 
-  function setProgress(pct, mbDone, mbTotal) {
-    document.getElementById('progress-fill').style.width = pct + '%';
-    document.getElementById('progress-pct').textContent = pct + '%';
-    document.getElementById('progress-mb').textContent = mbDone.toFixed(1) + ' / ' + mbTotal.toFixed(1) + ' MB';
+  function render(s) {
+    $('version').textContent = 'v' + s.version;
+    if (s.logs && s.logs.length) appendLogs(s.logs);
+    seq = s.seq;
+    $('warnings-dl').innerHTML = $('warnings-st').innerHTML = warningsHtml(s.warnings);
+
+    if (s.phase === 'download' && s.progress) {
+      var p = s.progress;
+      setStep(p.stage);
+      $('progress-fill').style.width = p.pct + '%';
+      $('progress-pct').textContent = p.total_bytes ? p.pct + '%' : '';
+      var mb = p.total_bytes ? fmtBytes(p.done_bytes) + ' / ' + fmtBytes(p.total_bytes) : (p.done_bytes ? fmtBytes(p.done_bytes) : '');
+      if (p.speed_bps > 0) mb += '  ·  ' + (p.speed_bps / 1048576).toFixed(1) + ' MB/s  ·  ' + fmtEta(p.eta_s);
+      $('progress-mb').textContent = mb;
+      $('progress-note').textContent = p.note || p.label || '';
+    }
+    if (s.phase === 'starting') $('starting-status').textContent = s.status || 'Starting…';
+    if (s.phase === 'activate') {
+      var lp = $('license-problem');
+      lp.textContent = s.license_problem || '';
+      lp.classList.toggle('show', !!s.license_problem);
+    }
+    if (s.phase === 'ready') {
+      presenterUrl = s.presenter_url;
+      $('join-url').textContent = s.join_url || '(see details)';
+      if (s.qr_url && $('join-qr').getAttribute('src') !== s.qr_url) $('join-qr').src = s.qr_url;
+      $('tier-line').textContent = (s.tier ? s.tier + ' plan · ' : '') + 'Keep this window open during the session.';
+      if (!openedPresenter && s.auto_open) { openedPresenter = true; api('open', { what: 'presenter' }); }
+    }
+    if (s.phase === 'error') $('error-message').textContent = s.error || 'Unknown error.';
+    if (s.phase !== phase) { phase = s.phase; showView(phase === 'preflight' ? 'splash' : phase); }
   }
 
-  function setStartingStatus(text) {
-    document.getElementById('starting-status').textContent = text;
+  function poll() {
+    if (closing) return;
+    fetch('/api/state?since=' + seq + '&t=' + encodeURIComponent(TOKEN))
+      .then(function (r) { return r.json(); }).then(render)
+      .catch(function () {}).finally(function () { setTimeout(poll, 1000); });
   }
 
-  function showReady(presenterUrl) {
-    var btn = document.getElementById('open-presenter-btn');
-    btn.onclick = function (e) {
-      e.preventDefault();
-      window.pywebview.api.open_url(presenterUrl);
-    };
-    showView('ready');
-  }
-
-  function showError(message) {
-    document.getElementById('error-message').textContent = message;
-    showView('error');
-  }
-
-  document.getElementById('starting-log-toggle').addEventListener('click', function () {
-    var panel = document.getElementById('starting-log');
-    panel.classList.toggle('show');
-    this.textContent = panel.classList.contains('show') ? 'Hide details' : 'Show details';
-  });
-  document.getElementById('error-log-toggle').addEventListener('click', function () {
-    var panel = document.getElementById('error-log');
-    panel.classList.toggle('show');
-    this.textContent = panel.classList.contains('show') ? 'Hide details' : 'Show details';
-  });
-  document.getElementById('quit-btn').addEventListener('click', function () {
-    window.pywebview.api.quit();
-  });
-
-  document.getElementById('activate-form').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var key = document.getElementById('license-key').value.trim();
-    var email = document.getElementById('license-email').value.trim();
-    var btn = document.getElementById('activate-btn');
-    var errBox = document.getElementById('activate-error');
-    errBox.classList.remove('show');
-    btn.disabled = true;
-    btn.textContent = 'Activating…';
-    window.pywebview.api.activate(key, email).then(function (result) {
-      if (result.ok) {
-        showView('starting');
-      } else {
-        btn.disabled = false;
-        btn.textContent = 'Activate';
-        errBox.textContent = result.error || 'Activation failed. Check your details and try again.';
-        errBox.classList.add('show');
-      }
+  document.querySelectorAll('.log-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var p = $(btn.getAttribute('data-log')), on = p.classList.toggle('show');
+      btn.textContent = on ? 'Hide details' : 'Show details';
+      if (on) p.scrollTop = p.scrollHeight;
     });
   });
+  $('activate-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var btn = $('activate-btn'), err = $('activate-error');
+    btn.disabled = true; btn.textContent = 'Activating… (server may take ~30s to wake up)';
+    err.classList.remove('show');
+    api('activate', { key: $('license-key').value.trim(), email: $('license-email').value.trim() }).then(function (r) {
+      if (!r.ok) { err.textContent = r.error || 'Activation failed.'; err.classList.add('show'); }
+    }).catch(function () { err.textContent = 'Lost contact with DwaniLive. Reopen the app.'; err.classList.add('show'); })
+      .finally(function () { btn.disabled = false; btn.textContent = 'Activate'; });
+  });
+  $('free-btn').addEventListener('click', function () { api('continue_free', {}); });
+  $('open-presenter-btn').addEventListener('click', function (e) { e.preventDefault(); api('open', { what: 'presenter' }); });
+  $('copy-join').addEventListener('click', function () {
+    var t = $('join-url').textContent;
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () {
+      $('copy-join').textContent = 'Copied'; setTimeout(function () { $('copy-join').textContent = 'Copy'; }, 1500);
+    }).catch(function () {});
+  });
+  $('retry-btn').addEventListener('click', function () { api('retry', {}); });
+  $('redownload-btn').addEventListener('click', function () {
+    if (confirm('Delete the downloaded models and download them again (~1.1 GB)?')) api('retry', { reset_models: true });
+  });
+  $('logs-btn').addEventListener('click', function () { api('open', { what: 'logs' }); });
+  $('diag-btn').addEventListener('click', function () {
+    api('diagnostics', {}).then(function (r) {
+      var done = function () { $('diag-btn').textContent = 'Copied — paste it to support'; };
+      if (navigator.clipboard) navigator.clipboard.writeText(r.text).then(done, function () { api('open', { what: 'logs' }); });
+      else api('open', { what: 'logs' });
+    });
+  });
+  function quit() { closing = true; api('quit', {}).finally(function () { document.body.innerHTML = '<p style="padding:2rem;font-family:sans-serif">DwaniLive has stopped. You can close this window.</p>'; window.close(); }); }
+  $('quit-btn').addEventListener('click', quit);
+  $('stop-btn').addEventListener('click', function () { if (confirm('Stop the session? Attendees will be disconnected.')) quit(); });
 
-  showView('splash');
+  window.addEventListener('beforeunload', function (e) {
+    if (phase === 'ready' && !closing) { e.preventDefault(); e.returnValue = ''; }
+  });
+  window.addEventListener('pagehide', function () {
+    if (!closing && navigator.sendBeacon) navigator.sendBeacon('/api/closed?t=' + encodeURIComponent(TOKEN), '{}');
+  });
+  poll();
+})();
 </script>
 </body>
 </html>
 """
 
-_PRESENTER_URL_RE = re.compile(r"Presenter mic page:\s*(\S+)")
+
+class LauncherState:
+    def __init__(self) -> None:
+        self.lock = threading.Lock()
+        self.phase = "preflight"
+        self.status = ""
+        self.progress: Optional[dict] = None
+        self.warnings: list[str] = []
+        self.error = ""
+        self.license_problem = ""
+        self.presenter_url = ""
+        self.join_url = ""
+        self.server_port: Optional[int] = None
+        self.tier = ""
+        self.auto_open = False
+        self.last_seen = time.monotonic()
+        self.closed_at: Optional[float] = None
+
+    def set(self, **kw) -> None:
+        with self.lock:
+            for k, v in kw.items():
+                setattr(self, k, v)
+
+    def to_json(self, since: int) -> dict:
+        seq, lines = appenv.LOG.snapshot(since)
+        with self.lock:
+            qr = f"http://127.0.0.1:{self.server_port}/qr.png" if self.server_port and self.phase == "ready" else ""
+            return {
+                "phase": self.phase, "status": self.status, "progress": self.progress,
+                "warnings": self.warnings, "error": self.error, "license_problem": self.license_problem,
+                "presenter_url": self.presenter_url, "join_url": self.join_url, "qr_url": qr,
+                "tier": self.tier, "auto_open": self.auto_open,
+                "version": appenv.APP_VERSION, "seq": seq, "logs": lines,
+            }
 
 
-class _TeeStdout:
-    """Mirrors everything written to a real stream (stdout/stderr) to an
-    additional callback, line-by-line, without changing what the real
-    stream sees. Used so every print() already scattered through
-    setup_models_if_needed(), setup_firewall_if_needed(), and server.py
-    itself shows up live in the window's log panel -- rather than needing
-    every one of those call sites rewritten to know about the GUI."""
+class LauncherApp:
+    """Owns the setup pipeline and the control window. launcher.py builds
+    one and calls run(); run() blocks until the user quits."""
 
-    def __init__(self, real_stream, on_line: Callable[[str], None]):
-        self._real = real_stream
-        self._on_line = on_line
-        self._buf = ""
-
-    def write(self, s: str) -> int:
-        self._real.write(s)
-        self._buf += s
-        while "\n" in self._buf or "\r" in self._buf:
-            # server.py's own progress bars use \r; treat it like \n here
-            # so the log panel gets a fresh line per update instead of one
-            # giant run-on string.
-            idx_n = self._buf.find("\n")
-            idx_r = self._buf.find("\r")
-            idx = min(x for x in (idx_n, idx_r) if x != -1)
-            line, self._buf = self._buf[:idx], self._buf[idx + 1:]
-            if line.strip():
-                try:
-                    self._on_line(line)
-                except Exception:
-                    pass  # a log-panel hiccup should never take down setup/the server
-        return len(s)
-
-    def flush(self) -> None:
-        self._real.flush()
-
-    def isatty(self) -> bool:
-        return False
-
-
-class _CaptureAndForward:
-    """Like _TeeStdout, but also keeps its own copy of the lines it saw --
-    used only around the activate() call, to pull its actual printed error
-    detail (bad key/email, subscription not active, cold-server timeout,
-    etc. -- see activate.py) into the inline error banner, instead of that
-    detail only being visible in the (hidden, at that point) log panel."""
-
-    def __init__(self, forward_to):
-        self._forward = forward_to
-        self._buf = ""
-        self.lines: list[str] = []
-
-    def write(self, s: str) -> int:
-        self._forward.write(s)
-        self._buf += s
-        while "\n" in self._buf:
-            line, self._buf = self._buf.split("\n", 1)
-            if line.strip():
-                self.lines.append(line)
-        return len(s)
-
-    def flush(self) -> None:
-        self._forward.flush()
-
-    def isatty(self) -> bool:
-        return False
-
-
-class Api:
-    """Methods callable from the page's JS via window.pywebview.api.*.
-    Kept intentionally tiny -- everything else (view transitions, progress,
-    log lines) is pushed from Python to JS via evaluate_js instead, so
-    there's one place (this module) driving the whole flow.
-    """
-
-    def __init__(self, gui: "LauncherGUI"):
-        self._gui = gui
-
-    def activate(self, license_key: str, email: str) -> dict:
-        from activate import activate as do_activate
-
-        # activate() only returns True/False -- its actually-useful error
-        # detail (bad key/email, subscription not active yet, server cold
-        # and timed out, etc.) goes to stderr via print(). Capture that
-        # here so it reaches the inline error banner instead of only the
-        # (not yet visible, at this point) log panel.
-        capture = _CaptureAndForward(sys.stderr)
-        old_stderr = sys.stderr
-        sys.stderr = capture
-        try:
-            ok = do_activate(license_key, self._gui.license_server_url, email)
-        except Exception as exc:
-            return {"ok": False, "error": str(exc)}
-        finally:
-            sys.stderr = old_stderr
-
-        if not ok:
-            detail = "\n".join(capture.lines) if capture.lines else \
-                "Activation failed. Check your license key and email and try again."
-            return {"ok": False, "error": detail}
-
-        # Success: hand off to the same continuation the "already cached"
-        # path uses, in a background thread so this JS call returns
-        # immediately instead of blocking on model loading/server startup.
-        threading.Thread(target=self._gui._start_server_phase, daemon=True).start()
-        return {"ok": True}
-
-    def open_url(self, url: str) -> None:
-        webbrowser.open(url)
-
-    def quit(self) -> None:
-        for w in webview.windows:
-            w.destroy()
-
-
-class LauncherGUI:
     def __init__(
         self,
         *,
-        setup_models_if_needed: Callable[..., None],
         setup_firewall_if_needed: Callable[[], None],
-        app_dir: Path,
-        nllb_model_dir: Path,
-        whisper_model_size: str,
         server_port: int,
         license_server_url: str,
-    ):
-        self._setup_models_if_needed = setup_models_if_needed
-        self._setup_firewall_if_needed = setup_firewall_if_needed
-        self.app_dir = app_dir
-        self.nllb_model_dir = nllb_model_dir
-        self.whisper_model_size = whisper_model_size
-        self.server_port = server_port
+        extra_server_args: Optional[list[str]] = None,
+    ) -> None:
+        self.setup_firewall_if_needed = setup_firewall_if_needed
+        self.preferred_port = server_port
         self.license_server_url = license_server_url
+        self.extra_server_args = extra_server_args or []
+        self.state = LauncherState()
+        self.token = secrets.token_urlsafe(18)
+        self.ui_url = ""
+        self._httpd: Optional[ThreadingHTTPServer] = None
+        self._license_decision = threading.Event()
+        self._cancel = False
+        self._pipeline_thread: Optional[threading.Thread] = None
+        self._server_started = False
+        self._quit = threading.Event()
+        appenv.LOG.add_listener(self._on_log_line)
 
-        self._window: Optional[webview.Window] = None
-        self._ready_shown = False
+    # ------------------------------------------------------------------ http
+    def _make_handler(self):
+        app = self
 
-    # -- small evaluate_js wrappers, all guarded so a display hiccup never
-    # takes down setup or the running server -----------------------------
-    def _js(self, code: str) -> None:
-        if self._window is None:
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *a):  # keep the log panel clean
+                pass
+
+            def _authed(self) -> bool:
+                from urllib.parse import parse_qs, urlparse
+
+                q = parse_qs(urlparse(self.path).query)
+                return secrets.compare_digest((q.get("t") or [""])[0], app.token)
+
+            def _send(self, code: int, body: bytes, ctype: str) -> None:
+                self.send_response(code)
+                self.send_header("Content-Type", ctype)
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+
+            def _json(self, obj, code: int = 200) -> None:
+                self._send(code, json.dumps(obj).encode("utf-8"), "application/json")
+
+            def do_GET(self):
+                from urllib.parse import parse_qs, urlparse
+
+                u = urlparse(self.path)
+                if not self._authed():
+                    return self._send(403, b"Forbidden", "text/plain")
+                if u.path == "/":
+                    return self._send(200, _HTML.encode("utf-8"), "text/html; charset=utf-8")
+                if u.path == "/api/state":
+                    app.state.set(last_seen=time.monotonic(), closed_at=None)
+                    since = int((parse_qs(u.query).get("since") or ["0"])[0] or 0)
+                    return self._json(app.state.to_json(since))
+                return self._send(404, b"Not found", "text/plain")
+
+            def do_POST(self):
+                from urllib.parse import urlparse
+
+                if not self._authed():
+                    return self._send(403, b"Forbidden", "text/plain")
+                length = int(self.headers.get("Content-Length") or 0)
+                try:
+                    body = json.loads(self.rfile.read(length) or b"{}") if length else {}
+                except ValueError:
+                    body = {}
+                route = urlparse(self.path).path
+                try:
+                    return self._json(app.handle_post(route, body))
+                except Exception as exc:  # never let a UI action crash the launcher
+                    traceback.print_exc()
+                    return self._json({"ok": False, "error": appenv.friendly_error(exc)}, 500)
+
+        return Handler
+
+    def handle_post(self, route: str, body: dict) -> dict:
+        if route == "/api/activate":
+            return self._activate(body.get("key", ""), body.get("email", ""))
+        if route == "/api/continue_free":
+            self._use_free_plan()
+            return {"ok": True}
+        if route == "/api/retry":
+            self._retry(reset_models=bool(body.get("reset_models")))
+            return {"ok": True}
+        if route == "/api/open":
+            self._open(body.get("what", ""))
+            return {"ok": True}
+        if route == "/api/diagnostics":
+            return {"ok": True, "text": diagnostics_text()}
+        if route == "/api/closed":
+            self.state.set(closed_at=time.monotonic())
+            return {"ok": True}
+        if route == "/api/quit":
+            threading.Timer(0.3, self.shutdown).start()
+            return {"ok": True}
+        return {"ok": False, "error": "unknown action"}
+
+    # --------------------------------------------------------------- actions
+    def _activate(self, key: str, email: str) -> dict:
+        if not key or not email:
+            return {"ok": False, "error": "Enter both the license key and the email."}
+        from activate import activate as do_activate
+
+        mark = appenv.LOG.seq
+        ok = do_activate(key, self.license_server_url, email)
+        if not ok:
+            _, lines = appenv.LOG.snapshot(mark)
+            detail = "\n".join(l for l in lines if "ctivat" in l or "->" in l) or "Activation failed. Check the key and email."
+            return {"ok": False, "error": detail}
+        self.state.set(license_problem="")
+        self._license_decision.set()
+        return {"ok": True}
+
+    def _use_free_plan(self) -> None:
+        from licensing import DEFAULT_CACHE_PATH
+
+        if DEFAULT_CACHE_PATH.exists():
+            # An expired/invalid token would make check_license() refuse to
+            # start at all; park it so the built-in Free fallback applies.
+            try:
+                DEFAULT_CACHE_PATH.replace(DEFAULT_CACHE_PATH.with_suffix(".token.inactive"))
+            except OSError:
+                pass
+        self.state.set(license_problem="")
+        self._license_decision.set()
+
+    def _retry(self, reset_models: bool = False) -> None:
+        if self._server_started:
+            # uvicorn can't be restarted in-process cleanly; relaunch ourselves.
+            self._relaunch()
             return
+        if self._pipeline_thread and self._pipeline_thread.is_alive():
+            return
+        if reset_models:
+            model_setup.reset_models()
+        self.state.set(phase="preflight", error="", progress=None)
+        self._start_pipeline()
+
+    def _relaunch(self) -> None:
+        args = [sys.executable] + ([] if appenv.IS_FROZEN else [str(Path(__file__).resolve().parent / "launcher.py")])
+        subprocess.Popen(args + ["--after-restart"], close_fds=True)
+        threading.Timer(0.5, self.shutdown).start()
+
+    def _open(self, what: str) -> None:
+        if what == "presenter" and self.state.presenter_url:
+            webbrowser.open(self.state.presenter_url)
+        elif what in ("logs", "data"):
+            folder = appenv.LOGS_DIR if what == "logs" else appenv.DATA_DIR
+            if sys.platform == "win32":
+                os.startfile(str(folder))  # type: ignore[attr-defined]
+            else:
+                webbrowser.open(folder.as_uri())
+
+    # -------------------------------------------------------------- pipeline
+    def _on_log_line(self, line: str) -> None:
+        if "Presenter mic page:" in line:
+            url = line.split("Presenter mic page:", 1)[1].strip().split()[0]
+            self.state.set(presenter_url=url)
+            try:
+                from urllib.parse import urlparse
+
+                self.state.set(server_port=urlparse(url).port)
+            except Exception:
+                pass
+        elif line.startswith("Join URL:"):
+            self.state.set(join_url=line.split(":", 1)[1].strip())
+
+    def _progress(self, p: model_setup.Progress) -> None:
+        self.state.set(progress={
+            "stage": p.stage, "label": p.label, "done_bytes": p.done_bytes, "total_bytes": p.total_bytes,
+            "pct": p.pct, "speed_bps": p.speed_bps, "eta_s": p.eta_s, "note": p.note,
+        })
+
+    def _start_pipeline(self) -> None:
+        self._pipeline_thread = threading.Thread(target=self._pipeline, name="dwani-setup", daemon=True)
+        self._pipeline_thread.start()
+
+    def _fail(self, exc: BaseException) -> None:
+        print("".join(traceback.format_exception(type(exc), exc, exc.__traceback__)), file=sys.stderr)
+        self.state.set(phase="error", error=appenv.friendly_error(exc))
+
+    def _pipeline(self) -> None:
         try:
-            self._window.evaluate_js(code)
+            self.state.set(phase="preflight")
+            self.state.set(warnings=appenv.preflight())
+
+            if not model_setup.all_installed():
+                self.state.set(phase="download")
+            model_setup.ensure_models(self._progress, cancel=lambda: self._cancel)
+
+            self._license_step()
+
+            self.state.set(phase="starting", status="Setting up local network access…")
+            self.setup_firewall_if_needed()
+
+            self.state.set(status="Loading speech + translation models…")
+            self._run_server_blocking()
+        except BaseException as exc:  # incl. SystemExit from server.main() -- the old GUI missed these and hung forever
+            if isinstance(exc, SystemExit) and exc.code in (0, None) and self._quit.is_set():
+                return
+            if isinstance(exc, SystemExit):
+                exc = RuntimeError(str(exc.code) if exc.code not in (None, 1) else _last_meaningful_log_line())
+            self._fail(exc)
+
+    def _license_step(self) -> None:
+        from licensing import DEFAULT_CACHE_PATH, LicenseError, check_license
+
+        import server
+
+        while True:
+            problem = ""
+            if DEFAULT_CACHE_PATH.exists():
+                try:
+                    lic = check_license(server._license_public_key())
+                    self.state.set(tier=str(getattr(lic, "tier", "") or "").title())
+                    return
+                except LicenseError as exc:
+                    problem = f"Your saved license can't be used: {exc}"
+            elif self._license_decision.is_set():
+                self.state.set(tier="Free")
+                return
+            self._license_decision.clear()
+            self.state.set(phase="activate", license_problem=problem)
+            self._license_decision.wait()
+            if not DEFAULT_CACHE_PATH.exists():
+                self.state.set(tier="Free")
+                return
+
+    def _run_server_blocking(self) -> None:
+        import server
+
+        os.environ.setdefault("HF_HUB_OFFLINE", "1")  # models are local; never phone home mid-session
+        args = [
+            "--port", str(self.preferred_port),
+            "--whisper-model", str(model_setup.WHISPER_DIR),
+            "--nllb-model-dir", str(model_setup.NLLB_DIR),
+            "--no-hotspot",
+            *server.licensed_launcher_flags(),
+            *self.extra_server_args,
+        ]
+        threading.Thread(target=self._wait_until_serving, daemon=True).start()
+        self._server_started = True
+        server.main(args)  # blocks for the life of the session
+        if not self._quit.is_set():
+            raise RuntimeError("The DwaniLive server stopped unexpectedly. " + _last_meaningful_log_line())
+
+    def _wait_until_serving(self) -> None:
+        deadline = time.monotonic() + 600
+        while time.monotonic() < deadline and self.state.phase == "starting":
+            url = self.state.presenter_url
+            if url:
+                try:
+                    local = url.replace("localhost", "127.0.0.1", 1)
+                    with urllib.request.urlopen(local, timeout=3) as r:
+                        if r.status == 200:
+                            self.state.set(phase="ready", auto_open=True)
+                            return
+                except Exception:
+                    pass
+            time.sleep(0.5)
+
+    # ---------------------------------------------------------------- window
+    def open_window(self) -> None:
+        open_app_window(self.ui_url)
+
+    def _watchdog(self) -> None:
+        while not self._quit.is_set():
+            time.sleep(1)
+            st = self.state
+            now = time.monotonic()
+            if st.closed_at is not None and now - st.closed_at > CLOSE_GRACE_S:
+                print("Control window closed -- shutting down.")
+                self.shutdown()
+            elif now - st.last_seen > HEARTBEAT_TIMEOUT_S:
+                print("Control window not responding -- shutting down.")
+                self.shutdown()
+
+    def shutdown(self) -> None:
+        if self._quit.is_set():
+            return
+        self._quit.set()
+        self._cancel = True
+        try:
+            import server
+
+            s = getattr(server, "session", None)
+            if s is not None:
+                s.stop_hotspot()
         except Exception:
             pass
-
-    @staticmethod
-    def _js_str(s: str) -> str:
-        return (
-            s.replace("\\", "\\\\").replace("`", "\\`").replace("</script>", "<\\/script>")
-        )
-
-    def _show_view(self, name: str) -> None:
-        self._js(f"showView('{name}')")
-
-    def _set_progress(self, pct: int, mb_done: float, mb_total: float) -> None:
-        self._js(f"setProgress({pct}, {mb_done}, {mb_total})")
-
-    def _set_status(self, text: str) -> None:
-        self._js(f"setStartingStatus(`{self._js_str(text)}`)")
-
-    def _append_log(self, line: str) -> None:
-        target = "ready-log" if self._ready_shown else "starting-log"
-        self._js(f"appendLog('{target}', `{self._js_str(line)}`)")
-
-    def _show_ready(self, presenter_url: str) -> None:
-        self._ready_shown = True
-        self._js(f"showReady(`{self._js_str(presenter_url)}`)")
-
-    def _show_error(self, message: str) -> None:
-        self._js(f"showError(`{self._js_str(message)}`)")
-
-    # -- the actual pipeline ------------------------------------------------
-    def _on_log_line(self, line: str) -> None:
-        self._append_log(line)
-        if not self._ready_shown:
-            match = _PRESENTER_URL_RE.search(line)
-            if match:
-                self._show_ready(match.group(1))
-
-    def _run_pipeline(self, window: webview.Window) -> None:
-        self._window = window
-        # webview.start()'s func runs as soon as the GUI loop starts, which
-        # can be before the page has actually finished loading -- without
-        # this wait, a fast path (models already cached, license already
-        # activated) could call evaluate_js() before there's any JS to
-        # evaluate against. Bounded timeout so a slow/failed page load
-        # degrades to "keep going anyway" rather than hanging setup forever.
-        window.events.loaded.wait(10)
-
-        tee_out = _TeeStdout(sys.stdout, self._on_log_line)
-        tee_err = _TeeStdout(sys.stderr, self._on_log_line)
-        sys.stdout, sys.stderr = tee_out, tee_err
-
         try:
-            from licensing import DEFAULT_CACHE_PATH
+            appenv.INSTANCE_FILE.unlink(missing_ok=True)
+        except OSError:
+            pass
+        if self._httpd:
+            threading.Thread(target=self._httpd.shutdown, daemon=True).start()
+        # uvicorn runs in our pipeline thread and owns no signal handlers
+        # there; a hard exit is the reliable way to end the process.
+        threading.Timer(1.0, lambda: os._exit(0)).start()
 
-            self._show_view("download")
-            self._setup_models_if_needed(
-                progress_cb=lambda pct, mb_done, mb_total: self._set_progress(pct, mb_done, mb_total),
-                interactive_on_error=False,
-            )
-
-            if DEFAULT_CACHE_PATH.exists():
-                self._start_server_phase()
-            else:
-                self._show_view("activate")
-                # Api.activate() takes it from here once the presenter submits
-                # the form -- see Api.activate() above.
-        except Exception as exc:
-            traceback.print_exc()
-            self._show_error(str(exc))
-
-    def _start_server_phase(self) -> None:
+    def run(self, open_window: bool = True) -> None:
+        self._httpd = ThreadingHTTPServer(("127.0.0.1", 0), self._make_handler())
+        port = self._httpd.server_address[1]
+        self.ui_url = f"http://127.0.0.1:{port}/?t={self.token}"
         try:
-            self._show_view("starting")
-            self._set_status("Setting up local network access…")
-            self._setup_firewall_if_needed()
+            appenv.INSTANCE_FILE.write_text(self.ui_url, encoding="utf-8")
+        except OSError:
+            pass
+        print(f"Launcher UI: http://127.0.0.1:{port}/")
+        self._start_pipeline()
+        threading.Thread(target=self._watchdog, daemon=True).start()
+        if open_window:
+            self.open_window()
+        self._httpd.serve_forever()
 
-            self._set_status(
-                "Loading translation models and starting the server (this can take a "
-                "minute the first time a model loads)…"
+
+# ---------------------------------------------------------------------------
+# Window helpers
+# ---------------------------------------------------------------------------
+
+def _find_browser_for_app_mode() -> Optional[str]:
+    if sys.platform != "win32":
+        for name in ("microsoft-edge", "google-chrome", "chromium", "chromium-browser"):
+            p = shutil.which(name)
+            if p:
+                return p
+        return None
+    roots = [os.environ.get(k) for k in ("ProgramFiles(x86)", "ProgramFiles", "LOCALAPPDATA")]
+    rels = [r"Microsoft\Edge\Application\msedge.exe", r"Google\Chrome\Application\chrome.exe"]
+    for rel in rels:
+        for root in roots:
+            if root and Path(root, rel).is_file():
+                return str(Path(root, rel))
+    try:
+        import winreg
+
+        for exe in ("msedge.exe", "chrome.exe"):
+            for hive in (winreg.HKEY_LOCAL_MACHINE, winreg.HKEY_CURRENT_USER):
+                try:
+                    with winreg.OpenKey(hive, rf"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{exe}") as k:
+                        val, _ = winreg.QueryValueEx(k, None)
+                        if val and Path(val).is_file():
+                            return val
+                except OSError:
+                    continue
+    except ImportError:
+        pass
+    return None
+
+
+def open_app_window(url: str) -> None:
+    browser = _find_browser_for_app_mode()
+    if browser:
+        try:
+            subprocess.Popen(
+                [browser, f"--app={url}", "--window-size=500,780", "--no-first-run", "--no-default-browser-check"],
+                close_fds=True,
             )
-
-            import server  # deliberately imported here, same reasoning as launcher.py's console path
-
-            # Blocking call (uvicorn.run) -- this method already runs on a
-            # background thread (see Api.activate() / _run_pipeline()), so
-            # blocking here is fine; it's what keeps the server alive.
-            server.main([
-                "--port", str(self.server_port),
-                "--whisper-model", self.whisper_model_size,
-                "--nllb-model-dir", str(self.nllb_model_dir),
-                *server.licensed_launcher_flags(),
-            ])
-        except Exception as exc:
-            traceback.print_exc()
-            self._show_error(str(exc))
+            return
+        except OSError:
+            pass
+    webbrowser.open(url)
 
 
-def run(
-    *,
-    setup_models_if_needed: Callable[..., None],
-    setup_firewall_if_needed: Callable[[], None],
-    app_dir: Path,
-    nllb_model_dir: Path,
-    whisper_model_size: str,
-    server_port: int,
-    license_server_url: str,
-) -> None:
-    """Entry point called from launcher.py's main(). Blocks until the
-    window is closed (webview.start() blocks the calling thread, same as
-    uvicorn.run() did in the console path)."""
-    gui = LauncherGUI(
-        setup_models_if_needed=setup_models_if_needed,
-        setup_firewall_if_needed=setup_firewall_if_needed,
-        app_dir=app_dir,
-        nllb_model_dir=nllb_model_dir,
-        whisper_model_size=whisper_model_size,
-        server_port=server_port,
-        license_server_url=license_server_url,
+def _last_meaningful_log_line() -> str:
+    _, lines = appenv.LOG.snapshot(10_000)
+    for line in reversed(lines):
+        s = line.strip()
+        if s and not s.startswith(("INFO", "Traceback", "File ", "^")):
+            return s
+    return "See the log for details."
+
+
+def diagnostics_text() -> str:
+    info = appenv.system_summary()
+    info["models"] = {
+        "whisper_installed": model_setup.whisper_installed(),
+        "nllb_installed": model_setup.nllb_installed(),
+        "models_dir": str(appenv.MODELS_DIR),
+    }
+    try:
+        from licensing import DEFAULT_CACHE_PATH
+
+        info["license_token_present"] = DEFAULT_CACHE_PATH.exists()
+    except Exception:
+        pass
+    _, lines = appenv.LOG.snapshot(10_000)
+    return (
+        "DwaniLive error report\n"
+        + json.dumps(info, indent=2)
+        + "\n\n--- last log lines ---\n"
+        + "\n".join(lines[-150:])
     )
-    window = webview.create_window(
-        "DwaniLive",
-        html=_HTML,
-        js_api=Api(gui),
-        width=460,
-        height=680,
-        min_size=(400, 560),
-        background_color="#fdf6e7",
-        confirm_close=True,
-    )
-    webview.start(gui._run_pipeline, window)
