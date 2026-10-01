@@ -303,6 +303,10 @@ async def qa_socket(websocket: WebSocket, lang: str, session_param: str):
         await websocket.close(code=4000, reason="unknown session")
         return
 
+    if getattr(qa_pipeline_instance, "_asr", None) is None:
+        await websocket.close(code=4004, reason="Spoken questions are off (start with --qa-mic); use the typed Ask panel")
+        return
+
     await websocket.accept()
     segmenter = AudioSegmenter()  # fresh per raised-hand connection, same reasoning as /host-ws
     try:
@@ -507,8 +511,37 @@ async def _start_dynamic_glossary_updater():
         asyncio.create_task(dynamic_glossary_updater.run())
 
 
-static_dir = Path(__file__).parent / "static"
-static_dir.mkdir(exist_ok=True)
+def _resolve_static_dir() -> Path:
+    """Where static/ actually lives. Path(__file__).parent alone is wrong for
+    a PyInstaller onefile build (files are unpacked to sys._MEIPASS) and the
+    old `.mkdir(exist_ok=True)` then silently created an EMPTY folder, so the
+    app "started" but every page was a 404. Fail loudly instead."""
+    candidates = []
+    meipass = getattr(sys, "_MEIPASS", None)
+    if meipass:
+        candidates.append(Path(meipass) / "static")
+    candidates.append(Path(__file__).resolve().parent / "static")
+    if getattr(sys, "frozen", False) or "__compiled__" in globals():
+        candidates.append(Path(sys.executable).resolve().parent / "static")
+    for c in candidates:
+        if (c / "index.html").is_file():
+            return c
+    raise RuntimeError(f"static/ folder with index.html not found (looked in: {', '.join(map(str, candidates))})")
+
+
+def _resolve_sentencepiece(nllb_model_dir: str) -> str:
+    """NLLB's sentencepiece.bpe.model used to be opened by a bare relative
+    path, i.e. relative to whatever folder Windows started the exe in --
+    fine from a terminal in the project folder, broken from a Start-menu
+    shortcut or a different drive. Look next to / inside the model dir."""
+    d = Path(nllb_model_dir).expanduser().resolve()
+    for c in (d.parent / "sentencepiece.bpe.model", d / "sentencepiece.bpe.model", Path("sentencepiece.bpe.model")):
+        if c.is_file():
+            return str(c)
+    return "sentencepiece.bpe.model"
+
+
+static_dir = _resolve_static_dir()
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 
@@ -580,6 +613,12 @@ def main(argv=None):
         "browsers only allow microphone access on a secure context (https://, or http://localhost), "
         "and a plain http://<lan-ip> join URL doesn't qualify. Not needed if every device using the mic "
         "features is on http://localhost (e.g. testing on the presenter's own machine).",
+    )
+    parser.add_argument(
+        "--qa-mic",
+        action="store_true",
+        help="With --qa, also load a second Whisper model so attendees can ASK BY VOICE over /qa-ws. "
+        "Off by default: typed questions (POST /qa/ask) need no ASR, and the extra model costs ~500MB RAM.",
     )
     parser.add_argument(
         "--session-id",
@@ -961,9 +1000,10 @@ def main(argv=None):
             if args.whisper_model
             else FakeASRBackend(default_transcript="[no --whisper-model given]")
         )
-        translator = (
+        translator = base_nllb = (
             RealNLLBBackend(
                 model_dir=args.nllb_model_dir,
+                sentencepiece_model_path=_resolve_sentencepiece(args.nllb_model_dir),
                 source_lang=args.presenter_language,
                 beam_size=args.nllb_beam_size,
                 inter_threads=args.nllb_inter_threads,
@@ -1037,15 +1077,27 @@ def main(argv=None):
         # a question could be asked in any language an attendee has selected,
         # so this one auto-detects per question instead (language=None). See
         # qa_pipeline.py's module docstring for the full reasoning.
-        if args.whisper_model:
+        #
+        # Only loaded with --qa-mic: attendees ask by typing (POST /qa/ask),
+        # which needs no ASR at all, and a second Whisper copy costs ~500MB
+        # RAM on the presenter's laptop for a path index.html no longer uses.
+        if args.qa_mic and args.whisper_model:
             from backends import RealWhisperBackend
 
             qa_asr = RealWhisperBackend(model_size=args.whisper_model, language=None, cpu_threads=args.asr_cpu_threads)
-        else:
+        elif args.qa_mic:
             qa_asr = FakeASRBackend(default_transcript="[no --whisper-model given]")
+        else:
+            qa_asr = None
 
+        _shared = locals().get("base_nllb")
         qa_translator = (
-            BidirectionalTranslationBackend(nllb_model_dir=args.nllb_model_dir)
+            BidirectionalTranslationBackend(
+                nllb_model_dir=args.nllb_model_dir,
+                sentencepiece_model_path=_resolve_sentencepiece(args.nllb_model_dir),
+                shared_translator=getattr(_shared, "_translator", None),
+                shared_tokenizer=getattr(_shared, "_tokenizer", None),
+            )
             if args.nllb_model_dir
             else FakeBidirectionalTranslationBackend()
         )
