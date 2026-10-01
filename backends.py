@@ -89,6 +89,44 @@ from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 
+
+def ensure_av_importable() -> None:
+    """faster_whisper imports PyAV (`av`, ~25 bundled FFmpeg DLLs) at module
+    import time, but only uses it in decode_audio() -- turning an audio FILE
+    into samples. DwaniLive always hands Whisper numpy arrays, so PyAV is
+    dead weight here, and it's actively harmful on Windows 11 machines with
+    Smart App Control: its unsigned DLLs get blocked ("An Application Control
+    policy has blocked this file") and faster_whisper fails to import at all.
+
+    The desktop build excludes `av` entirely; this installs a stand-in module
+    when the real one is missing or blocked, so faster_whisper imports fine
+    and decode_audio() raises a clear error if anything ever calls it."""
+    import sys
+    import types
+
+    if "av" in sys.modules and not getattr(sys.modules["av"], "_dwani_stub", False) and sys.modules["av"] is not None:
+        return
+    try:
+        import av  # noqa: F401  -- real PyAV present and loadable (dev machines)
+        return
+    except Exception:
+        pass
+    for name in [m for m in list(sys.modules) if m == "av" or m.startswith("av.")]:
+        del sys.modules[name]
+
+    class _Missing(types.ModuleType):
+        _dwani_stub = True
+
+        def __getattr__(self, name):
+            if name.startswith("__"):
+                raise AttributeError(name)
+            raise RuntimeError(
+                "PyAV is not available in this build: decoding audio files isn't supported. "
+                "Pass 16kHz float32 numpy arrays to the ASR backend instead."
+            )
+
+    sys.modules["av"] = _Missing("av")
+
 if TYPE_CHECKING:
     from pipeline import AudioSegment
 
@@ -227,6 +265,7 @@ class RealWhisperBackend:
         each assume they own the whole machine; profile on your actual
         presenter hardware before changing it.
         """
+        ensure_av_importable()
         from faster_whisper import WhisperModel  # deferred: heavy, optional dep
 
         self._model = WhisperModel(model_size, device=device, compute_type=compute_type, cpu_threads=cpu_threads)

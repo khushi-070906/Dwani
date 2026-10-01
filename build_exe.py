@@ -54,7 +54,10 @@ LOCAL_MODULES = [
     "decision_engine", "dynamic_glossary", "persistent_memory",
 ]
 # Pulled in by optional code paths only; keep them out of the desktop build.
-EXCLUDE = ["torch", "transformers", "sentence_transformers", "tensorflow", "matplotlib",
+# av (PyAV/FFmpeg, ~25 unsigned DLLs) and onnxruntime are only used for decoding
+# audio FILES and the optional Silero VAD -- never by DwaniLive -- and their
+# unsigned DLLs are what Windows Smart App Control blocks. See backends.ensure_av_importable.
+EXCLUDE = ["av", "onnxruntime", "torch", "transformers", "sentence_transformers", "tensorflow", "matplotlib",
            "webview", "clr_loader", "pythonnet", "IPython", "pytest", "tkinter"]
 
 

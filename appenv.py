@@ -41,7 +41,7 @@ from pathlib import Path
 from typing import Callable, Optional
 
 APP_NAME = "DwaniLive"
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.1.1"
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -377,6 +377,13 @@ def friendly_error(exc: BaseException) -> str:
     low = text.lower()
     if isinstance(exc, MemoryError) or "bad allocation" in low or "out of memory" in low:
         return "Ran out of memory loading the translation models. Close other apps (especially browsers) and try again."
+    if "application control policy" in low or "blocked by your organization" in low:
+        return (
+            "Windows Smart App Control (or a company policy) blocked one of DwaniLive's files. "
+            "Update to the latest DwaniLive. If it still happens: Windows Security -> App & browser "
+            "control -> Smart App Control settings. Note that turning it Off can't be undone "
+            "without resetting Windows, so on a managed/college PC ask your IT admin instead."
+        )
     if "dll load failed" in low or "specified module could not be found" in low:
         return (
             "A system library failed to load. Install the Microsoft Visual C++ Redistributable "

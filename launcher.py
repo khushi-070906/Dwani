@@ -254,7 +254,7 @@ def run_console() -> None:
 SELF_TEST_IMPORTS = [
     "numpy", "fastapi", "starlette", "uvicorn", "websockets", "pydantic", "dotenv",
     "qrcode", "PIL", "cryptography", "sentencepiece", "ctranslate2", "faster_whisper",
-    "av", "tokenizers", "onnxruntime", "certifi",
+    "tokenizers", "certifi",
     "licensing", "activate", "session", "pipeline", "backends", "qa_pipeline",
     "nllb_tokenizer", "accessibility", "glossary", "translation_cache", "server",
     "gui", "model_setup",
@@ -265,6 +265,12 @@ def self_test() -> int:
     import importlib
 
     results = {"system": appenv.system_summary(), "imports": {}, "checks": {}}
+    try:
+        from backends import ensure_av_importable
+
+        ensure_av_importable()  # PyAV is deliberately not shipped -- see backends.py
+    except Exception:
+        pass
     ok = True
     for mod in SELF_TEST_IMPORTS:
         try:
@@ -295,6 +301,9 @@ def self_test() -> int:
         if not ctranslate2.get_supported_compute_types("cpu"):
             raise RuntimeError("ctranslate2 reports no CPU compute types")
 
+    def _whisper_class():
+        from faster_whisper import WhisperModel  # noqa: F401  -- must import WITHOUT PyAV
+
     def _fw_assets():
         import faster_whisper
 
@@ -304,6 +313,7 @@ def self_test() -> int:
 
     check("static_files", _static)
     check("ctranslate2_native", _ct2)
+    check("faster_whisper_without_pyav", _whisper_class)
     check("faster_whisper_assets", _fw_assets)
     check("data_dir_writable", appenv.preflight)
     results["ok"] = ok
