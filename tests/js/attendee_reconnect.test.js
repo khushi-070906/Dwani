@@ -98,7 +98,24 @@ const ok = (cond, msg) => { console.log((cond ? "PASS " : "FAIL ") + msg); if (!
   ok(!$(w, "live-screen").hidden && sockets.length === 1, "reload rejoins automatically (no language picker)");
   ok($(w, "caption-stage").textContent.includes("After the switch"), "previous captions restored after reload");
 
-  // 7. change language forgets the auto-rejoin
+  // 7. server says "session full" (4003) / "unknown session" (4000): explain, don't hammer the laptop
+  {
+    const n0 = sockets.length;
+    const cur = sockets[sockets.length - 1];
+    cur._drop(4003);
+    clock.tick(30000);
+    ok(sockets.length === n0 && /Session full/.test(status(w)), "4003 session full: message shown, no retry loop");
+  }
+  w = boot(seed);
+  {
+    const n0 = sockets.length;
+    sockets[sockets.length - 1]._drop(4000);
+    clock.tick(30000);
+    ok(sockets.length === n0 && /Session not found/.test(status(w)), "4000 unknown session: asks to re-scan, no retry loop");
+  }
+  w = boot(seed);
+
+  // 8. change language forgets the auto-rejoin
   $(w, "change-lang-btn").click();
   ok(w.localStorage.getItem("dwani:last") === null && !$(w, "join-screen").hidden, "Change language returns to picker and forgets auto-rejoin");
   sockets[0]._drop();
