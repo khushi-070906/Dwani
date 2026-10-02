@@ -404,6 +404,7 @@
     flex-shrink: 0;
   }
   .reconnect-banner.visible { display: flex; }
+  .reconnect-banner .banner-help { color: inherit; font-size: 0.85em; font-weight: 700; }
   .reconnect-banner button {
     background: transparent;
     border: 1px solid var(--error);
@@ -648,6 +649,7 @@
     <div class="a11y-row a11y-actions">
       <button type="button" class="a11y-action" id="focus-btn">⛶ Full screen / projector</button>
       <button type="button" class="a11y-action secondary" id="a11y-reset">Reset</button>
+      <a class="a11y-action secondary" href="/help#attendee-display" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center">Help</a>
     </div>
   </div>
 
@@ -662,6 +664,7 @@
   <div class="reconnect-banner" id="reconnect-banner">
     <span>Connection to the presenter's device dropped.</span>
     <button id="reconnect-btn" type="button">Retry now</button>
+    <a class="banner-help" href="/help#attendee-reconnect" target="_blank" rel="noopener">Trouble connecting?</a>
   </div>
 </section>
 
