@@ -422,6 +422,26 @@ async def presenter_info():
     return info
 
 
+@app.get("/dashboard-stats")
+async def dashboard_stats(request: Request, key: str = ""):
+    """Live numbers for the presenter dashboard: attendees per language and
+    caption delay (see pipeline.LatencyStats). Local / presenter-key only."""
+    import phone_mic
+
+    client_host = request.client.host if request.client else None
+    if not phone_mic.is_loopback(client_host) and key != phone_mic.PRESENTER_KEY:
+        return Response(status_code=404)
+    by_language = {lang: len(socks) for lang, socks in subscribers.items() if socks}
+    stats = getattr(pipeline, "latency", None)
+    return {
+        "attendees": sum(by_language.values()),
+        "by_language": dict(sorted(by_language.items(), key=lambda kv: (-kv[1], kv[0]))),
+        "max_attendees": getattr(active_license, "max_attendees", None),
+        "presenting": host_connected,
+        "latency": stats.summary() if stats else {"count": 0, "captions_sent": 0},
+    }
+
+
 @app.get("/preflight")
 async def preflight_checks(request: Request, key: str = ""):
     """Readiness checks for the presenter page (see preflight.py). Contains
