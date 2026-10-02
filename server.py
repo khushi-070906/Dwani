@@ -624,6 +624,12 @@ async def index():
     return FileResponse(static_dir / "index.html")
 
 
+@app.get("/help")
+async def help_page():
+    """Offline troubleshooting guide (static/help.html), for presenters and attendees."""
+    return FileResponse(static_dir / "help.html")
+
+
 @app.get("/host")
 async def host_page():
     """The presenter opens this page (with ?session=<id>, same as attendees)
