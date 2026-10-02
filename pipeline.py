@@ -521,7 +521,9 @@ class Pipeline:
 
     async def _process_segment(self, segment: AudioSegment, is_final: bool = True) -> str:
         t0 = time.monotonic()
+        t0_wall = time.time()
         transcript = await self.asr.transcribe(segment)
+        translations: dict[str, str] = {}
         asr_ms = (time.monotonic() - t0) * 1000
         mt_times: list[float] = []
 
@@ -546,6 +548,7 @@ class Pipeline:
                 record = getattr(self.cache, "record_miss_translate_seconds", None)
                 if record is not None:
                     record(elapsed)
+            translations[lang] = translated
             await self.broadcast(lang, translated, is_final)
 
         # Fan out across subscribed languages CONCURRENTLY instead of one at
@@ -586,6 +589,14 @@ class Pipeline:
                     stats = self.latency = LatencyStats()
                 stats.record(asr_ms, max(mt_times, default=0.0), (time.monotonic() - t0) * 1000,
                              segment.duration_seconds, len(languages))
+
+        hook = getattr(self, "on_final", None)  # session notes (notes.py); set by server.main
+        if is_final and hook is not None and transcript.strip():
+            try:
+                speech_s = len(segment.samples) / max(1, segment.sample_rate)
+                hook(transcript, dict(translations), t0_wall + (time.monotonic() - t0), speech_s)
+            except Exception as exc:  # notes must never break live captions
+                print(f"[pipeline] notes hook failed: {exc}")
 
         return transcript
 
