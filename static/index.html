@@ -580,6 +580,7 @@
       <span class="lang-chip" id="live-lang-chip"></span>
       <button class="header-btn" id="ask-btn" type="button">💬 Ask</button>
       <button class="header-btn" id="a11y-btn" type="button">⚙ Accessibility</button>
+      <button class="header-btn" id="save-btn" type="button" title="Download everything shown so far as a text file">💾 Save</button>
       <button class="change-lang-btn" id="change-lang-btn" type="button">Change language</button>
     </div>
   </header>
@@ -669,6 +670,21 @@
   var currentLang = null;
   var lines = []; // committed caption lines, newest last
   var interimLine = "";
+  var captionLog = []; // every final caption this phone has shown: {t, text}
+  var lastMsgAt = 0, heartbeatTimer = null, countdownTimer = null, disconnectedAt = null, liveNoteTimer = null;
+  var HEARTBEAT_MS = 10000, STALE_MS = 25000, HISTORY_CAP = 2000;
+
+  // -- remember session + language + transcript across reloads -----------------
+  // localStorage can throw (private mode, quota): every use is guarded.
+  function store(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
+  function load(key) { try { return JSON.parse(localStorage.getItem(key) || "null"); } catch (e) { return null; } }
+  function forget(key) { try { localStorage.removeItem(key); } catch (e) {} }
+  function historyKey() { return "dwani:h:" + sessionId + ":" + currentLang; }
+  var saveTimer = null;
+  function persistHistory() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () { store(historyKey(), captionLog.slice(-HISTORY_CAP)); }, 800);
+  }
 
   // -- render language picker --------------------------------------------
 
@@ -702,6 +718,12 @@
     }
     sessionBadgeText.textContent = "SESSION " + sessionId.toUpperCase();
     buildLangGrid();
+    // Reloaded the page, or reopened it after the phone killed the tab?
+    // Go straight back into the same session and language.
+    var last = load("dwani:last");
+    if (last && last.session === sessionId && last.lang && Date.now() - last.at < 12 * 3600 * 1000) {
+      joinWithLanguage(last.lang);
+    }
   }
 
   customBtn.addEventListener("click", function () {
@@ -719,6 +741,14 @@
     liveScreen.hidden = false;
     liveLangChip.textContent = displayNameFor(langCode);
     resetCaptionState();
+    store("dwani:last", { session: sessionId, lang: langCode, at: Date.now() });
+    captionLog = load(historyKey()) || [];
+    if (captionLog.length) {  // show what was on screen before the reload
+      lines = captionLog.slice(-effectiveMaxLines()).map(function (h) { return h.text; });
+      waitingState.hidden = true;
+      captionStage.hidden = false;
+      renderCaptionStage();
+    }
     connect();
   }
 
@@ -729,6 +759,9 @@
 
   changeLangBtn.addEventListener("click", function () {
     manuallyDisconnected = true;
+    forget("dwani:last");
+    stopHeartbeat();
+    clearInterval(countdownTimer);
     if (socket) socket.close();
     clearTimeout(reconnectTimer);
     liveScreen.hidden = true;
@@ -748,25 +781,44 @@
     setStatus("connecting", "Connecting…");
     reconnectBanner.classList.remove("visible");
 
-    socket = new WebSocket(wsUrl());
+    clearInterval(countdownTimer);
+    var ws = new WebSocket(wsUrl());
+    socket = ws;
 
-    socket.addEventListener("open", function () {
+    ws.addEventListener("open", function () {
+      if (ws !== socket) return;
       reconnectAttempt = 0;
-      setStatus("live", "Live");
+      lastMsgAt = Date.now();
+      startHeartbeat();
+      var gap = disconnectedAt ? Math.round((Date.now() - disconnectedAt) / 1000) : 0;
+      disconnectedAt = null;
+      if (gap >= 3) {
+        setStatus("live", "Live · reconnected (~" + gap + "s missed)");
+        clearTimeout(liveNoteTimer);
+        liveNoteTimer = setTimeout(function () { if (ws === socket && ws.readyState === WebSocket.OPEN) setStatus("live", "Live"); }, 8000);
+      } else {
+        setStatus("live", "Live");
+      }
       sendAccessibilitySettings();
     });
 
-    socket.addEventListener("message", function (event) {
+    ws.addEventListener("message", function (event) {
+      if (ws !== socket) return;
+      lastMsgAt = Date.now();
       var payload;
       try {
         payload = JSON.parse(event.data);
       } catch (err) {
         return; // ignore malformed frames rather than crash the caption view
       }
+      if (payload && payload.type === "pong") return;
       handleCaption(payload);
     });
 
-    socket.addEventListener("close", function (event) {
+    ws.addEventListener("close", function (event) {
+      if (ws !== socket) return;  // an old socket we already replaced
+      stopHeartbeat();
+      if (!disconnectedAt) disconnectedAt = Date.now();
       if (manuallyDisconnected) return;
       if (event.code === 4000) {
         setStatus("down", "Session not found");
@@ -785,17 +837,55 @@
       scheduleReconnect();
     });
 
-    socket.addEventListener("error", function () {
+    ws.addEventListener("error", function () {
       // "close" fires right after "error" on a failed connection; no action needed here.
     });
   }
 
   function scheduleReconnect() {
-    var delay = RECONNECT_DELAYS[Math.min(reconnectAttempt, RECONNECT_DELAYS.length - 1)];
+    // Never gives up (the last delay repeats); jitter so 100 phones don't all
+    // hit the laptop in the same millisecond when the Wi-Fi comes back.
+    var base = RECONNECT_DELAYS[Math.min(reconnectAttempt, RECONNECT_DELAYS.length - 1)];
+    var delay = Math.round(base * (0.8 + Math.random() * 0.4));
     reconnectAttempt += 1;
+    var due = Date.now() + delay;
+    clearInterval(countdownTimer);
+    function tick() {
+      var secs = Math.max(0, Math.ceil((due - Date.now()) / 1000));
+      setStatus("connecting", secs ? "Reconnecting in " + secs + "s…" : "Reconnecting…");
+    }
+    tick();
+    countdownTimer = setInterval(tick, 500);
     reconnectTimer = setTimeout(function () {
+      clearInterval(countdownTimer);
       if (!manuallyDisconnected) connect();
     }, delay);
+  }
+
+  // -- heartbeat: catch connections that died without a close event -------------
+  // A phone that switches Wi-Fi networks or wanders out of range often keeps a
+  // socket that looks OPEN but delivers nothing; captions just stop. We ping
+  // every 10 s; if nothing at all has arrived for 25 s, we reconnect.
+  function startHeartbeat() {
+    stopHeartbeat();
+    heartbeatTimer = setInterval(function () {
+      if (!socket || socket.readyState !== WebSocket.OPEN) return;
+      if (Date.now() - lastMsgAt > STALE_MS) { forceReconnect(); return; }
+      try { socket.send(JSON.stringify({ type: "ping", t: Date.now() })); } catch (e) { forceReconnect(); }
+    }, HEARTBEAT_MS);
+  }
+  function stopHeartbeat() { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+
+  function forceReconnect() {
+    if (manuallyDisconnected || liveScreen.hidden) return;
+    var old = socket;
+    socket = null;               // its close event will now be ignored
+    stopHeartbeat();
+    if (!disconnectedAt) disconnectedAt = lastMsgAt || Date.now();
+    try { if (old) old.close(); } catch (e) {}
+    clearTimeout(reconnectTimer);
+    reconnectAttempt = 0;
+    connect();
   }
 
   // Phones kill background WebSockets when the screen locks or the user
@@ -803,6 +893,7 @@
   // timer (up to 8s) fired. Reconnect immediately on return / network back.
   function reconnectNowIfDropped() {
     if (manuallyDisconnected || liveScreen.hidden) return;
+    if (socket && socket.readyState === WebSocket.OPEN && Date.now() - lastMsgAt > STALE_MS) { forceReconnect(); return; }
     if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) return;
     clearTimeout(reconnectTimer);
     reconnectAttempt = 0;
@@ -812,6 +903,12 @@
     if (document.visibilityState === "visible") reconnectNowIfDropped();
   });
   window.addEventListener("online", reconnectNowIfDropped);
+  // Wi-Fi <-> mobile data / different Wi-Fi: the old socket is almost always dead.
+  if (navigator.connection && navigator.connection.addEventListener) {
+    navigator.connection.addEventListener("change", function () {
+      if (!manuallyDisconnected && !liveScreen.hidden) forceReconnect();
+    });
+  }
   window.addEventListener("pageshow", function (e) { if (e.persisted) reconnectNowIfDropped(); });
 
   reconnectBtn.addEventListener("click", function () {
@@ -855,6 +952,9 @@
 
     if (payload.final) {
       lines.push(payload.text);
+      captionLog.push({ t: Date.now(), text: payload.text });
+      if (captionLog.length > HISTORY_CAP) captionLog = captionLog.slice(-HISTORY_CAP);
+      persistHistory();
       var cap = effectiveMaxLines();
       if (lines.length > cap) {
         lines = lines.slice(lines.length - cap);
@@ -891,6 +991,21 @@
       captionStage.appendChild(el);
     });
   }
+
+  // -- save transcript ---------------------------------------------------------
+  document.getElementById("save-btn").addEventListener("click", function () {
+    if (!captionLog.length) { setStatus(statusDot.className.indexOf("live") > -1 ? "live" : "idle", "Nothing to save yet"); return; }
+    function hhmm(t) { var d = new Date(t); return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
+    var head = "DwaniLive captions\nSession " + sessionId.toUpperCase() + " · " + displayNameFor(currentLang) +
+               " · " + new Date(captionLog[0].t).toLocaleDateString() + "\n\n";
+    var body = captionLog.map(function (h) { return "[" + hhmm(h.t) + "] " + h.text; }).join("\n") + "\n";
+    var url = URL.createObjectURL(new Blob([head + body], { type: "text/plain;charset=utf-8" }));
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "dwanilive-captions-" + sessionId + "-" + currentLang + ".txt";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  });
 
   // -- accessibility mode ----------------------------------------------------
   //
