@@ -1,0 +1,42 @@
+# Runs every test on every push and pull request:
+#   - 203 Python tests (server, pipeline, launcher, licensing caps, pre-flight,
+#     help links, benchmarks, ...)
+#   - 86 browser tests: the attendee page, presenter dashboard, help page and
+#     home page simulated in jsdom (reconnects, accessibility, mic meter, nav)
+# A red X on a commit means something broke -- fix it before tagging a release.
+name: tests
+on:
+  push:
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15   # a hanging test fails the run instead of burning hours
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-desktop.txt
+      - name: Install (app runtime deps, no build tools)
+        run: |
+          grep -v -i -E "^(nuitka|pyinstaller)" requirements-desktop.txt > /tmp/req.txt
+          pip install -r /tmp/req.txt pytest httpx
+      - name: Run tests
+        run: pytest -q
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: tests/js
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install --no-audit --no-fund
+      - run: npm test
