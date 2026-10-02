@@ -635,6 +635,7 @@
               <span class="label">Get DwaniLive running (Windows 10/11, 64-bit)</span>
               <div style="display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center;">
                 <a class="dash-cta" href="${RELEASES}DwaniLive-Setup.exe">Download DwaniLive</a>
+                <span id="dash-release" style="font-size:0.85rem; color:var(--ink-faint);"></span>
                 <a href="${RELEASES}DwaniLive-win64.zip" style="font-size:0.85rem; color:var(--ink-faint);">or portable .zip</a>
               </div>
               <p style="margin:0.4rem 0 0; font-size:0.9rem;"><b>1.</b> Run <code>DwaniLive-Setup.exe</code>. If Windows shows "Windows protected your PC", click <b>More info &rarr; Run anyway</b> (normal for new apps).</p>
@@ -684,6 +685,10 @@
         <p class="sub">${data.email}</p>
         ${subscriptionHtml}
       `;
+      fetch('/api/release').then((r) => (r.ok ? r.json() : null)).then((rel) => {
+        const el = document.getElementById('dash-release');
+        if (el && rel && rel.version) el.innerHTML = 'v' + rel.version + ' · <a href="/changelog">What\'s new</a>';
+      }).catch(() => {});
       const copyBtn = document.getElementById('dash-copy-key');
       if (copyBtn) {
         copyBtn.addEventListener('click', () => {

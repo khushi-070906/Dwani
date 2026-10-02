@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What's new in DwaniLive</title>
+<meta name="description" content="Release history of the DwaniLive desktop app: new features and fixes in every version.">
+<link rel="icon" type="image/png" href="/static/favicon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
+<style>
+  :root { --bg: #fdf6e7; --raised: #fffaf0; --raised-2: #f4e9cf; --ink: #2c1810; --ink-dim: #4a3629; --ink-faint: #69543f;
+          --accent-deep: #a8460c; --accent-2: #c81e5e; --indigo: #223367; --live: #2f7a3a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 "Mukta", system-ui, sans-serif; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 1.2rem 1rem 4rem; }
+  header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .brand { font-family: "Rozha One", Georgia, serif; font-size: 2rem; text-decoration: none; line-height: 1;
+           background: linear-gradient(120deg, var(--accent-deep), var(--accent-2) 50%, var(--indigo)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .brand small { font-family: "Mukta", sans-serif; font-weight: 800; font-size: 0.36em; letter-spacing: 0.06em; color: var(--ink-dim); -webkit-text-fill-color: var(--ink-dim); }
+  nav a { color: var(--ink-dim); font-weight: 700; text-decoration: none; margin-left: 1rem; }
+  h1 { font-family: "Rozha One", Georgia, serif; font-weight: 400; font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 1.6rem 0 0.3rem; }
+  .lead { color: var(--ink-dim); margin: 0 0 1.4rem; }
+  .cta { display: inline-block; background: var(--accent-deep); color: #fffdf6; font-weight: 800; text-decoration: none; padding: 0.6rem 1.1rem; border-radius: 10px; }
+  .release { background: var(--raised); border: 1.5px solid var(--raised-2); border-radius: 16px; padding: 1rem 1.2rem; margin: 1rem 0; }
+  .release.latest { border-color: var(--accent-deep); }
+  .rel-head { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+  .rel-head h2 { margin: 0; font-size: 1.25rem; }
+  .date { color: var(--ink-faint); font-size: 0.9rem; }
+  .badge { font-size: 0.72rem; font-weight: 800; padding: 0.1rem 0.5rem; border-radius: 999px; background: #e2f3e9; color: var(--live); }
+  ul { margin: 0.5rem 0 0; padding-left: 1.2rem; }
+  li { margin: 0.2rem 0; }
+  .muted { color: var(--ink-faint); }
+  .status { color: var(--ink-faint); padding: 1rem 0; }
+  a { color: var(--accent-deep); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="/" lang="hi">ध्वनि<small> LIVE</small></a>
+    <nav><a href="/#features">Features</a><a href="/#plans">Pricing</a></nav>
+  </header>
+  <h1>What's new</h1>
+  <p class="lead">Every DwaniLive version, newest first. The app shows <b>Update now</b> when a new one is out: models and licence stay as they are.</p>
+  <p><a class="cta" id="dl" href="https://github.com/khushi-070906/Dwani/releases/latest/download/DwaniLive-Setup.exe">Download the latest version</a></p>
+  <div id="list"><p class="status">Loading releases…</p></div>
+</div>
+<script>
+(function () {
+  // Highlights for versions released before notes were generated from commits.
+  var HIGHLIGHTS = {
+    "1.8.1": ["Attendees now see “Session full” or “Session not found” instead of reconnecting forever",
+              "Every change is now checked by 290 automatic tests before release"],
+    "1.8.0": ["Built-in troubleshooting guide, available offline, with “How to fix” links from the setup check and error screens"],
+    "1.7.0": ["Presenter dashboard: live microphone level, warnings for a silent or distorting mic, caption delay, attendees per language"],
+    "1.6.0": ["Attendee display options: dark mode, easy-read font and spacing, line spacing, full-screen / projector mode",
+              "Screen-reader improvements: captions announced once, in the right language; Urdu reads right-to-left"],
+    "1.5.0": ["Attendees' phones reconnect automatically after Wi-Fi drops and keep the captions so far",
+              "Reloading keeps your language; “Save” downloads the captions as a text file"],
+    "1.4.0": ["“Check setup”: tests network, firewall, microphone and whether phones can reach the laptop"],
+    "1.3.0": ["Use your phone as a wireless microphone"],
+    "1.2.1": ["New DwaniLive logo"],
+    "1.2.0": ["One-click updates from inside the app"],
+    "1.1.1": ["Fixed: Windows Smart App Control blocking the app on some laptops"],
+    "1.1.0": ["New installer, resumable model download, activation inside the app, clearer error messages"]
+  };
+  var list = document.getElementById("list");
+
+  function bullets(notes) {
+    return (notes || "").split(/\r?\n/)
+      .map(function (l) { return l.trim(); })
+      .filter(function (l) { return /^[-*] /.test(l); })
+      .map(function (l) { return l.slice(2).replace(/ by @[\w-]+ in https?:\/\/\S+$/, "").trim(); })
+      .filter(function (t) { return t && !/^bump version/i.test(t); });
+  }
+
+  function render(rels) {
+    list.innerHTML = "";
+    if (!rels.length) { list.innerHTML = '<p class="status">No releases yet.</p>'; return; }
+    rels.forEach(function (r, i) {
+      var items = bullets(r.notes);
+      if (!items.length) items = HIGHLIGHTS[r.version] || [];
+      var box = document.createElement("article");
+      box.className = "release" + (i === 0 ? " latest" : "");
+      var head = document.createElement("div"); head.className = "rel-head";
+      var h = document.createElement("h2"); h.textContent = "v" + r.version; head.appendChild(h);
+      if (r.published_at) {
+        var d = document.createElement("span"); d.className = "date";
+        d.textContent = new Date(r.published_at).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+        head.appendChild(d);
+      }
+      if (i === 0) { var b = document.createElement("span"); b.className = "badge"; b.textContent = "Latest"; head.appendChild(b); }
+      box.appendChild(head);
+      if (items.length) {
+        var ul = document.createElement("ul");
+        items.forEach(function (t) { var li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
+        box.appendChild(ul);
+      } else {
+        var p = document.createElement("p"); p.className = "muted"; p.textContent = "Maintenance and reliability improvements."; box.appendChild(p);
+      }
+      list.appendChild(box);
+    });
+    if (rels[0].setup_url) document.getElementById("dl").href = rels[0].setup_url;
+  }
+
+  fetch("/api/releases").then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(render)
+    .catch(function () {
+      list.innerHTML = '<p class="status">Couldn\u2019t load the release list right now. See all versions on ' +
+        '<a href="https://github.com/khushi-070906/Dwani/releases">GitHub</a>.</p>';
+    });
+})();
+</script>
+</body>
+</html>
