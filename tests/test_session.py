@@ -38,10 +38,14 @@ def client():
 
 class TestAttendeeSocketAuth:
     def test_wrong_session_id_is_rejected(self, client):
-        with pytest.raises(Exception):
-            # starlette's TestClient raises when the server closes during handshake
-            with client.websocket_connect("/ws?lang=en&session_param=wrongid"):
-                pass
+        # Accepted, then closed with 4000, so the attendee page can say
+        # "Session not found" instead of retrying forever.
+        from starlette.websockets import WebSocketDisconnect
+        with client.websocket_connect("/ws?lang=en&session_param=wrongid") as ws:
+            with pytest.raises(WebSocketDisconnect) as exc:
+                ws.receive_text()
+        assert exc.value.code == 4000
+        assert server.subscribers.get("en", set()) == set() or len(server.subscribers.get("en", ())) == 0
 
     def test_correct_session_id_is_accepted_and_registers_subscriber(self, client):
         with client.websocket_connect("/ws?lang=en&session_param=testsession"):

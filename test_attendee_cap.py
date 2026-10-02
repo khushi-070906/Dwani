@@ -70,10 +70,10 @@ def reset_state():
     shared across tests -- reset before and after each test so one test's
     connections can't leak into the next."""
     server.subscribers.clear()
-    server.current_license = None
+    server.active_license = None
     yield
     server.subscribers.clear()
-    server.current_license = None
+    server.active_license = None
 
 
 def _connect(client, lang="en"):
@@ -84,6 +84,13 @@ def _connect(client, lang="en"):
     )
 
 
+def _assert_alive(ws):
+    """A real round trip (server heartbeat): proves the connection was accepted
+    and not closed. Sending alone proves nothing -- a rejected socket accepts sends."""
+    ws.send_json({"type": "ping", "t": 1})
+    assert ws.receive_json() == {"type": "pong", "t": 1}
+
+
 def _open_n_connections(stack: ExitStack, client, n: int):
     """Opens n /ws connections via the given ExitStack, so all n stay open
     (and get cleaned up together) for the duration of a `with` block."""
@@ -91,7 +98,7 @@ def _open_n_connections(stack: ExitStack, client, n: int):
 
 
 def test_connections_up_to_cap_are_all_accepted(free_tier_license):
-    server.current_license = free_tier_license
+    server.active_license = free_tier_license
     client = TestClient(server.app)
 
     with ExitStack() as stack:
@@ -100,27 +107,30 @@ def test_connections_up_to_cap_are_all_accepted(free_tier_license):
         # keepalive on each and getting no exception confirms none of them
         # were silently closed.
         for ws in sockets:
-            ws.send_text("keepalive")
+            _assert_alive(ws)
 
 
 def test_connection_past_cap_is_rejected(free_tier_license):
-    server.current_license = free_tier_license
+    server.active_license = free_tier_license
     client = TestClient(server.app)
 
     with ExitStack() as stack:
         _open_n_connections(stack, client, FREE_TIER_CAP)  # fill the cap exactly
 
-        # The (FREE_TIER_CAP + 1)th connection must be rejected, not accepted.
-        with pytest.raises(Exception):
-            with _connect(client) as ws_over_cap:
-                ws_over_cap.send_text("keepalive")
-                ws_over_cap.receive_text()  # forces the close frame to surface as an error
+        # The (FREE_TIER_CAP + 1)th connection is accepted and immediately
+        # closed with code 4003 + a reason, so the attendee page can show
+        # "Session full" instead of silently retrying.
+        from starlette.websockets import WebSocketDisconnect
+        with _connect(client) as ws_over_cap:
+            with pytest.raises(WebSocketDisconnect) as exc:
+                ws_over_cap.receive_text()
+        assert exc.value.code == 4003 and "Session is full" in (exc.value.reason or "")
 
 
 def test_disconnecting_frees_a_cap_slot(free_tier_license):
     """A departed attendee's slot must become available again -- the cap
     counts currently-connected attendees, not a lifetime total."""
-    server.current_license = free_tier_license
+    server.active_license = free_tier_license
     client = TestClient(server.app)
 
     with ExitStack() as stack:
@@ -129,24 +139,24 @@ def test_disconnecting_frees_a_cap_slot(free_tier_license):
         # Close one connection to free a slot.
         sockets[0].close()
 
-        # New connection with a slot now free: should NOT raise.
+        # New connection with a slot now free: must be accepted and stay open.
         with _connect(client) as ws:
-            ws.send_text("keepalive")
+            _assert_alive(ws)
 
 
 def test_no_license_means_no_cap_enforced():
-    """current_license is None when server.py is imported without __main__
+    """active_license is None when server.py is imported without __main__
     ever running check_license() (e.g. `uvicorn server:app` directly) --
     connections should NOT be capped in that state, matching pre-license
     behavior. Uses FREE_TIER_CAP + 1 connections to prove there really is
     no limit, not just that the limit wasn't hit."""
-    assert server.current_license is None
+    assert server.active_license is None
     client = TestClient(server.app)
 
     with ExitStack() as stack:
         sockets = _open_n_connections(stack, client, FREE_TIER_CAP + 1)
         for ws in sockets:
-            ws.send_text("keepalive")
+            _assert_alive(ws)
 
 
 def test_unlimited_tier_is_never_capped(unlimited_license):
@@ -154,10 +164,10 @@ def test_unlimited_tier_is_never_capped(unlimited_license):
     check, regardless of how many attendees are connected. Uses
     FREE_TIER_CAP + 1 connections to prove it's genuinely unlimited, not
     just under some other hidden limit."""
-    server.current_license = unlimited_license
+    server.active_license = unlimited_license
     client = TestClient(server.app)
 
     with ExitStack() as stack:
         sockets = _open_n_connections(stack, client, FREE_TIER_CAP + 1)
         for ws in sockets:
-            ws.send_text("keepalive")
+            _assert_alive(ws)
