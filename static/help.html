@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DwaniLive help: fix common problems</title>
+<link rel="icon" type="image/png" href="/static/favicon.png">
+<style>
+  @font-face { font-family: "Atkinson Hyperlegible"; src: url("/static/fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype"); font-weight: 400 500; font-display: swap; }
+  @font-face { font-family: "Atkinson Hyperlegible"; src: url("/static/fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype"); font-weight: 600 800; font-display: swap; }
+  :root {
+    --bg: #fdf6e7; --raised: #fffdf6; --raised-2: #f4e9cf; --ink: #2c1810; --ink-dim: #4a3629; --ink-faint: #69543f;
+    --accent: #e2790f; --accent-deep: #a8460c; --accent-2: #c81e5e; --indigo: #223367; --live: #2f7a3a; --error: #b3261e;
+    --font: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #15110d; --raised: #1f1914; --raised-2: #352b21; --ink: #f6ecda; --ink-dim: #dccbb0; --ink-faint: #b7a385;
+            --accent: #f2a453; --accent-deep: #f2a453; --indigo: #b9c6f0; --live: #74d085; --error: #ff8a80; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--font); }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 1.2rem 1rem 3rem; }
+  header { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+  .brand { font-size: 1.9rem; font-weight: 800; background: linear-gradient(120deg, #a8460c, #c81e5e 50%, #223367);
+           -webkit-background-clip: text; background-clip: text; color: transparent; }
+  h1 { font-size: 1.35rem; margin: 0.2rem 0 0.4rem; }
+  .lead { color: var(--ink-dim); margin: 0 0 1rem; }
+  .search { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 0.6rem 0; }
+  .search input { width: 100%; font: inherit; padding: 0.7rem 0.9rem; border-radius: 12px; border: 2px solid var(--raised-2);
+                  background: var(--raised); color: var(--ink); }
+  .search input:focus { outline: none; border-color: var(--accent); }
+  .quick { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.4rem 0 1rem; }
+  .quick a { text-decoration: none; font-weight: 700; font-size: 0.9rem; padding: 0.35rem 0.75rem; border-radius: 999px;
+             background: var(--raised); border: 1px solid var(--raised-2); color: var(--ink-dim); }
+  h2 { font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-deep); margin: 1.6rem 0 0.4rem; }
+  details { background: var(--raised); border: 1.5px solid var(--raised-2); border-radius: 14px; margin: 0.5rem 0; padding: 0.2rem 1rem; }
+  details[open] { border-color: var(--accent); }
+  summary { cursor: pointer; font-weight: 700; padding: 0.6rem 0; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "▸ "; color: var(--accent-deep); }
+  details[open] > summary::before { content: "▾ "; }
+  .sym { color: var(--ink-dim); font-size: 0.92rem; margin: -0.2rem 0 0.4rem; }
+  ol, ul { padding-left: 1.3rem; }
+  li { margin: 0.25rem 0; }
+  code, kbd { background: var(--raised-2); border-radius: 6px; padding: 0.05rem 0.35rem; font-size: 0.9em; }
+  .note { border-left: 4px solid var(--accent); padding: 0.4rem 0.8rem; background: var(--bg); border-radius: 0 8px 8px 0; margin: 0.6rem 0; }
+  .warn { border-left-color: var(--error); }
+  .empty { color: var(--ink-faint); text-align: center; padding: 2rem 0; }
+  .contact { margin-top: 2rem; padding: 1rem; border-radius: 14px; background: var(--raised); border: 1.5px dashed var(--raised-2); }
+  a { color: var(--accent-deep); }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  mark { background: #ffe08a; color: #2c1810; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><span class="brand" lang="hi">ध्वनि Live</span><span style="color:var(--ink-faint);font-weight:700">Help</span></header>
+<h1>Fix common problems</h1>
+<p class="lead">Works offline. Search below, or jump to a section. Most problems are the network, the microphone or Windows security, not DwaniLive itself.</p>
+
+<div class="search"><input id="q" type="search" placeholder="Search: e.g. phones can't join, mic, blocked, slow" aria-label="Search help"></div>
+<nav class="quick" aria-label="Sections">
+  <a href="#sec-start">Install &amp; start</a><a href="#sec-phones">Phones can't join</a><a href="#sec-mic">Microphone</a>
+  <a href="#sec-captions">Captions</a><a href="#sec-licence">Licence &amp; updates</a><a href="#sec-attendees">For attendees</a>
+</nav>
+<p class="empty" id="empty" hidden>Nothing matched. Try a simpler word, or send an error report (bottom of this page).</p>
+
+<!-- ============================================================ -->
+<h2 id="sec-start">Install &amp; start</h2>
+
+<details id="smartscreen"><summary>"Windows protected your PC" when installing</summary>
+<p class="sym">A blue window appears when you run DwaniLive-Setup.exe.</p>
+<ol><li>Click <b>More info</b>.</li><li>Click <b>Run anyway</b>.</li></ol>
+<p>Windows shows this for new apps that aren't yet widely downloaded. It goes away as more people install DwaniLive.</p>
+</details>
+
+<details id="app-control"><summary>"An Application Control policy has blocked this file"</summary>
+<p class="sym">DwaniLive starts but stops with this message, or a file is "blocked by your organization".</p>
+<ol>
+  <li><b>Update DwaniLive</b> to the latest version (button in the app window, or download the installer again). Version 1.1.1 and later removed the files Windows used to block.</li>
+  <li>Check <b>Windows Security → App &amp; browser control → Smart App Control</b>. If it says <i>On</i>, DwaniLive may still be blocked until it is code-signed.</li>
+  <li>On a college or company laptop, ask the IT team to allow DwaniLive.</li>
+</ol>
+<p class="note warn">Don't switch Smart App Control <b>off</b> casually: Windows can't turn it back on without a reset.</p>
+</details>
+
+<details id="wont-open"><summary>DwaniLive doesn't open, or closes straight away</summary>
+<ol>
+  <li>Open it again: if it's already running, the existing window comes back.</li>
+  <li>Start menu → <b>DwaniLive (error report)</b>. Copy what it shows and send it to us.</li>
+  <li>The log file is in <code>%LOCALAPPDATA%\DwaniLive\logs\dwanilive.log</code>. Paste that path into the File Explorer address bar.</li>
+  <li>If you see "<i>DLL load failed</i>", install the <a href="https://aka.ms/vs/17/release/vc_redist.x64.exe">Microsoft Visual C++ Redistributable (x64)</a> and try again.</li>
+</ol>
+</details>
+
+<details id="zip"><summary>"DwaniLive is being run from inside the .zip file"</summary>
+<p>Right-click the zip → <b>Extract All…</b> → open the extracted folder → run <code>DwaniLive.exe</code>. Or use <b>DwaniLive-Setup.exe</b> instead, which avoids this.</p>
+</details>
+
+<details id="antivirus"><summary>Antivirus deleted or quarantined a DwaniLive file</summary>
+<ol><li>Restore the file from the antivirus quarantine, or reinstall DwaniLive.</li>
+<li>Add the DwaniLive folder (<code>%LOCALAPPDATA%\Programs\DwaniLive</code>) as an exclusion in the antivirus.</li></ol>
+</details>
+
+<details id="download"><summary>First-time model download is stuck or very slow</summary>
+<p class="sym">The first launch downloads about 1.1 GB once. After that DwaniLive works offline.</p>
+<ul>
+  <li>Leave the window open: if the internet drops, it <b>resumes</b> where it stopped.</li>
+  <li>College networks sometimes block GitHub or Hugging Face. Connect the laptop to a <b>phone hotspot</b> just for the download.</li>
+  <li>You need about <b>3 GB free</b> disk space.</li>
+</ul>
+</details>
+
+<details id="models-damaged"><summary>"The downloaded model files are damaged or incompatible"</summary>
+<p>In the error screen click <b>Re-download models</b>. (Or run <code>DwaniLive.exe --reset-models</code>.) It downloads them again; this usually happens after an interrupted download or a full disk.</p>
+</details>
+
+<details id="memory"><summary>"Ran out of memory" or the laptop becomes very slow</summary>
+<ul><li>DwaniLive needs about <b>3 GB free RAM</b>. Close Chrome/Edge tabs, Zoom/Teams and games before starting.</li>
+<li>On a 4 GB laptop, restart Windows first so nothing else is running.</li></ul>
+</details>
+
+<!-- ============================================================ -->
+<h2 id="sec-phones">Phones can't join</h2>
+
+<details id="phones"><summary>Phones can't open the join link / QR code doesn't load</summary>
+<p class="sym">The QR scans but the page never opens, or says "can't reach this site".</p>
+<ol>
+  <li><b>Same Wi-Fi:</b> every phone must be on the <i>same</i> Wi-Fi as the laptop, not on mobile data.</li>
+  <li><b>Test with your own phone first.</b> On the presenter page, open <b>Check setup</b>: the "Phone test" turns green when a phone connects.</li>
+  <li>If your phone can't connect either, the network is blocking phone-to-laptop traffic (common on <b>college and hotel Wi-Fi</b>, called <i>client isolation</i>). Use a <a href="#hotspot">hotspot</a> instead.</li>
+  <li>Check the <a href="#firewall">firewall</a> and turn off any <a href="#vpn">VPN</a>.</li>
+</ol>
+</details>
+
+<details id="hotspot"><summary>Using a hotspot (the most reliable setup)</summary>
+<p><b>Option A: laptop hotspot.</b> Windows Settings → Network &amp; internet → <b>Mobile hotspot</b> → On. Attendees join that Wi-Fi name, then scan the QR.</p>
+<p><b>Option B: phone hotspot.</b> Turn on the hotspot on one phone, connect the laptop <i>and</i> all attendees to it.</p>
+<p class="note">Captions don't use internet data: everything stays between the laptop and the phones. A hotspot with no internet works fine.</p>
+<p>After switching networks, <b>re-share the QR code</b>: the laptop's address changes.</p>
+</details>
+
+<details id="firewall"><summary>Windows Firewall is blocking phones</summary>
+<ol>
+  <li>Close DwaniLive completely and open it again.</li>
+  <li>When Windows asks to allow network access, click <b>Yes / Allow</b>. This adds a rule called <i>DwaniLive LAN</i>, once.</li>
+  <li>If you clicked "No" by mistake, DwaniLive asks again the next day, or reopen it now.</li>
+</ol>
+</details>
+
+<details id="vpn"><summary>VPN is on (Tailscale, office VPN, etc.)</summary>
+<p>Turn the VPN off during the session. Otherwise phones may get the VPN's address, which they can't reach.</p>
+</details>
+
+<details id="no-internet-switch"><summary>Phone joins, then drops a few seconds later</summary>
+<p>Android phones on a Wi-Fi <i>without internet</i> sometimes switch back to mobile data automatically.</p>
+<ul><li>Tap the "No internet" notification → <b>Stay connected</b>, or</li>
+<li>Turn <b>mobile data off</b> during the session.</li></ul>
+</details>
+
+<details id="session-full"><summary>"This session is full"</summary>
+<p>Your plan allows a limited number of attendees (shown on the presenter page). Upgrade from your dashboard on the DwaniLive website, or ask someone to leave so a seat frees up.</p>
+</details>
+
+<!-- ============================================================ -->
+<h2 id="sec-mic">Microphone</h2>
+
+<details id="mic"><summary>Microphone not working / browser blocked the mic</summary>
+<ol>
+  <li>On the presenter page, open <b>Check setup → Test microphone</b> and speak: the bar should move.</li>
+  <li>If the browser blocked it: click the <b>lock / mic icon</b> in the address bar → allow microphone → reload.</li>
+  <li>Wrong microphone: Windows <b>Settings → System → Sound → Input</b> → pick the right one and check its volume.</li>
+  <li>Close Zoom, Teams or Meet: some microphones can only be used by one app at a time.</li>
+</ol>
+</details>
+
+<details id="mic-silent"><summary>"Can't hear anything: is the microphone muted?"</summary>
+<p>Check the mute switch on the mic or headset, the mute key on the laptop keyboard, and the input device in Windows Sound settings (above). Speak 15-20 cm from the microphone.</p>
+</details>
+
+<details id="mic-loud"><summary>"Too loud (distorting)"</summary>
+<p>Move the microphone a little further away, or lower the input volume in Windows Sound settings. Distorted audio produces wrong words.</p>
+</details>
+
+<details id="phone-mic"><summary>Using a phone as the microphone</summary>
+<ol>
+  <li>In the DwaniLive window, open <b>Or use your phone as the mic → Show phone QR</b> and scan it with the presenter's phone (same Wi-Fi).</li>
+  <li>"Your connection is not private" appears once: tap <b>Advanced → Proceed</b>. It's the laptop's own certificate.</li>
+  <li>Tap <b>Start</b>, allow the microphone, and keep the phone <b>unlocked</b> with calls silenced.</li>
+</ol>
+<p>Only one microphone can stream at a time: stop it on the laptop page first.</p>
+</details>
+
+<!-- ============================================================ -->
+<h2 id="sec-captions">Captions</h2>
+
+<details id="slow"><summary>Captions are slow (delay chip is red)</summary>
+<ul>
+  <li><b>Plug the laptop in.</b> On battery, Windows slows the processor down.</li>
+  <li>Close other apps, especially browsers with many tabs.</li>
+  <li>Speak in complete sentences with short pauses: captions appear at the end of each sentence.</li>
+</ul>
+</details>
+
+<details id="wrong-words"><summary>Captions have wrong words</summary>
+<ul>
+  <li>Speak 15-20 cm from a decent microphone; laptop built-in mics pick up the whole room.</li>
+  <li>Avoid music or fans near the mic.</li>
+  <li>Names and technical terms are the hardest. Say them clearly and, if possible, write them on your slides too.</li>
+</ul>
+</details>
+
+<details id="demo-mode"><summary>"Demo mode: placeholder output"</summary>
+<p>The real models aren't loaded. Start DwaniLive from the desktop app (Start menu), not from developer scripts.</p>
+</details>
+
+<!-- ============================================================ -->
+<h2 id="sec-licence">Licence &amp; updates</h2>
+
+<details id="activation"><summary>Activation failed</summary>
+<ul>
+  <li>Copy the key from your dashboard exactly (use the <b>Copy key</b> button) and use the same email you paid with.</li>
+  <li>The licence server may take ~30 seconds to wake up. Wait and try again.</li>
+  <li>You can always <b>Continue with the Free plan</b> and activate later.</li>
+</ul>
+</details>
+
+<details id="update"><summary>Updating DwaniLive</summary>
+<p>When a new version is out, the app window shows <b>Update now</b>: it downloads, installs and reopens by itself. Your models and licence stay. If it fails, download <b>DwaniLive-Setup.exe</b> again from your dashboard and install it over the old one.</p>
+</details>
+
+<!-- ============================================================ -->
+<h2 id="sec-attendees">For attendees</h2>
+
+<details id="attendee-reconnect"><summary>Captions stopped on my phone</summary>
+<ul>
+  <li>Wait a few seconds: the page reconnects by itself and shows a countdown.</li>
+  <li>Make sure your phone is still on the same Wi-Fi (and didn't switch to mobile data).</li>
+  <li>Reloading the page is safe: it keeps your language and the captions so far.</li>
+</ul>
+</details>
+
+<details id="attendee-display"><summary>Make captions easier to read</summary>
+<p>Tap <b>⚙ Accessibility</b>: bigger text, dark mode, high contrast, line spacing, an easy-read font, and <b>Full screen</b> (double-tap the captions too). Tap <b>💾 Save</b> to keep a text copy of everything shown.</p>
+</details>
+
+<div class="contact" id="contact">
+  <b>Still stuck?</b> In the DwaniLive window, click <b>Copy error report</b> (or Start menu → <b>DwaniLive (error report)</b>) and email it to
+  <a id="support-mail" href="mailto:khushimittal070906@gmail.com?subject=DwaniLive%20help">khushimittal070906@gmail.com</a>
+  with a line about what you were doing.
+</div>
+</div>
+
+<script>
+(function () {
+  var q = document.getElementById("q"), items = Array.prototype.slice.call(document.querySelectorAll("details"));
+  var heads = Array.prototype.slice.call(document.querySelectorAll("h2")), empty = document.getElementById("empty");
+  // "wifi", "wi-fi" and "wi fi" should all match "Wi-Fi"
+  function norm(t) { return t.toLowerCase().replace(/[-\u2010\u2011]/g, "").replace(/\bwi fi\b/g, "wifi"); }
+  items.forEach(function (d) { d.dataset.text = norm(d.textContent); });
+
+  function filter() {
+    var words = norm(q.value).split(/\s+/).filter(Boolean);
+    var shown = 0;
+    items.forEach(function (d) {
+      var hit = words.every(function (w) { return d.dataset.text.indexOf(w) > -1; });
+      d.hidden = !hit;
+      if (hit) shown++;
+      if (words.length) d.open = hit && shown <= 3;   // open the best few matches
+    });
+    heads.forEach(function (h) {   // hide a section title when none of its items match
+      var el = h.nextElementSibling, any = false;
+      while (el && el.tagName !== "H2") { if (el.tagName === "DETAILS" && !el.hidden) any = true; el = el.nextElementSibling; }
+      h.hidden = !any;
+    });
+    empty.hidden = shown > 0;
+  }
+  q.addEventListener("input", filter);
+
+  function openFromHash() {
+    var id = decodeURIComponent((location.hash || "").slice(1));
+    var el = id && document.getElementById(id);
+    if (el && el.tagName === "DETAILS") { el.open = true; el.scrollIntoView && el.scrollIntoView(); el.querySelector("summary").focus(); }
+  }
+  window.addEventListener("hashchange", openFromHash);
+  openFromHash();
+  var pre = new URLSearchParams(location.search).get("q");
+  if (pre) { q.value = pre; filter(); }
+})();
+</script>
+</body>
+</html>
