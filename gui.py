@@ -308,6 +308,7 @@ _HTML = r"""<!DOCTYPE html>
         <p class="hint">Only scan this on the presenter's phone; it can broadcast to the room. Stop the mic on the laptop page first if it's running.</p>
       </details>
     </div>
+    <p class="hint"><a href="#" id="ready-help">Troubleshooting guide</a> (phones can't join, microphone, slow captions)</p>
     <button class="danger" id="stop-btn" type="button">Stop session &amp; quit</button>
     <button class="log-toggle" data-log="ready-log">Show details</button>
     <div class="log-panel" id="ready-log"></div>
@@ -318,6 +319,7 @@ _HTML = r"""<!DOCTYPE html>
     <h1>Something went wrong</h1>
     <p class="subtitle" id="error-message">Unknown error.</p>
     <button class="primary" id="retry-btn" type="button">Try again</button>
+    <button class="secondary" id="help-btn" type="button">How to fix this →</button>
     <div class="row">
       <button class="secondary" id="diag-btn" type="button">Copy error report</button>
       <button class="secondary" id="logs-btn" type="button">Open log folder</button>
@@ -404,7 +406,7 @@ _HTML = r"""<!DOCTYPE html>
       $('tier-line').textContent = (s.tier ? s.tier + ' plan · ' : '') + 'Keep this window open during the session.';
       if (!openedPresenter && s.auto_open) { openedPresenter = true; api('open', { what: 'presenter' }); }
     }
-    if (s.phase === 'error') $('error-message').textContent = s.error || 'Unknown error.';
+    if (s.phase === 'error') { $('error-message').textContent = s.error || 'Unknown error.'; helpAnchor = s.help_anchor || ''; }
     renderUpdate(s.update);
     if (s.phase !== phase) { phase = s.phase; showView(phase === 'preflight' ? 'splash' : phase); }
   }
@@ -464,6 +466,9 @@ _HTML = r"""<!DOCTYPE html>
     }).catch(function () {});
   });
   $('retry-btn').addEventListener('click', function () { api('retry', {}); });
+  var helpAnchor = '';
+  $('help-btn').addEventListener('click', function () { api('open', { what: 'help', anchor: helpAnchor }); });
+  $('ready-help').addEventListener('click', function (e) { e.preventDefault(); api('open', { what: 'help', anchor: '' }); });
   $('redownload-btn').addEventListener('click', function () {
     if (confirm('Delete the downloaded models and download them again (~1.1 GB)?')) api('retry', { reset_models: true });
   });
@@ -502,6 +507,7 @@ class LauncherState:
         self.warnings: list[str] = []
         self.error = ""
         self.license_problem = ""
+        self.help_anchor = ""
         self.presenter_url = ""
         self.join_url = ""
         self.server_port: Optional[int] = None
@@ -526,6 +532,7 @@ class LauncherState:
             return {
                 "phase": self.phase, "status": self.status, "progress": self.progress,
                 "warnings": self.warnings, "error": self.error, "license_problem": self.license_problem,
+                "help_anchor": self.help_anchor,
                 "presenter_url": self.presenter_url, "join_url": self.join_url, "qr_url": qr, "phone_qr_url": phone_qr,
                 "tier": self.tier, "auto_open": self.auto_open, "update": self.update,
                 "version": appenv.APP_VERSION, "seq": seq, "logs": lines,
@@ -593,6 +600,19 @@ class LauncherApp:
                         return self._send(200, (appenv.STATIC_DIR / "favicon.png").read_bytes(), "image/png")
                     except OSError:
                         return self._send(404, b"", "text/plain")
+                # The troubleshooting guide must open even when the main server
+                # never started, so the launcher serves it (and its fonts) itself.
+                if u.path in ("/help", "/static/help.html") or u.path.startswith("/static/"):
+                    rel = "help.html" if u.path == "/help" else u.path[len("/static/"):]
+                    target = (appenv.STATIC_DIR / rel).resolve()
+                    root = appenv.STATIC_DIR.resolve()
+                    if root not in target.parents or not target.is_file():
+                        return self._send(404, b"Not found", "text/plain")
+                    import mimetypes
+                    ctype = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
+                    if ctype.startswith("text/"):
+                        ctype += "; charset=utf-8"
+                    return self._send(200, target.read_bytes(), ctype)
                 if not self._authed():
                     return self._send(403, b"Forbidden", "text/plain")
                 if u.path == "/":
@@ -632,7 +652,7 @@ class LauncherApp:
             self._retry(reset_models=bool(body.get("reset_models")))
             return {"ok": True}
         if route == "/api/open":
-            self._open(body.get("what", ""))
+            self._open(body.get("what", ""), body.get("anchor", ""))
             return {"ok": True}
         if route == "/api/diagnostics":
             return {"ok": True, "text": diagnostics_text()}
@@ -692,8 +712,11 @@ class LauncherApp:
         subprocess.Popen(args + ["--after-restart"], close_fds=True)
         threading.Timer(0.5, self.shutdown).start()
 
-    def _open(self, what: str) -> None:
-        if what == "presenter" and self.state.presenter_url:
+    def _open(self, what: str, anchor: str = "") -> None:
+        if what == "help":
+            safe = "".join(ch for ch in anchor if ch.isalnum() or ch == "-")
+            webbrowser.open(self.ui_url.split("/?")[0] + "/help" + ("#" + safe if safe else ""))
+        elif what == "presenter" and self.state.presenter_url:
             webbrowser.open(self.state.presenter_url)
         elif what in ("logs", "data"):
             folder = appenv.LOGS_DIR if what == "logs" else appenv.DATA_DIR
@@ -771,7 +794,8 @@ class LauncherApp:
 
     def _fail(self, exc: BaseException) -> None:
         print("".join(traceback.format_exception(type(exc), exc, exc.__traceback__)), file=sys.stderr)
-        self.state.set(phase="error", error=appenv.friendly_error(exc))
+        msg = appenv.friendly_error(exc)
+        self.state.set(phase="error", error=msg, help_anchor=help_anchor_for(msg))
 
     def _pipeline(self) -> None:
         try:
@@ -965,6 +989,22 @@ def _last_meaningful_log_line() -> str:
         if s and not s.startswith(("INFO", "Traceback", "File ", "^")):
             return s
     return "See the log for details."
+
+
+_HELP_RULES = [
+    ("smart app control", "app-control"), ("application control", "app-control"),
+    ("blocked by your organization", "app-control"),
+    ("inside the .zip", "zip"), ("memory", "memory"), ("dll", "wont-open"), ("visual c++", "wont-open"),
+    ("damaged or incompatible", "models-damaged"), ("disk space", "download"), ("no internet", "download"),
+    ("download", "download"), ("secure connection", "download"), ("antivirus", "antivirus"),
+    ("licen", "activation"), ("already running", "wont-open"),
+]
+
+
+def help_anchor_for(message: str) -> str:
+    """Which troubleshooting-guide section explains this error (static/help.html ids)."""
+    low = (message or "").lower()
+    return next((anchor for needle, anchor in _HELP_RULES if needle in low), "wont-open")
 
 
 def diagnostics_text() -> str:
