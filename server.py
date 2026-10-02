@@ -80,6 +80,10 @@ BROADCAST_SEND_TIMEOUT_SECONDS = 5.0
 
 @app.websocket("/ws")
 async def attendee_socket(websocket: WebSocket, lang: str, session_param: str):
+    # Accept BEFORE rejecting: a WebSocket closed before accept() reaches the
+    # browser as a bare HTTP 403 / close code 1006, so index.html could never
+    # show "Session full" or "Session not found" -- it just retried forever.
+    await websocket.accept()
     if session_param != session.session_id:
         await websocket.close(code=4000, reason="unknown session")
         return
@@ -97,7 +101,6 @@ async def attendee_socket(websocket: WebSocket, lang: str, session_param: str):
             )
             return
 
-    await websocket.accept()
     subscribers.setdefault(lang, set()).add(websocket)
     try:
         while True:
@@ -320,11 +323,11 @@ async def qa_socket(websocket: WebSocket, lang: str, session_param: str):
         await websocket.close(code=4000, reason="unknown session")
         return
 
+    await websocket.accept()  # accept first so the close code/reason reaches the browser
     if getattr(qa_pipeline_instance, "_asr", None) is None:
         await websocket.close(code=4004, reason="Spoken questions are off (start with --qa-mic); use the typed Ask panel")
         return
 
-    await websocket.accept()
     segmenter = AudioSegmenter()  # fresh per raised-hand connection, same reasoning as /host-ws
     try:
         while True:
