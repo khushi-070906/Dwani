@@ -478,6 +478,17 @@
   .pf-meter-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--live), var(--accent)); transition: width 80ms linear; }
   .pf-mic-text { margin: 0; font-size: 0.85rem; color: var(--ink-dim); }
   .pf-foot { margin: 0.6rem 0 0; font-size: 0.78rem; color: var(--ink-faint); }
+
+  /* ---- live meters (presenter dashboard) ---- */
+  .live-meters { display: flex; align-items: center; gap: 0.7rem; justify-content: center; margin: 0.3rem auto 0; max-width: 420px; width: 90%; }
+  .mic-meter { flex: 1; height: 10px; border-radius: 999px; background: var(--bg-raised-2); overflow: hidden; }
+  .mic-meter-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--live) 0%, var(--live) 70%, var(--accent) 85%, var(--error) 100%); background-size: 100vw 100%; transition: width 90ms linear; }
+  .delay-chip { font-size: 0.8rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; background: var(--bg-raised); border: 1px solid var(--bg-raised-2); color: var(--ink-dim); white-space: nowrap; }
+  .delay-chip.good, .stat-value.good { color: var(--live); }
+  .delay-chip.ok, .stat-value.ok { color: var(--accent-deep); }
+  .delay-chip.slow, .stat-value.slow { color: var(--error); }
+  .mic-hint { min-height: 1.2em; margin: 0.3rem auto 0; text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--error); max-width: 480px; }
+  .lang-pill .lang-name { font-weight: 700; }
 </style>
 </head>
 <body>
@@ -555,6 +566,11 @@
 </button>
 
 <p class="status-line" id="status-line">Not presenting</p>
+<div class="live-meters" id="live-meters" hidden>
+  <div class="mic-meter" role="meter" aria-label="Microphone level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="mic-meter"><div class="mic-meter-fill" id="mic-meter-fill"></div></div>
+  <span class="delay-chip" id="delay-chip" title="Time from the end of a sentence to the caption being sent">Caption delay —</span>
+</div>
+<p class="mic-hint" id="mic-hint" role="status"></p>
 
 <div class="pf-wrap">
   <button type="button" class="pf-toggle" id="pf-toggle" aria-expanded="false">
@@ -618,6 +634,16 @@
         <div class="stat-card">
           <div class="stat-value" id="stat-languages">0</div>
           <div class="stat-label">Languages in the room</div>
+        </div>
+        <div class="stat-card" id="stat-delay-card">
+          <div class="stat-value" id="stat-delay">—</div>
+          <div class="stat-label">Caption delay (typical)</div>
+          <div class="stat-sublabel" id="stat-delay-sub">Appears after the first captions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-captions">0</div>
+          <div class="stat-label">Captions sent</div>
+          <div class="stat-sublabel" id="stat-captions-sub"></div>
         </div>
         <div class="stat-card">
           <div class="stat-value" id="stat-a11y">0</div>
@@ -765,28 +791,65 @@
 
   // -- audience polling (read-only view of who's connected) -----------------
 
+  var LANG_NAMES = { en: "English", hi: "हिन्दी", pa: "ਪੰਜਾਬੀ", bn: "বাংলা", ta: "தமிழ்", te: "తెలుగు", mr: "मराठी", ur: "اردو",
+                     gu: "ગુજરાતી", kn: "ಕನ್ನಡ", ml: "മലയാളം", or: "ଓଡ଼ିଆ", as: "অসমীয়া", ne: "नेपाली" };
+  var dashKey = new URLSearchParams(window.location.search).get("key");
+
   function pollAudience() {
-    fetch("/session-info")
-      .then(function (r) { return r.json(); })
-      .then(renderAudience)
+    fetch("/dashboard-stats" + (dashKey ? "?key=" + encodeURIComponent(dashKey) : ""), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { if (d) renderDashboard(d); })
       .catch(function () { /* transient fetch failures are fine to ignore */ });
   }
 
-  function renderAudience(info) {
-    var langs = info.languages_available || [];
+  function delayClass(ms) { return ms <= 1500 ? "good" : ms <= 3000 ? "ok" : "slow"; }
+  function secs(ms) { return (ms / 1000).toFixed(1) + "s"; }
+
+  function renderDashboard(d) {
+    // audience per language, biggest first
+    var langs = Object.keys(d.by_language || {});
     statLanguages.textContent = langs.length;
+    statAttendees.textContent = d.attendees;
+    tabBadgeAttendees.textContent = d.attendees;
     langPillRow.innerHTML = "";
-    if (langs.length === 0) {
-      noAudience.hidden = false;
-      return;
-    }
-    noAudience.hidden = true;
+    noAudience.hidden = langs.length > 0;
     langs.forEach(function (lang) {
       var pill = document.createElement("span");
       pill.className = "lang-pill";
-      pill.textContent = lang.toUpperCase();
+      pill.title = lang;
+      var name = document.createElement("span");
+      name.className = "lang-name";
+      name.lang = lang;
+      name.textContent = LANG_NAMES[lang] || lang.toUpperCase();
+      var count = document.createElement("span");
+      count.className = "count";
+      count.textContent = d.by_language[lang];
+      pill.appendChild(name); pill.appendChild(count);
       langPillRow.appendChild(pill);
     });
+    var near = d.max_attendees && d.attendees >= d.max_attendees * 0.9;
+    noAudience.textContent = near ? d.attendees + " of " + d.max_attendees + " seats used on your plan: upgrade from your dashboard for more."
+                                  : "Nobody has joined yet.";
+    noAudience.hidden = langs.length > 0 && !near;
+
+    // caption delay
+    var L = d.latency || {};
+    var chip = document.getElementById("delay-chip");
+    var dv = document.getElementById("stat-delay"), dsub = document.getElementById("stat-delay-sub");
+    document.getElementById("stat-captions").textContent = L.captions_sent || 0;
+    document.getElementById("stat-captions-sub").textContent = L.count ? "last one " + Math.round(L.seconds_since_last) + "s ago" : "";
+    if (L.count) {
+      var cls = delayClass(L.p50_ms);
+      dv.textContent = secs(L.p50_ms); dv.className = "stat-value " + cls;
+      dsub.textContent = "slowest " + secs(L.p95_ms) + " · speech→text " + secs(L.asr_avg_ms) + " · translation " + secs(L.mt_avg_ms);
+      chip.textContent = "Caption delay ~" + secs(L.p50_ms);
+      chip.className = "delay-chip " + cls;
+      chip.title = cls === "slow" ? "Captions are slow: close other apps (especially browsers with many tabs) on this laptop." : "Time from the end of a sentence to the caption being sent";
+    } else {
+      dv.textContent = "—"; dv.className = "stat-value";
+      dsub.textContent = d.attendees ? "Start speaking to measure" : "Appears once someone has joined and you speak";
+      chip.textContent = "Caption delay —"; chip.className = "delay-chip";
+    }
   }
 
   // -- live stats dashboard ---------------------------------------------
@@ -810,7 +873,7 @@
     fetch("/accessibility-stats")
       .then(function (r) { return r.json(); })
       .then(function (stats) {
-        statAttendees.textContent = stats.connected_attendees;
+        // attendee total comes from /dashboard-stats (renderDashboard) -- one source, no flicker
         tabBadgeAttendees.textContent = stats.connected_attendees;
         statA11y.textContent = stats.attendees_with_accessibility_settings;
         var parts = [];
@@ -1045,17 +1108,43 @@
     silentSink.connect(audioContext.destination);
 
     isPresenting = true;
+    silentSince = null; loudChunks = 0;
+    document.getElementById("live-meters").hidden = false;
     micBtn.classList.add("live");
     micBtnLabel.textContent = "Stop";
     setStatus("Live — streaming to attendees", "live");
     requestWakeLock();
   }
 
+  var micMeterFill = document.getElementById("mic-meter-fill");
+  var micMeter = document.getElementById("mic-meter");
+  var micHint = document.getElementById("mic-hint");
+  var silentSince = null, loudChunks = 0, lastHintAt = 0;
+
   function updateSpeakingIndicator(samples) {
-    var sumSquares = 0;
-    for (var i = 0; i < samples.length; i++) sumSquares += samples[i] * samples[i];
+    var sumSquares = 0, peak = 0;
+    for (var i = 0; i < samples.length; i++) {
+      var v = samples[i];
+      sumSquares += v * v;
+      if (v > peak) peak = v; else if (-v > peak) peak = -v;
+    }
     var rms = Math.sqrt(sumSquares / samples.length);
     micBtn.classList.toggle("speaking", rms > 0.02);
+
+    var level = Math.min(100, Math.round(rms * 400));
+    micMeterFill.style.width = level + "%";
+    micMeter.setAttribute("aria-valuenow", String(level));
+
+    var now = Date.now();
+    if (rms < 0.006) { if (silentSince === null) silentSince = now; } else if (rms > 0.015) { silentSince = null; }
+    loudChunks = peak > 0.98 ? loudChunks + 1 : Math.max(0, loudChunks - 0.25);
+    var hint = "";
+    if (silentSince !== null && now - silentSince > 12000) {
+      hint = "Can't hear anything for " + Math.round((now - silentSince) / 1000) + "s: is the microphone muted or the wrong one selected?";
+    } else if (loudChunks > 6) {
+      hint = "Too loud (distorting): move the microphone a little further away or lower its volume.";
+    }
+    if (hint !== micHint.textContent && (hint === "" || now - lastHintAt > 1500)) { micHint.textContent = hint; lastHintAt = now; }
   }
 
   function downsampleTo16k(buffer, sourceRate) {
@@ -1089,6 +1178,9 @@
 
   function stopPresenting() {
     releaseWakeLock();
+    document.getElementById("live-meters").hidden = true;
+    micHint.textContent = "";
+    micMeterFill.style.width = "0%";
     setStatus("Stopping…", null);
     if (socket) socket.close(1000, "presenter stopped");
     teardownAudio();
