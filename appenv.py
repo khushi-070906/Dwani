@@ -41,7 +41,7 @@ from pathlib import Path
 from typing import Callable, Optional
 
 APP_NAME = "DwaniLive"
-APP_VERSION = "1.5.0"
+APP_VERSION = "1.6.0"
 
 # ---------------------------------------------------------------------------
 # Paths
