@@ -490,6 +490,27 @@
   .delay-chip.slow, .stat-value.slow { color: var(--error); }
   .mic-hint { min-height: 1.2em; margin: 0.3rem auto 0; text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--error); max-width: 480px; }
   .lang-pill .lang-name { font-weight: 700; }
+
+  /* ---- session notes tab ---- */
+  .notes-panel { text-align: left; }
+  .notes-status { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; flex-wrap: wrap; }
+  .notes-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ink-faint); }
+  .notes-dot.on { background: var(--error); box-shadow: 0 0 0 4px rgba(179, 38, 30, 0.15); }
+  .notes-toggle { margin-left: auto; border: 1px solid var(--bg-raised-2); background: var(--bg-raised); color: var(--ink-dim);
+    border-radius: 8px; padding: 0.3rem 0.7rem; font: 600 0.82rem var(--font-body); cursor: pointer; }
+  .notes-help { color: var(--ink-dim); font-size: 0.88rem; margin: 0.5rem 0 0.8rem; }
+  .notes-lang-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.6rem; font-size: 0.9rem; }
+  .notes-lang-row select { font: inherit; padding: 0.3rem 0.5rem; border-radius: 8px; border: 1px solid var(--bg-raised-2); background: var(--bg); color: var(--ink); }
+  .notes-hint { color: var(--ink-faint); font-size: 0.8rem; }
+  .notes-list { list-style: none; margin: 0; padding: 0; }
+  .notes-list li { padding: 0.65rem 0; border-top: 1px dashed var(--bg-raised-2); }
+  .notes-title { font-weight: 700; }
+  .notes-meta { color: var(--ink-faint); font-size: 0.82rem; }
+  .notes-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.35rem; }
+  .notes-actions a { font-size: 0.82rem; font-weight: 700; text-decoration: none; padding: 0.3rem 0.65rem; border-radius: 8px;
+    border: 1px solid var(--bg-raised-2); color: var(--ink-dim); background: var(--bg-raised); }
+  .notes-actions a.primary { background: var(--indigo); color: #fffdf6; border-color: var(--indigo); }
+  .notes-empty { color: var(--ink-faint); }
 </style>
 </head>
 <body>
@@ -605,6 +626,7 @@
     <button class="tab-btn active" data-tab="attendees" type="button" role="tab" aria-selected="true">Attendees<span class="tab-badge" id="tab-badge-attendees">0</span></button>
     <button class="tab-btn" data-tab="questions" type="button" role="tab" aria-selected="false">Questions<span class="tab-badge" id="tab-badge-questions">0</span></button>
     <button class="tab-btn" data-tab="stats" type="button" role="tab" aria-selected="false">Stats</button>
+    <button class="tab-btn" data-tab="notes" type="button" role="tab" aria-selected="false">Notes</button>
   </div>
 
   <div class="tab-panel" id="tab-attendees" role="tabpanel">
@@ -667,6 +689,24 @@
       </div>
     </div>
   </div>
+
+  <div class="tab-panel" id="tab-notes" role="tabpanel" hidden>
+    <div class="notes-panel">
+      <div class="notes-status" id="notes-status">
+        <span class="notes-dot" id="notes-dot"></span><span id="notes-status-text">Session notes</span>
+        <button type="button" class="notes-toggle" id="notes-toggle" hidden>Pause saving</button>
+      </div>
+      <p class="notes-help">Every caption is saved on this laptop (never uploaded). After the talk, download notes for
+        students in any language: <b>Notes</b> opens a printable page with highlights, key terms and the full
+        transcript (use <i>Save as PDF</i>); <b>.srt</b> is subtitles for your recording.</p>
+      <div class="notes-lang-row">
+        <label for="notes-lang">Language</label>
+        <select id="notes-lang"></select>
+        <span class="notes-hint" id="notes-hint"></span>
+      </div>
+      <ul class="notes-list" id="notes-list"><li class="notes-empty">No sessions yet. Notes appear here once you start speaking.</li></ul>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -706,7 +746,7 @@
   var tabBadgeAttendees = document.getElementById("tab-badge-attendees");
   var tabBadgeQuestions = document.getElementById("tab-badge-questions");
   var tabButtons = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
-  var tabPanels = { attendees: document.getElementById("tab-attendees"), questions: document.getElementById("tab-questions"), stats: document.getElementById("tab-stats") };
+  var tabPanels = { attendees: document.getElementById("tab-attendees"), questions: document.getElementById("tab-questions"), stats: document.getElementById("tab-stats"), notes: document.getElementById("tab-notes") };
 
   var socket = null;
   var audioContext = null;
@@ -764,6 +804,7 @@
       Object.keys(tabPanels).forEach(function (key) {
         tabPanels[key].hidden = key !== target;
       });
+      if (target === "notes") refreshNotes();
     });
   });
 
@@ -1295,6 +1336,70 @@
 
     run();  // one quick check on page load, so problems show before you press Start
   })();
+
+
+  // ---------------------------------------------------------------- session notes
+  var notesKey = new URLSearchParams(window.location.search).get("key");
+  var notesQ = function (sep) { return notesKey ? sep + "key=" + encodeURIComponent(notesKey) : ""; };
+  var notesLang = document.getElementById("notes-lang");
+  var notesState = null, notesSessions = [];
+  Object.keys(LANG_NAMES).forEach(function (code) {
+    var o = document.createElement("option"); o.value = code; o.textContent = LANG_NAMES[code]; notesLang.appendChild(o);
+  });
+
+  function renderNotes() {
+    var st = notesState || {};
+    var dot = document.getElementById("notes-dot"), txt = document.getElementById("notes-status-text");
+    var tog = document.getElementById("notes-toggle");
+    dot.className = "notes-dot" + (st.recording ? " on" : "");
+    txt.textContent = !st.available ? "Session notes are off" : st.recording ? "Saving notes · " + st.captions + " captions" : "Saving paused";
+    tog.hidden = !st.available;
+    tog.textContent = st.recording ? "Pause saving" : "Resume saving";
+    var list = document.getElementById("notes-list");
+    list.innerHTML = "";
+    if (!notesSessions.length) {
+      list.innerHTML = '<li class="notes-empty">No sessions yet. Notes appear here once you start speaking.</li>';
+      return;
+    }
+    var lang = notesLang.value;
+    notesSessions.forEach(function (n, i) {
+      var li = document.createElement("li");
+      var when = new Date(n.started * 1000).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+      var live = st.id === n.id;
+      var have = n.languages.indexOf(lang) > -1;
+      li.innerHTML = '<div class="notes-title"></div><div class="notes-meta"></div><div class="notes-actions"></div>';
+      li.querySelector(".notes-title").textContent = (live ? "This session · " : "") + when;
+      li.querySelector(".notes-meta").textContent = n.minutes + " min · " + n.captions + " captions" +
+        (have ? "" : " · " + (LANG_NAMES[lang] || lang) + " will be translated on download (about a minute per hour of talk)");
+      var acts = li.querySelector(".notes-actions");
+      [["notes", "Notes (PDF)", true], ["txt", ".txt"], ["srt", ".srt"], ["md", ".md"]].forEach(function (f) {
+        var a = document.createElement("a");
+        a.href = "/notes/export?id=" + encodeURIComponent(n.id) + "&lang=" + encodeURIComponent(lang) + "&format=" + f[0] + notesQ("&");
+        a.textContent = f[1];
+        if (f[2]) { a.className = "primary"; a.target = "_blank"; a.rel = "noopener"; }
+        acts.appendChild(a);
+      });
+      list.appendChild(li);
+    });
+  }
+
+  function refreshNotes() {
+    Promise.all([
+      fetch("/notes/status" + notesQ("?"), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }),
+      fetch("/notes/sessions" + notesQ("?"), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : []; })
+    ]).then(function (res) {
+      var first = notesState === null;
+      notesState = res[0]; notesSessions = res[1] || [];
+      if (first && notesSessions.length) notesLang.value = notesSessions[0].src_lang || "en";
+      renderNotes();
+    }).catch(function () {});
+  }
+  notesLang.addEventListener("change", renderNotes);
+  document.getElementById("notes-toggle").addEventListener("click", function () {
+    var on = !(notesState && notesState.recording);
+    fetch("/notes/recording?on=" + on + notesQ("&"), { method: "POST" }).then(refreshNotes);
+  });
+  setInterval(function () { if (!tabPanels.notes.hidden) refreshNotes(); }, 10000);
 
   init();
 })();
