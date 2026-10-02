@@ -952,13 +952,29 @@
       a.classList.toggle('active', on);
       if (on) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current');
     });
+    // Positions are measured against the VIEWPORT (getBoundingClientRect), not
+    // offsetTop: Pricing and FAQ live inside <main class="wrap">, which is
+    // position:relative, so their offsetTop was relative to <main> (~60px) and
+    // Pricing looked "already reached" while you were still on How it works.
+    const header = document.querySelector('.site-header');
+    let lockUntil = 0;
     const update = () => {
-      const probe = window.scrollY + window.innerHeight * 0.35;
+      if (Date.now() < lockUntil) return;   // a nav click is smooth-scrolling: keep its highlight
+      const line = (header ? header.getBoundingClientRect().bottom : 0) + 48;
       let current = null;
-      for (const sec of sections) if (sec.offsetTop <= probe) current = sec.id;
-      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) current = sections[sections.length - 1].id;
+      for (const sec of sections) if (sec.getBoundingClientRect().top <= line) current = sec.id;
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+      if (atBottom && window.scrollY > 0) {
+        const last = sections[sections.length - 1];
+        if (last.getBoundingClientRect().top < window.innerHeight) current = last.id;
+      }
       setActive(current);  // null at the hero = nothing highlighted
     };
+    links.forEach((a) => a.addEventListener('click', () => {
+      setActive(a.dataset.section);
+      lockUntil = Date.now() + 900;
+      setTimeout(update, 950);
+    }));
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     window.addEventListener('hashchange', update);
