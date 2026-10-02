@@ -1,6 +1,13 @@
 {
   "name": "dwanilive-attendee-tests",
   "private": true,
-  "scripts": { "test": "node attendee_reconnect.test.js" },
-  "devDependencies": { "jsdom": "^24.0.0", "@sinonjs/fake-timers": "^11.0.0" }
+  "scripts": {
+    "test": "node attendee_reconnect.test.js && node attendee_a11y.test.js",
+    "test:reconnect": "node attendee_reconnect.test.js",
+    "test:a11y": "node attendee_a11y.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0",
+    "@sinonjs/fake-timers": "^11.0.0"
+  }
 }
