@@ -347,6 +347,16 @@
     background: linear-gradient(120deg, var(--accent), var(--accent-2) 60%, var(--indigo)); color: #fff5e6; margin-bottom: 0.6rem;
   }
   .modal button.ghost { width: 100%; border: none; background: none; color: var(--ink-faint); font-size: 0.82rem; padding: 0.4rem; }
+
+  /* ---- included-in-every-plan features ---- */
+  .features-section { padding: 0.5rem 0 3rem; }
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.9rem; margin-top: 1.6rem; }
+  .feature { background: var(--bg-raised, #fffaf0); border: 1.5px solid var(--bg-raised-2, #f4e9cf); border-radius: 16px; padding: 1.1rem 1.1rem 1rem; }
+  .feature-ico { font-size: 1.5rem; line-height: 1; margin-bottom: 0.5rem; }
+  .feature h3 { margin: 0 0 0.35rem; font-size: 1.02rem; }
+  .feature p { margin: 0; color: var(--ink-dim); font-size: 0.92rem; line-height: 1.5; }
+  .release-line { color: var(--ink-faint); font-size: 0.78rem; margin: 0.35rem 0 0; text-align: center; min-height: 1.1em; }
+  .release-line a { color: var(--accent-deep); font-weight: 700; }
 </style>
 
 <style>
@@ -475,7 +485,6 @@
     <a href="#how-it-works" data-section="how-it-works">How it works</a>
     <a href="#plans" data-section="plans">Pricing</a>
     <a href="#faq" data-section="faq">FAQ</a>
-    <a href="/careers/">Careers</a>
   </div>
   <button type="button" class="nav-hamburger" id="nav-hamburger" aria-label="Menu" aria-expanded="false">&#9776;</button>
   <div class="nav-right" id="nav-right">
@@ -498,42 +507,42 @@
 
 <section class="how-it-works-section wrap" id="how-it-works">
   <div class="eyebrow-badge"><span class="dot"></span> How it works</div>
-  <h2 class="hiw-title">From subscribing to live captions in a room, in five steps</h2>
-  <p class="hiw-intro">DwaniLive runs on your own laptop during the talk -- so it keeps working even on flaky conference Wi-Fi. Here's the whole flow, start to finish.</p>
+  <h2 class="hiw-title">From download to live captions in a room, in five steps</h2>
+  <p class="hiw-intro">DwaniLive runs on your own laptop during the talk, so it keeps working even when the venue Wi-Fi has no internet. Here's the whole flow, start to finish.</p>
 
   <div class="steps">
 
     <div class="step">
       <div class="step-num">1</div>
       <div class="step-body">
-        <h3>Subscribe to a plan</h3>
-        <p>Pick Pro or Institution <a href="#plans" style="color:var(--accent-deep); font-weight:700;">below</a> and complete checkout. You'll be asked to create an account (or log in) first, since your subscription is tied to your account.</p>
+        <h3>Download and install</h3>
+        <p>Get <b>DwaniLive-Setup.exe</b> from the <a href="#plans" style="color:var(--accent-deep); font-weight:700;">Free plan below</a> (Windows 10/11). On first launch it downloads its speech and translation models once (about 1.1 GB). If the internet drops, it resumes where it stopped.</p>
+        <span class="note">Needs internet -- first launch only</span>
       </div>
     </div>
 
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-body">
-        <h3>Open your dashboard</h3>
-        <p>Once payment goes through, your <a href="dashboard.html" style="color:var(--accent-deep); font-weight:700;">dashboard</a> shows your license key and two downloads: the DwaniLive app itself, and a small one-time activation tool.</p>
+        <h3>Use it free, or activate Pro / Institution</h3>
+        <p>The Free plan works straight away, with no account and up to 20 attendees. For more, subscribe below. Your <a href="dashboard.html" style="color:var(--accent-deep); font-weight:700;">dashboard</a> then shows your licence key: paste it into the DwaniLive window once.</p>
       </div>
     </div>
 
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-body">
-        <h3>Activate once, while online</h3>
-        <p>Run the activation tool with the command shown on your dashboard (your license key and email are already filled in). It checks your subscription with our server and saves a signed pass on your laptop.</p>
-        <span class="note">Needs internet -- one time only</span>
+        <h3>Check your setup before you present</h3>
+        <p>Open DwaniLive, then click <b>Check setup</b> on the presenter page. It tests the network, Windows Firewall, the microphone (with a live level meter), and whether a phone can reach your laptop, and tells you exactly how to fix anything that's off.</p>
+        <span class="note offline">Works fully offline from here</span>
       </div>
     </div>
 
     <div class="step">
       <div class="step-num">4</div>
       <div class="step-body">
-        <h3>Start a session before you present</h3>
-        <p>Double-click the DwaniLive app. It checks the pass saved in step 3 (no server call needed), asks for microphone access, and gives you a join link and a QR code to display on your title slide.</p>
-        <span class="note offline">Works fully offline from here</span>
+        <h3>Put the QR code on your title slide</h3>
+        <p>Attendees scan it and pick their language. Use your laptop's microphone, or your phone as a wireless mic. Phone hotspots work too, and are often more reliable than college or hotel Wi-Fi.</p>
       </div>
     </div>
 
@@ -541,14 +550,29 @@
       <div class="step-num">5</div>
       <div class="step-body">
         <h3>Present -- captions appear live for the room</h3>
-        <p>As you speak, live captions (translated, if you've set that up) stream to everyone who joined. You can watch how many attendees are connected and see questions they send in, right from your own screen.</p>
+        <p>Everyone reads captions in their own language as you speak. Your dashboard shows how many people are following in each language, how quickly captions arrive, and whether the microphone can hear you.</p>
       </div>
     </div>
 
   </div>
 
   <div class="attendee-note">
-    <strong>What attendees do:</strong> nothing to install. They scan the QR code or open the link with their phone's camera or browser, and captions appear immediately in their language. Everything stays on the venue's local network -- no data leaves the building.
+    <strong>What attendees do:</strong> nothing to install. They scan the QR code, pick a language, and captions appear immediately. If their phone drops off the Wi-Fi, the page reconnects by itself and keeps the captions so far. Everything stays on the venue's local network -- no data leaves the building.
+  </div>
+</section>
+
+<section class="features-section wrap" id="features" aria-labelledby="features-title">
+  <h2 class="hiw-title" id="features-title">Included in every plan</h2>
+  <p class="hiw-intro">Built for real rooms: noisy halls, patchy Wi-Fi, and audiences who need captions to work for them.</p>
+  <div class="feature-grid">
+    <div class="feature"><div class="feature-ico" aria-hidden="true">📶</div><h3>Works offline</h3><p>Speech recognition and translation run on your laptop. No internet needed during the talk.</p></div>
+    <div class="feature"><div class="feature-ico" aria-hidden="true">✅</div><h3>Setup check</h3><p>One click tests network, firewall, microphone and phone reach, with a fix for each problem.</p></div>
+    <div class="feature"><div class="feature-ico" aria-hidden="true">📱</div><h3>Phone as microphone</h3><p>Walk around the stage: scan a QR with your phone and it becomes your wireless mic.</p></div>
+    <div class="feature"><div class="feature-ico" aria-hidden="true">🔄</div><h3>Never loses the room</h3><p>Attendees' phones reconnect automatically after a Wi-Fi blip and keep every caption so far.</p></div>
+    <div class="feature"><div class="feature-ico" aria-hidden="true">♿</div><h3>Accessible captions</h3><p>Big text, dark mode, high contrast, easy-read font, full-screen captions, screen-reader support, right-to-left scripts.</p></div>
+    <div class="feature"><div class="feature-ico" aria-hidden="true">📊</div><h3>Live presenter dashboard</h3><p>See who's following in which language, how fast captions arrive, and a live microphone level.</p></div>
+    <div class="feature"><div class="feature-ico" aria-hidden="true">💾</div><h3>Attendees keep a copy</h3><p>One tap saves everything shown so far as a text file, in the attendee's language.</p></div>
+    <div class="feature"><div class="feature-ico" aria-hidden="true">⬆️</div><h3>One-click updates</h3><p>New versions install from inside the app. Models and licence stay as they are.</p></div>
   </div>
 </section>
 
@@ -568,8 +592,9 @@
       <div class="plan-price"><span class="amount">₹0</span></div>
       <p class="plan-subnote">No activation needed</p>
       <!-- "latest" always serves the newest release: no need to edit this link on every version -->
-      <a class="plan-cta secondary" href="https://github.com/khushi-070906/Dwani/releases/latest/download/DwaniLive-Setup.exe" style="text-align:center; text-decoration:none; display:block;">Download for Windows</a>
-      <p class="plan-subnote" style="margin-top:0.4rem">Windows 10/11, 64-bit · <a href="https://github.com/khushi-070906/Dwani/releases/latest/download/DwaniLive-win64.zip">portable .zip</a></p>
+      <a class="plan-cta secondary" id="dl-setup" href="https://github.com/khushi-070906/Dwani/releases/latest/download/DwaniLive-Setup.exe" style="text-align:center; text-decoration:none; display:block;">Download for Windows</a>
+      <p class="plan-subnote" style="margin-top:0.4rem">Windows 10/11, 64-bit · <a id="dl-zip" href="https://github.com/khushi-070906/Dwani/releases/latest/download/DwaniLive-win64.zip">portable .zip</a></p>
+      <p class="release-line" id="release-line"></p>
       <ul class="plan-features">
         <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Offline transcription + translation (Whisper + NLLB-200)</li>
         <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="#0d6e5c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Up to 20 attendees, one presenter device</li>
@@ -666,7 +691,7 @@
 </main>
 
 <footer class="wrap">
-  DwaniLive · Built for in-person academic conferences · <a href="/careers/">Careers</a> · <a href="/careers/verify">Verify a certificate</a>
+  DwaniLive · Built for in-person academic conferences · <a href="/changelog">What's new</a>
 </footer>
 
 <!-- Checkout status modal -->
@@ -941,6 +966,22 @@
   document.getElementById('modal-close-btn').addEventListener('click', closeAuthModal);
   authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
   document.getElementById('switch-to-signup').addEventListener('click', (e) => { e.preventDefault(); openAuthModal('signup'); });
+
+  // ---- Latest desktop release (from /api/release, cached on our server) ----
+  (() => {
+    const line = document.getElementById('release-line');
+    if (!line) return;
+    fetch('/api/release').then((r) => (r.ok ? r.json() : null)).then((rel) => {
+      if (!rel || !rel.version) return;
+      const when = rel.published_at ? new Date(rel.published_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+      line.textContent = 'Latest: v' + rel.version + (when ? ' · ' + when : '') + ' · ';
+      const a = document.createElement('a');
+      a.href = '/changelog'; a.textContent = "What's new";
+      line.appendChild(a);
+      if (rel.setup_url) document.getElementById('dl-setup').href = rel.setup_url;
+      if (rel.zip_url && document.getElementById('dl-zip')) document.getElementById('dl-zip').href = rel.zip_url;
+    }).catch(() => {});
+  })();
 
   // ---- Nav: highlight the section in view (this page is the site's home) ----
   (() => {
