@@ -200,6 +200,77 @@ def serve_settings_page():
     return FileResponse(STATIC_DIR / "settings.html")
 
 
+# --- Release info for the website (version, download links, changelog) -----
+# The site always shows the newest desktop release without being edited:
+# GitHub's API is read here (not from each visitor's browser) and cached, so
+# visitors never hit GitHub's 60-requests/hour anonymous limit. Set
+# GITHUB_TOKEN to raise that limit; it's optional.
+RELEASE_REPO = os.environ.get("RELEASE_REPO", "khushi-070906/Dwani")
+_release_cache: dict = {"at": 0.0, "data": None}
+RELEASE_TTL_S = 600
+
+
+def _fetch_releases() -> list[dict]:
+    req = urllib.request.Request(f"https://api.github.com/repos/{RELEASE_REPO}/releases?per_page=12",
+                                 headers={"Accept": "application/vnd.github+json", "User-Agent": "dwanilive-site"})
+    token = os.environ.get("GITHUB_TOKEN")
+    if token:
+        req.add_header("Authorization", f"Bearer {token}")
+    with urllib.request.urlopen(req, timeout=8) as r:
+        raw = json.loads(r.read().decode("utf-8"))
+    out = []
+    for rel in raw:
+        if rel.get("draft") or rel.get("prerelease"):
+            continue
+        assets = {a.get("name"): a.get("browser_download_url") for a in rel.get("assets", [])}
+        out.append({
+            "tag": rel.get("tag_name", ""),
+            "version": rel.get("tag_name", "").lstrip("v"),
+            "published_at": rel.get("published_at"),
+            "url": rel.get("html_url"),
+            "setup_url": assets.get("DwaniLive-Setup.exe"),
+            "zip_url": assets.get("DwaniLive-win64.zip"),
+            "notes": (rel.get("body") or "")[:6000],
+        })
+    return out
+
+
+def _releases() -> list[dict] | None:
+    now = time.time()
+    if _release_cache["data"] is not None and now - _release_cache["at"] < RELEASE_TTL_S:
+        return _release_cache["data"]
+    try:
+        _release_cache["data"], _release_cache["at"] = _fetch_releases(), now
+    except Exception as exc:  # noqa: BLE001 -- GitHub down / rate limited: keep serving the last good copy
+        logging.getLogger(__name__).warning("release fetch failed: %s", exc)
+        _release_cache["at"] = now - RELEASE_TTL_S + 60  # retry in a minute
+    return _release_cache["data"]
+
+
+@app.get("/api/release")
+def latest_release(response: Response):
+    rels = _releases()
+    if not rels:
+        raise HTTPException(status_code=503, detail="Release information is temporarily unavailable")
+    response.headers["Cache-Control"] = "public, max-age=300"
+    return rels[0]
+
+
+@app.get("/api/releases")
+def all_releases(response: Response):
+    rels = _releases()
+    if rels is None:
+        raise HTTPException(status_code=503, detail="Release information is temporarily unavailable")
+    response.headers["Cache-Control"] = "public, max-age=300"
+    return rels
+
+
+@app.get("/changelog.html")
+@app.get("/changelog")
+def changelog_page():
+    return FileResponse(STATIC_DIR / "changelog.html")
+
+
 @app.get("/")
 def serve_root():
     return FileResponse(STATIC_DIR / "pricing.html")
