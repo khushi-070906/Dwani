@@ -271,7 +271,7 @@
     font-size: 0.85rem;
     font-weight: 600;
   }
-  .custom-lang button:hover { border-color: var(--accent); color: var(--accent); }
+  .custom-lang button:hover { border-color: var(--accent); color: var(--accent-deep); }
 
   .join-error {
     color: var(--error);
@@ -319,7 +319,7 @@
     50% { opacity: 0.35; }
   }
   .status-text.live { color: var(--live); }
-  .status-text.connecting { color: var(--accent); }
+  .status-text.connecting { color: var(--accent-deep); } /* --accent is only 2.8:1 on the light background */
   .status-text.down { color: var(--error); }
   .status-text.idle { color: var(--ink-dim); }
 
@@ -452,13 +452,13 @@
     font-size: 0.78rem;
     font-weight: 600;
   }
-  .header-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .header-btn:hover { border-color: var(--accent); color: var(--accent-deep); }
   .header-btn.recording {
     border-color: var(--error);
     color: var(--error);
     animation: pulse 1s ease-in-out infinite;
   }
-  .header-btn.panel-open { border-color: var(--accent); color: var(--accent); }
+  .header-btn.panel-open { border-color: var(--accent); color: var(--accent-deep); }
 
   .a11y-panel {
     position: fixed;
@@ -495,6 +495,50 @@
     color: var(--ink-dim);
     text-align: center;
     min-height: 1.1em;
+  }
+
+  /* ---- accessibility additions ---- */
+  @font-face { font-family: "Atkinson Hyperlegible"; src: url("/static/fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype"); font-weight: 400 500; font-display: swap; }
+  @font-face { font-family: "Atkinson Hyperlegible"; src: url("/static/fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype"); font-weight: 600 800; font-display: swap; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  body.a11y-dark {
+    --bg: #15110d; --bg-raised: #1f1914; --bg-raised-2: #352b21;
+    --ink: #f6ecda; --ink-dim: #dccbb0; --ink-faint: #b7a385;
+    --accent: #f2a453; --accent-deep: #f2a453; --live: #74d085; --error: #ff8a80; --focus: #f2a453;
+  }
+  body.a11y-dark, body.a11y-high-contrast { background: var(--bg); }
+  body.a11y-dark .mandala-bg, body.a11y-high-contrast .mandala-bg { opacity: 0.12; }
+  .caption-line { line-height: var(--a11y-leading, 1.35); }
+  body.a11y-easyread .caption-stage { text-align: left; }
+  body.a11y-easyread .caption-line {
+    font-family: "Atkinson Hyperlegible", var(--font-body);
+    font-weight: 600; letter-spacing: 0.04em; word-spacing: 0.18em;
+  }
+  .a11y-hint { color: var(--ink-faint); font-size: 0.8em; }
+  .a11y-row select { background: var(--bg); color: var(--ink); border: 1px solid var(--bg-raised-2); border-radius: 6px; padding: 0.2rem 0.4rem; font: inherit; }
+  .a11y-actions { gap: 0.5rem; flex-wrap: wrap; }
+  .a11y-action { border: none; border-radius: 8px; padding: 0.5rem 0.9rem; min-height: 40px; background: var(--indigo); color: #fffdf6; font: 700 0.85rem var(--font-body); cursor: pointer; }
+  .a11y-action.secondary { background: transparent; color: var(--ink-dim); border: 1px solid var(--bg-raised-2); }
+  .header-btn, .change-lang-btn { min-height: 40px; }
+  *:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  /* full screen / projector: only the captions, big */
+  .focus-exit { display: none; }
+  body.a11y-focus .live-header, body.a11y-focus .a11y-panel, body.a11y-focus .a11y-ask-status,
+  body.a11y-focus .garland, body.a11y-focus .mandala-bg { display: none !important; }
+  body.a11y-focus .caption-stage { padding: 3vh 5vw 6vh; }
+  body.a11y-focus .caption-line.age-0 { font-size: calc(clamp(2.2rem, 6.5vw, 5.5rem) * var(--a11y-scale, 1)); }
+  body.a11y-focus .caption-line.age-1 { font-size: calc(clamp(1.8rem, 5vw, 4.2rem) * var(--a11y-scale, 1)); }
+  body.a11y-focus .caption-line.age-2 { font-size: calc(clamp(1.5rem, 4vw, 3.2rem) * var(--a11y-scale, 1)); }
+  body.a11y-focus .caption-line.age-3 { font-size: calc(clamp(1.3rem, 3.4vw, 2.6rem) * var(--a11y-scale, 1)); }
+  body.a11y-focus .focus-exit {
+    display: block; position: fixed; top: max(0.6rem, env(safe-area-inset-top)); right: 0.6rem; z-index: 50;
+    min-height: 44px; padding: 0.5rem 0.9rem; border-radius: 999px; border: 1px solid var(--bg-raised-2);
+    background: var(--bg-raised); color: var(--ink-dim); font: 600 0.85rem var(--font-body); opacity: 0.35; cursor: pointer;
+  }
+  body.a11y-focus .focus-exit:hover, body.a11y-focus .focus-exit:focus-visible { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .caption-line { animation: none !important; }
+    .caption-stage.flash { animation: none !important; outline: 3px solid var(--accent); }
   }
 </style>
 </head>
@@ -562,7 +606,7 @@
   <div class="lang-grid" id="lang-grid"></div>
 
   <div class="custom-lang">
-    <input id="custom-lang-input" type="text" placeholder="Other language code, e.g. ja, ar" maxlength="12">
+    <input id="custom-lang-input" type="text" placeholder="Other language code, e.g. ja, ar" maxlength="12" aria-label="Other language code, for example ja or ar">
     <button id="custom-lang-btn" type="button">Join</button>
   </div>
 
@@ -578,8 +622,8 @@
     </div>
     <div class="header-right">
       <span class="lang-chip" id="live-lang-chip"></span>
-      <button class="header-btn" id="ask-btn" type="button">💬 Ask</button>
-      <button class="header-btn" id="a11y-btn" type="button">⚙ Accessibility</button>
+      <button class="header-btn" id="ask-btn" type="button" aria-expanded="false" aria-controls="ask-panel">💬 Ask</button>
+      <button class="header-btn" id="a11y-btn" type="button" aria-expanded="false" aria-controls="a11y-panel">⚙ Accessibility</button>
       <button class="header-btn" id="save-btn" type="button" title="Download everything shown so far as a text file">💾 Save</button>
       <button class="change-lang-btn" id="change-lang-btn" type="button">Change language</button>
     </div>
@@ -593,14 +637,27 @@
   <p class="a11y-ask-status" id="ask-status"></p>
 
   <div class="a11y-panel" id="a11y-panel" hidden>
-    <div class="a11y-row"><label><input type="checkbox" id="a11y-high-contrast"> High contrast</label></div>
-    <div class="a11y-row"><label>Text size <input type="range" id="a11y-font-scale" min="1" max="2.5" step="0.1" value="1"></label></div>
+    <div class="a11y-row"><label><input type="checkbox" id="a11y-dark"> Dark mode</label></div>
+    <div class="a11y-row"><label><input type="checkbox" id="a11y-high-contrast"> High contrast (yellow on black)</label></div>
+    <div class="a11y-row"><label>Text size <input type="range" id="a11y-font-scale" min="1" max="2.5" step="0.1" value="1" aria-valuetext="100%"></label></div>
+    <div class="a11y-row"><label>Line spacing
+      <select id="a11y-leading"><option value="1.35">Normal</option><option value="1.6">Relaxed</option><option value="2">Extra</option></select></label></div>
+    <div class="a11y-row"><label><input type="checkbox" id="a11y-easyread"> Easy-read font &amp; spacing <span class="a11y-hint">(helps many readers with dyslexia)</span></label></div>
     <div class="a11y-row"><label><input type="checkbox" id="a11y-hold-longer"> Hold captions longer</label></div>
     <div class="a11y-row"><label><input type="checkbox" id="a11y-flash"> Flash on new caption</label></div>
+    <div class="a11y-row a11y-actions">
+      <button type="button" class="a11y-action" id="focus-btn">⛶ Full screen / projector</button>
+      <button type="button" class="a11y-action secondary" id="a11y-reset">Reset</button>
+    </div>
   </div>
 
   <div class="waiting-state" id="waiting-state">Waiting for the presenter to begin…</div>
-  <div class="caption-stage" id="caption-stage" hidden></div>
+  <div class="caption-stage" id="caption-stage" hidden aria-hidden="true"></div>
+  <!-- Screen readers: final captions only (interim words would be read twice), and
+       connection changes only when the state changes (not every countdown tick). -->
+  <div id="sr-captions" class="sr-only" role="log" aria-live="polite" aria-relevant="additions" aria-label="Captions"></div>
+  <div id="sr-status" class="sr-only" role="status" aria-live="polite"></div>
+  <button type="button" class="focus-exit" id="focus-exit">✕ Exit full screen</button>
 
   <div class="reconnect-banner" id="reconnect-banner">
     <span>Connection to the presenter's device dropped.</span>
@@ -659,6 +716,16 @@
   var a11yFontScale = document.getElementById("a11y-font-scale");
   var a11yHoldLonger = document.getElementById("a11y-hold-longer");
   var a11yFlash = document.getElementById("a11y-flash");
+  var a11yDark = document.getElementById("a11y-dark");
+  var a11yEasy = document.getElementById("a11y-easyread");
+  var a11yLeading = document.getElementById("a11y-leading");
+  var focusBtn = document.getElementById("focus-btn");
+  var focusExit = document.getElementById("focus-exit");
+  var srCaptions = document.getElementById("sr-captions");
+  var srStatus = document.getElementById("sr-status");
+  var lastSrState = null;
+  // Presentation-only settings (not sent to the server). Saved on this phone.
+  var ui = { dark: false, easyread: false, leading: "1.35" };
   var askBtn = document.getElementById("ask-btn");
   var askStatus = document.getElementById("ask-status");
 
@@ -694,7 +761,7 @@
       btn.className = "lang-btn";
       btn.type = "button";
       btn.innerHTML =
-        '<span class="lang-native">' + lang.native + '</span>' +
+        '<span class="lang-native" lang="' + lang.code + '">' + lang.native + '</span>' +
         '<span class="lang-english">' + lang.english + '</span>';
       btn.addEventListener("click", function () { joinWithLanguage(lang.code); });
       langGrid.appendChild(btn);
@@ -740,6 +807,8 @@
     joinScreen.hidden = true;
     liveScreen.hidden = false;
     liveLangChip.textContent = displayNameFor(langCode);
+    captionStage.lang = langCode;   // correct voice / hyphenation for this language
+    srCaptions.lang = langCode;
     resetCaptionState();
     store("dwani:last", { session: sessionId, lang: langCode, at: Date.now() });
     captionLog = load(historyKey()) || [];
@@ -921,6 +990,10 @@
     statusDot.className = "status-dot " + state;
     statusText.className = "status-text " + state;
     statusText.textContent = label;
+    if (state !== lastSrState) {  // announce state changes, not every countdown tick
+      lastSrState = state;
+      srStatus.textContent = state === "connecting" ? "Reconnecting to the presenter" : label;
+    }
   }
 
   function showReconnectBanner(text) {
@@ -953,6 +1026,7 @@
     if (payload.final) {
       lines.push(payload.text);
       captionLog.push({ t: Date.now(), text: payload.text });
+      announceCaption(payload.text);
       if (captionLog.length > HISTORY_CAP) captionLog = captionLog.slice(-HISTORY_CAP);
       persistHistory();
       var cap = effectiveMaxLines();
@@ -972,6 +1046,15 @@
     renderCaptionStage();
   }
 
+  function announceCaption(text) {
+    var d = document.createElement("div");
+    d.lang = currentLang || "";
+    d.dir = "auto";
+    d.textContent = text;
+    srCaptions.appendChild(d);
+    while (srCaptions.childNodes.length > 30) srCaptions.removeChild(srCaptions.firstChild);
+  }
+
   function renderCaptionStage() {
     var cap = effectiveMaxLines();
     var display = lines.slice();
@@ -987,6 +1070,7 @@
       var isInterim = interimLine && idx === count - 1 && text === interimLine;
       var el = document.createElement("div");
       el.className = "caption-line age-" + Math.min(ageFromNewest, 3) + (isInterim ? " interim" : "");
+      el.dir = "auto";  // Urdu/Arabic captions read right-to-left
       el.textContent = text;
       captionStage.appendChild(el);
     });
@@ -1021,30 +1105,117 @@
     var opening = a11yPanel.hidden;
     a11yPanel.hidden = !opening;
     a11yBtn.classList.toggle("panel-open", opening);
+    a11yBtn.setAttribute("aria-expanded", String(opening));
     if (opening) {
       askPanel.hidden = true;
       askBtn.classList.remove("panel-open");
+      askBtn.setAttribute("aria-expanded", "false");
     }
   });
 
-  [a11yHighContrast, a11yFontScale, a11yHoldLonger, a11yFlash].forEach(function (el) {
-    el.addEventListener("input", function () {
-      a11y.high_contrast = a11yHighContrast.checked;
-      a11y.large_text = a11yFontScale.value > 1;
-      a11y.font_scale = parseFloat(a11yFontScale.value);
-      a11y.hold_seconds = a11yHoldLonger.checked ? 15.0 : 6.0;
-      a11y.flash_on_new_caption = a11yFlash.checked;
+  function readA11yInputs() {
+    a11y.high_contrast = a11yHighContrast.checked;
+    a11y.large_text = a11yFontScale.value > 1;
+    a11y.font_scale = parseFloat(a11yFontScale.value);
+    a11y.hold_seconds = a11yHoldLonger.checked ? 15.0 : 6.0;
+    a11y.flash_on_new_caption = a11yFlash.checked;
+    ui.dark = a11yDark.checked;
+    ui.easyread = a11yEasy.checked;
+    ui.leading = a11yLeading.value;
+  }
+  function writeA11yInputs() {
+    a11yHighContrast.checked = !!a11y.high_contrast;
+    a11yFontScale.value = a11y.font_scale || 1;
+    a11yHoldLonger.checked = a11y.hold_seconds > 6;
+    a11yFlash.checked = !!a11y.flash_on_new_caption;
+    a11yDark.checked = !!ui.dark;
+    a11yEasy.checked = !!ui.easyread;
+    a11yLeading.value = ui.leading || "1.35";
+  }
+  [a11yHighContrast, a11yFontScale, a11yHoldLonger, a11yFlash, a11yDark, a11yEasy, a11yLeading].forEach(function (el) {
+    function changed() {
+      readA11yInputs();
       applyAccessibilityLocal();
+      store("dwani:a11y", { a11y: a11y, ui: ui });
       sendAccessibilitySettings();
       renderCaptionStage(); // re-render immediately if the line cap just changed
-    });
+    }
+    el.addEventListener("input", changed);
+    el.addEventListener("change", changed);
   });
+  document.getElementById("a11y-reset").addEventListener("click", function () {
+    forget("dwani:a11y");
+    a11y.high_contrast = false; a11y.large_text = false; a11y.font_scale = 1.0; a11y.hold_seconds = 6.0; a11y.flash_on_new_caption = false;
+    ui = { dark: prefersDark(), easyread: false, leading: "1.35" };
+    writeA11yInputs(); applyAccessibilityLocal(); sendAccessibilitySettings(); renderCaptionStage();
+  });
+
+  function prefersDark() {
+    try { return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (e) { return false; }
+  }
 
   function applyAccessibilityLocal() {
     document.body.classList.toggle("a11y-high-contrast", a11y.high_contrast);
+    document.body.classList.toggle("a11y-dark", !!ui.dark && !a11y.high_contrast);
+    document.body.classList.toggle("a11y-easyread", !!ui.easyread);
     document.body.classList.toggle("a11y-scaled", a11y.font_scale !== 1);
     document.documentElement.style.setProperty("--a11y-scale", a11y.font_scale);
+    document.documentElement.style.setProperty("--a11y-leading", ui.leading || "1.35");
+    a11yFontScale.setAttribute("aria-valuetext", Math.round((a11y.font_scale || 1) * 100) + "%");
   }
+
+  // Restore this phone's saved settings (or follow the phone's dark mode).
+  (function restoreA11y() {
+    var saved = load("dwani:a11y");
+    if (saved && saved.a11y) {
+      ["high_contrast", "large_text", "font_scale", "hold_seconds", "flash_on_new_caption"].forEach(function (k) {
+        if (k in saved.a11y) a11y[k] = saved.a11y[k];
+      });
+    }
+    ui = saved && saved.ui ? { dark: !!saved.ui.dark, easyread: !!saved.ui.easyread, leading: String(saved.ui.leading || "1.35") }
+                           : { dark: prefersDark(), easyread: false, leading: "1.35" };
+    writeA11yInputs();
+    applyAccessibilityLocal();
+  })();
+
+  // -- full screen / projector -------------------------------------------------
+  // Hides everything except the captions and makes them big. Uses the
+  // Fullscreen API where available (not on iPhone) and keeps the screen on
+  // where the browser allows it (secure pages, e.g. the laptop's own localhost).
+  var wakeLock = null;
+  function enterFocus() {
+    document.body.classList.add("a11y-focus");
+    a11yPanel.hidden = true; a11yBtn.classList.remove("panel-open"); a11yBtn.setAttribute("aria-expanded", "false");
+    var el = document.documentElement;
+    var req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req) { try { var p = req.call(el); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+    if (navigator.wakeLock && window.isSecureContext) {
+      navigator.wakeLock.request("screen").then(function (l) { wakeLock = l; }).catch(function () {});
+    }
+    srStatus.textContent = "Full screen captions. Press Escape or the Exit button to leave.";
+    focusExit.focus();
+  }
+  function exitFocus() {
+    if (!document.body.classList.contains("a11y-focus")) return;
+    document.body.classList.remove("a11y-focus");
+    var fs = document.fullscreenElement || document.webkitFullscreenElement;
+    var exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (fs && exit) { try { var p = exit.call(document); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+    if (wakeLock) { try { wakeLock.release(); } catch (e) {} wakeLock = null; }
+    a11yBtn.focus();
+  }
+  focusBtn.addEventListener("click", enterFocus);
+  focusExit.addEventListener("click", exitFocus);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") exitFocus(); });
+  ["fullscreenchange", "webkitfullscreenchange"].forEach(function (ev) {
+    document.addEventListener(ev, function () {
+      if (!(document.fullscreenElement || document.webkitFullscreenElement)) exitFocus();
+    });
+  });
+  // Double-tap the captions to enter/leave full screen.
+  captionStage.addEventListener("dblclick", function () {
+    document.body.classList.contains("a11y-focus") ? exitFocus() : enterFocus();
+  });
 
   function sendAccessibilitySettings() {
     if (socket && socket.readyState === WebSocket.OPEN) {
@@ -1070,9 +1241,11 @@
     var opening = askPanel.hidden;
     askPanel.hidden = !opening;
     askBtn.classList.toggle("panel-open", opening);
+    askBtn.setAttribute("aria-expanded", String(opening));
     if (opening) {
       a11yPanel.hidden = true; // only one panel open at a time
       a11yBtn.classList.remove("panel-open");
+      a11yBtn.setAttribute("aria-expanded", "false");
       askTextarea.focus();
     }
   });
