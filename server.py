@@ -425,6 +425,103 @@ async def presenter_info():
     return info
 
 
+# ---------------------------------------------------------------------------
+# Session notes (notes.py): recorded on the laptop, exported after the talk
+# ---------------------------------------------------------------------------
+
+notes_recorder = None          # set in main() unless --no-notes
+_notes_locks: dict = {}
+_term_cache: dict = {}
+
+
+def notes_dir() -> Path:
+    override = os.environ.get("DWANI_NOTES_DIR")
+    if override:
+        return Path(override)
+    try:
+        import appenv
+        return appenv.DATA_DIR / "sessions"
+    except Exception:
+        return Path.cwd() / "sessions"
+
+
+def _presenter_only(request: Request, key: str) -> bool:
+    import phone_mic
+    client_host = request.client.host if request.client else None
+    return phone_mic.is_loopback(client_host) or key == phone_mic.PRESENTER_KEY
+
+
+@app.get("/notes/status")
+async def notes_status(request: Request, key: str = ""):
+    if not _presenter_only(request, key):
+        return Response(status_code=404)
+    r = notes_recorder
+    return {"available": r is not None, "recording": bool(r and r.enabled), "captions": r.count if r else 0,
+            "id": r.path.stem if r else None}
+
+
+@app.post("/notes/recording")
+async def notes_toggle(request: Request, on: bool, key: str = ""):
+    if not _presenter_only(request, key) or notes_recorder is None:
+        return Response(status_code=404)
+    notes_recorder.enabled = on
+    return {"recording": notes_recorder.enabled}
+
+
+@app.get("/notes/sessions")
+async def notes_sessions(request: Request, key: str = ""):
+    if not _presenter_only(request, key):
+        return Response(status_code=404)
+    import notes
+    return await asyncio.to_thread(notes.list_sessions, notes_dir())
+
+
+@app.get("/notes/export")
+async def notes_export(request: Request, id: str, lang: str = "", format: str = "notes", key: str = ""):
+    """Notes / transcript / subtitles for a recorded session, in any language.
+    Translations that weren't produced live are made now with the app's NLLB
+    model and saved, so the next export of that language is instant."""
+    import re as _re
+    import notes
+
+    if not _presenter_only(request, key):
+        return Response(status_code=404)
+    path = notes.safe_session_path(notes_dir(), id)
+    if path is None or format not in ("notes", "txt", "srt", "md"):
+        return Response(status_code=404)
+    sess = await asyncio.to_thread(notes.load_session, path)
+    lang = lang or sess.src_lang
+    if not _re.fullmatch(r"[a-z]{2,3}", lang):
+        return Response(status_code=400)
+    translator = getattr(pipeline, "translator", None)
+    if lang != sess.src_lang:
+        if translator is None:
+            return Response("Translation model not loaded", status_code=503)
+        lock = _notes_locks.setdefault((id, lang), asyncio.Lock())
+        async with lock:
+            await notes.ensure_language(sess, lang, translator.translate)
+    terms_tr = {}
+    if format in ("notes", "md") and lang != sess.src_lang and translator is not None:
+        for term in notes.key_terms(sess.captions):
+            ck = (term, sess.src_lang, lang)
+            if ck not in _term_cache:
+                try:
+                    _term_cache[ck] = await translator.translate(term, lang)
+                except Exception:
+                    _term_cache[ck] = ""
+            terms_tr[term] = _term_cache[ck]
+    base = f"dwanilive-{id}-{lang}"
+    if format == "notes":
+        return Response(notes.export_html(sess, lang, terms_tr), media_type="text/html; charset=utf-8")
+    body, ext, mime = {
+        "txt": (notes.export_txt(sess, lang), "txt", "text/plain"),
+        "srt": (notes.export_srt(sess, lang), "srt", "application/x-subrip"),
+        "md": (notes.export_md(sess, lang, terms_tr), "md", "text/markdown"),
+    }[format]
+    return Response(body, media_type=f"{mime}; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="{base}.{ext}"'})
+
+
 @app.get("/dashboard-stats")
 async def dashboard_stats(request: Request, key: str = ""):
     """Live numbers for the presenter dashboard: attendees per language and
@@ -678,7 +775,7 @@ def main(argv=None):
     # than the one in the printed QR (-> every phone rejected with 4000
     # "unknown session"), the real Whisper/NLLB pipeline was never used,
     # --qa stayed disabled, and the license attendee cap was never applied.
-    global session, active_license, pipeline, qa_pipeline_instance, dynamic_glossary_updater, phone_mic_url
+    global session, active_license, pipeline, qa_pipeline_instance, dynamic_glossary_updater, phone_mic_url, notes_recorder
 
     if argv is None:
         argv = sys.argv[1:]
@@ -696,6 +793,11 @@ def main(argv=None):
         "browsers only allow microphone access on a secure context (https://, or http://localhost), "
         "and a plain http://<lan-ip> join URL doesn't qualify. Not needed if every device using the mic "
         "features is on http://localhost (e.g. testing on the presenter's own machine).",
+    )
+    parser.add_argument(
+        "--no-notes",
+        action="store_true",
+        help="Don't save session notes (captions + translations) on this laptop.",
     )
     parser.add_argument(
         "--phone-mic",
@@ -1158,6 +1260,15 @@ def main(argv=None):
         print(f"Using real backends: whisper={args.whisper_model or '(none)'} nllb_dir={args.nllb_model_dir or '(none)'}")
     else:
         print("No --whisper-model/--nllb-model-dir given -- broadcasting placeholder transcripts/translations.")
+
+    if not args.no_notes:
+        try:
+            import notes
+            notes_recorder = notes.NotesRecorder(notes_dir(), session.session_id, args.presenter_language)
+            pipeline.on_final = notes_recorder.record
+            print(f"Session notes: {notes_recorder.path}")
+        except Exception as exc:  # never block a session over notes
+            print(f"(Session notes disabled: {exc})")
 
     if args.qa:
         # A separate RealWhisperBackend instance from the main pipeline's,
