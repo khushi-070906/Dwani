@@ -417,6 +417,29 @@ async def presenter_info():
     return info
 
 
+@app.get("/preflight")
+async def preflight_checks(request: Request, key: str = ""):
+    """Readiness checks for the presenter page (see preflight.py). Contains
+    network details, so only the laptop itself or the presenter's phone
+    (with the presenter key) may read it."""
+    import phone_mic
+    import preflight
+
+    client_host = request.client.host if request.client else None
+    if not phone_mic.is_loopback(client_host) and key != phone_mic.PRESENTER_KEY:
+        return Response(status_code=404)
+    ips = session.candidate_local_ips()
+    checks = preflight.model_checks(getattr(pipeline, "asr", None), getattr(pipeline, "translator", None))
+    checks += preflight.network_checks(ips, session.primary_ip() if ips else "", session.port)
+    checks.append(await asyncio.to_thread(preflight.firewall_check))
+    checks.append(preflight.phones_check(sum(len(v) for v in subscribers.values())))
+    if phone_mic_url:
+        checks.append(preflight.Check("phone_mic", "Phone as microphone", preflight.INFO,
+                                      "Available: scan the phone-mic QR in the DwaniLive window."))
+    checks.append(preflight.licence_check(active_license))
+    return preflight.summarize(checks)
+
+
 @app.get("/qr.png")
 async def qr_image():
     return FileResponse(session.qr_image_path)
