@@ -27,6 +27,8 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history + tags, for the release notes below
 
       - uses: actions/setup-python@v5
         with:
@@ -58,10 +60,28 @@ jobs:
           path: release/*
           if-no-files-found: error
 
+      - name: Write release notes from commit messages
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          # Notes = this release's commit subjects (we write one clear commit per change),
+          # minus version bumps. The website's "What's new" page shows these.
+          prev=$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)
+          range="${prev:+$prev..}${GITHUB_REF_NAME}"
+          {
+            echo "## What's new in ${GITHUB_REF_NAME}"
+            echo
+            git log "$range" --no-merges --pretty=format:'- %s' | grep -v -i -E '^- bump version' || true
+            echo
+            echo
+            [ -n "$prev" ] && echo "**Full changes:** https://github.com/${GITHUB_REPOSITORY}/compare/${prev}...${GITHUB_REF_NAME}"
+          } > release_notes.md
+          cat release_notes.md
+
       - name: Publish GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           files: release/*
           make_latest: true
-          generate_release_notes: true
+          body_path: release_notes.md
