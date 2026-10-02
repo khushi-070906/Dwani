@@ -48,6 +48,7 @@ Usage sketch from server.py:
 from __future__ import annotations
 
 import asyncio
+from collections import deque
 import time
 from dataclasses import dataclass, field
 from typing import Awaitable, Callable, Iterable, Protocol
@@ -413,6 +414,47 @@ class FakeTranslationBackend:
 BroadcastFn = Callable[[str, str, bool], Awaitable[None]]
 
 
+class LatencyStats:
+    """Rolling timing of the last N FINAL captions, for the presenter dashboard.
+
+    Measured from the moment a finished utterance reaches the pipeline (the
+    segmenter has already waited for the pause that ends it) until the
+    caption was sent in the slowest language: speech recognition + the
+    longest translation + broadcast. The attendee additionally waits for
+    that end-of-speech pause and Wi-Fi delivery, typically a few hundred ms.
+    """
+
+    def __init__(self, keep: int = 50) -> None:
+        self.samples: deque = deque(maxlen=keep)
+        self.total_captions = 0
+
+    def record(self, asr_ms: float, mt_ms: float, total_ms: float, audio_s: float, languages: int) -> None:
+        self.total_captions += 1
+        self.samples.append({"asr_ms": asr_ms, "mt_ms": mt_ms, "total_ms": total_ms, "audio_s": audio_s,
+                             "languages": languages, "at": time.time()})
+
+    @staticmethod
+    def _pct(values: list[float], q: float) -> float:
+        v = sorted(values)
+        return v[min(len(v) - 1, max(0, round(q * (len(v) - 1))))]
+
+    def summary(self) -> dict:
+        if not self.samples:
+            return {"count": 0, "captions_sent": self.total_captions}
+        s = list(self.samples)
+        totals = [x["total_ms"] for x in s]
+        return {
+            "count": len(s),
+            "captions_sent": self.total_captions,
+            "p50_ms": round(self._pct(totals, 0.5)),
+            "p95_ms": round(self._pct(totals, 0.95)),
+            "last_ms": round(totals[-1]),
+            "asr_avg_ms": round(sum(x["asr_ms"] for x in s) / len(s)),
+            "mt_avg_ms": round(sum(x["mt_ms"] for x in s) / len(s)),
+            "seconds_since_last": round(time.time() - s[-1]["at"], 1),
+        }
+
+
 class Pipeline:
     """
     Owns one host session's transcription-translation flow.
@@ -478,7 +520,10 @@ class Pipeline:
         return await self._process_segment(segment, is_final=True)
 
     async def _process_segment(self, segment: AudioSegment, is_final: bool = True) -> str:
+        t0 = time.monotonic()
         transcript = await self.asr.transcribe(segment)
+        asr_ms = (time.monotonic() - t0) * 1000
+        mt_times: list[float] = []
 
         # Snapshot languages once per segment: translating once per language
         # here is what keeps MT cost independent of attendee count.
@@ -492,6 +537,7 @@ class Pipeline:
                 start = time.monotonic()
                 translated = await self.translator.translate(transcript, lang)
                 elapsed = time.monotonic() - start
+                mt_times.append(elapsed * 1000)
                 await self.cache.put(transcript, lang, translated)
                 # Only SemanticCache (translation_cache.py) exposes this --
                 # feeds CacheStats.estimated_seconds_saved automatically for
@@ -534,6 +580,12 @@ class Pipeline:
             for lang, result in zip(languages, results):
                 if isinstance(result, Exception):
                     print(f"[pipeline] translation/broadcast failed for {lang!r}: {result}")
+            if is_final:
+                stats = getattr(self, "latency", None)
+                if stats is None:
+                    stats = self.latency = LatencyStats()
+                stats.record(asr_ms, max(mt_times, default=0.0), (time.monotonic() - t0) * 1000,
+                             segment.duration_seconds, len(languages))
 
         return transcript
 
