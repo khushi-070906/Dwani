@@ -115,6 +115,11 @@ async def attendee_socket(websocket: WebSocket, lang: str, session_param: str):
                 message = json.loads(raw)
             except (ValueError, TypeError):
                 continue
+            if isinstance(message, dict) and message.get("type") == "ping":
+                # Heartbeat from index.html: lets a phone notice within seconds that
+                # a Wi-Fi switch silently killed the connection (no close event).
+                await websocket.send_json({"type": "pong", "t": message.get("t")})
+                continue
             if isinstance(message, dict) and message.get("type") == "settings":
                 accessibility_prefs[websocket] = AccessibilityPreferences.from_dict(
                     message.get("accessibility", {})
