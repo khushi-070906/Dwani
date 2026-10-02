@@ -456,6 +456,28 @@
     margin-top: 0.3rem;
     line-height: 1.4;
   }
+
+  /* ---- pre-flight check ---- */
+  .pf-wrap { width: 100%; max-width: 560px; margin: 0.4rem auto 0.8rem; }
+  .pf-toggle { display: inline-flex; align-items: center; gap: 0.5rem; border: 1.5px solid var(--bg-raised-2); background: var(--bg-raised);
+    border-radius: 999px; padding: 0.35rem 0.85rem; font: 600 0.88rem var(--font-body); color: var(--ink-dim); cursor: pointer; }
+  .pf-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ink-faint); }
+  .pf-dot.ok { background: var(--live); } .pf-dot.warn { background: var(--accent); } .pf-dot.fail { background: var(--error); }
+  .pf-panel { margin-top: 0.6rem; background: var(--bg-raised); border: 1.5px solid var(--bg-raised-2); border-radius: 14px; padding: 0.8rem 1rem; text-align: left; box-shadow: var(--shadow); }
+  .pf-list { list-style: none; margin: 0; padding: 0; }
+  .pf-list li { display: grid; grid-template-columns: 1.5rem 1fr; gap: 0.1rem 0.4rem; padding: 0.45rem 0; border-bottom: 1px dashed var(--bg-raised-2); font-size: 0.9rem; }
+  .pf-ico { font-weight: 800; text-align: center; }
+  .pf-ico.ok { color: var(--live); } .pf-ico.warn { color: var(--accent-deep); } .pf-ico.fail { color: var(--error); } .pf-ico.info { color: var(--indigo); }
+  .pf-title { font-weight: 700; color: var(--ink); }
+  .pf-detail { grid-column: 2; color: var(--ink-dim); }
+  .pf-fix { grid-column: 2; color: var(--accent-deep); font-size: 0.85rem; }
+  .pf-mic { padding-top: 0.6rem; }
+  .pf-mic-head { display: flex; justify-content: space-between; align-items: center; font-size: 0.92rem; }
+  .pf-mic-btn { border: none; border-radius: 8px; padding: 0.3rem 0.7rem; background: var(--indigo); color: #fffdf6; font: 700 0.8rem var(--font-body); cursor: pointer; }
+  .pf-meter { height: 10px; border-radius: 999px; background: var(--bg-raised-2); overflow: hidden; margin: 0.5rem 0 0.3rem; }
+  .pf-meter-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--live), var(--accent)); transition: width 80ms linear; }
+  .pf-mic-text { margin: 0; font-size: 0.85rem; color: var(--ink-dim); }
+  .pf-foot { margin: 0.6rem 0 0; font-size: 0.78rem; color: var(--ink-faint); }
 </style>
 </head>
 <body>
@@ -533,6 +555,21 @@
 </button>
 
 <p class="status-line" id="status-line">Not presenting</p>
+
+<div class="pf-wrap">
+  <button type="button" class="pf-toggle" id="pf-toggle" aria-expanded="false">
+    <span class="pf-dot" id="pf-dot"></span><span id="pf-summary">Check setup</span>
+  </button>
+  <div class="pf-panel" id="pf-panel" hidden>
+    <ul class="pf-list" id="pf-list"></ul>
+    <div class="pf-mic">
+      <div class="pf-mic-head"><b>Microphone</b><button type="button" class="pf-mic-btn" id="pf-mic-btn">Test microphone</button></div>
+      <div class="pf-meter"><div class="pf-meter-fill" id="pf-meter-fill"></div></div>
+      <p class="pf-mic-text" id="pf-mic-text">Click "Test microphone" and say something. The bar should move.</p>
+    </div>
+    <p class="pf-foot">Updates every few seconds. Scan the join QR with your own phone: the phone test turns green when it connects.</p>
+  </div>
+</div>
 
 <div class="join-section">
   <button type="button" class="join-toggle" id="join-toggle" aria-expanded="true">
@@ -1070,8 +1107,102 @@
     clearTimeout(qaReconnectTimer);
   });
 
+  // ---------------------------------------------------------------- pre-flight
+  (function () {
+    var toggle = document.getElementById("pf-toggle"), panel = document.getElementById("pf-panel");
+    var list = document.getElementById("pf-list"), dot = document.getElementById("pf-dot"), summary = document.getElementById("pf-summary");
+    var ICON = { ok: "✓", warn: "!", fail: "✗", info: "i" };
+    var key = new URLSearchParams(window.location.search).get("key");
+    var timer = null, micCheck = null;
+
+    function browserChecks() {
+      var out = [];
+      if (!window.isSecureContext) {
+        out.push({ status: "fail", title: "Browser security", detail: "This page isn't secure, so the browser will block the microphone.",
+                   fix: "Open the presenter page from the DwaniLive window (or the phone-mic QR), not by typing the IP address." });
+      }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        out.push({ status: "fail", title: "Microphone access", detail: "This browser can't use the microphone.", fix: "Use Chrome, Edge or Safari." });
+      }
+      if (micCheck) out.push(micCheck);
+      return out;
+    }
+
+    function render(server) {
+      var checks = (server ? server.checks : []).concat(browserChecks());
+      list.innerHTML = "";
+      checks.forEach(function (c) {
+        var li = document.createElement("li");
+        li.innerHTML = '<span class="pf-ico ' + c.status + '">' + (ICON[c.status] || "") + '</span><span class="pf-title"></span>' +
+                       '<span class="pf-detail"></span>' + (c.fix ? '<span class="pf-fix"></span>' : "");
+        li.querySelector(".pf-title").textContent = c.title;
+        li.querySelector(".pf-detail").textContent = c.detail;
+        if (c.fix) li.querySelector(".pf-fix").textContent = c.fix;
+        list.appendChild(li);
+      });
+      var fails = checks.filter(function (c) { return c.status === "fail"; }).length;
+      var warns = checks.filter(function (c) { return c.status === "warn"; }).length;
+      dot.className = "pf-dot " + (fails ? "fail" : warns ? "warn" : "ok");
+      summary.textContent = fails ? fails + " problem" + (fails > 1 ? "s" : "") + " to fix" : warns ? "Ready, " + warns + " thing" + (warns > 1 ? "s" : "") + " to check" : "All set";
+    }
+
+    function run() {
+      return fetch("/preflight" + (key ? "?key=" + encodeURIComponent(key) : ""), { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(render)
+        .catch(function () { render(null); });
+    }
+
+    toggle.addEventListener("click", function () {
+      var open = panel.hidden;
+      panel.hidden = !open;
+      toggle.setAttribute("aria-expanded", String(open));
+      if (open) { run(); timer = setInterval(run, 4000); } else { clearInterval(timer); }
+    });
+
+    document.getElementById("pf-mic-btn").addEventListener("click", function () {
+      var btn = this, fill = document.getElementById("pf-meter-fill"), text = document.getElementById("pf-mic-text");
+      if (isPresenting) { text.textContent = "You're live, so the microphone is already in use. Stop presenting to run the test."; return; }
+      btn.disabled = true;
+      text.textContent = "Listening for 5 seconds. Say something…";
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        var an = ctx.createAnalyser(); an.fftSize = 1024;
+        ctx.createMediaStreamSource(stream).connect(an);
+        var buf = new Float32Array(an.fftSize), peak = 0, start = performance.now();
+        var label = (stream.getAudioTracks()[0] || {}).label || "default microphone";
+        (function tick() {
+          an.getFloatTimeDomainData(buf);
+          var rms = 0; for (var i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+          rms = Math.sqrt(rms / buf.length); peak = Math.max(peak, rms);
+          fill.style.width = Math.min(100, rms * 400) + "%";
+          if (performance.now() - start < 5000) return requestAnimationFrame(tick);
+          stream.getTracks().forEach(function (t) { t.stop(); }); ctx.close(); fill.style.width = "0%"; btn.disabled = false;
+          if (peak > 0.02) {
+            micCheck = { status: "ok", title: "Microphone", detail: "Working: " + label + "." };
+            text.textContent = "Microphone works (" + label + ").";
+          } else {
+            micCheck = { status: "fail", title: "Microphone", detail: "Almost no sound from " + label + ".",
+                         fix: "Unmute the mic, pick the right one in Windows Sound settings, or move closer. Then test again." };
+            text.textContent = "Couldn't hear you. See the fix above.";
+          }
+          run();
+        })();
+      }).catch(function (err) {
+        btn.disabled = false;
+        micCheck = { status: "fail", title: "Microphone", detail: "Permission denied or no microphone found (" + err.name + ").",
+                     fix: "Click the lock/mic icon in the address bar, allow the microphone, and reload the page." };
+        text.textContent = "The browser blocked the microphone.";
+        run();
+      });
+    });
+
+    run();  // one quick check on page load, so problems show before you press Start
+  })();
+
   init();
 })();
+
 </script>
 </body>
 </html>
