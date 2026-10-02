@@ -27,6 +27,7 @@ class Check:
     status: str
     detail: str
     fix: str = ""
+    help: str = ""   # anchor in static/help.html, e.g. "firewall" -> /help#firewall
 
 
 # ---------------------------------------------------------------------------
@@ -60,25 +61,25 @@ def network_checks(ips: list[str], primary: str, port: int) -> list[Check]:
     checks: list[Check] = []
     if not ips:
         checks.append(Check("network", "Network", FAIL, "This laptop isn't connected to any network.",
-                            "Connect to Wi-Fi, or turn on a phone hotspot and connect the laptop to it."))
+                            "Connect to Wi-Fi, or turn on a phone hotspot and connect the laptop to it.", "hotspot"))
         return checks
     kind, label = classify_ip(primary)
     if kind == "linklocal":
         checks.append(Check("network", "Network", FAIL, f"{primary}: {label}.",
-                            "The Wi-Fi didn't give the laptop an address. Reconnect, or use a phone hotspot."))
+                            "The Wi-Fi didn't give the laptop an address. Reconnect, or use a phone hotspot.", "hotspot"))
     elif kind in ("hotspot-laptop", "hotspot-phone"):
         checks.append(Check("network", "Network", OK, f"{primary} on {label}: the most reliable setup.",
                             "Attendees' phones must join this same hotspot."))
     elif kind == "lan":
         checks.append(Check("network", "Network", WARN, f"{primary} on {label}.",
                             "Fine at home or office. College/hotel Wi-Fi often blocks phone-to-laptop traffic "
-                            "(\"client isolation\"); if the phone test below fails, use a phone hotspot instead."))
+                            "(\"client isolation\"); if the phone test below fails, use a phone hotspot instead.", "phones"))
     elif kind == "vpn":
         checks.append(Check("network", "Network", WARN, f"{primary} is {label}.",
-                            "Turn off the VPN during the session so phones get the Wi-Fi address."))
+                            "Turn off the VPN during the session so phones get the Wi-Fi address.", "vpn"))
     else:
         checks.append(Check("network", "Network", WARN, f"{primary} ({label}).",
-                            "Use a normal Wi-Fi or a phone hotspot for the session."))
+                            "Use a normal Wi-Fi or a phone hotspot for the session.", "hotspot"))
     others = [i for i in ips if i != primary]
     if others:
         checks.append(Check("adapters", "Network adapters", INFO,
@@ -95,7 +96,7 @@ def port_check(ip: str, port: int) -> Check:
         return Check("port", "Join address", OK, f"DwaniLive is listening on {ip}:{port}.")
     except OSError as exc:
         return Check("port", "Join address", FAIL, f"Couldn't reach {ip}:{port} ({exc.__class__.__name__}).",
-                     "Restart DwaniLive. If it still fails, another app may be using the port.")
+                     "Restart DwaniLive. If it still fails, another app may be using the port.", "wont-open")
 
 
 def firewall_check(rule_name: str = "DwaniLive LAN") -> Check:
@@ -109,9 +110,9 @@ def firewall_check(rule_name: str = "DwaniLive LAN") -> Check:
             return Check("firewall", "Windows Firewall", OK, "Phones are allowed to connect.")
     except Exception:  # noqa: BLE001
         return Check("firewall", "Windows Firewall", WARN, "Couldn't read the firewall settings.",
-                     "If phones can't connect, close and reopen DwaniLive and click Allow on the network prompt.")
+                     "If phones can't connect, close and reopen DwaniLive and click Allow on the network prompt.", "firewall")
     return Check("firewall", "Windows Firewall", WARN, "No DwaniLive firewall rule found, so Windows may block phones.",
-                 "Close and reopen DwaniLive and click Yes / Allow when Windows asks about network access.")
+                 "Close and reopen DwaniLive and click Yes / Allow when Windows asks about network access.", "firewall")
 
 
 def phones_check(connected: int) -> Check:
@@ -119,7 +120,7 @@ def phones_check(connected: int) -> Check:
         return Check("phones", "Phone test", OK, f"{connected} device(s) connected: phones can reach this laptop.")
     return Check("phones", "Phone test", WARN, "No phone has joined yet.",
                  "Scan the join QR with your own phone now. If it doesn't open within 10 seconds, the network "
-                 "is blocking phones: switch everyone to a phone hotspot.")
+                 "is blocking phones: switch everyone to a phone hotspot.", "phones")
 
 
 # ---------------------------------------------------------------------------
@@ -146,10 +147,10 @@ def model_checks(asr, translator) -> list[Check]:
                                        ("translation", "Translation", translator, "NLLB")):
         chain = _class_chain(obj)
         if not chain:
-            out.append(Check(cid, title, FAIL, "Not loaded.", "Restart DwaniLive."))
+            out.append(Check(cid, title, FAIL, "Not loaded.", "Restart DwaniLive.", "wont-open"))
         elif any(n.startswith("Fake") for n in chain):
             out.append(Check(cid, title, FAIL, "Demo mode: placeholder output, not real recognition/translation.",
-                             "Start DwaniLive from the desktop app (not run.py) so the real models load."))
+                             "Start DwaniLive from the desktop app (not run.py) so the real models load.", "demo-mode"))
         else:
             out.append(Check(cid, title, OK, f"{real_hint} model loaded."))
     return out

@@ -471,6 +471,7 @@
   .pf-title { font-weight: 700; color: var(--ink); }
   .pf-detail { grid-column: 2; color: var(--ink-dim); }
   .pf-fix { grid-column: 2; color: var(--accent-deep); font-size: 0.85rem; }
+  .pf-help { grid-column: 2; font-size: 0.85rem; font-weight: 700; color: var(--indigo); }
   .pf-mic { padding-top: 0.6rem; }
   .pf-mic-head { display: flex; justify-content: space-between; align-items: center; font-size: 0.92rem; }
   .pf-mic-btn { border: none; border-radius: 8px; padding: 0.3rem 0.7rem; background: var(--indigo); color: #fffdf6; font: 700 0.8rem var(--font-body); cursor: pointer; }
@@ -583,7 +584,7 @@
       <div class="pf-meter"><div class="pf-meter-fill" id="pf-meter-fill"></div></div>
       <p class="pf-mic-text" id="pf-mic-text">Click "Test microphone" and say something. The bar should move.</p>
     </div>
-    <p class="pf-foot">Updates every few seconds. Scan the join QR with your own phone: the phone test turns green when it connects.</p>
+    <p class="pf-foot"><a href="/help" target="_blank" rel="noopener">Troubleshooting guide</a> · Updates every few seconds. Scan the join QR with your own phone: the phone test turns green when it connects.</p>
   </div>
 </div>
 
@@ -1211,10 +1212,10 @@
       var out = [];
       if (!window.isSecureContext) {
         out.push({ status: "fail", title: "Browser security", detail: "This page isn't secure, so the browser will block the microphone.",
-                   fix: "Open the presenter page from the DwaniLive window (or the phone-mic QR), not by typing the IP address." });
+                   fix: "Open the presenter page from the DwaniLive window (or the phone-mic QR), not by typing the IP address.", help: "phone-mic" });
       }
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        out.push({ status: "fail", title: "Microphone access", detail: "This browser can't use the microphone.", fix: "Use Chrome, Edge or Safari." });
+        out.push({ status: "fail", title: "Microphone access", detail: "This browser can't use the microphone.", fix: "Use Chrome, Edge or Safari.", help: "mic" });
       }
       if (micCheck) out.push(micCheck);
       return out;
@@ -1226,10 +1227,13 @@
       checks.forEach(function (c) {
         var li = document.createElement("li");
         li.innerHTML = '<span class="pf-ico ' + c.status + '">' + (ICON[c.status] || "") + '</span><span class="pf-title"></span>' +
-                       '<span class="pf-detail"></span>' + (c.fix ? '<span class="pf-fix"></span>' : "");
+                       '<span class="pf-detail"></span>' + (c.fix ? '<span class="pf-fix"></span>' : "") +
+                       (c.help && c.status !== "ok" ? '<a class="pf-help" target="_blank" rel="noopener"></a>' : "");
         li.querySelector(".pf-title").textContent = c.title;
         li.querySelector(".pf-detail").textContent = c.detail;
         if (c.fix) li.querySelector(".pf-fix").textContent = c.fix;
+        var hl = li.querySelector(".pf-help");
+        if (hl) { hl.href = "/help#" + encodeURIComponent(c.help); hl.textContent = "How to fix →"; }
         list.appendChild(li);
       });
       var fails = checks.filter(function (c) { return c.status === "fail"; }).length;
@@ -1275,7 +1279,7 @@
             text.textContent = "Microphone works (" + label + ").";
           } else {
             micCheck = { status: "fail", title: "Microphone", detail: "Almost no sound from " + label + ".",
-                         fix: "Unmute the mic, pick the right one in Windows Sound settings, or move closer. Then test again." };
+                         fix: "Unmute the mic, pick the right one in Windows Sound settings, or move closer. Then test again.", help: "mic-silent" };
             text.textContent = "Couldn't hear you. See the fix above.";
           }
           run();
@@ -1283,7 +1287,7 @@
       }).catch(function (err) {
         btn.disabled = false;
         micCheck = { status: "fail", title: "Microphone", detail: "Permission denied or no microphone found (" + err.name + ").",
-                     fix: "Click the lock/mic icon in the address bar, allow the microphone, and reload the page." };
+                     fix: "Click the lock/mic icon in the address bar, allow the microphone, and reload the page.", help: "mic" };
         text.textContent = "The browser blocked the microphone.";
         run();
       });
