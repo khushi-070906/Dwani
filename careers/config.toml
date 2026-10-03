@@ -1,0 +1,343 @@
+# DwaniLive Careers -- FIRST-RUN DEFAULTS ONLY.
+# After deploying, change everything from the website itself:
+#   Admin -> Settings  (organisation, signatory, signature image, offer defaults)
+#   Admin -> Roles     (roles, questions, openings, closing dates)
+# Secrets are CAREERS_* environment variables on the DwaniLive Render service: see careers/README.md.
+
+[org]
+name = "DwaniLive"
+# Name that legally issues the letter. If DwaniLive isn't a registered
+# company yet, use the founder's name, e.g. "Khushi Mittal (Founder, DwaniLive)".
+legal_name = "DwaniLive"
+tagline = "Offline live speech translation for in-person events"
+address = "New Delhi, India"
+website = "https://dhwani-elit.onrender.com"
+email = "khushimittal070906@gmail.com"
+# Prefix for document numbers: DL-OFF-2026-0001, DL-CERT-2026-0001
+doc_prefix = "DL"
+
+[signatory]
+name = "Khushi Mittal"
+title = "Founder"
+# Optional transparent PNG of your signature (e.g. assets/signature.png).
+# Leave empty to print a signature line instead.
+signature_image = ""
+
+[offer_defaults]
+mode = "Remote"
+hours_per_week = 15
+stipend = "Unpaid (performance-based stipend may be offered)"
+accept_within_days = 5
+notice_days = 7
+reporting_to = "Khushi Mittal, Founder"
+
+# One block per role you hire for. `key` is what you pass to --role.
+[[roles]]
+key = "ml"
+open = false
+title = "Machine Learning Intern"
+question = "Tell us about one ML or data project you built. What was the hardest part?"
+summary = "Make live speech recognition and translation work better for Indian languages and accents."
+looking_for = ["Comfortable with Python", "Has trained or fine-tuned at least one model (coursework counts)", "Curious about speech and language"]
+keywords = ["python", "pytorch", "machine learning", "nlp", "speech", "whisper", "transformers", "asr", "translation"]
+duties = [
+  "Evaluating and improving speech recognition and translation quality for Indian languages",
+  "Building benchmarks for latency and accuracy on real lecture audio",
+  "Documenting experiments and results for the team",
+]
+
+[[roles]]
+key = "fullstack"
+open = false
+title = "Full-Stack Developer Intern"
+question = "Share a link to something you built for the web and tell us what you would improve in it."
+summary = "Build the website, dashboard and the real-time caption pages thousands of attendees see."
+looking_for = ["HTML/CSS/JavaScript", "Some backend experience (FastAPI, Node, Django...)", "Cares about speed and accessibility"]
+keywords = ["javascript", "react", "fastapi", "python", "html", "css", "websocket", "postgres"]
+duties = [
+  "Building and improving the DwaniLive website, dashboard and caption pages",
+  "Improving real-time features and accessibility of the caption interface",
+  "Writing tests and fixing bugs reported by users",
+]
+
+[[roles]]
+key = "growth"
+open = false
+title = "Growth & Partnerships Intern"
+question = "Describe an event, club activity or campaign you helped organise or promote. What was the result?"
+summary = "Bring DwaniLive to colleges, conferences and events across India."
+looking_for = ["Clear written and spoken communication", "Has organised or promoted an event, club or fest", "Self-starter"]
+keywords = ["marketing", "sales", "outreach", "content", "events", "communication", "canva", "linkedin"]
+duties = [
+  "Reaching out to colleges, conference organisers and event teams to run pilots",
+  "Creating content such as posts, demo videos and case studies",
+  "Collecting feedback from pilot users for the product team",
+]
+
+# ---------------------------------------------------------------------------
+# Intern roles for DwaniLive's own projects.
+# FIRST ROUND: only speech-research, backend-platform and frontend-accessibility are open.
+# `open` here is the plan; on an existing site, Admin -> Roles -> "Apply opening plan" applies it.
+# ---------------------------------------------------------------------------
+
+[[roles]]
+key = "speech-research"
+title = "Speech & Language Research Intern"
+summary = "Make live captions more accurate and easier to read, and publish what you learn."
+openings = 2
+open = true
+question = "Describe an experiment you ran where the result surprised you. What did you change afterwards?"
+duties = [
+  "Running experiments on speech recognition and translation quality for Indian languages",
+  "Building evaluation sets and benchmarks from real lecture audio",
+  "Writing up results so the team and the research community can use them",
+]
+looking_for = [
+  "Python and some experience with PyTorch or similar",
+  "You've run an experiment and reported the numbers honestly",
+  "Curious about speech, Hindi/English code-switching or low-resource languages",
+]
+keywords = [
+  "whisper",
+  "asr",
+  "speech",
+  "nlp",
+  "pytorch",
+  "evaluation",
+  "wer",
+  "transformers",
+  "audio",
+  "python",
+  "research",
+]
+projects = [
+  "Smarter caption segmentation :: Captions currently appear when the speaker pauses. Measure how often sentences get cut off or merged, then tune the audio segmenter. :: Before/after numbers and the tuned settings",
+  "Language auto-detect :: Detect when a speaker switches between Hindi and English mid-talk and switch models without a restart. :: Detector plus an accuracy report",
+  "Quantization study :: Benchmark Whisper sizes and int8/int4 on 4 GB, 8 GB and 16 GB laptops. :: Speed vs accuracy table and a recommended default per RAM size",
+  "Noise robustness :: Test with classroom noise, fans, echo and different accents; find where recognition breaks and fix the worst cases. :: Test set and failure report",
+  "Punctuation and sentence restoration :: Add punctuation and sentence boundaries so live captions are easier to read. :: Model or rules plus a readability comparison",
+  "Translation confidence :: Flag low-confidence translations so readers know to double-check them. :: Confidence score and a UI mock-up",
+]
+
+[[roles]]
+key = "backend-platform"
+title = "Backend & Platform Intern"
+summary = "Make the hiring portal and its services reliable, secure and ready for many organisations."
+openings = 2
+open = true
+question = "Tell us about a backend you built. What broke first when it got real use?"
+duties = [
+  "Building background jobs, APIs and security features for the careers portal",
+  "Writing tests and keeping the project easy to run for new contributors",
+  "Measuring performance and fixing what breaks under load",
+]
+looking_for = [
+  "Python (FastAPI, Flask or Django) and SQL",
+  "You've built a backend that real people used",
+  "Interested in reliability, security and clean design",
+]
+keywords = [
+  "python",
+  "fastapi",
+  "postgres",
+  "sql",
+  "docker",
+  "redis",
+  "api",
+  "testing",
+  "linux",
+  "django",
+  "flask",
+  "backend",
+]
+projects = [
+  "Postgres job queue :: Move email and PDF sending to a durable queue (SELECT ... FOR UPDATE SKIP LOCKED) with retries, backoff and idempotency. :: Queue module with tests that survive a server restart",
+  "Migrations and Docker :: Add Alembic migrations and a Docker setup so anyone can run the portal with one command. :: docker compose up works, with a migration history",
+  "Two-factor login and audit log :: TOTP two-factor login for admins and a searchable audit trail of every action. :: 2FA flow and an audit page",
+  "Public API and webhooks :: API keys and signed webhooks so other tools can read applicants and receive status changes. :: Documented API and webhook delivery tests",
+  "Object storage :: Store resumes and PDFs in Supabase Storage or S3 and serve them with time-limited signed URLs. :: Migration script and a benchmark against database storage",
+  "Load test :: Simulate hundreds of applications and measure requests per second and p95 latency. :: Locust or k6 script and a one-page report",
+]
+
+[[roles]]
+key = "frontend-accessibility"
+title = "Frontend & Accessibility Intern"
+summary = "Build the pages attendees read captions on, so they work for everyone, on any phone."
+openings = 2
+open = true
+question = "Share a link to something you built for the web and tell us what you would improve in it."
+duties = [
+  "Building and improving the caption pages and the presenter dashboard",
+  "Testing with screen readers and on low-end phones",
+  "Making the interface available in Indian languages",
+]
+looking_for = [
+  "HTML, CSS and JavaScript (a framework is a bonus)",
+  "You care about accessibility, speed and small screens",
+  "Comfortable testing your own work on real devices",
+]
+keywords = [
+  "javascript",
+  "html",
+  "css",
+  "react",
+  "accessibility",
+  "pwa",
+  "lighthouse",
+  "responsive",
+  "figma",
+  "typescript",
+  "frontend",
+]
+projects = [
+  "Attendee web app (PWA) :: Make the caption page installable, reconnect automatically when Wi-Fi drops, and keep recent captions visible. :: Installable page and reconnect tests",
+  "Caption styling and accessibility :: Font size, high contrast, a dyslexia-friendly font and dark mode; pass a screen-reader review. :: Settings panel and a Lighthouse accessibility score of 95+",
+  "Presenter dashboard :: A live view of attendee count, languages, delay and microphone level. :: Working dashboard",
+  "UI localization :: Show the app and the attendee page in Hindi, Tamil, Bengali and one more language. :: Four languages and a translation workflow",
+]
+
+[[roles]]
+key = "qa-release"
+title = "QA & Release Engineering Intern"
+summary = "Make sure DwaniLive installs and runs on real laptops and phones, and ship it smoothly."
+openings = 1
+open = false
+question = "Describe a bug you tracked down. How did you find the cause?"
+duties = [
+  "Testing releases on different laptops, phones and networks",
+  "Writing automated tests and improving the build and installer",
+  "Finding the causes of failures and documenting fixes",
+]
+looking_for = [
+  "Careful, methodical and curious about why things break",
+  "Some Python or JavaScript",
+  "Access to more than one kind of device (a plus, not a must)",
+]
+keywords = [
+  "testing",
+  "qa",
+  "playwright",
+  "selenium",
+  "github actions",
+  "ci",
+  "python",
+  "linux",
+  "windows",
+  "packaging",
+  "automation",
+]
+projects = [
+  "Device lab :: Test on 10+ phones and 3-4 laptops and record what works and what doesn't. :: Compatibility matrix",
+  "Automated browser tests :: Playwright tests for the attendee and presenter pages, running in CI. :: Test suite running on every push",
+  "Pre-flight check page :: Before a session, check mic, Wi-Fi, firewall, port and models, and show green/red with fixes. :: Page covering 15 common failures",
+  "Language packs :: Let users download only the languages they need instead of the full 1.1 GB. :: Selector and a size comparison",
+  "macOS and Linux builds :: Port the desktop app and document what changes. :: Working build or a feasibility report",
+  "Opt-in crash reports :: Anonymous crash reports, sent only if the user agrees. :: Report pipeline and a privacy note",
+]
+
+[[roles]]
+key = "docs-content"
+title = "Technical Writer & Content Intern"
+summary = "Help users succeed with DwaniLive: guides, FAQs and short videos."
+openings = 1
+open = false
+question = "Pick something technical you understand well and explain it in four or five sentences for a beginner."
+duties = [
+  "Writing guides, FAQs and release notes in plain language",
+  "Recording and editing short tutorial videos",
+  "Turning real support questions into documentation",
+]
+looking_for = [
+  "Clear writing",
+  "You can explain technical things simply",
+  "Basic video editing is a plus",
+]
+keywords = [
+  "writing",
+  "documentation",
+  "markdown",
+  "video",
+  "canva",
+  "editing",
+  "communication",
+  "blog",
+  "content",
+]
+projects = [
+  "Troubleshooting guide and FAQ :: Turn real support questions into a searchable guide. :: Docs with 30+ answers",
+  "Tutorial videos :: Five short videos: install, first session, phones joining, projector, fixing common problems. :: Five edited videos under 3 minutes each",
+  "Pilot case studies :: Write up pilots with photos, numbers and quotes. :: Three case studies",
+  "Release notes :: Plain-language release notes for every version. :: A template and the last five releases",
+]
+
+[[roles]]
+key = "design-brand"
+title = "Product Design & Brand Intern"
+summary = "Shape how DwaniLive looks and feels, from the app to posters and demo videos."
+openings = 1
+open = false
+question = "Share a design you are proud of and tell us what feedback changed it."
+duties = [
+  "Designing screens, templates and printable material",
+  "Creating demo videos and social media content",
+  "Testing designs with real users",
+]
+looking_for = [
+  "A portfolio (even college projects) in Figma, Canva or similar",
+  "A good eye for typography and layout",
+  "Comfortable getting feedback from users",
+]
+keywords = [
+  "figma",
+  "canva",
+  "ui",
+  "ux",
+  "design",
+  "branding",
+  "illustration",
+  "video",
+  "photoshop",
+  "typography",
+]
+projects = [
+  "Brand kit :: A slide template, poster, QR table tent and social templates in the DwaniLive style. :: Print-ready files",
+  "60-second demo video :: Show the product in action, subtitled in two languages. :: Final video plus a vertical cut",
+  "Onboarding flow redesign :: Redesign the first-run screens of the desktop app. :: Figma prototype tested with five users",
+  "Careers site polish :: Review the careers pages on mobile and refresh the illustrations. :: Before/after screenshots",
+]
+
+[[roles]]
+key = "pilot-research"
+title = "Pilot & Market Research Intern"
+summary = "Learn what colleges and event teams actually need, and help run our first pilots."
+openings = 1
+open = false
+question = "Describe a time you asked people for feedback. What did you learn and what did you do with it?"
+duties = [
+  "Running pilots with colleges and collecting structured feedback",
+  "Interviewing institutions and summarising what they say",
+  "Maintaining a clean database of colleges, events and contacts",
+]
+looking_for = [
+  "Good at talking to people and writing things up",
+  "Organised with spreadsheets",
+  "Interest in accessibility and education",
+]
+keywords = [
+  "research",
+  "survey",
+  "outreach",
+  "communication",
+  "excel",
+  "interviews",
+  "ngo",
+  "accessibility",
+  "sheets",
+  "events",
+]
+projects = [
+  "Pilot playbook :: A step-by-step guide to running a free pilot at a college, written after running three. :: Playbook and three pilot reports",
+  "Pricing survey :: Interview 30 institutions about what they would pay for and why. :: Survey data and a summary",
+  "Disability cell outreach :: Talk to the disability cells of 20 colleges for feedback and testimonials. :: Contact sheet and five quotes",
+  "College event map :: List 100 colleges in Delhi NCR with their events and who organises them. :: Spreadsheet with contacts",
+]
