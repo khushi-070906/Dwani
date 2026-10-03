@@ -668,6 +668,7 @@
   </div>
 </section>
 
+<script src="/static/i18n.js"></script>
 <script>
 (function () {
   "use strict";
@@ -763,6 +764,7 @@
       var btn = document.createElement("button");
       btn.className = "lang-btn";
       btn.type = "button";
+      btn.dataset.lang = lang.code;
       btn.innerHTML =
         '<span class="lang-native" lang="' + lang.code + '">' + lang.native + '</span>' +
         '<span class="lang-english">' + lang.english + '</span>';
@@ -787,6 +789,8 @@
       return;
     }
     sessionBadgeText.textContent = "SESSION " + sessionId.toUpperCase();
+    // Before a language is picked: the phone's own language, if we have it.
+    if (window.DwaniI18n) window.DwaniI18n.setLang(((navigator.language || "en").split("-")[0] || "en").toLowerCase());
     buildLangGrid();
     // Reloaded the page, or reopened it after the phone killed the tab?
     // Go straight back into the same session and language.
@@ -807,6 +811,8 @@
 
   function joinWithLanguage(langCode) {
     currentLang = langCode;
+    // Buttons and messages follow the caption language when we have that translation.
+    if (window.DwaniI18n) window.DwaniI18n.setLang(langCode);
     joinScreen.hidden = true;
     liveScreen.hidden = false;
     liveLangChip.textContent = displayNameFor(langCode);
@@ -901,7 +907,7 @@
         // Attendee cap reached -- retrying every 8s forever just hammers the
         // presenter's laptop and never succeeds until someone leaves.
         setStatus("down", "Session full");
-        showReconnectBanner(event.reason || "This session is full. Tap Reconnect to try again later.");
+        showReconnectBanner(event.reason || "This session is full. Tap Retry now to try again later.");
         return;
       }
       setStatus("down", "Disconnected");
