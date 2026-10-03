@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "static"
 SERVER = (ROOT / "license_server.py").read_text(encoding="utf-8")
 ROUTES = set(re.findall(r'@app\.(?:get|post)\("([^"{]+)"', SERVER))
+MOUNTS = tuple(m + "/" for m in re.findall(r'app\.mount\("(/[\w-]+)"', SERVER) if m != "/static")
 SITE_PAGES = sorted(set(re.findall(r'FileResponse\(STATIC_DIR / "([\w-]+\.html)"\)', SERVER)))
 
 
@@ -28,7 +29,7 @@ def test_every_internal_link_on_the_website_exists():
     for name in SITE_PAGES:
         html = (STATIC / name).read_text(encoding="utf-8")
         for href in re.findall(r'href="(/[^"#?]*)', html):
-            if href in ("/",) or href.startswith("/static/"):
+            if href in ("/",) or href.startswith("/static/") or href.startswith(MOUNTS):
                 continue
             if href not in ROUTES:
                 broken.append(f"{name}: {href}")

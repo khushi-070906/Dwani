@@ -46,3 +46,14 @@ services:
         sync: false
       - key: SMTP_PASSWORD
         sync: false
+      # ---- Careers portal at /careers (careers/README.md) ----
+      - key: CAREERS_PUBLIC_URL          # printed in every certificate QR: set before issuing documents
+        value: https://dhwani-elit.onrender.com/careers
+      - key: CAREERS_ADMIN_EMAIL         # owner login for /careers/admin
+        sync: false
+      - key: CAREERS_ADMIN_PASSWORD
+        sync: false
+      - key: CAREERS_SESSION_SECRET
+        generateValue: true
+      - key: CAREERS_SIGNING_KEY         # python -m careers.credentials new-key  (keep a backup)
+        sync: false

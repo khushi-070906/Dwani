@@ -29,7 +29,7 @@ function page(file, api) {
   ok(/^Latest: v1\.8\.1 · /.test(line.textContent) && line.querySelector('a[href="/changelog"]'), "home: 'Latest: v1.8.1 · date · What's new': " + line.textContent);
   ok(w.document.getElementById("dl-setup").href === REL[0].setup_url, "home: download button points at that exact release");
   ok(w.document.querySelectorAll("#features .feature").length === 8, "home: 8 'included in every plan' features");
-  ok(!w.document.body.innerHTML.includes("/careers"), "home: no links to the undeployed careers portal");
+  ok([...w.document.querySelectorAll('a[href="/careers/"]')].length >= 1, "home: Careers link points at /careers/");
 
   w = page("pricing.html", "down"); await flush();
   ok(w.document.getElementById("release-line").textContent === "" &&

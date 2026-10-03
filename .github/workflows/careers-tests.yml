@@ -1,0 +1,27 @@
+# Careers portal (/careers) tests: SQLite (standalone + mounted at /careers) and real PostgreSQL.
+name: careers tests
+on:
+  push:
+    paths: ["careers/**", "license_server.py", "requirements.txt", ".github/workflows/careers-tests.yml"]
+  pull_request:
+    paths: ["careers/**", "license_server.py", "requirements.txt"]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: t, POSTGRES_PASSWORD: t, POSTGRES_DB: careers_e2e }
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -r requirements.txt pytest httpx pillow
+      - name: SQLite
+        run: pytest -q careers/tests
+      - name: PostgreSQL
+        env: { CAREERS_TEST_PG: "postgresql://t:t@localhost:5432/careers_e2e" }
+        run: pytest -q careers/tests/test_app.py
