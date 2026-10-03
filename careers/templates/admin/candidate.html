@@ -1,0 +1,184 @@
+{% extends "admin/layout.html" %}
+{% block title %}{{ c.name }} · {{ org.name }} Hiring{% endblock %}
+{% block content %}
+{% set owner = me.role == 'owner' %}
+<section class="wrap" style="padding-top:1.2rem">
+  <a href="{{ P }}/admin">← All applicants</a>
+  <div style="display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;margin:.6rem 0 0">
+    <h1 style="margin:0;font-size:1.7rem">{{ c.name }}</h1>
+    <span class="st st-{{ c.status }}">{{ STATUS_LABEL[c.status] }}</span>
+    <span class="muted">{{ c.role.title }} · fit <b class="score">{{ c.score }}</b>{% if sc_avg %} · panel <b class="score">{{ sc_avg }}/5</b>{% endif %}</span>
+  </div>
+  {% if others %}<p class="muted" style="font-size:.88rem">Also applied for: {% for o in others %}<a href="{{ P }}/admin/c/{{ o.id }}">{{ o.role.title }}</a> ({{ STATUS_LABEL[o.status] }}){{ ', ' if not loop.last }}{% endfor %}</p>{% endif %}
+  <div class="cols">
+    <div>
+      <div class="card">
+        <dl class="qa">
+          <dt>Contact</dt><dd><a href="mailto:{{ c.email }}">{{ c.email }}</a> · {{ c.phone }}{% if c.city %} · {{ c.city }}{% endif %}</dd>
+          <dt>Education</dt><dd>{{ c.college }} · {{ c.degree }}{% if c.grad_year %} · class of {{ c.grad_year }}{% endif %}{% if c.cgpa %} · CGPA {{ c.cgpa }}{% endif %}</dd>
+          <dt>Availability</dt><dd>{{ c.hours }} h/week{% if c.available_from %} · from {{ c.available_from|date }}{% endif %}</dd>
+          <dt>Skills</dt><dd>{{ c.skills }}</dd>
+          {% if c.role.question %}<dt>{{ c.role.question }}</dt><dd>{{ c.answer }}</dd>{% endif %}
+          <dt>Why us</dt><dd>{{ c.why }}</dd>
+          <dt>Resume</dt><dd>{% if c.resume_file %}<a href="{{ P }}/admin/c/{{ c.id }}/resume" target="_blank">Open uploaded PDF ({{ c.resume_name }})</a>{% endif %}{% if c.resume %}{% if c.resume_file %} · {% endif %}<a href="{{ c.resume }}" target="_blank" rel="noopener noreferrer">Open link ↗</a>{% endif %}</dd>
+          <dt>Links</dt><dd>{% if c.links %}<a href="{{ c.links }}" target="_blank" rel="noopener noreferrer">{{ c.links }}</a>{% else %}<span class="muted">none</span>{% endif %}</dd>
+          <dt>Source</dt><dd>{{ c.source or '–' }}</dd>
+          <dt>Fit reasons</dt><dd class="muted">{{ c.score_notes }}</dd>
+          <dt>Applied</dt><dd>{{ c.created_at|datetime }} · <a href="{{ status_link }}" target="_blank">applicant's status page ↗</a></dd>
+        </dl>
+      </div>
+
+      <div class="card" id="scorecards" style="margin-top:1rem">
+        <h3 style="margin-top:0">Interview scorecards</h3>
+        {% for sc in c.scorecards %}
+          <div class="doc"><div><b>{{ sc.reviewer }}</b> · <span class="tag">{{ RECO[sc.recommendation] }}</span> · {{ sc.average }}/5
+            <div class="muted" style="font-size:.82rem">skills {{ sc.skills }} · communication {{ sc.communication }} · ownership {{ sc.ownership }}{% if sc.notes %} · {{ sc.notes }}{% endif %}</div></div></div>
+        {% else %}<p class="muted">No scorecards yet.</p>{% endfor %}
+        <details style="margin-top:.6rem"><summary style="cursor:pointer;font-weight:700">Add / update your scorecard</summary>
+        <form method="post" action="{{ P }}/admin/c/{{ c.id }}/scorecard">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          {% for k, label in [('skills','Skills'),('communication','Communication'),('ownership','Ownership & attitude')] %}
+          <label>{{ label }}</label>
+          <div class="stars">{% for n in range(1,6) %}<label><input type="radio" name="{{ k }}" value="{{ n }}" required> {{ n }}</label>{% endfor %}</div>
+          {% endfor %}
+          <label>Recommendation</label>
+          <select name="recommendation" required><option value="">Choose…</option>{% for k, v in RECO.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select>
+          <label>Notes <span class="opt">(private)</span></label><textarea name="notes" style="min-height:70px"></textarea>
+          <button class="btn indigo small" type="submit" style="margin-top:.6rem">Save scorecard</button>
+        </form></details>
+      </div>
+
+      <div class="card" id="history" style="margin-top:1rem">
+        <h3 style="margin-top:0">History</h3>
+        <ul class="timeline">
+          {% for e in c.events|reverse %}
+          <li><span class="k {{ e.kind }}">{{ e.kind|replace('_',' ') }}</span> {{ e.detail }} <div class="when">{{ e.at|datetime }}{% if e.by %} · {{ e.by }}{% endif %}</div></li>
+          {% endfor %}
+        </ul>
+        <form method="post" action="{{ P }}/admin/c/{{ c.id }}/note" style="margin-top:.8rem">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <textarea name="text" placeholder="Private note (impressions, follow-ups...)" style="min-height:70px"></textarea>
+          <button class="btn ghost small" type="submit" style="margin-top:.4rem">Add note</button>
+        </form>
+      </div>
+    </div>
+
+    <div>
+      {% if allowed %}
+      <div class="card" style="margin-bottom:.9rem">
+        <h3 style="margin-top:0">Next step</h3>
+        <div class="actions">
+          {% for st in allowed %}{% if owner or st == 'shortlisted' %}
+          <form method="post" action="{{ P }}/admin/c/{{ c.id }}/move">
+            <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="status" value="{{ st }}">
+            {% if st == 'rejected' %}
+              <input type="hidden" name="send_rejection" value="1">
+              <button class="btn danger small" type="submit" onclick="return confirm('Reject and send a polite rejection email?')">Reject + email</button>
+            {% elif st == 'offered' %}
+            {% else %}
+              <button class="btn {{ 'ghost' if st in ('withdrawn','declined') else 'indigo' }} small" type="submit">{{ ACTION_LABEL[st] }}</button>
+            {% endif %}
+          </form>
+          {% endif %}{% endfor %}
+        </div>
+        {% if c.status == 'offered' %}<p class="muted" style="font-size:.84rem;margin:.6rem 0 0">Mark as joined once they start (on {{ offer.start|date if offer }}).</p>{% endif %}
+      </div>
+      {% endif %}
+
+      {% if owner and c.status in ('applied','shortlisted','interview') %}
+      <details class="box" {{ 'open' if c.status == 'shortlisted' }}>
+        <summary>📅 {{ 'Reschedule interview' if c.interview_at else 'Invite to interview' }}</summary>
+        <form method="post" action="{{ P }}/admin/c/{{ c.id }}/interview">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <div class="row2">
+            <div><label>Date &amp; time (IST)</label><input type="datetime-local" name="when" value="{{ c.interview_at.strftime('%Y-%m-%dT%H:%M') if c.interview_at }}" required></div>
+            <div><label>Duration (min)</label><input type="number" name="duration" value="30" min="10" max="180"></div>
+          </div>
+          <label>Meeting link or place</label><input type="text" name="where" value="{{ c.interview_where }}" placeholder="https://meet.google.com/..." required>
+          <button class="btn indigo block" type="submit">Send invite + calendar file</button>
+        </form>
+      </details>
+      {% endif %}
+
+      {% if owner and c.status in ('selected','offered') %}
+      <details class="box" {{ 'open' if c.status == 'selected' }}>
+        <summary>📄 {{ 'Create offer letter' if c.status == 'selected' else 'Re-issue offer letter' }}</summary>
+        <form method="post" action="{{ P }}/admin/c/{{ c.id }}/offer">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <label>Role</label>
+          <select name="role_id">{% for r in roles %}<option value="{{ r.id }}" {{ 'selected' if r.id == c.role_id }}>{{ r.title }}</option>{% endfor %}</select>
+          <div class="row2">
+            <div><label>Start date</label><input type="date" name="start" value="{{ offer.start.isoformat() if offer else default_start }}" required></div>
+            <div><label>End date</label><input type="date" name="end" value="{{ offer.end.isoformat() if offer else default_end }}" required></div>
+          </div>
+          <label>Stipend</label><input type="text" name="stipend" placeholder="{{ d.stipend }}">
+          <div class="row2">
+            <div><label>Mode</label><input type="text" name="mode" placeholder="{{ d.mode }}"></div>
+            <div><label>Hours / week</label><input type="number" name="hours" placeholder="{{ d.hours_per_week }}"></div>
+          </div>
+          <label>Reports to</label><input type="text" name="reporting_to" placeholder="{{ d.reporting_to }}">
+          <button class="btn block" type="submit">Create offer letter</button>
+          <p class="muted" style="font-size:.82rem">Creates the PDF only. Preview it below, then click Send.{% if offer %} The previous offer will be revoked.{% endif %}</p>
+        </form>
+      </details>
+      {% endif %}
+
+      {% if owner and c.status in ('joined','completed') %}
+      <details class="box" {{ 'open' if c.status == 'joined' and offer and offer.end <= today }}>
+        <summary>🏅 Completion certificate</summary>
+        <form method="post" action="{{ P }}/admin/c/{{ c.id }}/certificate">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          {% if offer %}<p class="muted" style="font-size:.88rem;margin:.2rem 0">Internship: {{ offer.start|date }} – {{ offer.end|date }}</p>{% endif %}
+          <label>Actual last day <span class="opt">(if it ended early)</span></label><input type="date" name="end" max="{{ today.isoformat() }}">
+          <label>One line about their work <span class="opt">(printed on the certificate)</span></label>
+          <input type="text" name="highlight" maxlength="240" placeholder="During the internship they built ...">
+          <button class="btn block" type="submit">Create certificate</button>
+        </form>
+      </details>
+      <details class="box">
+        <summary>✉️ Letter of recommendation</summary>
+        <form method="post" action="{{ P }}/admin/c/{{ c.id }}/lor">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <p class="muted" style="font-size:.85rem;margin:.2rem 0">The letter opens with their name, role and dates automatically. Write 2-3 paragraphs about what they did and how well (blank line between paragraphs).</p>
+          <textarea name="body" style="min-height:170px" placeholder="During the internship, {{ c.name.split()[0] }} ...&#10;&#10;{{ c.name.split()[0] }} is ... I recommend them ..."></textarea>
+          <button class="btn block" type="submit">Create letter</button>
+        </form>
+      </details>
+      {% endif %}
+
+      <div class="card" id="documents">
+        <h3 style="margin-top:0">Documents</h3>
+        {% for doc in c.documents|reverse %}
+        <div class="doc {{ 'revoked' if doc.revoked }}">
+          <div><b>{{ doc.id }}</b> {{ doc.kind_label }}{% if doc.revoked %} · <span class="err">revoked</span>{% elif doc.sent_at %} · <span class="tag">sent</span>{% else %} · <span class="tag" style="background:#fff1d6;color:#7a4a00">not sent</span>{% endif %}
+            <div class="muted" style="font-size:.82rem">{{ doc.issued|date }} · <a href="{{ verify_url(doc.id) }}" target="_blank">verify page ↗</a></div></div>
+          <div class="actions">
+            <a class="btn ghost small" href="{{ P }}/admin/doc/{{ doc.id }}.pdf" target="_blank">Preview</a>
+            {% if owner and not doc.revoked %}
+            <form method="post" action="{{ P }}/admin/doc/{{ doc.id }}/send"><input type="hidden" name="csrf" value="{{ csrf }}">
+              <button class="btn small" type="submit" onclick="return confirm('Email {{ doc.id }} to {{ c.email }}?')">{{ 'Resend' if doc.sent_at else 'Send' }}</button></form>
+            <form method="post" action="{{ P }}/admin/doc/{{ doc.id }}/revoke"><input type="hidden" name="csrf" value="{{ csrf }}">
+              <button class="btn danger small" type="submit" onclick="return confirm('Revoke {{ doc.id }}? The verify page will show it as invalid.')">Revoke</button></form>
+            {% endif %}
+          </div>
+        </div>
+        {% else %}
+        <p class="muted">No documents yet.</p>
+        {% endfor %}
+      </div>
+
+      {% if owner and not c.documents %}
+      <details class="box" style="margin-top:.9rem">
+        <summary class="err">Delete applicant data</summary>
+        <form method="post" action="{{ P }}/admin/c/{{ c.id }}/delete">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <p class="muted" style="font-size:.88rem">Permanently erases this application (for privacy requests or after a round). Type their email to confirm.</p>
+          <input type="text" name="confirm" placeholder="{{ c.email }}">
+          <button class="btn danger small" type="submit" style="margin-top:.5rem">Delete permanently</button>
+        </form>
+      </details>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

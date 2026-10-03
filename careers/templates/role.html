@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{{ role.title }} · Careers at {{ org.name }}{% endblock %}
+{% block head %}<script type="application/ld+json">{{ ld|safe }}</script>{% endblock %}
+{% macro field(name, label, type="text", placeholder="", hint="") -%}
+  <div class="f{{ ' has-err' if errors.get(name) }}">
+    <label for="{{ name }}">{{ label }}</label>
+    {% if type == "textarea" %}
+    <textarea id="{{ name }}" name="{{ name }}" placeholder="{{ placeholder }}">{{ form.get(name, '') }}</textarea>
+    {% else %}
+    <input id="{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ form.get(name, '') }}" placeholder="{{ placeholder }}">
+    {% endif %}
+    {% if hint %}<div class="hint">{{ hint }}</div>{% endif %}
+    {% if errors.get(name) %}<div class="err">{{ errors[name] }}</div>{% endif %}
+  </div>
+{%- endmacro %}
+{% set optional_fields = ['city', 'cgpa', 'links', 'hours', 'available_from', 'grad_year', 'skills', 'source'] + ([] if not role.question else ['why']) %}
+{% set optional_open = errors and (errors.keys()|list|select('in', optional_fields)|list) %}
+{% block content %}
+<article class="wrap narrow simple-role">
+  <a class="back" href="{{ P }}/#roles">← All roles</a>
+  <h1>{{ role.title }}</h1>
+  <p class="lede">{{ role.summary }}</p>
+  <p class="role-meta">{{ d.mode }} · ~{{ d.hours_per_week }} hrs/week · {{ d.stipend }}{% if role.openings %} · {{ role.openings }} opening{{ 's' if role.openings != 1 }}{% endif %}{% if role.closes_on %} · apply by {{ role.closes_on|date }}{% endif %}</p>
+  {% if role.accepting %}<a class="btn" href="#apply">Apply</a>{% endif %}
+
+  {% if role.duty_list() %}
+  <h2 class="simple-h2">What you'll do</h2>
+  <ul class="plain">{% for x in role.duty_list()[:3] %}<li>{{ x }}</li>{% endfor %}</ul>
+  {% endif %}
+  {% if role.looking_list() %}
+  <h2 class="simple-h2">You'll fit if</h2>
+  <ul class="plain">{% for x in role.looking_list()[:3] %}<li>{{ x }}</li>{% endfor %}</ul>
+  {% endif %}
+  {% if role.project_list() %}
+  <details class="more">
+    <summary>Example projects ({{ role.project_list()|length }})</summary>
+    <ul class="plain">{% for p in role.project_list() %}<li><b>{{ p.title }}</b>{% if p.what %}: {{ p.what }}{% endif %}</li>{% endfor %}</ul>
+  </details>
+  {% endif %}
+
+  <section id="apply">
+  {% if role.accepting %}
+    <h2 class="simple-h2">Apply</h2>
+    <form method="post" action="{{ P }}/roles/{{ role.key }}/apply" enctype="multipart/form-data" novalidate class="simple-form">
+      {{ field("name", "Full name", placeholder="As it should appear on your certificate") }}
+      <div class="row2">
+        {{ field("email", "Email", "email") }}
+        {{ field("phone", "Phone (WhatsApp)", "tel") }}
+      </div>
+      <div class="row2">
+        {{ field("college", "College") }}
+        {{ field("degree", "Degree and year", placeholder="B.Tech IT, 2nd year") }}
+      </div>
+      <div class="f{{ ' has-err' if errors.get('resume_file') or errors.get('resume') }}">
+        <label for="resume_file">Resume <span class="opt">PDF, or paste a link below</span></label>
+        <input id="resume_file" name="resume_file" type="file" accept="application/pdf">
+        <input name="resume" type="url" value="{{ form.get('resume', '') }}" placeholder="…or https://drive.google.com/…" aria-label="Resume link" class="resume-link">
+        {% if errors.get('resume_file') %}<div class="err">{{ errors['resume_file'] }}</div>{% endif %}
+        {% if errors.get('resume') %}<div class="err">{{ errors['resume'] }}</div>{% endif %}
+      </div>
+      {% if role.question %}{{ field("answer", role.question, "textarea") }}
+      {% else %}{{ field("why", "Why would you like to intern with " ~ org.name ~ "?", "textarea") }}{% endif %}
+
+      <details class="more"{{ ' open' if optional_open }}>
+        <summary>More about you <span class="opt">(optional)</span></summary>
+        <div class="row2">
+          {{ field("links", "GitHub / LinkedIn / portfolio", "url", placeholder="https://") }}
+          {{ field("cgpa", "CGPA (out of 10)") }}
+        </div>
+        <div class="row2">
+          {{ field("hours", "Hours per week", "number", placeholder=d.hours_per_week|string) }}
+          {{ field("available_from", "Available from", "date") }}
+        </div>
+        {{ field("skills", "Skills and tools", "textarea", placeholder="Python, React, Canva… and what you built with them") }}
+        {% if role.question %}{{ field("why", "Why " ~ org.name ~ "?", "textarea") }}{% endif %}
+        <div class="row2">
+          {{ field("city", "City") }}
+          <div class="f">
+            <label for="source">How did you hear about us?</label>
+            <select id="source" name="source">
+              {% for opt in ["", "LinkedIn", "Friend / senior", "College group / club", "Instagram", "Event / talk", "Other"] %}
+              <option value="{{ opt }}" {{ 'selected' if form.get('source') == opt }}>{{ opt or "Choose one" }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </details>
+
+      <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+      <div class="{{ 'has-err' if errors.get('consent') }}">
+        <label class="check"><input type="checkbox" name="consent" value="1" {{ 'checked' if form.get('consent') }}>
+          <span>{{ org.name }} may use these details to review my application and contact me.</span></label>
+        {% if errors.get('consent') %}<div class="err">{{ errors['consent'] }}</div>{% endif %}
+      </div>
+      <button class="btn block" type="submit">Submit application</button>
+    </form>
+  {% else %}
+    <p class="muted">This role isn't accepting applications right now.</p>
+  {% endif %}
+  </section>
+</article>
+{% endblock %}

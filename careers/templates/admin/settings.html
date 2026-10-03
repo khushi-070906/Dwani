@@ -1,0 +1,36 @@
+{% extends "admin/layout.html" %}
+{% block title %}Settings · {{ org.name }} Hiring{% endblock %}
+{% block content %}
+<section class="wrap" style="padding-top:1.2rem;max-width:900px">
+  <h1 style="font-size:1.6rem">Settings</h1>
+  <div class="card" style="margin-bottom:1rem">
+    <h3 style="margin-top:0">System check</h3>
+    <dl class="kv" style="margin:0">
+      <dt>Public URL</dt><dd>{{ public_url }} <span class="muted">(printed in every QR code)</span></dd>
+      <dt>Database</dt><dd>{{ db_kind }}</dd>
+      <dt>Document signing</dt><dd>{% if signing.env %}<span class="badge valid">✓ key {{ signing.kid }}</span>{% else %}<span class="badge bad">⚠ {{ signing.source }}</span>{% endif %}
+        <div class="muted" style="font-size:.82rem">Issuer {{ signing.did }} · {{ signing.published }} public key(s) published at <a href="{{ P }}/.well-known/did.json" target="_blank">/.well-known/did.json</a></div></dd>
+      <dt>Email</dt><dd>{% if smtp_ok %}<span class="badge valid">✓ {{ smtp_user }}</span>{% else %}<span class="badge bad">✗ SMTP not configured: no emails will be sent</span>{% endif %}</dd>
+    </dl>
+  </div>
+  <form method="post" action="{{ P }}/admin/settings" enctype="multipart/form-data">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    {% for section, title in [('org','Organisation'),('signatory','Signatory'),('offer','Offer defaults')] %}
+    <div class="card" style="margin-bottom:1rem">
+      <h3 style="margin-top:0">{{ title }}</h3>
+      {% for key, label, sec in fields if sec == section %}
+        <label for="{{ key }}">{{ label }}</label><input id="{{ key }}" type="text" name="{{ key }}" value="{{ values[key] }}">
+      {% endfor %}
+      {% if section == 'signatory' %}
+        <label>Signature image <span class="opt">(transparent PNG works best, max 1 MB)</span></label>
+        <input type="file" name="signature" accept="image/png,image/jpeg">
+        {% if has_signature %}<label class="check"><input type="checkbox" name="remove_signature" value="1"> Remove current signature</label>{% endif %}
+        <p class="muted" style="font-size:.85rem">{{ 'A signature is set.' if has_signature else 'No signature: letters show blank space to sign by hand.' }}
+          Preview: <a href="{{ P }}/admin/settings/sample.pdf" target="_blank">offer letter</a> · <a href="{{ P }}/admin/settings/sample.pdf?kind=certificate" target="_blank">certificate</a></p>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <button class="btn" type="submit">Save settings</button>
+  </form>
+</section>
+{% endblock %}

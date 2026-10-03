@@ -1,0 +1,36 @@
+{% extends "admin/layout.html" %}
+{% block title %}Analytics · {{ org.name }} Hiring{% endblock %}
+{% block content %}
+<section class="wrap" style="padding-top:1.2rem">
+  <h1 style="font-size:1.6rem">Analytics</h1>
+  <div class="grid" style="margin-top:.5rem">
+    <div class="card">
+      <h3 style="margin-top:0">Funnel</h3>
+      {% for st, n in reached.items() %}
+      <div style="margin:.45rem 0">
+        <div style="display:flex;justify-content:space-between;font-size:.9rem"><span>{{ STATUS_LABEL[st] }}</span><b>{{ n }}{% if total and st != 'applied' %} <span class="muted" style="font-weight:400">({{ (100 * n / total)|round|int }}%)</span>{% endif %}</b></div>
+        <div class="bar" style="width:{{ (100 * n / total) if total else 0 }}%"></div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Applications per week</h3>
+      <div class="bars">{% for start, n in weeks %}<div style="height:{{ (100 * n / max_week)|round }}%" title="Week of {{ start|date }}: {{ n }}"><span>{{ n if n }}</span></div>{% endfor %}</div>
+      <div class="muted" style="font-size:.78rem;display:flex;justify-content:space-between;margin-top:.3rem"><span>{{ weeks[0][0]|date }}</span><span>this week</span></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">By role</h3>
+      <table class="list"><tr><th>Role</th><th>Applied</th><th>Offers</th></tr>
+        {% for r, n, o in by_role %}<tr><td>{{ r.title }}</td><td>{{ n }}</td><td>{{ o }}</td></tr>{% endfor %}</table>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Top colleges</h3>
+      <table class="list">{% for name, n in colleges %}<tr><td>{{ name }}</td><td>{{ n }}</td></tr>{% else %}<tr><td class="muted">No data yet</td></tr>{% endfor %}</table>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Where applicants heard about you</h3>
+      <table class="list">{% for name, n in sources %}<tr><td>{{ name }}</td><td>{{ n }}</td></tr>{% else %}<tr><td class="muted">No data yet</td></tr>{% endfor %}</table>
+    </div>
+  </div>
+</section>
+{% endblock %}

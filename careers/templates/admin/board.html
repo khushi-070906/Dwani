@@ -1,0 +1,65 @@
+{% extends "admin/layout.html" %}
+{% block title %}Applicants · {{ org.name }} Hiring{% endblock %}
+{% block content %}
+<section class="wrap" style="padding-top:1.2rem">
+  {% if new_count or upcoming or cert_due or unsent %}
+  <div class="reminders">
+    {% if new_count %}<div class="card"><h4>New this week</h4><div class="kpi">{{ new_count }}</div><a href="{{ P }}/admin?status=applied">Review applications →</a></div>{% endif %}
+    {% if upcoming %}<div class="card"><h4>Upcoming interviews</h4><ul>{% for c in upcoming %}<li><a href="{{ P }}/admin/c/{{ c.id }}">{{ c.name }}</a> · {{ c.interview_at|ist }}</li>{% endfor %}</ul></div>{% endif %}
+    {% if cert_due %}<div class="card"><h4>Certificates due</h4><ul>{% for c in cert_due %}<li><a href="{{ P }}/admin/c/{{ c.id }}">{{ c.name }}</a> ({{ c.role.title }})</li>{% endfor %}</ul></div>{% endif %}
+    {% if unsent %}<div class="card"><h4>Created but not sent</h4><ul>{% for d in unsent %}<li><a href="{{ P }}/admin/c/{{ d.candidate_id }}#documents">{{ d.id }}</a> · {{ d.holder_name }}</li>{% endfor %}</ul></div>{% endif %}
+  </div>
+  {% endif %}
+  <div class="stats">
+    <a href="{{ P }}/admin" class="pill {{ 'on' if not f_status }}">Active</a>
+    {% for st in STATUSES %}{% if counts.get(st) %}
+    <a href="{{ P }}/admin?status={{ st }}{{ '&role=' ~ f_role if f_role }}" class="pill {{ 'on' if f_status == st }}">{{ STATUS_LABEL[st] }} <b>{{ counts[st] }}</b></a>
+    {% endif %}{% endfor %}
+    <span class="pill">Total <b>{{ total }}</b></span>
+  </div>
+  <form class="toolbar" method="get" action="{{ P }}/admin">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search name, email, college">
+    <select name="role"><option value="">All roles</option>{% for r in roles %}<option value="{{ r.key }}" {{ 'selected' if f_role == r.key }}>{{ r.title }}</option>{% endfor %}</select>
+    {% if f_status %}<input type="hidden" name="status" value="{{ f_status }}">{% endif %}
+    <button class="btn ghost small" type="submit">Filter</button>
+    {% if me.role == 'owner' %}<a class="btn ghost small" href="{{ P }}/admin/export.csv">Export CSV</a>{% endif %}
+  </form>
+  <form method="post" action="{{ P }}/admin/bulk">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <div class="table-wrap">
+    <table class="list">
+      <thead><tr><th><input type="checkbox" aria-label="Select all" onclick="document.querySelectorAll('.pick').forEach(c=>c.checked=this.checked)"></th>
+        <th>Fit</th><th>Panel</th><th>Name</th><th>Role</th><th>College</th><th>Status</th><th>Applied</th></tr></thead>
+      <tbody>
+      {% for c in cands %}
+        <tr>
+          <td><input class="pick" type="checkbox" name="ids" value="{{ c.id }}"></td>
+          <td class="score" title="{{ c.score_notes }}">{{ c.score }}</td>
+          <td>{% if avg.get(c.id) %}<span class="tag">{{ avg[c.id] }}/5</span>{% else %}<span class="muted">–</span>{% endif %}</td>
+          <td><a class="name" href="{{ P }}/admin/c/{{ c.id }}">{{ c.name }}</a><div class="muted" style="font-size:.82rem">{{ c.email }}</div></td>
+          <td>{{ c.role.title }}</td>
+          <td>{{ c.college }}<div class="muted" style="font-size:.82rem">{{ c.degree }}{% if c.grad_year %} '{{ c.grad_year[-2:] }}{% endif %}{% if c.cgpa %} · {{ c.cgpa }}{% endif %}</div></td>
+          <td><span class="st st-{{ c.status }}">{{ STATUS_LABEL[c.status] }}</span></td>
+          <td class="muted" style="white-space:nowrap">{{ c.created_at|date }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="8" class="empty">No applicants here yet. Share your careers page!</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% if cands %}
+    <div class="bulk">
+      <span class="muted">Selected →</span>
+      <select name="status">
+        <option value="shortlisted">Shortlist</option>
+        {% if me.role == 'owner' %}<option value="rejected">Reject</option><option value="withdrawn">Mark withdrawn</option>{% endif %}
+      </select>
+      {% if me.role == 'owner' %}<label class="check" style="margin:0"><input type="checkbox" name="send_rejection" value="1"> send rejection email</label>{% endif %}
+      <button class="btn small" type="submit" onclick="return confirm('Apply to the selected applicants?')">Apply</button>
+    </div>
+    <p class="muted" style="font-size:.85rem"><b>Fit</b> is an automatic sorting aid (role keywords, CGPA, hours, GitHub, effort); hover it for reasons. <b>Panel</b> is the average interview scorecard. Always read the application.</p>
+    {% endif %}
+  </form>
+</section>
+{% endblock %}

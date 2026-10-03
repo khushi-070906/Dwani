@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="wrap narrow simple-hero">
+  <h1>Intern with {{ org.name }}</h1>
+  <p>Help build live, offline captions that let everyone in a room follow a talk in their own language.
+     {{ d.mode }}, about {{ d.hours_per_week }} hours a week, around your classes.</p>
+</section>
+
+<section class="wrap narrow" id="roles">
+  <h2 class="simple-h2">Open roles</h2>
+  {% if roles %}
+  <ul class="role-list">
+    {% for r in roles %}
+    <li>
+      <a href="{{ P }}/roles/{{ r.key }}">
+        <span class="role-title">{{ r.title }}</span>
+        <span class="role-sum">{{ r.summary }}</span>
+        {% if r.closes_on %}<span class="role-meta">Apply by {{ r.closes_on|date }}</span>{% endif %}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">No roles are open right now. Check back soon.</p>
+  {% endif %}
+  <p class="process">How it works: apply (10 minutes) → a short call → offer letter. You get a verifiable certificate when you finish.</p>
+</section>
+{% endblock %}

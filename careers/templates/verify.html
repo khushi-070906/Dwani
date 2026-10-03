@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Verify a document · {{ org.name }}{% endblock %}
+{% block content %}
+<section class="wrap narrow" style="padding:2.5rem 1.25rem 3rem">
+  <div class="card">
+    <h1 style="font-size:1.4rem;margin:0 0 .8rem">Verify a document issued by {{ org.name }}</h1>
+    <form method="get" action="{{ P }}/verify" style="display:flex;gap:.5rem">
+      <input type="text" name="id" value="{{ doc_id if not upload }}" placeholder="Document number, e.g. DL-CERT-2026-0001" style="text-transform:uppercase" required>
+      <button class="btn indigo" type="submit">Verify</button>
+    </form>
+    <form method="post" action="{{ P }}/verify/upload" enctype="multipart/form-data" style="margin-top:.7rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+      <span class="muted" style="font-size:.9rem">…or check the PDF file itself:</span>
+      <input type="file" name="pdf" accept="application/pdf" required style="flex:1;min-width:180px">
+      <button class="btn ghost small" type="submit">Check PDF</button>
+    </form>
+
+    {% if upload %}
+    <div style="margin-top:1.4rem">
+      <h3 class="small" style="margin-top:0">File: {{ upload.filename }}</h3>
+      {% if upload.exact %}<span class="badge valid">✓ This exact file was issued by {{ org.name }}</span>
+      {% elif sig and sig.valid %}<span class="badge valid">✓ Contains a valid signed credential</span>
+        <p class="muted" style="font-size:.88rem">The file isn't byte-for-byte identical to the one we sent (it may have been re-saved), but the credential inside it is genuine. Compare the details below with what the PDF shows.</p>
+      {% elif upload.has_credential %}<span class="badge bad">✗ The signed credential inside this file is not valid</span><p>{{ sig.reason }}</p>
+      {% else %}<span class="badge bad">✗ Not a document issued by {{ org.name }}</span>
+        <p>This file doesn't match any document we issued and carries no signed credential. If someone presented it as ours, it is not genuine.</p>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if doc_id and not upload or (upload and doc) %}
+    <div style="margin-top:1.4rem">
+      {% if not doc %}
+        <span class="badge bad">✗ Not found</span>
+        <p>No document with number <b>{{ doc_id }}</b> was issued by {{ org.name }}. Check the number for typos.</p>
+      {% else %}
+        {% if doc.revoked %}<span class="badge bad">✗ Revoked: this document is no longer valid</span>
+        {% elif not upload %}<span class="badge valid">✓ Genuine, issued by {{ org.legal_name }}</span>{% endif %}
+        <div class="holder">{{ doc.holder_name }}</div>
+        <dl class="kv">
+          <dt>Document</dt><dd>{{ doc.kind_label }}</dd>
+          <dt>Number</dt><dd>{{ doc.id }}</dd>
+          {% if doc.holder_college %}<dt>College</dt><dd>{{ doc.holder_college }}</dd>{% endif %}
+          <dt>Role</dt><dd>{{ doc.role_title }}</dd>
+          <dt>Period</dt><dd>{{ doc.start|date }} – {{ doc.end|date }}</dd>
+          <dt>Issued</dt><dd>{{ doc.issued|date }}</dd>
+        </dl>
+        {% if doc.credential %}
+        <div class="sigbox" id="sigbox" data-doc="{{ doc.id }}">
+          <div><b>🔏 Digitally signed</b> <span class="muted">(Ed25519 · W3C Verifiable Credential)</span></div>
+          <div id="sig-server">{% if sig and sig.valid %}<span class="tag">server check: valid</span>{% elif sig %}<span class="tag" style="background:var(--bad-bg);color:var(--bad)">server check: {{ sig.reason }}</span>{% endif %}</div>
+          <div id="sig-browser" class="muted" style="font-size:.88rem">Checking the signature in your browser…</div>
+          <div style="font-size:.85rem;margin-top:.4rem"><a href="{{ P }}/api/credentials/{{ doc.id }}" target="_blank">Download credential (.jwt)</a> · <a href="{{ P }}/.well-known/did.json" target="_blank">Issuer public key</a></div>
+        </div>
+        {% endif %}
+        {% if linkedin %}<p style="margin-top:1.1rem"><a class="btn indigo small" href="{{ linkedin }}" target="_blank" rel="noopener">Add to LinkedIn profile</a></p>{% endif %}
+        <div class="hash">PDF fingerprint (SHA-256): {{ doc.sha256 }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  <p class="muted" style="font-size:.88rem;margin-top:1rem">Every offer letter, certificate and recommendation letter from {{ org.name }} carries a document
+    number, a QR code that opens this page, and a digitally signed credential embedded in the PDF. The signature can be checked
+    with only the file and our published public key. If the details here don't match the document you were shown, it wasn't issued by {{ org.name }}.</p>
+</section>
+<script>
+/* Independent check: fetch the signed credential and the issuer's public key,
+   and verify the Ed25519 signature with the browser's own WebCrypto, so the
+   result doesn't depend on trusting this server's "valid" message. */
+(function () {
+  var P = {{ P|tojson }};
+  var box = document.getElementById("sigbox");
+  if (!box) return;
+  var out = document.getElementById("sig-browser");
+  var B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+  function b58dec(s) {
+    var bytes = [0];
+    for (var i = 0; i < s.length; i++) {
+      var carry = B58.indexOf(s[i]);
+      if (carry < 0) throw new Error("bad base58");
+      for (var j = 0; j < bytes.length; j++) { carry += bytes[j] * 58; bytes[j] = carry & 255; carry >>= 8; }
+      while (carry) { bytes.push(carry & 255); carry >>= 8; }
+    }
+    for (var k = 0; k < s.length && s[k] === "1"; k++) bytes.push(0);
+    return new Uint8Array(bytes.reverse());
+  }
+  function b64u(s) {
+    s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "=";
+    var bin = atob(s), u = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+    return u;
+  }
+  function say(ok, msg) { out.className = ""; out.innerHTML = (ok ? '<span class="badge valid">✓ ' : '<span class="badge bad">✗ ') + msg + "</span>"; }
+  if (!window.crypto || !crypto.subtle) { out.textContent = "Your browser can't run the signature check; use the server check above."; return; }
+  Promise.all([
+    fetch(P + "/api/credentials/" + encodeURIComponent(box.dataset.doc)).then(function (r) { return r.text(); }),
+    fetch(P + "/did.json").then(function (r) { return r.json(); })
+  ]).then(function (res) {
+    var jwt = res[0].trim(), did = res[1], parts = jwt.split(".");
+    var header = JSON.parse(new TextDecoder().decode(b64u(parts[0])));
+    var kid = String(header.kid || "").split("#").pop();
+    var vm = (did.verificationMethod || []).filter(function (m) { return m.id.split("#").pop() === kid; })[0];
+    if (!vm) return say(false, "Signed with an unpublished key");
+    var raw = b58dec(vm.publicKeyMultibase.slice(1));
+    if (raw[0] !== 0xed || raw[1] !== 0x01) return say(false, "Unexpected key type");
+    return crypto.subtle.importKey("raw", raw.slice(2), { name: "Ed25519" }, false, ["verify"]).then(function (key) {
+      return crypto.subtle.verify({ name: "Ed25519" }, key, b64u(parts[2]), new TextEncoder().encode(parts[0] + "." + parts[1]));
+    }).then(function (ok) {
+      ok ? say(true, "Signature verified in your browser") : say(false, "Signature does NOT verify");
+    });
+  }).catch(function () {
+    out.textContent = "Your browser doesn't support Ed25519 checks yet; use the server check above or the offline verifier.";
+  });
+})();
+</script>
+{% endblock %}

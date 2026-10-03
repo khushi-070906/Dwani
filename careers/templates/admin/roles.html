@@ -1,0 +1,63 @@
+{% extends "admin/layout.html" %}
+{% block title %}Roles · {{ org.name }} Hiring{% endblock %}
+{% macro role_form(r) %}
+<form method="post" action="{{ P }}/admin/roles">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  {% if r %}<input type="hidden" name="id" value="{{ r.id }}">{% endif %}
+  <div class="row2">
+    <div><label>Title</label><input type="text" name="title" value="{{ r.title if r }}" required></div>
+    <div><label>Key <span class="opt">(URL: /roles/key)</span></label><input type="text" name="key" value="{{ r.key if r }}" {{ 'readonly' if r }} required></div>
+  </div>
+  <label>One-line summary</label><input type="text" name="summary" value="{{ r.summary if r }}">
+  <div class="row2">
+    <div><label>What they'll do <span class="opt">(one per line, e.g. "Building …")</span></label><textarea name="duties">{{ r.duties if r }}</textarea></div>
+    <div><label>Looking for <span class="opt">(one per line)</span></label><textarea name="looking_for">{{ r.looking_for if r }}</textarea></div>
+  </div>
+  <label>Projects they could own <span class="opt">(one per line: Title :: what they'd do :: deliverable)</span></label><textarea name="projects" style="min-height:130px">{{ r.projects if r }}</textarea>
+  <label>Extra question for applicants <span class="opt">(optional)</span></label><input type="text" name="question" value="{{ r.question if r }}">
+  <label>Scoring keywords <span class="opt">(comma separated)</span></label><input type="text" name="keywords" value="{{ r.keywords if r }}">
+  <div class="row2">
+    <div><label>Openings <span class="opt">(0 = don't show)</span></label><input type="number" name="openings" min="0" value="{{ r.openings if r else 0 }}"></div>
+    <div><label>Applications close on <span class="opt">(optional)</span></label><input type="date" name="closes_on" value="{{ r.closes_on.isoformat() if r and r.closes_on }}"></div>
+  </div>
+  <label class="check"><input type="checkbox" name="is_open" value="1" {{ 'checked' if (not r or r.is_open) }}> Accepting applications</label>
+  {% if me.role == 'owner' %}<button class="btn small" type="submit" style="margin-top:.7rem">Save</button>{% endif %}
+</form>
+{% endmacro %}
+{% block content %}
+<section class="wrap" style="padding-top:1.2rem;max-width:900px">
+  <h1 style="font-size:1.6rem">Roles</h1>
+  {% if me.role == 'owner' and plan and not missing %}
+  <form method="post" action="{{ P }}/admin/roles/apply-plan" class="card" style="margin-bottom:1rem">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <b>Opening plan from config:</b>
+    <ul style="margin:.4rem 0">{% for title, should in plan %}<li>{{ title }} → <b>{{ 'open' if should else 'closed' }}</b></li>{% endfor %}</ul>
+    <button class="btn small" type="submit">Apply opening plan</button>
+    <span class="muted" style="font-size:.84rem"> Only opens/closes these roles. Nothing else changes, and you can toggle any role yourself afterwards.</span>
+  </form>
+  {% endif %}
+  {% if me.role == 'owner' and missing %}
+  <form method="post" action="{{ P }}/admin/roles/sync" class="card" style="margin-bottom:1rem">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <b>{{ missing|length }} starter role(s) from config aren't in this database yet:</b>
+    <span class="muted">{{ missing|join(', ') }}</span><br>
+    <button class="btn small" type="submit" style="margin-top:.6rem">Add them</button>
+    <span class="muted" style="font-size:.84rem"> (After this, an "Apply opening plan" button appears if any role should be opened or closed.)</span>
+    <span class="muted" style="font-size:.84rem"> Existing roles are not changed. Roles marked closed in the config are added closed.</span>
+  </form>
+  {% endif %}
+  {% for r in roles %}
+  <details class="box">
+    <summary>{{ r.title }} <span class="st {{ 'st-joined' if r.accepting else 'st-rejected' }}">{{ 'Open' if r.accepting else 'Closed' }}</span>
+      <span class="muted" style="font-weight:400">· {{ counts.get(r.id, 0) }} applicant(s) · <a href="{{ P }}/roles/{{ r.key }}" target="_blank">/roles/{{ r.key }}</a></span></summary>
+    {{ role_form(r) }}
+  </details>
+  {% endfor %}
+  {% if me.role == 'owner' %}
+  <details class="box" {{ 'open' if not roles }}>
+    <summary>＋ Add a role</summary>
+    {{ role_form(None) }}
+  </details>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Careers at {{ org.name }}{% endblock %}</title>
+<meta name="description" content="Internships at {{ org.name }}: {{ org.tagline }}.">
+<link rel="icon" type="image/png" href="{{ P }}/static/favicon.png">
+<link rel="apple-touch-icon" href="{{ P }}/static/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="{{ P }}/static/site.css">
+{% block head %}{% endblock %}
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="{% block brandlink %}{{ P }}/{% endblock %}"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span><span class="careers">{% block brandsuffix %}Careers{% endblock %}</span></a>
+    <nav class="nav">{% block nav %}
+      <a href="{{ P }}/#roles">Open roles</a>
+      <a href="{{ P }}/verify">Verify a certificate</a>
+      <a href="{{ org.website }}">{{ org.name }} home</a>
+    {% endblock %}</nav>
+  </div>
+</header>
+<main>
+  <div class="wrap">{% if flash %}<div class="flash {{ flash.kind }}">{{ flash.msg }}</div>{% endif %}</div>
+  {% block content %}{% endblock %}
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© {{ org.name }} · {{ org.address }}</span>
+    <span><a href="mailto:{{ org.email }}">{{ org.email }}</a></span>
+  </div>
+</footer>
+</body>
+</html>

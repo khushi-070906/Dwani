@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} · {{ org.name }}{% endblock %}
+{% block content %}
+<section class="wrap narrow hero" style="text-align:center">
+  <h1>{{ "Not found" if code == 404 else "Something's not right" }}</h1>
+  <p style="margin:0 auto">{{ message }}</p>
+  <p style="margin:1.5rem auto 0"><a class="btn ghost" href="javascript:history.back()">← Go back</a></p>
+</section>
+{% endblock %}

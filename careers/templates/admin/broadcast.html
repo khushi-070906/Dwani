@@ -1,0 +1,24 @@
+{% extends "admin/layout.html" %}
+{% block title %}Broadcast · {{ org.name }} Hiring{% endblock %}
+{% block content %}
+<section class="wrap" style="padding-top:1.2rem;max-width:800px">
+  <h1 style="font-size:1.6rem">Broadcast email</h1>
+  <p class="muted">Send one message to a group, e.g. an onboarding call for everyone who joined, or a "new roles open" note. Each email is personal (one recipient per email) and shows in their History.</p>
+  <form method="post" action="{{ P }}/admin/broadcast" class="card" onsubmit="return confirm('Send this email to everyone in the selected groups?')">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>Send to</label>
+    <div class="actions">
+      {% for st in STATUSES %}{% if counts.get(st) %}
+      <label class="check" style="margin:0 .6rem 0 0"><input type="checkbox" name="statuses" value="{{ st }}" {{ 'checked' if st == 'joined' }}> {{ STATUS_LABEL[st] }} ({{ counts[st] }})</label>
+      {% endif %}{% endfor %}
+    </div>
+    <label>Role</label>
+    <select name="role"><option value="">All roles</option>{% for r in roles %}<option value="{{ r.key }}">{{ r.title }}</option>{% endfor %}</select>
+    <label>Subject</label><input type="text" name="subject" required>
+    <label>Message</label>
+    <textarea name="body" style="min-height:200px" required placeholder="Hi {first_name},&#10;&#10;...&#10;&#10;{signatory_name}"></textarea>
+    <p class="muted" style="font-size:.84rem">Placeholders: {first_name}, {name}, {role_title}, {status_url}, {signatory_name}, {org_name}</p>
+    <button class="btn" type="submit">Send</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block bodyclass %}admin{% endblock %}
+{% block brandlink %}{{ P }}/admin{% endblock %}
+{% block brandsuffix %}Hiring{% endblock %}
+{% block nav %}
+  <a href="{{ P }}/admin" class="{{ 'on' if active == 'board' }}">Applicants</a>
+  <a href="{{ P }}/admin/analytics" class="{{ 'on' if active == 'analytics' }}">Analytics</a>
+  <a href="{{ P }}/admin/roles" class="{{ 'on' if active == 'roles' }}">Roles</a>
+  {% if me and me.role == 'owner' %}
+  <a href="{{ P }}/admin/broadcast" class="{{ 'on' if active == 'broadcast' }}">Broadcast</a>
+  <a href="{{ P }}/admin/team" class="{{ 'on' if active == 'team' }}">Team</a>
+  <a href="{{ P }}/admin/settings" class="{{ 'on' if active == 'settings' }}">Settings</a>
+  {% endif %}
+  <form method="post" action="{{ P }}/admin/logout" style="display:inline"><input type="hidden" name="csrf" value="{{ csrf }}"><button type="submit" title="{{ me.email if me }}">Log out</button></form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Application received · {{ org.name }}{% endblock %}
+{% block content %}
+<section class="wrap narrow hero" style="text-align:center">
+  <div style="font-size:3rem">🎉</div>
+  <h1>Application received!</h1>
+  <p style="margin:0 auto">Thank you. We've emailed you a confirmation (check spam just in case). We read every
+    application personally and reply to everyone, usually within 1-2 weeks.</p>
+  {% if token %}
+  <p style="margin:1.5rem auto 0"><a class="btn" href="{{ P }}/status/{{ token }}">Track your application</a></p>
+  <p class="muted" style="font-size:.85rem;margin:.6rem auto 0">Bookmark that page. The same link is in your email.</p>
+  {% endif %}
+  <p style="margin:1.2rem auto 0"><a href="{{ P }}/">Back to open roles</a></p>
+</section>
+{% endblock %}

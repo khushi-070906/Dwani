@@ -1,0 +1,41 @@
+{% extends "admin/layout.html" %}
+{% block title %}Team · {{ org.name }} Hiring{% endblock %}
+{% block content %}
+<section class="wrap" style="padding-top:1.2rem;max-width:900px">
+  <h1 style="font-size:1.6rem">Team</h1>
+  <p class="muted"><b>Owners</b> can do everything. <b>Reviewers</b> (e.g. senior interns helping with screening) can view applicants, add notes and scorecards, and shortlist, but can't reject, send emails or issue documents.</p>
+  <div class="table-wrap">
+  <table class="list">
+    <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Last login</th><th></th></tr></thead>
+    <tbody>
+      {% if owner_email %}<tr><td>{{ org.name }} owner</td><td>{{ owner_email }}</td><td><span class="tag">owner</span></td><td class="muted">set in Render (ADMIN_EMAIL)</td><td></td></tr>{% endif %}
+      {% for u in users %}
+      <tr>
+        <td>{{ u.name }}{% if not u.active %} <span class="muted">(deactivated)</span>{% endif %}</td><td>{{ u.email }}</td>
+        <td><span class="tag">{{ u.role }}</span></td><td class="muted">{{ u.last_login|datetime if u.last_login else 'never' }}</td>
+        <td>
+          <div class="actions">
+          <form method="post" action="{{ P }}/admin/team"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="{{ u.id }}">
+            <button class="btn ghost small" type="submit">{{ 'Deactivate' if u.active else 'Re-activate' }}</button></form>
+          <form method="post" action="{{ P }}/admin/team" onsubmit="var p=prompt('New password for {{ u.email }} (10+ characters)');if(!p)return false;this.password.value=p;">
+            <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="reset"><input type="hidden" name="id" value="{{ u.id }}"><input type="hidden" name="password">
+            <button class="btn ghost small" type="submit">Reset password</button></form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <details class="box" style="margin-top:1rem" open>
+    <summary>＋ Add team member</summary>
+    <form method="post" action="{{ P }}/admin/team">
+      <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="add">
+      <div class="row2"><div><label>Name</label><input type="text" name="name" required></div><div><label>Email</label><input type="email" name="email" required></div></div>
+      <div class="row2"><div><label>Temporary password <span class="opt">(10+ characters)</span></label><input type="text" name="password" minlength="10" required></div>
+        <div><label>Role</label><select name="role"><option value="reviewer">Reviewer</option><option value="owner">Owner</option></select></div></div>
+      <button class="btn small" type="submit" style="margin-top:.7rem">Add</button>
+    </form>
+  </details>
+</section>
+{% endblock %}

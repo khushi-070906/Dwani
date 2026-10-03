@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Your application · {{ org.name }}{% endblock %}
+{% block content %}
+<section class="wrap narrow" style="padding:2.2rem 1.25rem 3rem">
+  <div class="card">
+    <div class="muted" style="font-size:.9rem">Application for</div>
+    <h1 style="margin:.1rem 0 .2rem;font-size:1.5rem">{{ c.role.title }}</h1>
+    <div class="muted">{{ c.name }} · applied {{ c.created_at|date }}</div>
+
+    {% if c.status in ('rejected', 'declined', 'withdrawn') %}
+      <div class="flash {{ 'error' if c.status == 'rejected' else 'ok' }}" style="margin-top:1.2rem">
+        {% if c.status == 'rejected' %}We won't be moving forward with this application. Thank you for applying, and we hope to see you in a future round.
+        {% elif c.status == 'withdrawn' %}This application was withdrawn.
+        {% else %}You declined this offer. We wish you the very best!{% endif %}
+      </div>
+    {% else %}
+      <ol class="stages">
+        {% for key, label in stages %}
+        <li class="{{ 'done' if loop.index0 < current else ('now' if loop.index0 == current else '') }}">
+          <span class="dot"></span>{{ label }}
+          {% if loop.index0 == current and key == 'interview' and c.interview_at %}
+            <div class="muted" style="font-size:.88rem">{{ c.interview_at|ist }}{% if c.interview_where %} · {% if c.interview_where.startswith('http') %}<a href="{{ c.interview_where }}" target="_blank" rel="noopener">join link</a>{% else %}{{ c.interview_where }}{% endif %}{% endif %}</div>
+          {% endif %}
+          {% if loop.index0 == current and key == 'intern' and c.status == 'completed' %}<div class="muted" style="font-size:.88rem">Completed. Thank you!</div>{% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+    {% endif %}
+
+    {% if docs %}
+    <h3 class="small" style="margin-top:1.4rem">Your documents</h3>
+    {% for d in docs %}
+      <div class="doc"><div><b>{{ d.kind_label }}</b><div class="muted" style="font-size:.82rem">{{ d.id }} · {{ d.issued|date }}</div></div>
+        <a class="btn ghost small" href="{{ P }}/status/{{ c.token }}/doc/{{ d.id }}.pdf" target="_blank">Download PDF</a></div>
+    {% endfor %}
+    {% endif %}
+
+    {% if can_withdraw %}
+    <form method="post" action="{{ P }}/status/{{ c.token }}/withdraw" style="margin-top:1.4rem" onsubmit="return confirm('Withdraw your application? This cannot be undone.')">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <button class="btn danger small" type="submit">Withdraw application</button>
+    </form>
+    {% endif %}
+  </div>
+  <p class="muted" style="font-size:.85rem;margin-top:1rem">Questions? Write to <a href="mailto:{{ org.email }}">{{ org.email }}</a>. Keep this link private: anyone with it can see this page.</p>
+</section>
+{% endblock %}
