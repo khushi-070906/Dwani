@@ -6,3 +6,10 @@ python-dotenv
 cryptography
 razorpay
 pydantic
+# careers portal (/careers)
+sqlalchemy>=2.0
+jinja2
+itsdangerous
+python-multipart
+reportlab>=4.0
+pypdf>=4.2

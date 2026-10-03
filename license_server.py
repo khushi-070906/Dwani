@@ -279,6 +279,25 @@ def serve_root():
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
+# --- Careers portal at /careers ---------------------------------------------
+# Hiring, offer letters, verifiable certificates (careers/). A self-contained
+# sub-app: it shares this database (its tables are all named careers_*, so
+# license data is never touched) and the SMTP account, and reads its own
+# CAREERS_* environment variables. If it ever fails to load, the license
+# server keeps running and only /careers is unavailable.
+@app.get("/careers", include_in_schema=False)
+def careers_root_redirect():
+    return RedirectResponse(url="/careers/")
+
+
+try:
+    from careers.app import app as careers_app
+
+    app.mount("/careers", careers_app)
+except Exception:  # noqa: BLE001
+    logging.getLogger(__name__).exception("Careers portal failed to load; /careers is disabled")
+
+
 class _DBWrapper:
     """Makes a psycopg2 connection behave like the sqlite3.Connection this
     file was originally written against, so every existing conn.execute(...)
