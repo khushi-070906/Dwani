@@ -511,6 +511,11 @@
     border: 1px solid var(--bg-raised-2); color: var(--ink-dim); background: var(--bg-raised); }
   .notes-actions a.primary { background: var(--indigo); color: #fffdf6; border-color: var(--indigo); }
   .notes-empty { color: var(--ink-faint); }
+
+  /* ---- interface language toggle ---- */
+  .ui-lang { position: fixed; top: max(0.7rem, env(safe-area-inset-top)); right: 0.8rem; z-index: 20; border: 1.5px solid var(--bg-raised-2);
+    background: var(--bg-raised); color: var(--ink-dim); border-radius: 999px; padding: 0.3rem 0.8rem; font: 700 0.85rem var(--font-body);
+    cursor: pointer; min-height: 36px; }
 </style>
 </head>
 <body>
@@ -587,6 +592,7 @@
   <span id="mic-btn-label">Start</span>
 </button>
 
+<button type="button" class="ui-lang" id="ui-lang" data-no-i18n aria-label="Interface language">हिन्दी</button>
 <p class="status-line" id="status-line">Not presenting</p>
 <div class="live-meters" id="live-meters" hidden>
   <div class="mic-meter" role="meter" aria-label="Microphone level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="mic-meter"><div class="mic-meter-fill" id="mic-meter-fill"></div></div>
@@ -709,6 +715,7 @@
   </div>
 </div>
 
+<script src="/static/i18n.js"></script>
 <script>
 (function () {
   "use strict";
@@ -1400,6 +1407,24 @@
     fetch("/notes/recording?on=" + on + notesQ("&"), { method: "POST" }).then(refreshNotes);
   });
   setInterval(function () { if (!tabPanels.notes.hidden) refreshNotes(); }, 10000);
+
+
+  // ---------------------------------------------------------------- interface language
+  (function () {
+    var btn = document.getElementById("ui-lang");
+    if (!window.DwaniI18n || !btn) { if (btn) btn.hidden = true; return; }
+    var saved = null;
+    try { saved = localStorage.getItem("dwani:hostLang"); } catch (e) {}
+    var initial = saved || (/^hi\b/i.test(navigator.language || "") ? "hi" : "en");
+    function show(code) {
+      var cur = window.DwaniI18n.setLang(code);
+      btn.textContent = cur === "hi" ? "English" : "हिन्दी";      // offers the other language
+      btn.lang = cur === "hi" ? "en" : "hi";
+      try { localStorage.setItem("dwani:hostLang", cur); } catch (e) {}
+    }
+    btn.addEventListener("click", function () { show(window.DwaniI18n.lang() === "hi" ? "en" : "hi"); });
+    show(initial);
+  })();
 
   init();
 })();
