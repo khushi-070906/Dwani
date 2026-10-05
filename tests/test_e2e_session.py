@@ -31,7 +31,8 @@ def free_port():
 def srv(tmp_path_factory):
     port = free_port()
     notes = tmp_path_factory.mktemp("notes")
-    env = dict(os.environ, DWANI_NOTES_DIR=str(notes), DWANI_GLOSSARY_PATH=str(notes / "g.json"), PYTHONUNBUFFERED="1")
+    env = dict(os.environ, DWANI_NOTES_DIR=str(notes), DWANI_GLOSSARY_PATH=str(notes / "g.json"),
+               DWANI_PRESENTER_PREFS=str(notes / "presenter.json"), PYTHONUNBUFFERED="1")
     log = open(notes / "server.log", "w")
     p = subprocess.Popen([sys.executable, "server.py", "--port", str(port), "--session-id", SID],
                          cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT)
@@ -114,6 +115,16 @@ def test_whole_session(srv):
         assert dash["attendees"] == 2 and dash["by_language"] == {"hi": 1, "ta": 1}
         assert dash["latency"]["count"] >= 2 and dash["latency"]["p50_ms"] >= 0
         print(f"  dashboard: {dash['attendees']} attendees {dash['by_language']}, caption delay p50 {dash['latency']['p50_ms']} ms")
+
+        # presenter switches to Hindi mid-session (presenter page dropdown)
+        req = urllib.request.Request(srv["http"] + "/presenter-language", data=json.dumps({"language": "hi"}).encode(),
+                                     headers={"Content-Type": "application/json"}, method="POST")
+        assert json.loads(urllib.request.urlopen(req, timeout=5).read())["speaking"] == "hi"
+        await stream(host, speech(1))
+        after_hi, after_ta = await finals(hi, 1), await finals(ta, 1)
+        assert after_hi and not after_hi[0].startswith("[hi]"), after_hi     # Hindi phone: the words as spoken
+        assert after_ta and after_ta[0].startswith("[ta]"), after_ta         # Tamil phone: translated
+        print(f"  after switching to Hindi: hindi phone {after_hi[0][:30]!r}, tamil phone {after_ta[0][:30]!r}")
 
         await hi.send(json.dumps({"type": "ping", "t": 7}))
         assert json.loads(await asyncio.wait_for(hi.recv(), 5)) == {"type": "pong", "t": 7}
