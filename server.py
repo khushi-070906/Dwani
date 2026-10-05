@@ -471,6 +471,34 @@ _notes_locks: dict = {}
 _term_cache: dict = {}
 
 
+# Plan gating for exports. Free: the transcript in the talk's own language.
+# Pro / Institution: printable notes (highlights, key terms, "where students got
+# lost"), subtitles, Markdown, and every language. Recording itself is never gated.
+FREE_NOTES = {"formats": {"txt"}, "other_languages": False}
+WEBSITE_URL = os.environ.get("DWANI_WEBSITE_URL", "https://dhwani-elit.onrender.com")
+
+
+def _plan() -> str:
+    return getattr(active_license, "tier", None) or "free"
+
+
+def has_feature(name: str) -> bool:
+    lic = active_license
+    try:
+        return lic is not None and name in lic.features()
+    except Exception:
+        return False
+
+
+GLOSSARY_LOCKED = {"error": "Slides vocabulary is part of the Pro and Institution plans.", "locked": True}
+
+
+def notes_allowed(fmt: str, lang: str, src_lang: str) -> bool:
+    if _plan() != "free":
+        return True
+    return fmt in FREE_NOTES["formats"] and (lang == src_lang or FREE_NOTES["other_languages"])
+
+
 def notes_dir() -> Path:
     override = os.environ.get("DWANI_NOTES_DIR")
     if override:
@@ -488,13 +516,87 @@ def _presenter_only(request: Request, key: str) -> bool:
     return phone_mic.is_loopback(client_host) or key == phone_mic.PRESENTER_KEY
 
 
+# ---------------------------------------------------------------------------
+# Slides vocabulary (talk_glossary.py)
+# ---------------------------------------------------------------------------
+
+talk_glossary = None   # set in main(); None in demo mode without a glossary
+
+
+def glossary_store_path() -> Path:
+    override = os.environ.get("DWANI_GLOSSARY_PATH")
+    if override:
+        return Path(override)
+    try:
+        import appenv
+        return appenv.DATA_DIR / "glossary.json"
+    except Exception:
+        return Path.cwd() / "glossary.json"
+
+
+@app.get("/glossary/terms")
+async def glossary_terms(request: Request, key: str = ""):
+    if not _presenter_only(request, key):
+        return Response(status_code=404)
+    if talk_glossary is None:
+        return {"available": False, "terms": []}
+    return {"available": True, "locked": not has_feature("glossary"), **talk_glossary.status()}
+
+
+@app.post("/glossary/extract")
+async def glossary_extract(request: Request, key: str = ""):
+    """Read uploaded slides/notes and suggest terms. Nothing is applied until
+    the presenter confirms with POST /glossary/terms."""
+    import talk_glossary as tg
+
+    if not _presenter_only(request, key):
+        return Response(status_code=404)
+    if not has_feature("glossary"):
+        return Response(json.dumps(GLOSSARY_LOCKED), status_code=402, media_type="application/json")
+    form = await request.form()
+    up = form.get("file")
+    if up is None or not hasattr(up, "read"):
+        return Response(json.dumps({"error": "Choose a file to upload."}), status_code=400, media_type="application/json")
+    data = await up.read(tg.MAX_UPLOAD_BYTES + 1)
+    try:
+        text = await asyncio.to_thread(tg.extract_text, up.filename or "", data)
+    except ValueError as exc:
+        return Response(json.dumps({"error": str(exc)}), status_code=400, media_type="application/json")
+    except Exception:
+        return Response(json.dumps({"error": "Couldn't read that file. Try exporting it as PDF."}), status_code=400,
+                        media_type="application/json")
+    have = {t.lower() for t in (talk_glossary.terms if talk_glossary else [])}
+    found = [c for c in tg.candidates(text) if c["term"].lower() not in have]
+    return {"file": up.filename, "characters": len(text), "candidates": found}
+
+
+@app.post("/glossary/terms")
+async def glossary_update(request: Request, key: str = ""):
+    """{"add": [...]} / {"remove": [...]} / {"set": [...]} -- applied immediately."""
+    if not _presenter_only(request, key) or talk_glossary is None:
+        return Response(status_code=404)
+    if not has_feature("glossary"):
+        return Response(json.dumps(GLOSSARY_LOCKED), status_code=402, media_type="application/json")
+    try:
+        body = await request.json()
+    except Exception:
+        return Response(status_code=400)
+    if "set" in body:
+        talk_glossary.set_terms(list(body.get("set") or []))
+    if body.get("add"):
+        talk_glossary.add(list(body["add"]))
+    if body.get("remove"):
+        talk_glossary.remove(list(body["remove"]))
+    return {"available": True, "locked": False, **talk_glossary.status()}
+
+
 @app.get("/notes/status")
 async def notes_status(request: Request, key: str = ""):
     if not _presenter_only(request, key):
         return Response(status_code=404)
     r = notes_recorder
     return {"available": r is not None, "recording": bool(r and r.enabled), "captions": r.count if r else 0,
-            "id": r.path.stem if r else None}
+            "id": r.path.stem if r else None, "plan": _plan(), "full_notes": _plan() != "free"}
 
 
 @app.post("/notes/recording")
@@ -530,6 +632,16 @@ async def notes_export(request: Request, id: str, lang: str = "", format: str = 
     lang = lang or sess.src_lang
     if not _re.fullmatch(r"[a-z]{2,3}", lang):
         return Response(status_code=400)
+    if not notes_allowed(format, lang, sess.src_lang):
+        page = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pro feature</title><style>body{{font-family:system-ui,sans-serif;max-width:520px;margin:12vh auto;padding:0 1.2rem;color:#2c1810;
+line-height:1.6}}a.b{{display:inline-block;background:#a8460c;color:#fff;padding:.6rem 1rem;border-radius:10px;text-decoration:none;
+font-weight:700}}</style></head><body><h1>This is a Pro feature</h1>
+<p>On the Free plan you can download the full transcript (<b>.txt</b>) in the talk's own language.
+Pro and Institution add printable notes with highlights and key terms, subtitles (.srt), and notes in every language.</p>
+<p><a class="b" href="{WEBSITE_URL}/#plans">See plans</a> &nbsp; <a href="/notes/export?id={id}&amp;format=txt{'&amp;key=' + key if key else ''}">Download the transcript instead</a></p>
+</body></html>"""
+        return Response(page, status_code=402, media_type="text/html; charset=utf-8")
     translator = getattr(pipeline, "translator", None)
     if lang != sess.src_lang:
         if translator is None:
@@ -813,7 +925,7 @@ def main(argv=None):
     # than the one in the printed QR (-> every phone rejected with 4000
     # "unknown session"), the real Whisper/NLLB pipeline was never used,
     # --qa stayed disabled, and the license attendee cap was never applied.
-    global session, active_license, pipeline, qa_pipeline_instance, dynamic_glossary_updater, phone_mic_url, notes_recorder
+    global session, active_license, pipeline, qa_pipeline_instance, dynamic_glossary_updater, phone_mic_url, notes_recorder, talk_glossary
 
     if argv is None:
         argv = sys.argv[1:]
@@ -1203,6 +1315,11 @@ def main(argv=None):
                 )
         else:
             glossary = None
+        if glossary is None:
+            # Always have one, even empty, so terms from uploaded slides
+            # (talk_glossary.py, /glossary/*) can be added during the session.
+            from glossary import Glossary
+            glossary = Glossary()
 
         asr_initial_prompt = None
         if args.asr_glossary_prompt:
@@ -1307,6 +1424,15 @@ def main(argv=None):
         except Exception as exc:  # never block a session over notes
             print(f"(Session notes disabled: {exc})")
     pipeline.on_final = record_final
+    if args.whisper_model or args.nllb_model_dir:
+        try:
+            import talk_glossary as tg
+            # Saved terms only come back on a plan that includes the glossary.
+            talk_glossary = tg.TalkGlossary(glossary, glossary_store_path() if has_feature("glossary") else None, asr=asr)
+            if talk_glossary.terms:
+                print(f"Slides vocabulary: {len(talk_glossary.terms)} term(s) from {glossary_store_path()}")
+        except Exception as exc:
+            print(f"(Slides vocabulary unavailable: {exc})")
 
     if args.qa:
         # A separate RealWhisperBackend instance from the main pipeline's,
