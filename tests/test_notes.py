@@ -145,9 +145,13 @@ def test_server_endpoints(tmp_path, monkeypatch):
     monkeypatch.setenv("DWANI_NOTES_DIR", str(tmp_path))
     rec, s = make_session(tmp_path)
     monkeypatch.setattr(server, "notes_recorder", rec)
+    from types import SimpleNamespace
+    monkeypatch.setattr(server, "active_license", SimpleNamespace(tier="pro", max_attendees=None,
+                                                                  features=lambda: {"core", "glossary"}))
     c = TestClient(server.app)
     st = c.get("/notes/status").json()
-    assert st == {"available": True, "recording": True, "captions": len(LECTURE), "id": rec.path.stem}
+    assert st == {"available": True, "recording": True, "captions": len(LECTURE), "id": rec.path.stem,
+                  "plan": "pro", "full_notes": True}   # Free-plan limits: tests/test_talk_glossary.py
     assert c.post("/notes/recording?on=false").json() == {"recording": False}
     sessions = c.get("/notes/sessions").json()
     assert sessions[0]["id"] == rec.path.stem and sessions[0]["languages"] == ["en", "hi"]
