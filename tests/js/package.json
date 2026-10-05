@@ -2,7 +2,7 @@
   "name": "dwanilive-attendee-tests",
   "private": true,
   "scripts": {
-    "test": "node attendee_reconnect.test.js && node attendee_a11y.test.js && node presenter_dashboard.test.js && node help_page.test.js && node home_nav.test.js && node site_release.test.js && node notes_tab.test.js && node i18n.test.js",
+    "test": "node attendee_reconnect.test.js && node attendee_a11y.test.js && node presenter_dashboard.test.js && node help_page.test.js && node home_nav.test.js && node site_release.test.js && node notes_tab.test.js && node i18n.test.js && node lost_me.test.js",
     "test:reconnect": "node attendee_reconnect.test.js",
     "test:a11y": "node attendee_a11y.test.js",
     "test:dashboard": "node presenter_dashboard.test.js",
@@ -10,7 +10,8 @@
     "test:home": "node home_nav.test.js",
     "test:site": "node site_release.test.js",
     "test:notes": "node notes_tab.test.js",
-    "test:i18n": "node i18n.test.js"
+    "test:i18n": "node i18n.test.js",
+    "test:lost": "node lost_me.test.js"
   },
   "devDependencies": {
     "jsdom": "^24.0.0",
