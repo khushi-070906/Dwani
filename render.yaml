@@ -57,3 +57,6 @@ services:
         generateValue: true
       - key: CAREERS_SIGNING_KEY         # python -m careers.credentials new-key  (keep a backup)
         sync: false
+      # Opens /admin/crash-reports?token=... (error reports users choose to send). Unset = page disabled.
+      - key: REPORTS_TOKEN
+        generateValue: true
