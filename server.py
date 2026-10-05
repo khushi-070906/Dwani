@@ -10,6 +10,8 @@ Run:
 
 import argparse
 import asyncio
+import time
+from collections import deque
 import dataclasses
 import json
 import os
@@ -118,6 +120,16 @@ async def attendee_socket(websocket: WebSocket, lang: str, session_param: str):
                 message = json.loads(raw)
             except (ValueError, TypeError):
                 continue
+            if isinstance(message, dict) and message.get("type") == "confused":
+                now_m = time.monotonic()
+                counted = now_m - _last_confused.get(websocket, -1e9) >= CONFUSED_COOLDOWN_S
+                if counted:
+                    _last_confused[websocket] = now_m
+                    confused_events.append((time.time(), id(websocket), lang))
+                    if notes_recorder is not None:
+                        notes_recorder.mark_confused(time.time(), lang)
+                await websocket.send_json({"type": "confused_ack", "counted": counted})
+                continue
             if isinstance(message, dict) and message.get("type") == "ping":
                 # Heartbeat from index.html: lets a phone notice within seconds that
                 # a Wi-Fi switch silently killed the connection (no close event).
@@ -136,6 +148,7 @@ async def attendee_socket(websocket: WebSocket, lang: str, session_param: str):
     finally:
         _unsubscribe(lang, websocket)
         accessibility_prefs.pop(websocket, None)
+        _last_confused.pop(websocket, None)
 
 
 def _unsubscribe(lang: str, websocket: WebSocket) -> None:
@@ -430,6 +443,30 @@ async def presenter_info():
 # ---------------------------------------------------------------------------
 
 notes_recorder = None          # set in main() unless --no-notes
+
+# "Lost me" taps from attendees: anonymous, at most one per phone per CONFUSED_COOLDOWN_S.
+CONFUSED_COOLDOWN_S = 20.0
+CONFUSED_WINDOW_S = 60.0
+_last_confused: dict = {}                       # websocket -> monotonic time of its last counted tap
+confused_events: deque = deque(maxlen=5000)     # (wall time, id(websocket), lang)
+last_final = {"text": "", "t": 0.0}             # what the presenter said most recently (source language)
+
+
+def record_final(transcript, translations, end_wall, speech_s):
+    """pipeline.on_final: remember the latest sentence (for the presenter's
+    'lost me' banner) and save it to session notes."""
+    last_final.update(text=(transcript or "").strip(), t=end_wall)
+    if notes_recorder is not None:
+        notes_recorder.record(transcript, translations, end_wall, speech_s)
+
+
+def confusion_summary(attendees: int, now: float | None = None) -> dict:
+    now = time.time() if now is None else now
+    recent = {sock for t, sock, _ in confused_events if now - t <= CONFUSED_WINDOW_S}
+    people = len(recent)
+    return {"people": people, "attendees": attendees, "share": round(people / attendees, 3) if attendees else 0.0,
+            "alert": people >= 2 and attendees > 0 and people / attendees >= 0.15,
+            "about": last_final["text"][-140:], "total": len(confused_events)}
 _notes_locks: dict = {}
 _term_cache: dict = {}
 
@@ -539,6 +576,7 @@ async def dashboard_stats(request: Request, key: str = ""):
         "max_attendees": getattr(active_license, "max_attendees", None),
         "presenting": host_connected,
         "latency": stats.summary() if stats else {"count": 0, "captions_sent": 0},
+        "confusion": confusion_summary(sum(by_language.values())),
     }
 
 
@@ -1265,10 +1303,10 @@ def main(argv=None):
         try:
             import notes
             notes_recorder = notes.NotesRecorder(notes_dir(), session.session_id, args.presenter_language)
-            pipeline.on_final = notes_recorder.record
             print(f"Session notes: {notes_recorder.path}")
         except Exception as exc:  # never block a session over notes
             print(f"(Session notes disabled: {exc})")
+    pipeline.on_final = record_final
 
     if args.qa:
         # A separate RealWhisperBackend instance from the main pipeline's,
