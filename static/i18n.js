@@ -69,6 +69,9 @@
     "Couldn't send -- try again.": "नहीं भेज पाए — फिर कोशिश करें।",
     "Sent -- the presenter will see it shortly.": "भेज दिया — वक्ता इसे जल्द देखेंगे।",
     "Couldn't reach the server -- check your connection and try again.": "सर्वर तक नहीं पहुँच पाए — कनेक्शन जाँचें और फिर कोशिश करें।",
+    "🤔 Lost me": "🤔 समझ नहीं आया",
+    "✓ Sent to the presenter": "✓ वक्ता को बता दिया",
+    "Tell the presenter you didn't follow that (anonymous)": "वक्ता को बताएँ कि यह समझ नहीं आया (नाम नहीं जाएगा)",
 
     // ---- presenter page
     "Using your phone as the mic: keep this screen open and unlocked, and silence calls & notifications during the talk.":
@@ -119,6 +122,9 @@
     "Start speaking to measure": "मापने के लिए बोलना शुरू करें",
     "Appears once someone has joined and you speak": "किसी के जुड़ने और आपके बोलने के बाद दिखेगा",
     "Captions sent": "भेजे गए कैप्शन",
+    "\"Lost me\" taps": "\"समझ नहीं आया\" टैप",
+    "Anonymous, this session": "बिना नाम के, इस सेशन में",
+    "Slow down, or say it another way.": "थोड़ा धीरे बोलें, या दूसरे तरीके से समझाएँ।",
     "Using accessibility mode": "सुलभता मोड इस्तेमाल कर रहे",
     "Questions answered / asked": "जवाब दिए / पूछे गए सवाल",
     "Semantic cache hit rate": "कैश से मिले अनुवाद",
@@ -186,6 +192,8 @@
       "$1 मिनट · $2 कैप्शन · $3 का अनुवाद डाउनलोड के समय होगा (हर घंटे की बात पर लगभग एक मिनट)"],
     [/^([\d.]+) min · (\d+) captions$/, "$1 मिनट · $2 कैप्शन"],
     [/^Asked in (.+)$/, "$1 में पूछा गया"],
+    [/^🤔 (\d+) of (\d+) lost you in the last minute$/, "🤔 पिछले एक मिनट में $2 में से $1 लोगों को समझ नहीं आया"],
+    [/^on: “…(.+)”$/, "इस पर: “…$1”"],
     [/^Original: (.+)$/, "मूल: $1"],
     [/^Microphone access denied or unavailable: (.+)$/, "माइक की अनुमति नहीं मिली या माइक उपलब्ध नहीं: $1"],
     [/^Couldn't load session info from the server: (.+)$/, "सर्वर से सेशन की जानकारी नहीं मिली: $1"]
