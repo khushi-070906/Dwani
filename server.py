@@ -454,10 +454,112 @@ last_final = {"text": "", "t": 0.0}             # what the presenter said most r
 
 def record_final(transcript, translations, end_wall, speech_s):
     """pipeline.on_final: remember the latest sentence (for the presenter's
-    'lost me' banner) and save it to session notes."""
+    'lost me' banner) and save it to session notes, with the language it was
+    spoken in (the presenter can switch mid-talk)."""
     last_final.update(text=(transcript or "").strip(), t=end_wall)
     if notes_recorder is not None:
-        notes_recorder.record(transcript, translations, end_wall, speech_s)
+        notes_recorder.record(transcript, translations, end_wall, speech_s, src_lang=spoken_language())
+
+
+# ---------------------------------------------------------------------------
+# Presenter's language: chosen on the presenter page, switchable mid-session
+# ---------------------------------------------------------------------------
+
+PRESENTER_LANGS = ["en", "hi", "pa", "bn", "ta", "te", "mr", "ur", "gu", "kn", "ml", "or", "as", "ne"]
+presenter_lang = {"choice": "en"}       # a code above, or "auto"
+
+
+def presenter_prefs_path() -> Path:
+    override = os.environ.get("DWANI_PRESENTER_PREFS")
+    if override:
+        return Path(override)
+    try:
+        import appenv
+        return appenv.DATA_DIR / "presenter.json"
+    except Exception:
+        return Path.cwd() / "presenter.json"
+
+
+def _backend_chain(obj, depth=0, seen=None):
+    """The translator and whatever it wraps (glossary / cache / ITDE layers)."""
+    seen = seen if seen is not None else set()
+    if obj is None or id(obj) in seen or depth > 6:
+        return
+    seen.add(id(obj))
+    yield obj
+    for attr in ("_inner", "inner", "_translator", "translator", "_base", "base", "_backend", "backend"):
+        child = getattr(obj, attr, None)
+        if child is not None and not isinstance(child, (str, int, float, bool, dict, list)):
+            yield from _backend_chain(child, depth + 1, seen)
+
+
+def _set_translation_source(lang: str) -> None:
+    for b in _backend_chain(getattr(pipeline, "translator", None)):
+        if hasattr(b, "set_source_language"):
+            b.set_source_language(lang)
+
+
+def spoken_language() -> str:
+    """The language actually being spoken now (auto mode: the last one detected)."""
+    if presenter_lang["choice"] != "auto":
+        return presenter_lang["choice"]
+    return getattr(pipeline, "source_language", None) or getattr(getattr(pipeline, "asr", None), "last_language", None) or "en"
+
+
+def apply_presenter_language(choice: str, persist: bool = True) -> str:
+    if choice != "auto" and choice not in PRESENTER_LANGS:
+        raise ValueError(f"Unsupported presenter language {choice!r}")
+    asr = getattr(pipeline, "asr", None)
+    if choice == "auto":
+        if asr is not None and hasattr(asr, "set_language"):
+            asr.set_language(None)                     # Whisper detects per sentence
+        pipeline.auto_source = True
+
+        def follow(lang):
+            if lang in PRESENTER_LANGS:
+                _set_translation_source(lang)
+                pipeline.source_language = lang
+            else:
+                raise ValueError(lang)
+        pipeline.on_detected_language = follow
+    else:
+        _set_translation_source(choice)
+        if asr is not None and hasattr(asr, "set_language"):
+            asr.set_language(choice)
+        pipeline.auto_source = False
+        pipeline.source_language = choice
+    presenter_lang["choice"] = choice
+    qa = qa_pipeline_instance
+    if qa is not None and hasattr(qa, "_presenter_language"):
+        qa._presenter_language = spoken_language()     # questions are translated into this
+    if persist:
+        try:
+            p = presenter_prefs_path()
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(json.dumps({"language": choice}), encoding="utf-8")
+        except OSError:
+            pass
+    return choice
+
+
+@app.get("/presenter-language")
+async def get_presenter_language(request: Request, key: str = ""):
+    if not _presenter_only(request, key):
+        return Response(status_code=404)
+    return {"choice": presenter_lang["choice"], "speaking": spoken_language(), "choices": ["auto"] + PRESENTER_LANGS}
+
+
+@app.post("/presenter-language")
+async def set_presenter_language(request: Request, key: str = ""):
+    if not _presenter_only(request, key):
+        return Response(status_code=404)
+    try:
+        choice = str((await request.json()).get("language", ""))
+        apply_presenter_language(choice)
+    except Exception:
+        return Response(json.dumps({"error": "That language isn't supported."}), status_code=400,
+                        media_type="application/json")
+    return {"choice": presenter_lang["choice"], "speaking": spoken_language()}
 
 
 def confusion_summary(attendees: int, now: float | None = None) -> dict:
@@ -643,12 +745,20 @@ Pro and Institution add printable notes with highlights and key terms, subtitles
 </body></html>"""
         return Response(page, status_code=402, media_type="text/html; charset=utf-8")
     translator = getattr(pipeline, "translator", None)
-    if lang != sess.src_lang:
+    if any(lang != (c.src_lang or sess.src_lang) for c in sess.captions):
         if translator is None:
             return Response("Translation model not loaded", status_code=503)
+        between = next((b for b in _backend_chain(translator) if hasattr(b, "translate_between")), None)
+
+        async def translate_from(text, target, source):
+            # explicit source: captions may be in different languages, and the
+            # live translator's own source must not change under a running session
+            if between is not None:
+                return await between.translate_between(text, source, target)
+            return await translator.translate(text, target)
         lock = _notes_locks.setdefault((id, lang), asyncio.Lock())
         async with lock:
-            await notes.ensure_language(sess, lang, translator.translate)
+            await notes.ensure_language(sess, lang, translate_from)
     terms_tr = {}
     if format in ("notes", "md") and lang != sess.src_lang and translator is not None:
         for term in notes.key_terms(sess.captions):
@@ -1424,6 +1534,19 @@ def main(argv=None):
         except Exception as exc:  # never block a session over notes
             print(f"(Session notes disabled: {exc})")
     pipeline.on_final = record_final
+    # Presenter's language: what they picked on the presenter page last time
+    # wins over the default; an explicit --presenter-language other than "en" wins over both.
+    initial = args.presenter_language
+    if initial == "en":
+        try:
+            initial = json.loads(presenter_prefs_path().read_text(encoding="utf-8")).get("language", "en")
+        except (OSError, ValueError):
+            pass
+    try:
+        apply_presenter_language(initial, persist=False)
+    except ValueError:
+        apply_presenter_language("en", persist=False)
+    print(f"Presenter language: {presenter_lang['choice']}")
     if args.whisper_model or args.nllb_model_dir:
         try:
             import talk_glossary as tg
