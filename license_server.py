@@ -235,15 +235,49 @@ def _fetch_releases() -> list[dict]:
     return out
 
 
+def _fetch_releases_atom() -> list[dict]:
+    """Same data from github.com/<repo>/releases.atom -- a plain web page, not the
+    API, so it isn't subject to the API's 60-requests/hour anonymous limit that
+    Render's shared outbound IPs routinely exhaust. Asset URLs follow the fixed
+    names the release workflow uploads."""
+    import html as _html
+    import re as _re
+    import xml.etree.ElementTree as ET
+
+    req = urllib.request.Request(f"https://github.com/{RELEASE_REPO}/releases.atom",
+                                 headers={"User-Agent": "dwanilive-site", "Accept": "application/atom+xml"})
+    with urllib.request.urlopen(req, timeout=8) as r:
+        root = ET.fromstring(r.read())
+    ns = {"a": "http://www.w3.org/2005/Atom"}
+    out = []
+    for e in root.findall("a:entry", ns):
+        link = e.find("a:link", ns)
+        url = link.get("href") if link is not None else ""
+        tag = url.rsplit("/tag/", 1)[-1] if "/tag/" in url else (e.findtext("a:title", "", ns) or "").strip()
+        if not tag:
+            continue
+        body = _html.unescape(e.findtext("a:content", "", ns) or "")
+        items = [_re.sub(r"<[^>]+>", "", li).strip() for li in _re.findall(r"<li>(.*?)</li>", body, _re.S)]
+        dl = f"https://github.com/{RELEASE_REPO}/releases/download/{tag}"
+        out.append({"tag": tag, "version": tag.lstrip("v"), "published_at": e.findtext("a:updated", None, ns),
+                    "url": url, "setup_url": f"{dl}/DwaniLive-Setup.exe", "zip_url": f"{dl}/DwaniLive-win64.zip",
+                    "notes": "\n".join(f"- {i}" for i in items if i)})
+    return out
+
+
 def _releases() -> list[dict] | None:
     now = time.time()
     if _release_cache["data"] is not None and now - _release_cache["at"] < RELEASE_TTL_S:
         return _release_cache["data"]
-    try:
-        _release_cache["data"], _release_cache["at"] = _fetch_releases(), now
-    except Exception as exc:  # noqa: BLE001 -- GitHub down / rate limited: keep serving the last good copy
-        logging.getLogger(__name__).warning("release fetch failed: %s", exc)
-        _release_cache["at"] = now - RELEASE_TTL_S + 60  # retry in a minute
+    for fetch in (_fetch_releases, _fetch_releases_atom):   # API first (exact asset links), feed if it's rate-limited
+        try:
+            data = fetch()
+            if data:
+                _release_cache["data"], _release_cache["at"] = data, now
+                return data
+        except Exception as exc:  # noqa: BLE001
+            logging.getLogger(__name__).warning("release fetch via %s failed: %s", fetch.__name__, exc)
+    _release_cache["at"] = now - RELEASE_TTL_S + 60  # GitHub unreachable: keep the last good copy, retry in a minute
     return _release_cache["data"]
 
 
