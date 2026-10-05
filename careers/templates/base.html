@@ -11,18 +11,36 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;600;700;800&display=swap">
 <link rel="stylesheet" href="{{ P }}/static/site.css">
 {% block head %}{% endblock %}
+{% block sitenav_assets %}<link rel="stylesheet" href="/static/site-nav.css">{% endblock %}
 </head>
 <body class="{% block bodyclass %}{% endblock %}">
+{% block header %}
+{# The DwaniLive website's own header (static/site-nav.css + site-nav.js), so
+   /careers looks like the rest of the site. Admin pages override this block. #}
 <header class="site-header">
-  <div class="wrap">
-    <a class="brand" href="{% block brandlink %}{{ P }}/{% endblock %}"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span><span class="careers">{% block brandsuffix %}Careers{% endblock %}</span></a>
-    <nav class="nav">{% block nav %}
-      <a href="{{ P }}/#roles">Open roles</a>
-      <a href="{{ P }}/verify">Verify a certificate</a>
-      <a href="{{ org.website }}">{{ org.name }} home</a>
-    {% endblock %}</nav>
+<nav class="nav-shell">
+  <div class="brand-row">
+    <a href="/" style="text-decoration:none;"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
   </div>
+  <div class="nav-links" id="nav-links">
+    <a href="/#how-it-works">How it works</a>
+    <a href="/#plans">Pricing</a>
+    <a href="/#faq">FAQ</a>
+    <a href="/careers/" class="active" aria-current="page">Careers</a>
+  </div>
+  <button type="button" class="nav-hamburger" id="nav-hamburger" aria-label="Menu" aria-expanded="false">&#9776;</button>
+  <div class="nav-right" id="nav-right">
+    <div class="nav-account" id="nav-account" style="display:none;">
+      <img class="nav-avatar" id="nav-avatar" alt="">
+      <span id="nav-name-label"></span>
+    </div>
+    <a href="/dashboard.html" class="nav-icon-btn" id="nav-dashboard-btn" title="Dashboard" style="display:none;">&#9776;</a>
+    <a href="/login.html" class="nav-cta" id="nav-login-cta">Log in</a>
+  </div>
+</nav>
 </header>
+<script src="/static/site-nav.js" defer></script>
+{% endblock %}
 <main>
   <div class="wrap">{% if flash %}<div class="flash {{ flash.kind }}">{{ flash.msg }}</div>{% endif %}</div>
   {% block content %}{% endblock %}

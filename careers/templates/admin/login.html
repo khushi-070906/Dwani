@@ -1,4 +1,10 @@
 {% extends "base.html" %}
+{% block sitenav_assets %}{% endblock %}
+{% block header %}
+<header class="site-header admin-header"><div class="wrap">
+  <a class="brand" href="{{ P }}/admin"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span><span class="careers">Hiring</span></a>
+</div></header>
+{% endblock %}
 {% block title %}Team login · {{ org.name }}{% endblock %}
 {% block nav %}{% endblock %}
 {% block content %}

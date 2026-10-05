@@ -14,9 +14,9 @@ img { max-width: 100%; }
 .narrow { max-width: 720px; }
 
 /* header */
-.site-header { position: sticky; top: 0; z-index: 10; background: rgba(253, 246, 231, 0.92); backdrop-filter: blur(8px);
+.admin-header { position: sticky; top: 0; z-index: 10; background: rgba(253, 246, 231, 0.92); backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--raised-2); }
-.site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 64px; }
+.admin-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 64px; }
 .brand { text-decoration: none; display: inline-flex; align-items: baseline; gap: 0.5rem; }
 .brand .dwani { font-family: var(--font-display); font-size: 2rem; line-height: 1;
   background: linear-gradient(120deg, var(--accent-deep), var(--accent-2) 50%, var(--indigo));

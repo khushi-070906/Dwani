@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 {% block bodyclass %}admin{% endblock %}
-{% block brandlink %}{{ P }}/admin{% endblock %}
-{% block brandsuffix %}Hiring{% endblock %}
-{% block nav %}
+{% block sitenav_assets %}{% endblock %}
+{% block header %}
+<header class="site-header admin-header">
+  <div class="wrap">
+    <a class="brand" href="{{ P }}/admin"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span><span class="careers">Hiring</span></a>
+    <nav class="nav">
   <a href="{{ P }}/admin" class="{{ 'on' if active == 'board' }}">Applicants</a>
   <a href="{{ P }}/admin/analytics" class="{{ 'on' if active == 'analytics' }}">Analytics</a>
   <a href="{{ P }}/admin/roles" class="{{ 'on' if active == 'roles' }}">Roles</a>
@@ -12,4 +15,7 @@
   <a href="{{ P }}/admin/settings" class="{{ 'on' if active == 'settings' }}">Settings</a>
   {% endif %}
   <form method="post" action="{{ P }}/admin/logout" style="display:inline"><input type="hidden" name="csrf" value="{{ csrf }}"><button type="submit" title="{{ me.email if me }}">Log out</button></form>
+</nav>
+  </div>
+</header>
 {% endblock %}
