@@ -376,3 +376,23 @@ def test_short_form_only_essentials_required(client):
     bad = dict(minimal, email="short2@example.com", links="not a url")
     r = client.post("/roles/speech-research/apply", data=bad)
     assert r.status_code == 422 and '<details class="more" open>' in r.text   # optional section opens to show its error
+
+
+def _nav(html):
+    import re as _re
+    block = html[html.index('id="nav-links"'):]
+    block = block[:block.index("</div>")]
+    return [(h.lstrip("/").replace("careers/", "/careers/"), t.strip()) for h, t in _re.findall(r'<a href="([^"]+)"[^>]*>([^<]+)</a>', block)]
+
+
+def test_public_pages_use_the_website_nav(client):
+    """/careers must show the DwaniLive website's own header, not a separate one."""
+    home = (Path(__file__).resolve().parents[2] / "static" / "pricing.html").read_text(encoding="utf-8")
+    site = _nav(home)
+    for path in ("/", "/roles/speech-research", "/verify"):
+        page = client.get(path).text
+        assert _nav(page) == site, (path, _nav(page), site)
+        assert 'href="/static/site-nav.css"' in page and 'src="/static/site-nav.js"' in page
+        assert 'class="active" aria-current="page">Careers<' in page
+    admin = client.get("/admin/login").text
+    assert "site-nav.css" not in admin and "admin-header" in admin
