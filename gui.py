@@ -47,6 +47,7 @@ from pathlib import Path
 from typing import Callable, Optional
 
 import appenv
+import crash_report
 import model_setup
 import updater
 
@@ -233,6 +234,10 @@ _HTML = r"""<!DOCTYPE html>
     font-family: var(--font-body); font-weight: 800; font-size: 0.8rem; cursor: pointer; }
   .update-banner button:disabled { opacity: 0.7; cursor: default; }
   .update-err { width: 100%; font-size: 0.76rem; color: #ffd6d1; }
+
+  .report-box { text-align: left; margin-top: 0.8rem; }
+  .report-preview { max-height: 220px; overflow: auto; font-size: 0.72rem; background: rgba(0,0,0,0.04); border-radius: 8px;
+    padding: 0.6rem; white-space: pre-wrap; word-break: break-word; }
 </style>
 </head>
 <body>
@@ -322,10 +327,21 @@ _HTML = r"""<!DOCTYPE html>
     <button class="secondary" id="help-btn" type="button">How to fix this →</button>
     <div class="row">
       <button class="secondary" id="diag-btn" type="button">Copy error report</button>
+      <button class="secondary" id="send-report-btn" type="button">Send error report…</button>
       <button class="secondary" id="logs-btn" type="button">Open log folder</button>
     </div>
     <button class="secondary" id="redownload-btn" type="button">Re-download models</button>
     <button class="secondary" id="quit-btn" type="button">Quit</button>
+    <div class="report-box" id="report-box" hidden>
+      <p class="hint">This is everything that will be sent. Your name, folders, computer name, e-mail and licence key have
+        already been removed. Nothing is sent unless you press Send.</p>
+      <pre class="report-preview" id="report-preview"></pre>
+      <div class="row">
+        <button class="primary" id="report-send" type="button">Send</button>
+        <button class="secondary" id="report-cancel" type="button">Cancel</button>
+      </div>
+    </div>
+    <p class="hint" id="report-result" role="status"></p>
     <button class="log-toggle" data-log="error-log">Show details</button>
     <div class="log-panel" id="error-log"></div>
   </section>
@@ -473,6 +489,28 @@ _HTML = r"""<!DOCTYPE html>
     if (confirm('Delete the downloaded models and download them again (~1.1 GB)?')) api('retry', { reset_models: true });
   });
   $('logs-btn').addEventListener('click', function () { api('open', { what: 'logs' }); });
+  $('send-report-btn').addEventListener('click', function () {
+    api('report/preview', {}).then(function (r) {
+      $('report-preview').textContent = (r && r.text) || '';
+      $('report-box').hidden = false;
+      $('report-result').textContent = '';
+    });
+  });
+  $('report-cancel').addEventListener('click', function () { $('report-box').hidden = true; });
+  $('report-send').addEventListener('click', function () {
+    $('report-send').disabled = true;
+    $('report-send').textContent = 'Sending…';
+    api('report/send', {}).then(function (r) {
+      $('report-send').disabled = false;
+      $('report-send').textContent = 'Send';
+      if (r && r.ok) {
+        $('report-box').hidden = true;
+        $('report-result').textContent = 'Sent, thank you. Reference ' + r.ref + ': mention it if you email us.';
+      } else {
+        $('report-result').textContent = (r && r.error) || 'Could not send the report.';
+      }
+    });
+  });
   $('diag-btn').addEventListener('click', function () {
     api('diagnostics', {}).then(function (r) {
       var done = function () { $('diag-btn').textContent = 'Copied — paste it to support'; };
@@ -656,6 +694,15 @@ class LauncherApp:
             return {"ok": True}
         if route == "/api/diagnostics":
             return {"ok": True, "text": diagnostics_text()}
+        if route == "/api/report/preview":
+            return {"ok": True, "text": crash_report.preview(self._error_report())}
+        if route == "/api/report/send":
+            try:
+                ref = crash_report.send(self._error_report(), self.license_server_url)
+            except Exception as exc:  # offline, server asleep, ...
+                print(f"error report not sent: {exc}", file=sys.stderr)
+                return {"ok": False, "error": "Couldn't send it (no internet?). Use Copy error report and email it instead."}
+            return {"ok": True, "ref": ref}
         if route == "/api/closed":
             self.state.set(closed_at=time.monotonic())
             return {"ok": True}
@@ -711,6 +758,10 @@ class LauncherApp:
         args = [sys.executable] + ([] if appenv.IS_FROZEN else [str(Path(__file__).resolve().parent / "launcher.py")])
         subprocess.Popen(args + ["--after-restart"], close_fds=True)
         threading.Timer(0.5, self.shutdown).start()
+
+    def _error_report(self) -> dict:
+        """What 'Send error report' sends: scrubbed (crash_report.py), shown to the user first."""
+        return _report_for(getattr(self.state, "error", "") or "")
 
     def _open(self, what: str, anchor: str = "") -> None:
         if what == "help":
@@ -1005,6 +1056,11 @@ def help_anchor_for(message: str) -> str:
     """Which troubleshooting-guide section explains this error (static/help.html ids)."""
     low = (message or "").lower()
     return next((anchor for needle, anchor in _HELP_RULES if needle in low), "wont-open")
+
+
+def _report_for(error: str) -> dict:
+    _, lines = appenv.LOG.snapshot(10_000)
+    return crash_report.build(error, lines, appenv.system_summary(), appenv.APP_VERSION)
 
 
 def diagnostics_text() -> str:
