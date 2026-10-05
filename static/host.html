@@ -547,6 +547,12 @@
   .term-add input { flex: 1; font: inherit; padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid var(--bg-raised-2); background: var(--bg); color: var(--ink); }
   .term-add .slides-btn { margin-top: 0; }
   .slides-foot { font-size: 0.8rem; color: var(--ink-faint); margin-top: 0.8rem; }
+
+  /* ---- presenter's own language ---- */
+  .speak-row { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin: 0.6rem auto 0; font-weight: 700; color: var(--ink-dim); font-size: 0.92rem; }
+  .speak-row select { font: 700 0.92rem var(--font-body); padding: 0.35rem 0.6rem; border-radius: 10px; border: 1.5px solid var(--bg-raised-2);
+    background: var(--bg-raised); color: var(--ink); max-width: 70vw; }
+  .speak-note { text-align: center; color: var(--live); font-size: 0.82rem; min-height: 1.1em; margin: 0.25rem 0 0; }
 </style>
 </head>
 <body>
@@ -624,6 +630,11 @@
 </button>
 
 <button type="button" class="ui-lang" id="ui-lang" data-no-i18n aria-label="Interface language">हिन्दी</button>
+<div class="speak-row">
+  <label for="speak-lang">I'm speaking</label>
+  <select id="speak-lang"><option value="en">English</option></select>
+</div>
+<p class="speak-note" id="speak-note" role="status"></p>
 <p class="status-line" id="status-line">Not presenting</p>
 <div class="live-meters" id="live-meters" hidden>
   <div class="mic-meter" role="meter" aria-label="Microphone level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="mic-meter"><div class="mic-meter-fill" id="mic-meter-fill"></div></div>
@@ -1575,6 +1586,33 @@
   }
   document.getElementById("term-add-btn").addEventListener("click", addTypedTerm);
   document.getElementById("term-input").addEventListener("keydown", function (e) { if (e.key === "Enter") addTypedTerm(); });
+
+
+  // ---------------------------------------------------------------- presenter's language
+  (function () {
+    var sel = document.getElementById("speak-lang"), note = document.getElementById("speak-note");
+    var key = new URLSearchParams(window.location.search).get("key");
+    var q = key ? "?key=" + encodeURIComponent(key) : "";
+    sel.innerHTML = "";
+    var auto = document.createElement("option"); auto.value = "auto"; auto.textContent = "Auto-detect (Hindi + English mix)";
+    sel.appendChild(auto);
+    Object.keys(LANG_NAMES).forEach(function (code) {
+      var o = document.createElement("option"); o.value = code; o.textContent = LANG_NAMES[code]; o.lang = code; sel.appendChild(o);
+    });
+    var noteTimer = null;
+    function say(text) { note.textContent = text; clearTimeout(noteTimer); noteTimer = setTimeout(function () { note.textContent = ""; }, 6000); }
+    fetch("/presenter-language" + q, { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { if (d && d.choice) sel.value = d.choice; }).catch(function () {});
+    sel.addEventListener("change", function () {
+      var choice = sel.value;
+      fetch("/presenter-language" + q, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ language: choice }) })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          if (!res.ok) { say(res.j.error || "That language isn't supported."); return; }
+          say(choice === "auto" ? "Detecting the language of each sentence." : "Listening for " + (LANG_NAMES[choice] || choice) + " from the next sentence.");
+        }).catch(function () { say("Couldn't reach DwaniLive on this laptop."); });
+    });
+  })();
 
   init();
 })();

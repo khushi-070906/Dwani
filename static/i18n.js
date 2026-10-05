@@ -173,6 +173,10 @@
     "Free plan: the full transcript (.txt) in the talk's language. Pro adds printable notes with highlights, subtitles and every language.":
       "फ़्री प्लान: बात की भाषा में पूरा ट्रांसक्रिप्ट (.txt)। प्रो में मुख्य बातों वाले नोट्स, सबटाइटल और हर भाषा मिलती है।",
     "· Pro": "· प्रो",
+    "I'm speaking": "मेरी भाषा",
+    "Auto-detect (Hindi + English mix)": "अपने आप पहचानें (हिंदी-अंग्रेज़ी मिली-जुली)",
+    "Detecting the language of each sentence.": "हर वाक्य की भाषा अपने आप पहचानी जाएगी।",
+    "That language isn't supported.": "यह भाषा अभी उपलब्ध नहीं है।",
     "Slides vocabulary is part of the Pro and Institution plans.": "स्लाइड्स शब्दावली प्रो और इंस्टीट्यूशन प्लान में मिलती है।",
     "Pro feature": "प्रो फ़ीचर",
     // setup-check titles (their details come from the laptop in English)
@@ -213,6 +217,7 @@
     [/^([\d.]+) min · (\d+) captions$/, "$1 मिनट · $2 कैप्शन"],
     [/^Asked in (.+)$/, "$1 में पूछा गया"],
     [/^Reading (.+)…$/, "$1 पढ़ रहे हैं…"],
+    [/^Listening for (.+) from the next sentence\.$/, "अगले वाक्य से $1 सुनेंगे।"],
     [/^Found (\d+) possible terms\.$/, "$1 संभावित शब्द मिले।"],
     [/^Added (\d+) terms\. They're used from the next sentence\.$/, "$1 शब्द जोड़े गए। अगले वाक्य से इस्तेमाल होंगे।"],
     [/^Remove (.+)$/, "$1 हटाएँ"],
