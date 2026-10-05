@@ -93,6 +93,11 @@ class NotesRecorder:
                      "src": text, "tr": {k: v for k, v in (translations or {}).items() if v and k != self.src_lang}})
         self.count += 1
 
+    def mark_confused(self, wall: float, lang: str = "") -> None:
+        """An attendee tapped 'Lost me' (anonymous)."""
+        if self.enabled:
+            self._write({"type": "confused", "t": round(wall, 3), "lang": lang})
+
 
 @dataclass
 class Session:
@@ -103,6 +108,7 @@ class Session:
     title: str
     started: float
     captions: list[Caption]
+    confused: list = field(default_factory=list)   # wall times of anonymous "Lost me" taps
 
     @property
     def duration_s(self) -> float:
@@ -116,7 +122,7 @@ class Session:
 
 
 def load_session(path: Path) -> Session:
-    meta, caps = {}, []
+    meta, caps, confused = {}, [], []
     with open(path, encoding="utf-8") as f:
         for line in f:
             try:
@@ -129,8 +135,10 @@ def load_session(path: Path) -> Session:
                 caps.append(Caption(o["t"], o["start"], o["end"], o["src"], o.get("tr") or {}))
             elif o.get("type") == "tr" and 0 <= o.get("i", -1) < len(caps):   # translation added after the talk
                 caps[o["i"]].tr[o["lang"]] = o["text"]
+            elif o.get("type") == "confused":
+                confused.append(float(o.get("t", 0)))
     return Session(path.stem, path, meta.get("session", ""), meta.get("src_lang", "en"),
-                   meta.get("title", path.stem), meta.get("started", path.stat().st_mtime), caps)
+                   meta.get("title", path.stem), meta.get("started", path.stat().st_mtime), caps, confused)
 
 
 def list_sessions(directory: Path) -> list[dict]:
@@ -286,6 +294,21 @@ def export_srt(s: Session, lang: str) -> str:
     return "\n".join(out)
 
 
+def lost_moments(s: Session, min_taps: int = 1) -> list[tuple[Caption, int]]:
+    """Captions during which attendees tapped 'Lost me': each tap is attributed to
+    the sentence being spoken (or just finished) at that moment. Busiest first
+    would hide the flow of the talk, so they're returned in talk order."""
+    if not s.captions or not s.confused:
+        return []
+    ends = [c.t for c in s.captions]
+    counts: dict[int, int] = {}
+    for t in s.confused:
+        # the first caption that finished at/after the tap; a tap after the last caption -> the last one
+        i = next((k for k, e in enumerate(ends) if e >= t - 2.0), len(ends) - 1)
+        counts[i] = counts.get(i, 0) + 1
+    return [(s.captions[i], n) for i, n in sorted(counts.items()) if n >= min_taps]
+
+
 def _notes_parts(s: Session, lang: str) -> tuple[list[Caption], list[str]]:
     hl = [s.captions[i] for i in highlights(s.captions)]
     return hl, key_terms(s.captions)
@@ -300,6 +323,10 @@ def export_md(s: Session, lang: str, term_translations: dict | None = None) -> s
     if terms:
         tt = term_translations or {}
         L += ["## Key terms", ""] + [f"- {t}" + (f" — {tt[t]}" if tt.get(t) and lang != s.src_lang else "") for t in terms] + [""]
+    lost = lost_moments(s)
+    if lost:
+        L += ["## Where students got lost", ""] + [
+            f"- **[{_clock(c.start)}]** {text_of(c, lang, s.src_lang)} _({n} tap{'s' if n != 1 else ''})_" for c, n in lost] + [""]
     L += ["## Transcript", ""] + [f"**[{_clock(c.start)}]** {text_of(c, lang, s.src_lang)}  " for c in s.captions
                                   if text_of(c, lang, s.src_lang)]
     return "\n".join(L) + "\n"
@@ -314,6 +341,8 @@ def export_html(s: Session, lang: str, term_translations: dict | None = None) ->
     terms_html = "".join(
         f'<li><b lang="{s.src_lang}">{e(t)}</b>' + (f' <span lang="{lang}">— {e(tt[t])}</span>' if tt.get(t) and lang != s.src_lang else "")
         + "</li>" for t in terms)
+    lost_html = "".join(f'<li><span class="ts">{_clock(c.start)}</span> {e(text_of(c, lang, s.src_lang))} '
+                        f'<span class="taps">{n} tap{"s" if n != 1 else ""}</span></li>' for c, n in lost_moments(s))
     body = "".join(f'<p><span class="ts">{_clock(c.start)}</span> {e(text_of(c, lang, s.src_lang))}</p>'
                    for c in s.captions if text_of(c, lang, s.src_lang))
     when = time.strftime('%d %B %Y, %H:%M', time.localtime(s.started))
@@ -331,6 +360,7 @@ def export_html(s: Session, lang: str, term_translations: dict | None = None) ->
   .hl li {{ margin: .45rem 0; }}
   .terms {{ columns: 2; column-gap: 2rem; }}
   .terms li {{ break-inside: avoid; margin: .2rem 0; }}
+  .taps {{ color: #b3261e; font-size: .78rem; font-weight: 700; white-space: nowrap; }}
   .ts {{ color: #a8460c; font-size: .8rem; font-weight: 700; font-variant-numeric: tabular-nums; margin-inline-end: .35rem; }}
   .transcript p {{ margin: .35rem 0; }}
   .note {{ color: #69543f; font-size: .8rem; margin-top: 2rem; border-top: 1px solid #eadfc8; padding-top: .6rem; }}
@@ -343,6 +373,7 @@ def export_html(s: Session, lang: str, term_translations: dict | None = None) ->
 <div class="meta">{when} · {_clock(s.duration_s)} · {e(LANG_NAMES.get(lang, lang))}</div></header>
 {f'<h2>Highlights</h2><ul class="hl">{hl_html}</ul>' if hl_html else ''}
 {f'<h2>Key terms</h2><ul class="terms">{terms_html}</ul>' if terms_html else ''}
+{f'<h2>Where students got lost</h2><p class="meta">Anonymous "Lost me" taps from attendees during the talk.</p><ul class="hl">{lost_html}</ul>' if lost_html else ''}
 <h2>Full transcript</h2><div class="transcript">{body}</div>
 <p class="note">Generated offline by DwaniLive from live captions. Highlights are sentences selected automatically from the
 talk; captions and translations are machine-generated and may contain errors.</p>
