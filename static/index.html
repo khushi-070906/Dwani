@@ -549,6 +549,9 @@
   .lost-btn:disabled { opacity: 0.75; cursor: default; }
   .lost-btn.sent { border-color: var(--live); color: var(--live); }
   body.a11y-focus .lost-btn { display: none; }
+
+  #a11y-speak-note { margin: -0.2rem 0 0.4rem; font-size: 0.82rem; }
+  #a11y-speak-note:empty { display: none; }
 </style>
 </head>
 <body>
@@ -653,6 +656,10 @@
       <select id="a11y-leading"><option value="1.35">Normal</option><option value="1.6">Relaxed</option><option value="2">Extra</option></select></label></div>
     <div class="a11y-row"><label><input type="checkbox" id="a11y-easyread"> Easy-read font &amp; spacing <span class="a11y-hint">(helps many readers with dyslexia)</span></label></div>
     <div class="a11y-row"><label><input type="checkbox" id="a11y-hold-longer"> Hold captions longer</label></div>
+    <div class="a11y-row"><label><input type="checkbox" id="a11y-speak"> 🔊 Read captions aloud</label></div>
+    <div class="a11y-row" id="a11y-speak-rate-row" hidden><label>Reading speed
+      <select id="a11y-speak-rate"><option value="0.85">Slower</option><option value="1" selected>Normal</option><option value="1.2">Faster</option></select></label></div>
+    <p class="a11y-hint" id="a11y-speak-note" role="status"></p>
     <div class="a11y-row"><label><input type="checkbox" id="a11y-flash"> Flash on new caption</label></div>
     <div class="a11y-row a11y-actions">
       <button type="button" class="a11y-action" id="focus-btn">⛶ Full screen / projector</button>
@@ -826,6 +833,7 @@
     liveScreen.hidden = false;
     liveLangChip.textContent = displayNameFor(langCode);
     captionStage.lang = langCode;   // correct voice / hyphenation for this language
+    if (typeof updateSpeakNote === "function") setTimeout(updateSpeakNote, 0);
     srCaptions.lang = langCode;
     resetCaptionState();
     store("dwani:last", { session: sessionId, lang: langCode, at: Date.now() });
@@ -1047,6 +1055,7 @@
       lines.push(payload.text);
       captionLog.push({ t: Date.now(), text: payload.text });
       announceCaption(payload.text);
+      speakCaption(payload.text);
       if (captionLog.length > HISTORY_CAP) captionLog = captionLog.slice(-HISTORY_CAP);
       persistHistory();
       var cap = effectiveMaxLines();
@@ -1113,6 +1122,75 @@
     }, LOST_COOLDOWN_MS);
   });
 
+
+  // -- read captions aloud with the phone's own voice (Web Speech API) ----------
+  // Offline on most phones, no model on the laptop. Only final captions are
+  // spoken; if speech falls behind the talk, older ones are skipped so the
+  // listener stays live rather than drifting minutes behind.
+  var speakBox = document.getElementById("a11y-speak");
+  var speakRate = document.getElementById("a11y-speak-rate");
+  var speakNote = document.getElementById("a11y-speak-note");
+  var tts = window.speechSynthesis || null;
+  var speakQueue = 0;
+
+  function voiceFor(lang) {
+    if (!tts) return null;
+    var voices = tts.getVoices() || [];
+    var exact = voices.filter(function (v) { return (v.lang || "").toLowerCase().split(/[-_]/)[0] === lang; });
+    return exact.find(function (v) { return v.localService; }) || exact[0] || null;
+  }
+
+  function updateSpeakNote() {
+    document.getElementById("a11y-speak-rate-row").hidden = !speakBox.checked;
+    if (!speakBox.checked) { speakNote.textContent = ""; return; }
+    if (!tts) { speakNote.textContent = "This browser can't read aloud. Try Chrome or Safari."; return; }
+    var lang = currentLang || "en";
+    if (!voiceFor(lang)) {
+      speakNote.textContent = "Your phone has no " + displayNameFor(lang) + " voice. Add one in your phone's text-to-speech settings.";
+    } else {
+      speakNote.textContent = "";
+    }
+  }
+
+  function speakCaption(text) {
+    if (!speakBox.checked || !tts || !text) return;
+    var voice = voiceFor(currentLang || "en");
+    if (!voice) return;
+    if (speakQueue >= 2) { tts.cancel(); speakQueue = 0; }   // fell behind: jump to the latest
+    var u = new SpeechSynthesisUtterance(text);
+    u.voice = voice;
+    u.lang = voice.lang;
+    u.rate = parseFloat(speakRate.value) || 1;
+    u.onend = u.onerror = function () { speakQueue = Math.max(0, speakQueue - 1); };
+    speakQueue += 1;
+    tts.speak(u);
+  }
+
+  function setSpeak(on, fromUser) {
+    speakBox.checked = on;
+    ui.speak = on; ui.speakRate = speakRate.value;
+    store("dwani:a11y", { a11y: a11y, ui: ui });
+    if (!on && tts) { tts.cancel(); speakQueue = 0; }
+    if (on && fromUser && tts && voiceFor(currentLang || "en")) {
+      // iPhones only allow speech that starts from a tap: speak once now to unlock it.
+      var hello = new SpeechSynthesisUtterance(" ");
+      hello.volume = 0;
+      tts.speak(hello);
+    }
+    updateSpeakNote();
+  }
+  speakBox.addEventListener("change", function () { setSpeak(speakBox.checked, true); });
+  speakRate.addEventListener("change", function () { ui.speakRate = speakRate.value; store("dwani:a11y", { a11y: a11y, ui: ui }); });
+  if (tts && "onvoiceschanged" in tts) tts.onvoiceschanged = updateSpeakNote;   // voices load late on some phones
+  (function restoreSpeak() {
+    var saved = load("dwani:a11y");
+    if (saved && saved.ui) {
+      if (saved.ui.speakRate) speakRate.value = String(saved.ui.speakRate);
+      speakBox.checked = !!saved.ui.speak;
+      document.getElementById("a11y-speak-rate-row").hidden = !speakBox.checked;
+    }
+  })();
+
   // -- save transcript ---------------------------------------------------------
   document.getElementById("save-btn").addEventListener("click", function () {
     if (!captionLog.length) { setStatus(statusDot.className.indexOf("live") > -1 ? "live" : "idle", "Nothing to save yet"); return; }
@@ -1159,6 +1237,7 @@
     ui.dark = a11yDark.checked;
     ui.easyread = a11yEasy.checked;
     ui.leading = a11yLeading.value;
+    // ui.speak / ui.speakRate are kept as they are (set by the read-aloud controls)
   }
   function writeA11yInputs() {
     a11yHighContrast.checked = !!a11y.high_contrast;
@@ -1183,8 +1262,9 @@
   document.getElementById("a11y-reset").addEventListener("click", function () {
     forget("dwani:a11y");
     a11y.high_contrast = false; a11y.large_text = false; a11y.font_scale = 1.0; a11y.hold_seconds = 6.0; a11y.flash_on_new_caption = false;
-    ui = { dark: prefersDark(), easyread: false, leading: "1.35" };
+    ui = { dark: prefersDark(), easyread: false, leading: "1.35", speak: false, speakRate: "1" };
     writeA11yInputs(); applyAccessibilityLocal(); sendAccessibilitySettings(); renderCaptionStage();
+    speakRate.value = "1"; setSpeak(false, false);
   });
 
   function prefersDark() {
@@ -1209,8 +1289,9 @@
         if (k in saved.a11y) a11y[k] = saved.a11y[k];
       });
     }
-    ui = saved && saved.ui ? { dark: !!saved.ui.dark, easyread: !!saved.ui.easyread, leading: String(saved.ui.leading || "1.35") }
-                           : { dark: prefersDark(), easyread: false, leading: "1.35" };
+    ui = saved && saved.ui ? { dark: !!saved.ui.dark, easyread: !!saved.ui.easyread, leading: String(saved.ui.leading || "1.35"),
+                               speak: !!saved.ui.speak, speakRate: String(saved.ui.speakRate || "1") }
+                           : { dark: prefersDark(), easyread: false, leading: "1.35", speak: false, speakRate: "1" };
     writeA11yInputs();
     applyAccessibilityLocal();
   })();
