@@ -385,9 +385,15 @@ class FakeASRBackend:
     (or one supplied per-call via `next_transcript`) instead of running a
     real model."""
 
-    def __init__(self, default_transcript: str = "") -> None:
+    def __init__(self, default_transcript: str = "", language: str | None = "en") -> None:
         self.default_transcript = default_transcript
         self.calls: list[AudioSegment] = []
+        self._language = language
+        self.last_language = language or "en"
+
+    def set_language(self, lang: str | None) -> None:
+        self._language = lang
+        self.last_language = lang or self.last_language
 
     async def transcribe(self, segment: AudioSegment) -> str:
         self.calls.append(segment)
@@ -401,8 +407,16 @@ class FakeTranslationBackend:
 
     def __init__(self) -> None:
         self.calls: list[tuple[str, str]] = []
+        self.source_lang = "en"
+
+    def set_source_language(self, lang: str) -> None:
+        self.source_lang = lang
 
     async def translate(self, text: str, target_lang: str) -> str:
+        self.calls.append((text, target_lang))
+        return f"[{target_lang}] {text}"
+
+    async def translate_between(self, text: str, source_lang: str, target_lang: str) -> str:
         self.calls.append((text, target_lang))
         return f"[{target_lang}] {text}"
 
@@ -524,6 +538,21 @@ class Pipeline:
         t0_wall = time.time()
         transcript = await self.asr.transcribe(segment)
         translations: dict[str, str] = {}
+        # Language being spoken (server /presenter-language). In auto mode it's
+        # whatever Whisper detected for this sentence, and the translator is
+        # pointed at it before translating.
+        source = getattr(self, "source_language", None)
+        if getattr(self, "auto_source", False):
+            detected = getattr(self.asr, "last_language", None)
+            hook = getattr(self, "on_detected_language", None)
+            if detected:
+                source = detected
+                if hook is not None:
+                    try:
+                        hook(detected)
+                    except Exception as exc:  # unsupported detected language: keep the previous source
+                        print(f"[pipeline] can't translate from detected language {detected!r}: {exc}")
+                        source = getattr(self, "source_language", None)
         asr_ms = (time.monotonic() - t0) * 1000
         mt_times: list[float] = []
 
@@ -532,6 +561,12 @@ class Pipeline:
         languages = list(dict.fromkeys(self.subscribed_languages()))
 
         async def _translate_and_broadcast(lang: str) -> None:
+            if source and lang == source:
+                # The attendee reads the language being spoken: send the words
+                # as recognised -- "translating" hi->hi only paraphrases them.
+                translations[lang] = transcript
+                await self.broadcast(lang, transcript, is_final)
+                return
             cached = await self.cache.get(transcript, lang)
             if cached is not None:
                 translated = cached
