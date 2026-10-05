@@ -541,6 +541,14 @@
     .caption-line { animation: none !important; }
     .caption-stage.flash { animation: none !important; outline: 3px solid var(--accent); }
   }
+
+  /* ---- "Lost me": anonymous signal to the presenter ---- */
+  .lost-btn { position: fixed; right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); z-index: 40;
+    min-height: 48px; padding: 0.6rem 1.05rem; border-radius: 999px; border: 1.5px solid var(--bg-raised-2);
+    background: var(--bg-raised); color: var(--ink); font: 700 0.95rem var(--font-body); box-shadow: 0 6px 18px -6px rgba(44, 24, 16, 0.35); cursor: pointer; }
+  .lost-btn:disabled { opacity: 0.75; cursor: default; }
+  .lost-btn.sent { border-color: var(--live); color: var(--live); }
+  body.a11y-focus .lost-btn { display: none; }
 </style>
 </head>
 <body>
@@ -660,6 +668,7 @@
   <div id="sr-captions" class="sr-only" role="log" aria-live="polite" aria-relevant="additions" aria-label="Captions"></div>
   <div id="sr-status" class="sr-only" role="status" aria-live="polite"></div>
   <button type="button" class="focus-exit" id="focus-exit">✕ Exit full screen</button>
+  <button type="button" class="lost-btn" id="lost-btn" hidden aria-label="Tell the presenter you didn't follow that (anonymous)">🤔 Lost me</button>
 
   <div class="reconnect-banner" id="reconnect-banner">
     <span>Connection to the presenter's device dropped.</span>
@@ -868,6 +877,7 @@
       reconnectAttempt = 0;
       lastMsgAt = Date.now();
       startHeartbeat();
+      showLostButton(true);
       var gap = disconnectedAt ? Math.round((Date.now() - disconnectedAt) / 1000) : 0;
       disconnectedAt = null;
       if (gap >= 3) {
@@ -889,13 +899,14 @@
       } catch (err) {
         return; // ignore malformed frames rather than crash the caption view
       }
-      if (payload && payload.type === "pong") return;
+      if (payload && (payload.type === "pong" || payload.type === "confused_ack")) return;
       handleCaption(payload);
     });
 
     ws.addEventListener("close", function (event) {
       if (ws !== socket) return;  // an old socket we already replaced
       stopHeartbeat();
+      showLostButton(false);
       if (!disconnectedAt) disconnectedAt = Date.now();
       if (manuallyDisconnected) return;
       if (event.code === 4000) {
@@ -1084,6 +1095,23 @@
       captionStage.appendChild(el);
     });
   }
+
+
+  // -- "Lost me": anonymous tap; the presenter sees how many people lost the thread ----
+  var lostBtn = document.getElementById("lost-btn");
+  var LOST_COOLDOWN_MS = 20000, lostTimer = null;
+  function showLostButton(live) { lostBtn.hidden = !live; }
+  lostBtn.addEventListener("click", function () {
+    if (!socket || socket.readyState !== WebSocket.OPEN || lostBtn.disabled) return;
+    try { socket.send(JSON.stringify({ type: "confused" })); } catch (e) { return; }
+    lostBtn.disabled = true;
+    lostBtn.classList.add("sent");
+    lostBtn.textContent = "✓ Sent to the presenter";
+    clearTimeout(lostTimer);
+    lostTimer = setTimeout(function () {
+      lostBtn.disabled = false; lostBtn.classList.remove("sent"); lostBtn.textContent = "🤔 Lost me";
+    }, LOST_COOLDOWN_MS);
+  });
 
   // -- save transcript ---------------------------------------------------------
   document.getElementById("save-btn").addEventListener("click", function () {
