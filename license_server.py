@@ -48,9 +48,12 @@ One-time setup in the Razorpay Dashboard (Test mode first):
        RAZORPAY_WEBHOOK_SECRET above.
 """
 
+import hashlib
+import hmac
 import json
 import logging
 import os
+import re
 import secrets
 import smtplib
 import time
@@ -69,7 +72,7 @@ import psycopg2.extras
 from dotenv import load_dotenv
 from fastapi import Cookie, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -299,6 +302,76 @@ def all_releases(response: Response):
     return rels
 
 
+# --- Error reports from the desktop app (crash_report.py) ---------------------
+# Sent only when a user presses "Send error report" after previewing it; the
+# app scrubs names, folders, e-mails and keys first. We keep a hash of the IP
+# (for rate limiting), never the IP itself.
+CRASH_MAX_BYTES = 100_000
+CRASH_PER_HOUR = 10
+_crash_hits: dict = {}
+
+
+def _client_key(request: Request) -> str:
+    ip = (request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+          or (request.client.host if request.client else "?"))
+    return hashlib.sha256(("dwani-crash:" + ip).encode()).hexdigest()[:16]
+
+
+@app.post("/api/crash-report")
+async def crash_report(request: Request):
+    raw = await request.body()
+    if len(raw) > CRASH_MAX_BYTES:
+        raise HTTPException(status_code=413, detail="Report too large")
+    who = _client_key(request)
+    now = time.time()
+    recent = [t for t in _crash_hits.get(who, []) if now - t < 3600]
+    if len(recent) >= CRASH_PER_HOUR:
+        raise HTTPException(status_code=429, detail="Too many reports from this network; try again later")
+    _crash_hits[who] = recent + [now]
+    try:
+        body = json.loads(raw.decode("utf-8"))
+        assert isinstance(body, dict)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Expected a JSON report")
+    clip = lambda v, n: str(v or "")[:n]
+    with db() as conn:
+        row = conn.execute(
+            "INSERT INTO crash_reports (created_at, version, os, error, details, sender) VALUES (?, ?, ?, ?, ?, ?) RETURNING id",
+            (int(now), clip(body.get("version"), 40), clip(body.get("os"), 200), clip(body.get("error"), 4000),
+             json.dumps(body, ensure_ascii=False)[:CRASH_MAX_BYTES], who),
+        ).fetchone()
+    return {"ref": f"DL-ERR-{row['id']:04d}"}
+
+
+@app.get("/admin/crash-reports")
+def crash_reports_page(token: str = "", ref: str = ""):
+    """For the DwaniLive team: the latest error reports. Protected by the
+    REPORTS_TOKEN environment variable (unset = page disabled)."""
+    expected = os.environ.get("REPORTS_TOKEN", "")
+    if not expected or not hmac.compare_digest(token, expected):
+        raise HTTPException(status_code=404)
+    import html as _h
+    with db() as conn:
+        if ref:
+            m = re.fullmatch(r"(?:DL-ERR-)?0*(\d+)", ref.strip(), re.I)
+            rows = conn.execute("SELECT * FROM crash_reports WHERE id = ?", (int(m.group(1)) if m else -1,)).fetchall()
+        else:
+            rows = conn.execute("SELECT * FROM crash_reports ORDER BY id DESC LIMIT 100").fetchall()
+    items = "".join(
+        f"<details><summary><b>DL-ERR-{r['id']:04d}</b> · {time.strftime('%d %b %Y %H:%M', time.gmtime(r['created_at']))} UTC"
+        f" · v{_h.escape(r['version'] or '?')} · {_h.escape((r['error'] or '')[:140])}</summary>"
+        f"<p>{_h.escape(r['os'] or '')}</p><pre>{_h.escape(json.dumps(json.loads(r['details']), indent=2, ensure_ascii=False))}</pre></details>"
+        for r in rows) or "<p>No reports yet.</p>"
+    page = ("<!DOCTYPE html><html><head><meta charset='utf-8'><title>Error reports</title><style>"
+            "body{font-family:system-ui,sans-serif;max-width:960px;margin:2rem auto;padding:0 1rem;color:#2c1810}"
+            "details{border:1px solid #eadfc8;border-radius:10px;padding:.5rem .8rem;margin:.5rem 0}"
+            "pre{white-space:pre-wrap;word-break:break-word;font-size:.78rem;background:#faf5ea;padding:.6rem;border-radius:8px}"
+            "</style></head><body><h1>DwaniLive error reports</h1>"
+            f"<form><input type='hidden' name='token' value='{_h.escape(token)}'><input name='ref' placeholder='DL-ERR-0042'>"
+            f" <button>Find</button></form>{items}</body></html>")
+    return HTMLResponse(page, headers={"Cache-Control": "no-store", "X-Robots-Tag": "noindex"})
+
+
 @app.get("/changelog.html")
 @app.get("/changelog")
 def changelog_page():
@@ -405,6 +478,17 @@ def init_db():
         # /cancel-subscription order by "most recently created" without
         # relying on SQLite's implicit, Postgres-nonexistent "rowid".
         conn.execute("ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS id SERIAL")
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS crash_reports (
+                id SERIAL PRIMARY KEY,
+                created_at INTEGER NOT NULL,
+                version TEXT,
+                os TEXT,
+                error TEXT,
+                details TEXT,
+                sender TEXT
+            )
+        """)
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
