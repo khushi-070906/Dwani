@@ -255,10 +255,10 @@ def run_console() -> None:
 SELF_TEST_IMPORTS = [
     "numpy", "fastapi", "starlette", "uvicorn", "websockets", "pydantic", "dotenv",
     "qrcode", "PIL", "cryptography", "sentencepiece", "ctranslate2", "faster_whisper",
-    "tokenizers", "certifi",
+    "tokenizers", "certifi", "pypdf",
     "licensing", "activate", "session", "pipeline", "backends", "qa_pipeline",
     "nllb_tokenizer", "accessibility", "glossary", "translation_cache", "server",
-    "gui", "model_setup", "updater", "phone_mic", "preflight", "notes",
+    "gui", "model_setup", "updater", "phone_mic", "preflight", "notes", "talk_glossary",
 ]
 
 

@@ -26,3 +26,4 @@ certifi==2026.2.25
 # build tools (pick one; build_exe.py --backend nuitka|pyinstaller)
 nuitka==4.2
 pyinstaller==6.22.3
+pypdf==5.9.0
