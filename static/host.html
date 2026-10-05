@@ -516,6 +516,13 @@
   .ui-lang { position: fixed; top: max(0.7rem, env(safe-area-inset-top)); right: 0.8rem; z-index: 20; border: 1.5px solid var(--bg-raised-2);
     background: var(--bg-raised); color: var(--ink-dim); border-radius: 999px; padding: 0.3rem 0.8rem; font: 700 0.85rem var(--font-body);
     cursor: pointer; min-height: 36px; }
+
+  /* ---- "Lost me" banner ---- */
+  .lost-banner { max-width: 480px; width: 90%; margin: 0.5rem auto 0; padding: 0.7rem 0.9rem; border-radius: 14px; text-align: left;
+    background: #fff4e5; border: 1.5px solid var(--accent); box-shadow: var(--shadow); }
+  .lost-head { font-weight: 800; color: var(--accent-deep); }
+  .lost-about { color: var(--ink-dim); font-size: 0.9rem; margin-top: 0.15rem; font-style: italic; }
+  .lost-tip { color: var(--ink-faint); font-size: 0.82rem; margin-top: 0.25rem; }
 </style>
 </head>
 <body>
@@ -599,6 +606,11 @@
   <span class="delay-chip" id="delay-chip" title="Time from the end of a sentence to the caption being sent">Caption delay —</span>
 </div>
 <p class="mic-hint" id="mic-hint" role="status"></p>
+<div class="lost-banner" id="lost-banner" role="status" hidden>
+  <div class="lost-head" id="lost-head"></div>
+  <div class="lost-about" id="lost-about"></div>
+  <div class="lost-tip">Slow down, or say it another way.</div>
+</div>
 
 <div class="pf-wrap">
   <button type="button" class="pf-toggle" id="pf-toggle" aria-expanded="false">
@@ -668,6 +680,11 @@
           <div class="stat-value" id="stat-delay">—</div>
           <div class="stat-label">Caption delay (typical)</div>
           <div class="stat-sublabel" id="stat-delay-sub">Appears after the first captions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-lost">0</div>
+          <div class="stat-label">"Lost me" taps</div>
+          <div class="stat-sublabel">Anonymous, this session</div>
         </div>
         <div class="stat-card">
           <div class="stat-value" id="stat-captions">0</div>
@@ -880,6 +897,16 @@
     noAudience.textContent = near ? d.attendees + " of " + d.max_attendees + " seats used on your plan: upgrade from your dashboard for more."
                                   : "Nobody has joined yet.";
     noAudience.hidden = langs.length > 0 && !near;
+
+    // "Lost me" taps
+    var C = d.confusion || {};
+    document.getElementById("stat-lost").textContent = C.total || 0;
+    var banner = document.getElementById("lost-banner");
+    banner.hidden = !C.alert;
+    if (C.alert) {
+      document.getElementById("lost-head").textContent = "🤔 " + C.people + " of " + C.attendees + " lost you in the last minute";
+      document.getElementById("lost-about").textContent = C.about ? "on: \u201c…" + C.about + "\u201d" : "";
+    }
 
     // caption delay
     var L = d.latency || {};
