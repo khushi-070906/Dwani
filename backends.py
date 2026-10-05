@@ -270,9 +270,14 @@ class RealWhisperBackend:
 
         self._model = WhisperModel(model_size, device=device, compute_type=compute_type, cpu_threads=cpu_threads)
         self._language = language
+        self.last_language = language   # what Whisper detected for the latest sentence (auto mode)
         self._target_sample_rate = target_sample_rate
         self._beam_size = beam_size
         self._initial_prompt = initial_prompt
+
+    def set_language(self, lang: str | None) -> None:
+        """None = auto-detect (useful for Hindi-English mixing)."""
+        self._language = lang
 
     async def transcribe(self, segment: "AudioSegment") -> str:
         # faster-whisper's transcribe() is a blocking, synchronous call --
@@ -293,6 +298,7 @@ class RealWhisperBackend:
             # boundaries the rest of the pipeline (and its tests) rely on.
             vad_filter=False,
         )
+        self.last_language = getattr(_info, "language", None) or self._language
         return "".join(s.text for s in segments).strip()
 
 
@@ -361,9 +367,19 @@ class RealNLLBBackend:
         # pushed off the event loop.
         return await asyncio.to_thread(self._translate_sync, text, target_lang)
 
-    def _translate_sync(self, text: str, target_lang: str) -> str:
+    def set_source_language(self, lang: str) -> None:
+        """The presenter switched language (server /presenter-language):
+        translate from `lang` from the next sentence on."""
+        self._source_flores = flores_code(lang)   # raises UnsupportedLanguageError first, changes nothing
+
+    async def translate_between(self, text: str, source_lang: str, target_lang: str) -> str:
+        """Translate with an explicit source, without touching the live source
+        language (session notes re-translate older captions this way)."""
+        return await asyncio.to_thread(self._translate_sync, text, target_lang, flores_code(source_lang))
+
+    def _translate_sync(self, text: str, target_lang: str, source_flores: str | None = None) -> str:
         target_flores = flores_code(target_lang)
-        source_tokens = self._tokenizer.encode_source(text, self._source_flores)
+        source_tokens = self._tokenizer.encode_source(text, source_flores or self._source_flores)
 
         result = self._translator.translate_batch(
             [source_tokens],
