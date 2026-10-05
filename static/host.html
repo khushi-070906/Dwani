@@ -511,6 +511,8 @@
     border: 1px solid var(--bg-raised-2); color: var(--ink-dim); background: var(--bg-raised); }
   .notes-actions a.primary { background: var(--indigo); color: #fffdf6; border-color: var(--indigo); }
   .notes-empty { color: var(--ink-faint); }
+  .notes-actions a.locked { opacity: 0.7; border-style: dashed; }
+  .notes-plan { font-size: 0.82rem; color: var(--ink-faint); margin: 0 0 0.5rem; }
 
   /* ---- interface language toggle ---- */
   .ui-lang { position: fixed; top: max(0.7rem, env(safe-area-inset-top)); right: 0.8rem; z-index: 20; border: 1.5px solid var(--bg-raised-2);
@@ -523,6 +525,28 @@
   .lost-head { font-weight: 800; color: var(--accent-deep); }
   .lost-about { color: var(--ink-dim); font-size: 0.9rem; margin-top: 0.15rem; font-style: italic; }
   .lost-tip { color: var(--ink-faint); font-size: 0.82rem; margin-top: 0.25rem; }
+
+  /* ---- slides vocabulary tab ---- */
+  .slides-panel { text-align: left; }
+  .slides-upload { display: block; border: 2px dashed var(--bg-raised-2); border-radius: 12px; padding: 0.9rem; text-align: center;
+    cursor: pointer; font-weight: 700; color: var(--ink-dim); }
+  .slides-upload:hover { border-color: var(--accent); }
+  .slides-upload input { display: block; margin: 0 auto 0.4rem; max-width: 100%; }
+  .slides-status { font-size: 0.88rem; color: var(--ink-dim); min-height: 1.2em; margin: 0.5rem 0; }
+  .slides-subhead { font-weight: 700; font-size: 0.9rem; margin: 0.9rem 0 0.4rem; }
+  .terms-count { display: inline-block; min-width: 1.4rem; text-align: center; font-size: 0.78rem; border-radius: 999px; background: var(--bg-raised-2); padding: 0 0.4rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .chip { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; padding: 0.25rem 0.6rem; border-radius: 999px;
+    border: 1px solid var(--bg-raised-2); background: var(--bg-raised); }
+  .chip input { margin: 0; }
+  .chip .n { color: var(--ink-faint); font-size: 0.75rem; }
+  .chip button { border: none; background: none; color: var(--ink-faint); cursor: pointer; font-size: 0.9rem; padding: 0 0.1rem; }
+  .slides-btn { margin-top: 0.6rem; border: none; border-radius: 8px; padding: 0.45rem 0.9rem; background: var(--indigo); color: #fffdf6;
+    font: 700 0.85rem var(--font-body); cursor: pointer; }
+  .term-add { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
+  .term-add input { flex: 1; font: inherit; padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid var(--bg-raised-2); background: var(--bg); color: var(--ink); }
+  .term-add .slides-btn { margin-top: 0; }
+  .slides-foot { font-size: 0.8rem; color: var(--ink-faint); margin-top: 0.8rem; }
 </style>
 </head>
 <body>
@@ -645,6 +669,7 @@
     <button class="tab-btn" data-tab="questions" type="button" role="tab" aria-selected="false">Questions<span class="tab-badge" id="tab-badge-questions">0</span></button>
     <button class="tab-btn" data-tab="stats" type="button" role="tab" aria-selected="false">Stats</button>
     <button class="tab-btn" data-tab="notes" type="button" role="tab" aria-selected="false">Notes</button>
+    <button class="tab-btn" data-tab="slides" type="button" role="tab" aria-selected="false">Slides</button>
   </div>
 
   <div class="tab-panel" id="tab-attendees" role="tabpanel">
@@ -713,6 +738,28 @@
     </div>
   </div>
 
+  <div class="tab-panel" id="tab-slides" role="tabpanel" hidden>
+    <div class="slides-panel">
+      <p class="notes-help">Upload your slides or notes. DwaniLive picks out the technical terms so they're heard correctly
+        and never mistranslated. Works during a session too.</p>
+      <label class="slides-upload"><input type="file" id="slides-file" accept=".pptx,.pdf,.docx,.txt,.md">
+        <span>Choose slides (.pptx, .pdf, .docx, .txt)</span></label>
+      <p class="slides-status" id="slides-status" role="status"></p>
+      <div id="slides-candidates" hidden>
+        <div class="slides-subhead">Untick anything that isn't a technical term:</div>
+        <div class="chips" id="slides-chips"></div>
+        <button type="button" class="slides-btn" id="slides-add">Add selected terms</button>
+      </div>
+      <div class="slides-subhead">Terms in use <span class="terms-count" id="terms-count">0</span></div>
+      <div class="chips" id="terms-chips"></div>
+      <div class="term-add">
+        <input id="term-input" type="text" maxlength="60" placeholder="Add a term, e.g. backpropagation" aria-label="Add a term">
+        <button type="button" class="slides-btn" id="term-add-btn">Add</button>
+      </div>
+      <p class="slides-foot" id="slides-foot"></p>
+    </div>
+  </div>
+
   <div class="tab-panel" id="tab-notes" role="tabpanel" hidden>
     <div class="notes-panel">
       <div class="notes-status" id="notes-status">
@@ -727,6 +774,7 @@
         <select id="notes-lang"></select>
         <span class="notes-hint" id="notes-hint"></span>
       </div>
+      <p class="notes-plan" id="notes-plan" hidden>Free plan: the full transcript (.txt) in the talk's language. Pro adds printable notes with highlights, subtitles and every language.</p>
       <ul class="notes-list" id="notes-list"><li class="notes-empty">No sessions yet. Notes appear here once you start speaking.</li></ul>
     </div>
   </div>
@@ -770,7 +818,7 @@
   var tabBadgeAttendees = document.getElementById("tab-badge-attendees");
   var tabBadgeQuestions = document.getElementById("tab-badge-questions");
   var tabButtons = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
-  var tabPanels = { attendees: document.getElementById("tab-attendees"), questions: document.getElementById("tab-questions"), stats: document.getElementById("tab-stats"), notes: document.getElementById("tab-notes") };
+  var tabPanels = { attendees: document.getElementById("tab-attendees"), questions: document.getElementById("tab-questions"), stats: document.getElementById("tab-stats"), notes: document.getElementById("tab-notes"), slides: document.getElementById("tab-slides") };
 
   var socket = null;
   var audioContext = null;
@@ -829,6 +877,7 @@
         tabPanels[key].hidden = key !== target;
       });
       if (target === "notes") refreshNotes();
+      if (target === "slides") refreshTerms();
     });
   });
 
@@ -1388,6 +1437,7 @@
     dot.className = "notes-dot" + (st.recording ? " on" : "");
     txt.textContent = !st.available ? "Session notes are off" : st.recording ? "Saving notes · " + st.captions + " captions" : "Saving paused";
     tog.hidden = !st.available;
+    document.getElementById("notes-plan").hidden = st.full_notes !== false;
     tog.textContent = st.recording ? "Pause saving" : "Resume saving";
     var list = document.getElementById("notes-list");
     list.innerHTML = "";
@@ -1406,11 +1456,15 @@
       li.querySelector(".notes-meta").textContent = n.minutes + " min · " + n.captions + " captions" +
         (have ? "" : " · " + (LANG_NAMES[lang] || lang) + " will be translated on download (about a minute per hour of talk)");
       var acts = li.querySelector(".notes-actions");
+      var full = !st || st.full_notes !== false;
       [["notes", "Notes (PDF)", true], ["txt", ".txt"], ["srt", ".srt"], ["md", ".md"]].forEach(function (f) {
         var a = document.createElement("a");
         a.href = "/notes/export?id=" + encodeURIComponent(n.id) + "&lang=" + encodeURIComponent(lang) + "&format=" + f[0] + notesQ("&");
         a.textContent = f[1];
-        if (f[2]) { a.className = "primary"; a.target = "_blank"; a.rel = "noopener"; }
+        var locked = !full && (f[0] !== "txt" || lang !== n.src_lang);
+        if (f[2]) a.className = "primary";
+        if (f[2] || locked) { a.target = "_blank"; a.rel = "noopener"; }   // the Pro page opens beside, not over, the presenter page
+        if (locked) { a.className = (a.className + " locked").trim(); a.title = "Pro feature"; a.appendChild(document.createTextNode(" · Pro")); }
         acts.appendChild(a);
       });
       list.appendChild(li);
@@ -1452,6 +1506,75 @@
     btn.addEventListener("click", function () { show(window.DwaniI18n.lang() === "hi" ? "en" : "hi"); });
     show(initial);
   })();
+
+
+  // ---------------------------------------------------------------- slides vocabulary
+  var slidesStatus = document.getElementById("slides-status");
+  function termsUrl(path) { return path + notesQ(path.indexOf("?") > -1 ? "&" : "?"); }
+  function renderTerms(st) {
+    var box = document.getElementById("terms-chips");
+    box.innerHTML = "";
+    document.getElementById("terms-count").textContent = (st.terms || []).length;
+    (st.terms || []).forEach(function (t) {
+      var chip = document.createElement("span"); chip.className = "chip";
+      var label = document.createElement("span"); label.textContent = t; label.setAttribute("data-no-i18n", "");
+      var x = document.createElement("button"); x.type = "button"; x.textContent = "✕"; x.setAttribute("aria-label", "Remove " + t);
+      x.addEventListener("click", function () { updateTerms({ remove: [t] }); });
+      chip.appendChild(label); chip.appendChild(x); box.appendChild(chip);
+    });
+    var locked = !!st.locked;
+    document.getElementById("slides-file").disabled = locked || !st.available;
+    document.getElementById("term-input").disabled = locked || !st.available;
+    document.getElementById("slides-foot").textContent = !st.available
+      ? "Available when DwaniLive runs with its speech models (not in demo mode)."
+      : locked ? "Slides vocabulary is part of the Pro and Institution plans."
+      : st.whisper_hint ? "Speech recognition is listening for these terms; translation keeps them intact." : "";
+  }
+  function refreshTerms() {
+    fetch(termsUrl("/glossary/terms"), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (st) { if (st) renderTerms(st); }).catch(function () {});
+  }
+  function updateTerms(body) {
+    return fetch(termsUrl("/glossary/terms"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+      .then(function (r) { return r.ok ? r.json() : null; }).then(function (st) { if (st) renderTerms(st); return st; });
+  }
+  document.getElementById("slides-file").addEventListener("change", function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    slidesStatus.textContent = "Reading " + f.name + "…";
+    var fd = new FormData(); fd.append("file", f);
+    fetch(termsUrl("/glossary/extract"), { method: "POST", body: fd }).then(function (r) {
+      return r.json().then(function (j) { return { ok: r.ok, j: j }; });
+    }).then(function (res) {
+      if (!res.ok) { slidesStatus.textContent = res.j.error || "Couldn't read that file."; return; }
+      var c = res.j.candidates || [];
+      var box = document.getElementById("slides-chips"); box.innerHTML = "";
+      document.getElementById("slides-candidates").hidden = c.length === 0;
+      slidesStatus.textContent = c.length ? "Found " + c.length + " possible terms." : "No new technical terms found in that file.";
+      c.forEach(function (cand) {
+        var lab = document.createElement("label"); lab.className = "chip";
+        var cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = !!cand.suggested; cb.value = cand.term;
+        var t = document.createElement("span"); t.textContent = cand.term; t.setAttribute("data-no-i18n", "");
+        var n = document.createElement("span"); n.className = "n"; n.textContent = "×" + cand.count; n.setAttribute("data-no-i18n", "");
+        lab.appendChild(cb); lab.appendChild(t); lab.appendChild(n); box.appendChild(lab);
+      });
+    }).catch(function () { slidesStatus.textContent = "Couldn't reach DwaniLive on this laptop."; });
+  });
+  document.getElementById("slides-add").addEventListener("click", function () {
+    var picked = Array.prototype.slice.call(document.querySelectorAll("#slides-chips input:checked")).map(function (cb) { return cb.value; });
+    if (!picked.length) return;
+    updateTerms({ add: picked }).then(function () {
+      document.getElementById("slides-candidates").hidden = true;
+      slidesStatus.textContent = "Added " + picked.length + " terms. They're used from the next sentence.";
+    });
+  });
+  function addTypedTerm() {
+    var inp = document.getElementById("term-input"), t = inp.value.trim();
+    if (!t) return;
+    updateTerms({ add: [t] }).then(function () { inp.value = ""; });
+  }
+  document.getElementById("term-add-btn").addEventListener("click", addTypedTerm);
+  document.getElementById("term-input").addEventListener("keydown", function (e) { if (e.key === "Enter") addTypedTerm(); });
 
   init();
 })();
