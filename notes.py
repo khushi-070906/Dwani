@@ -61,6 +61,7 @@ class Caption:
     end: float               # ... and ended
     src: str                 # presenter's words
     tr: dict = field(default_factory=dict)  # {lang: translation}
+    src_lang: str = ""       # language spoken for this caption (presenter can switch mid-talk)
 
 
 class NotesRecorder:
@@ -83,14 +84,19 @@ class NotesRecorder:
         with self._lock, open(self.path, "a", encoding="utf-8") as f:
             f.write(json.dumps(obj, ensure_ascii=False) + "\n")
 
-    def record(self, transcript: str, translations: dict, end_wall: float, speech_seconds: float) -> None:
+    def record(self, transcript: str, translations: dict, end_wall: float, speech_seconds: float,
+               src_lang: str | None = None) -> None:
         text = (transcript or "").strip()
         if not self.enabled or not text:
             return
+        spoken = src_lang or self.src_lang
         end = max(0.0, end_wall - self.started)
         start = max(0.0, end - max(speech_seconds, 0.5))
-        self._write({"type": "cap", "t": round(end_wall, 3), "start": round(start, 2), "end": round(end, 2),
-                     "src": text, "tr": {k: v for k, v in (translations or {}).items() if v and k != self.src_lang}})
+        line = {"type": "cap", "t": round(end_wall, 3), "start": round(start, 2), "end": round(end, 2),
+                "src": text, "tr": {k: v for k, v in (translations or {}).items() if v and k != spoken}}
+        if spoken != self.src_lang:
+            line["sl"] = spoken
+        self._write(line)
         self.count += 1
 
     def mark_confused(self, wall: float, lang: str = "") -> None:
@@ -118,6 +124,8 @@ class Session:
         langs = {self.src_lang}
         for c in self.captions:
             langs.update(c.tr)
+            if c.src_lang:
+                langs.add(c.src_lang)
         return sorted(langs)
 
 
@@ -132,7 +140,8 @@ def load_session(path: Path) -> Session:
             if o.get("type") == "meta":
                 meta = o
             elif o.get("type") == "cap":
-                caps.append(Caption(o["t"], o["start"], o["end"], o["src"], o.get("tr") or {}))
+                caps.append(Caption(o["t"], o["start"], o["end"], o["src"], o.get("tr") or {},
+                                    o.get("sl") or meta.get("src_lang", "en")))
             elif o.get("type") == "tr" and 0 <= o.get("i", -1) < len(caps):   # translation added after the talk
                 caps[o["i"]].tr[o["lang"]] = o["text"]
             elif o.get("type") == "confused":
@@ -163,13 +172,21 @@ def safe_session_path(directory: Path, session_id: str) -> Path | None:
 
 
 async def ensure_language(session: Session, lang: str, translate) -> int:
-    """Fill in translations missing for `lang` using `translate(text, lang)`
-    (the app's NLLB backend) and persist them, so the next export is instant."""
-    if lang == session.src_lang:
-        return 0
-    todo = [(i, c) for i, c in enumerate(session.captions) if lang not in c.tr]
+    """Fill in translations missing for `lang` and persist them, so the next
+    export is instant. `translate(text, lang, source_lang)` (preferred: each
+    caption is translated from the language it was actually spoken in) or
+    the older `translate(text, lang)`."""
+    import inspect
+
+    try:
+        three = len(inspect.signature(translate).parameters) >= 3
+    except (TypeError, ValueError):
+        three = False
+    todo = [(i, c) for i, c in enumerate(session.captions)
+            if lang != (c.src_lang or session.src_lang) and lang not in c.tr]
     for i, c in todo:
-        c.tr[lang] = (await translate(c.src, lang)) or ""
+        src = c.src_lang or session.src_lang
+        c.tr[lang] = (await (translate(c.src, lang, src) if three else translate(c.src, lang))) or ""
         with open(session.path, "a", encoding="utf-8") as f:
             f.write(json.dumps({"type": "tr", "i": i, "lang": lang, "text": c.tr[lang]}, ensure_ascii=False) + "\n")
     return len(todo)
@@ -272,7 +289,7 @@ def _srt_time(s: float) -> str:
 
 
 def text_of(c: Caption, lang: str, src_lang: str) -> str:
-    return c.src if lang == src_lang else c.tr.get(lang, "")
+    return c.src if lang == (c.src_lang or src_lang) else c.tr.get(lang, "")
 
 
 def export_txt(s: Session, lang: str) -> str:
