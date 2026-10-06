@@ -1,0 +1,32 @@
+{
+ "id": "ration_lookup",
+ "title": "Ration card lookup",
+ "flow": "lookup_ration",
+ "description": {
+  "en": "Say your ration card number to hear your category, members and ration shop.",
+  "hi": "राशन कार्ड नंबर बोलिए, अपनी श्रेणी, सदस्य और राशन दुकान सुनिए।"
+ },
+ "glossary": [
+  "ration card",
+  "PHH",
+  "AAY",
+  "NFSA"
+ ],
+ "fields": [
+  {
+   "id": "card_no",
+   "kind": "ration_card",
+   "label": "Ration card number",
+   "prompt": {
+    "en": "What is your ration card number? Say it slowly.",
+    "hi": "आपका राशन कार्ड नंबर क्या है? धीरे-धीरे बोलिए।"
+   },
+   "labels": {
+    "hi": "राशन कार्ड नंबर"
+   }
+  }
+ ],
+ "titles": {
+  "hi": "राशन कार्ड की जानकारी"
+ }
+}

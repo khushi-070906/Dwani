@@ -1,0 +1,339 @@
+{
+ "id": "grievance",
+ "title": "Public grievance (complaint)",
+ "flow": "grievance",
+ "final_readback": true,
+ "description": {
+  "en": "Describe your complaint by speaking. A complaint letter is drafted for you.",
+  "hi": "अपनी शिकायत बोलकर बताइए। आपके लिए शिकायत पत्र तैयार होगा।"
+ },
+ "glossary": [
+  "khasra",
+  "khatauni",
+  "ration card",
+  "Aadhaar",
+  "MGNREGA",
+  "job card",
+  "PM Awas",
+  "patwari",
+  "lekhpal",
+  "kotedar",
+  "CPGRAMS"
+ ],
+ "extract": {
+  "from": "complaint",
+  "fields": {
+   "department": "department",
+   "location": "place",
+   "incident_date": "date"
+  }
+ },
+ "fields": [
+  {
+   "id": "full_name",
+   "kind": "name",
+   "label": "Name of complainant",
+   "prompt": {
+    "en": "What is your full name?",
+    "hi": "अपना पूरा नाम बताइए।"
+   },
+   "labels": {
+    "hi": "शिकायतकर्ता का नाम"
+   }
+  },
+  {
+   "id": "mobile",
+   "kind": "mobile",
+   "label": "Mobile number",
+   "prompt": {
+    "en": "What is your mobile number? The office will contact you on it.",
+    "hi": "आपका मोबाइल नंबर क्या है? विभाग इसी पर संपर्क करेगा।"
+   },
+   "labels": {
+    "hi": "मोबाइल नंबर"
+   }
+  },
+  {
+   "id": "complaint",
+   "kind": "text",
+   "label": "Complaint",
+   "prompt": {
+    "en": "Please tell me your complaint. Say what happened, where, and since when.",
+    "hi": "अपनी शिकायत बताइए। क्या हुआ, कहाँ हुआ और कब से हो रहा है।"
+   },
+   "labels": {
+    "hi": "शिकायत"
+   },
+   "params": {
+    "min_length": 15
+   }
+  },
+  {
+   "id": "department",
+   "kind": "choice",
+   "label": "Department",
+   "prompt": {
+    "en": "Which department is this about?",
+    "hi": "यह किस विभाग से जुड़ी शिकायत है?"
+   },
+   "labels": {
+    "hi": "विभाग"
+   },
+   "options": [
+    {
+     "value": "Revenue (land records)",
+     "synonyms": {
+      "en": [
+       "revenue",
+       "khasra",
+       "khatauni",
+       "khata"
+      ],
+      "hi": [
+       "राजस्व (भूमि अभिलेख)",
+       "खसरा",
+       "खतौनी",
+       "खाता",
+       "पटवारी"
+      ]
+     }
+    },
+    {
+     "value": "Food & civil supplies (ration)",
+     "synonyms": {
+      "en": [
+       "food & civil supplies",
+       "ration",
+       "ration card",
+       "kotedar"
+      ],
+      "hi": [
+       "खाद्य एवं रसद (राशन)",
+       "राशन",
+       "राशन कार्ड",
+       "कोटेदार",
+       "डीलर"
+      ]
+     }
+    },
+    {
+     "value": "Electricity",
+     "synonyms": {
+      "en": [
+       "electricity",
+       "bijli",
+       "electricity",
+       "meter"
+      ],
+      "hi": [
+       "बिजली विभाग",
+       "बिजली",
+       "मीटर",
+       "ट्रांसफार्मर",
+       "ट्रांसफॉर्मर"
+      ]
+     }
+    },
+    {
+     "value": "Water supply",
+     "synonyms": {
+      "en": [
+       "water supply",
+       "paani",
+       "pani",
+       "water"
+      ],
+      "hi": [
+       "जल आपूर्ति",
+       "पानी",
+       "नल",
+       "हैंडपंप",
+       "हैंड पंप"
+      ]
+     }
+    },
+    {
+     "value": "Rural development & panchayat",
+     "synonyms": {
+      "en": [
+       "rural development & panchayat",
+       "pradhan",
+       "sarpanch",
+       "panchayat"
+      ],
+      "hi": [
+       "ग्राम्य विकास एवं पंचायत",
+       "प्रधान",
+       "सरपंच",
+       "पंचायत",
+       "मनरेगा"
+      ]
+     }
+    },
+    {
+     "value": "Roads (PWD)",
+     "synonyms": {
+      "en": [
+       "roads",
+       "sadak",
+       "road",
+       "pothole"
+      ],
+      "hi": [
+       "सड़क (लोक निर्माण विभाग)",
+       "सड़क",
+       "सडक",
+       "रोड",
+       "गड्ढा"
+      ]
+     }
+    },
+    {
+     "value": "Health",
+     "synonyms": {
+      "en": [
+       "health",
+       "hospital",
+       "doctor",
+       "dawai"
+      ],
+      "hi": [
+       "स्वास्थ्य विभाग",
+       "अस्पताल",
+       "डॉक्टर",
+       "डाक्टर",
+       "दवाई"
+      ]
+     }
+    },
+    {
+     "value": "Education",
+     "synonyms": {
+      "en": [
+       "education",
+       "school",
+       "teacher",
+       "master ji"
+      ],
+      "hi": [
+       "शिक्षा विभाग",
+       "स्कूल",
+       "विद्यालय",
+       "शिक्षक",
+       "अध्यापक"
+      ]
+     }
+    },
+    {
+     "value": "Police",
+     "synonyms": {
+      "en": [
+       "police",
+       "police",
+       "thana",
+       "fir"
+      ],
+      "hi": [
+       "पुलिस",
+       "पुलिस",
+       "थाना",
+       "थाने",
+       "एफआईआर"
+      ]
+     }
+    },
+    {
+     "value": "Social welfare (pension)",
+     "synonyms": {
+      "en": [
+       "social welfare",
+       "pension",
+       "old age pension",
+       "vridha"
+      ],
+      "hi": [
+       "समाज कल्याण (पेंशन)",
+       "पेंशन",
+       "वृद्धा",
+       "वृद्धावस्था",
+       "विधवा"
+      ]
+     }
+    },
+    {
+     "value": "Municipal (sanitation)",
+     "synonyms": {
+      "en": [
+       "municipal",
+       "safai",
+       "kooda",
+       "garbage"
+      ],
+      "hi": [
+       "नगर निकाय (सफाई)",
+       "सफाई",
+       "कूड़ा",
+       "कूडा",
+       "नाली"
+      ]
+     }
+    },
+    {
+     "value": "Other",
+     "synonyms": {
+      "en": [
+       "other",
+       "something else"
+      ],
+      "hi": [
+       "अन्य",
+       "कोई और",
+       "दूसरा"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "location",
+   "kind": "place",
+   "label": "Place",
+   "prompt": {
+    "en": "Where did this happen? Say the village or ward, tehsil and district.",
+    "hi": "यह कहाँ हुआ? गाँव या वार्ड, तहसील और जिला बताइए।"
+   },
+   "labels": {
+    "hi": "जगह"
+   }
+  },
+  {
+   "id": "incident_date",
+   "kind": "date",
+   "label": "Date of incident",
+   "prompt": {
+    "en": "When did this happen? Say the date, or say skip.",
+    "hi": "यह कब हुआ? तारीख़ बताइए, या 'छोड़ो' कहिए।"
+   },
+   "labels": {
+    "hi": "घटना की तारीख़"
+   },
+   "required": false
+  },
+  {
+   "id": "relief",
+   "kind": "text",
+   "label": "Action requested",
+   "prompt": {
+    "en": "What do you want the office to do? Or say skip.",
+    "hi": "आप विभाग से क्या कार्रवाई चाहते हैं? या 'छोड़ो' कहिए।"
+   },
+   "labels": {
+    "hi": "माँगी गई कार्रवाई"
+   },
+   "required": false
+  }
+ ],
+ "titles": {
+  "hi": "शिकायत"
+ }
+}

@@ -1,0 +1,239 @@
+{
+ "id": "health_registration",
+ "title": "Hospital registration",
+ "glossary": [
+  "OPD",
+  "ABHA",
+  "Aadhaar"
+ ],
+ "fields": [
+  {
+   "id": "full_name",
+   "kind": "name",
+   "label": "Full name",
+   "prompt": {
+    "en": "What is your full name?",
+    "hi": "अपना पूरा नाम बताइए।"
+   }
+  },
+  {
+   "id": "father_name",
+   "kind": "name",
+   "label": "Father / husband name",
+   "prompt": {
+    "en": "What is your father's or husband's name?",
+    "hi": "अपने पिता या पति का नाम बताइए।"
+   }
+  },
+  {
+   "id": "dob",
+   "kind": "date",
+   "label": "Date of birth",
+   "prompt": {
+    "en": "What is your date of birth? Say day, month and year.",
+    "hi": "अपनी जन्म तिथि बताइए: दिन, महीना और साल।"
+   },
+   "params": {}
+  },
+  {
+   "id": "gender",
+   "kind": "choice",
+   "label": "Gender",
+   "prompt": {
+    "en": "Are you male, female or other?",
+    "hi": "आप पुरुष हैं, महिला हैं या अन्य?"
+   },
+   "options": [
+    {
+     "value": "Male",
+     "synonyms": {
+      "en": [
+       "male",
+       "man",
+       "boy"
+      ],
+      "hi": [
+       "पुरुष",
+       "आदमी",
+       "मर्द",
+       "लड़का"
+      ]
+     }
+    },
+    {
+     "value": "Female",
+     "synonyms": {
+      "en": [
+       "female",
+       "woman",
+       "girl"
+      ],
+      "hi": [
+       "महिला",
+       "औरत",
+       "स्त्री",
+       "लड़की"
+      ]
+     }
+    },
+    {
+     "value": "Other",
+     "synonyms": {
+      "en": [
+       "other",
+       "transgender"
+      ],
+      "hi": [
+       "अन्य",
+       "ट्रांसजेंडर"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "mobile",
+   "kind": "mobile",
+   "label": "Mobile number",
+   "prompt": {
+    "en": "What is your mobile number?",
+    "hi": "अपना मोबाइल नंबर बताइए।"
+   }
+  },
+  {
+   "id": "aadhaar",
+   "kind": "aadhaar",
+   "label": "Aadhaar number",
+   "prompt": {
+    "en": "Please say your Aadhaar number, one digit at a time. You may skip this.",
+    "hi": "अपना आधार नंबर एक-एक अंक बोलकर बताइए। आप इसे छोड़ सकते हैं।"
+   },
+   "required": false
+  },
+  {
+   "id": "village",
+   "kind": "place",
+   "label": "Village / town",
+   "prompt": {
+    "en": "Which village or town do you live in?",
+    "hi": "आप किस गाँव या शहर में रहते हैं?"
+   }
+  },
+  {
+   "id": "district",
+   "kind": "place",
+   "label": "District",
+   "prompt": {
+    "en": "Which district is that?",
+    "hi": "आपका ज़िला कौन सा है?"
+   }
+  },
+  {
+   "id": "pincode",
+   "kind": "pincode",
+   "label": "PIN code",
+   "prompt": {
+    "en": "What is your PIN code?",
+    "hi": "अपना पिन कोड बताइए।"
+   }
+  },
+  {
+   "id": "department",
+   "kind": "choice",
+   "label": "Department",
+   "prompt": {
+    "en": "Which department do you want: general medicine, children, women's health, eye, or bones?",
+    "hi": "आपको कौन सा विभाग चाहिए: सामान्य, बच्चों का, महिला रोग, आँख या हड्डी?"
+   },
+   "options": [
+    {
+     "value": "General Medicine",
+     "synonyms": {
+      "en": [
+       "general",
+       "medicine",
+       "fever"
+      ],
+      "hi": [
+       "सामान्य",
+       "जनरल",
+       "बुखार"
+      ]
+     }
+    },
+    {
+     "value": "Paediatrics",
+     "synonyms": {
+      "en": [
+       "children",
+       "child",
+       "paediatric",
+       "pediatric"
+      ],
+      "hi": [
+       "बच्चों",
+       "बच्चा",
+       "बच्चे"
+      ]
+     }
+    },
+    {
+     "value": "Gynaecology",
+     "synonyms": {
+      "en": [
+       "women",
+       "gynaecology",
+       "gynecology",
+       "pregnancy"
+      ],
+      "hi": [
+       "महिला",
+       "प्रसूति",
+       "गर्भ"
+      ]
+     }
+    },
+    {
+     "value": "Ophthalmology",
+     "synonyms": {
+      "en": [
+       "eye",
+       "eyes"
+      ],
+      "hi": [
+       "आँख",
+       "आंख"
+      ]
+     }
+    },
+    {
+     "value": "Orthopaedics",
+     "synonyms": {
+      "en": [
+       "bone",
+       "bones",
+       "fracture"
+      ],
+      "hi": [
+       "हड्डी",
+       "हड्डियों"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "complaint",
+   "kind": "text",
+   "label": "Main complaint",
+   "prompt": {
+    "en": "What is the problem? Tell me in a few words.",
+    "hi": "क्या तकलीफ़ है? थोड़े शब्दों में बताइए।"
+   }
+  }
+ ],
+ "form_language": "en",
+ "titles": {
+  "hi": "अस्पताल पंजीकरण"
+ }
+}

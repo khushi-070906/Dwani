@@ -1,0 +1,62 @@
+{
+ "id": "land_record",
+ "title": "Land record (khasra) lookup",
+ "flow": "lookup_land",
+ "description": {
+  "en": "Say your district, village and khasra number to hear the land record.",
+  "hi": "जिला, गाँव और खसरा नंबर बोलिए, ज़मीन का रिकॉर्ड सुनिए।"
+ },
+ "glossary": [
+  "khasra",
+  "khatauni",
+  "khata",
+  "Bhulekh"
+ ],
+ "fields": [
+  {
+   "id": "district",
+   "kind": "place",
+   "label": "District",
+   "prompt": {
+    "en": "Which district is the land in?",
+    "hi": "ज़मीन किस जिले में है?"
+   },
+   "labels": {
+    "hi": "जिला"
+   },
+   "params": {
+    "lookup": "district"
+   }
+  },
+  {
+   "id": "village",
+   "kind": "place",
+   "label": "Village",
+   "prompt": {
+    "en": "Which village?",
+    "hi": "कौन सा गाँव?"
+   },
+   "labels": {
+    "hi": "गाँव"
+   },
+   "params": {
+    "lookup": "village"
+   }
+  },
+  {
+   "id": "khasra",
+   "kind": "khasra",
+   "label": "Khasra number",
+   "prompt": {
+    "en": "What is the khasra number? For example, one hundred forty five by two.",
+    "hi": "खसरा नंबर क्या है? जैसे, एक सौ पैंतालीस बटा दो।"
+   },
+   "labels": {
+    "hi": "खसरा नंबर"
+   }
+  }
+ ],
+ "titles": {
+  "hi": "ज़मीन का रिकॉर्ड (खसरा)"
+ }
+}

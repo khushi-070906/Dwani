@@ -1,0 +1,662 @@
+{
+ "id": "scheme_advisor",
+ "title": "Scheme eligibility advisor",
+ "flow": "advisor",
+ "hidden": true,
+ "description": {
+  "en": "Answer a few questions and find out which government schemes you may be able to get.",
+  "hi": "कुछ सवालों के जवाब दीजिए और जानिए कि आपको कौन सी सरकारी योजनाएँ मिल सकती हैं।"
+ },
+ "glossary": [
+  "PM-KISAN",
+  "e-Shram",
+  "Ayushman",
+  "Ujjwala",
+  "Jan Dhan",
+  "EPFO",
+  "ESIC",
+  "BPL",
+  "AAY",
+  "PHH"
+ ],
+ "fields": [
+  {
+   "id": "age",
+   "kind": "number",
+   "label": "Age",
+   "prompt": {
+    "en": "How old are you?",
+    "hi": "आपकी उम्र कितनी है?"
+   },
+   "labels": {
+    "hi": "उम्र"
+   },
+   "params": {
+    "minimum": 0,
+    "maximum": 120
+   }
+  },
+  {
+   "id": "gender",
+   "kind": "choice",
+   "label": "Gender",
+   "prompt": {
+    "en": "Are you male, female or other?",
+    "hi": "आप पुरुष हैं, महिला हैं या अन्य?"
+   },
+   "labels": {
+    "hi": "लिंग"
+   },
+   "options": [
+    {
+     "value": "Male",
+     "synonyms": {
+      "en": [
+       "male",
+       "man"
+      ],
+      "hi": [
+       "पुरुष",
+       "आदमी",
+       "मर्द"
+      ]
+     }
+    },
+    {
+     "value": "Female",
+     "synonyms": {
+      "en": [
+       "female",
+       "woman",
+       "lady"
+      ],
+      "hi": [
+       "महिला",
+       "औरत",
+       "स्त्री"
+      ]
+     }
+    },
+    {
+     "value": "Other",
+     "synonyms": {
+      "en": [
+       "other"
+      ],
+      "hi": [
+       "अन्य"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "area",
+   "kind": "choice",
+   "label": "Area",
+   "prompt": {
+    "en": "Do you live in a village or in a town or city?",
+    "hi": "आप गाँव में रहते हैं या शहर / कस्बे में?"
+   },
+   "labels": {
+    "hi": "इलाका"
+   },
+   "options": [
+    {
+     "value": "Rural",
+     "synonyms": {
+      "en": [
+       "village",
+       "rural"
+      ],
+      "hi": [
+       "गाँव",
+       "गांव",
+       "देहात"
+      ]
+     }
+    },
+    {
+     "value": "Urban",
+     "synonyms": {
+      "en": [
+       "town",
+       "city",
+       "urban"
+      ],
+      "hi": [
+       "शहर",
+       "कस्बा",
+       "नगर"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "occupation",
+   "kind": "choice",
+   "label": "Work",
+   "prompt": {
+    "en": "What work do you do? For example: farmer, farm labourer, daily wage work, private job, government job, own business, student, homemaker, or not working.",
+    "hi": "आप क्या काम करते हैं? जैसे: किसान, खेत मज़दूर, दिहाड़ी मज़दूरी, प्राइवेट नौकरी, सरकारी नौकरी, अपना काम-धंधा, पढ़ाई, गृहिणी, या कोई काम नहीं।"
+   },
+   "labels": {
+    "hi": "काम"
+   },
+   "options": [
+    {
+     "value": "Farmer",
+     "synonyms": {
+      "en": [
+       "farmer",
+       "farming",
+       "agriculture",
+       "kisan"
+      ],
+      "hi": [
+       "किसान",
+       "खेती",
+       "किसानी"
+      ]
+     }
+    },
+    {
+     "value": "Farm labourer",
+     "synonyms": {
+      "en": [
+       "farm labourer",
+       "farm labour",
+       "agricultural labourer",
+       "khet mazdoor"
+      ],
+      "hi": [
+       "खेत मज़दूर",
+       "खेत मजदूर",
+       "खेतिहर मज़दूर"
+      ]
+     }
+    },
+    {
+     "value": "Daily-wage / unorganised worker",
+     "synonyms": {
+      "en": [
+       "daily wage",
+       "labour",
+       "labourer",
+       "mazdoor",
+       "construction",
+       "driver",
+       "domestic worker"
+      ],
+      "hi": [
+       "दिहाड़ी",
+       "मज़दूरी",
+       "मजदूरी",
+       "मज़दूर",
+       "मजदूर",
+       "राजमिस्त्री",
+       "ड्राइवर"
+      ]
+     }
+    },
+    {
+     "value": "Salaried (private)",
+     "synonyms": {
+      "en": [
+       "private job",
+       "company job",
+       "salary",
+       "private"
+      ],
+      "hi": [
+       "प्राइवेट नौकरी",
+       "प्राइवेट",
+       "कंपनी"
+      ]
+     }
+    },
+    {
+     "value": "Government job",
+     "synonyms": {
+      "en": [
+       "government job",
+       "govt job",
+       "sarkari naukri"
+      ],
+      "hi": [
+       "सरकारी नौकरी",
+       "सरकारी"
+      ]
+     }
+    },
+    {
+     "value": "Self-employed / small business",
+     "synonyms": {
+      "en": [
+       "business",
+       "shop",
+       "self employed",
+       "own work",
+       "dukan"
+      ],
+      "hi": [
+       "दुकान",
+       "धंधा",
+       "काम-धंधा",
+       "अपना काम",
+       "व्यापार"
+      ]
+     }
+    },
+    {
+     "value": "Student",
+     "synonyms": {
+      "en": [
+       "student",
+       "studying"
+      ],
+      "hi": [
+       "पढ़ाई",
+       "विद्यार्थी",
+       "छात्र"
+      ]
+     }
+    },
+    {
+     "value": "Homemaker",
+     "synonyms": {
+      "en": [
+       "homemaker",
+       "housewife",
+       "house work"
+      ],
+      "hi": [
+       "गृहिणी",
+       "घर का काम",
+       "घरेलू"
+      ]
+     }
+    },
+    {
+     "value": "Not working",
+     "synonyms": {
+      "en": [
+       "not working",
+       "unemployed",
+       "nothing"
+      ],
+      "hi": [
+       "बेरोज़गार",
+       "कोई काम नहीं",
+       "खाली"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "land_acres",
+   "kind": "number",
+   "label": "Land owned (acres)",
+   "prompt": {
+    "en": "How much land do you own, in acres? Say zero if you farm someone else's land.",
+    "hi": "आपके नाम कितनी ज़मीन है, एकड़ में? दूसरों की ज़मीन पर खेती करते हैं तो शून्य बोलिए।"
+   },
+   "labels": {
+    "hi": "अपनी ज़मीन (एकड़)"
+   },
+   "params": {
+    "minimum": 0,
+    "maximum": 1000,
+    "decimals": 2,
+    "unit": "acre"
+   },
+   "when": {
+    "field": "occupation",
+    "in": [
+     "Farmer"
+    ]
+   }
+  },
+  {
+   "id": "annual_income",
+   "kind": "number",
+   "label": "Family income per year (₹)",
+   "prompt": {
+    "en": "About how much does your whole family earn in a year, in rupees?",
+    "hi": "आपके पूरे परिवार की साल भर की कमाई लगभग कितने रुपये है?"
+   },
+   "labels": {
+    "hi": "परिवार की सालाना आय (₹)"
+   },
+   "params": {
+    "minimum": 0,
+    "maximum": 100000000
+   }
+  },
+  {
+   "id": "income_tax_payer",
+   "kind": "yesno",
+   "label": "Income-tax payer in family",
+   "prompt": {
+    "en": "Does anyone in your family pay income tax?",
+    "hi": "क्या आपके परिवार में कोई आयकर (इनकम टैक्स) भरता है?"
+   },
+   "labels": {
+    "hi": "परिवार में आयकरदाता"
+   }
+  },
+  {
+   "id": "govt_employee",
+   "kind": "yesno",
+   "label": "Government employee or pensioner in family",
+   "prompt": {
+    "en": "Is anyone in your family a government employee or a government pensioner?",
+    "hi": "क्या आपके परिवार में कोई सरकारी कर्मचारी या सरकारी पेंशनर है?"
+   },
+   "labels": {
+    "hi": "परिवार में सरकारी कर्मचारी"
+   }
+  },
+  {
+   "id": "epfo",
+   "kind": "yesno",
+   "label": "PF / ESIC member",
+   "prompt": {
+    "en": "Is PF or ESIC deducted from your salary?",
+    "hi": "क्या आपकी तनख्वाह से पीएफ या ईएसआईसी कटता है?"
+   },
+   "labels": {
+    "hi": "पीएफ / ईएसआईसी"
+   },
+   "when": {
+    "field": "occupation",
+    "not_in": [
+     "Government job",
+     "Student"
+    ]
+   }
+  },
+  {
+   "id": "bank_account",
+   "kind": "yesno",
+   "label": "Has a bank account",
+   "prompt": {
+    "en": "Do you have a bank account?",
+    "hi": "क्या आपका बैंक खाता है?"
+   },
+   "labels": {
+    "hi": "बैंक खाता"
+   }
+  },
+  {
+   "id": "ration_card",
+   "kind": "choice",
+   "label": "Ration card",
+   "prompt": {
+    "en": "What kind of ration card does your family have: Antyodaya, priority or BPL, another card, or none?",
+    "hi": "आपके परिवार का राशन कार्ड कैसा है: अंत्योदय, पात्र गृहस्थी या बीपीएल, कोई और, या नहीं है?"
+   },
+   "labels": {
+    "hi": "राशन कार्ड"
+   },
+   "options": [
+    {
+     "value": "AAY",
+     "synonyms": {
+      "en": [
+       "antyodaya",
+       "aay",
+       "pink card"
+      ],
+      "hi": [
+       "अंत्योदय",
+       "अन्त्योदय"
+      ]
+     }
+    },
+    {
+     "value": "PHH / BPL",
+     "synonyms": {
+      "en": [
+       "priority",
+       "phh",
+       "bpl",
+       "bpl card"
+      ],
+      "hi": [
+       "पात्र गृहस्थी",
+       "बीपीएल",
+       "प्राथमिक",
+       "गरीबी रेखा"
+      ]
+     }
+    },
+    {
+     "value": "Other (APL)",
+     "synonyms": {
+      "en": [
+       "apl",
+       "other",
+       "general card"
+      ],
+      "hi": [
+       "एपीएल",
+       "सामान्य",
+       "दूसरा",
+       "कोई और"
+      ]
+     }
+    },
+    {
+     "value": "None",
+     "synonyms": {
+      "en": [
+       "none",
+       "no card",
+       "don't have",
+       "no ration card"
+      ],
+      "hi": [
+       "नहीं है",
+       "कोई नहीं",
+       "राशन कार्ड नहीं"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "house",
+   "kind": "choice",
+   "label": "House",
+   "prompt": {
+    "en": "Do you live in a pucca house, a kutcha house, or do you have no house of your own?",
+    "hi": "आप पक्के घर में रहते हैं, कच्चे घर में, या आपका अपना घर नहीं है?"
+   },
+   "labels": {
+    "hi": "घर"
+   },
+   "options": [
+    {
+     "value": "Pucca house",
+     "synonyms": {
+      "en": [
+       "pucca",
+       "pakka",
+       "concrete",
+       "brick"
+      ],
+      "hi": [
+       "पक्का",
+       "पक्के"
+      ]
+     }
+    },
+    {
+     "value": "Kutcha house",
+     "synonyms": {
+      "en": [
+       "kutcha",
+       "kachcha",
+       "mud"
+      ],
+      "hi": [
+       "कच्चा",
+       "कच्चे",
+       "झोपड़ी",
+       "मिट्टी"
+      ]
+     }
+    },
+    {
+     "value": "No house",
+     "synonyms": {
+      "en": [
+       "no house",
+       "homeless",
+       "rent",
+       "rented"
+      ],
+      "hi": [
+       "घर नहीं",
+       "बेघर",
+       "किराये",
+       "किराए"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "lpg",
+   "kind": "yesno",
+   "label": "LPG gas connection at home",
+   "prompt": {
+    "en": "Does your household have an LPG gas connection?",
+    "hi": "क्या आपके घर में एलपीजी गैस कनेक्शन है?"
+   },
+   "labels": {
+    "hi": "एलपीजी कनेक्शन"
+   },
+   "when": {
+    "field": "gender",
+    "eq": "Female"
+   }
+  },
+  {
+   "id": "widow",
+   "kind": "yesno",
+   "label": "Widow",
+   "prompt": {
+    "en": "Are you a widow? You can say skip.",
+    "hi": "क्या आप विधवा हैं? चाहें तो 'छोड़ो' कहिए।"
+   },
+   "labels": {
+    "hi": "विधवा"
+   },
+   "required": false,
+   "when": {
+    "field": "gender",
+    "eq": "Female"
+   }
+  },
+  {
+   "id": "disability",
+   "kind": "yesno",
+   "label": "Disability certificate",
+   "prompt": {
+    "en": "Do you have a disability certificate? You can say skip.",
+    "hi": "क्या आपके पास दिव्यांगता प्रमाणपत्र है? चाहें तो 'छोड़ो' कहिए।"
+   },
+   "labels": {
+    "hi": "दिव्यांग प्रमाणपत्र"
+   },
+   "required": false
+  },
+  {
+   "id": "category",
+   "kind": "choice",
+   "label": "Social category",
+   "prompt": {
+    "en": "Which category: General, OBC, SC, ST or EWS? You can say skip.",
+    "hi": "आपकी श्रेणी क्या है: सामान्य, ओबीसी, एससी, एसटी या ईडब्ल्यूएस? चाहें तो 'छोड़ो' कहिए।"
+   },
+   "labels": {
+    "hi": "श्रेणी"
+   },
+   "required": false,
+   "options": [
+    {
+     "value": "General",
+     "synonyms": {
+      "en": [
+       "general",
+       "open"
+      ],
+      "hi": [
+       "सामान्य",
+       "जनरल"
+      ]
+     }
+    },
+    {
+     "value": "OBC",
+     "synonyms": {
+      "en": [
+       "obc",
+       "backward"
+      ],
+      "hi": [
+       "ओबीसी",
+       "पिछड़ा"
+      ]
+     }
+    },
+    {
+     "value": "SC",
+     "synonyms": {
+      "en": [
+       "sc",
+       "scheduled caste"
+      ],
+      "hi": [
+       "एससी",
+       "अनुसूचित जाति"
+      ]
+     }
+    },
+    {
+     "value": "ST",
+     "synonyms": {
+      "en": [
+       "st",
+       "scheduled tribe",
+       "tribal"
+      ],
+      "hi": [
+       "एसटी",
+       "अनुसूचित जनजाति",
+       "आदिवासी"
+      ]
+     }
+    },
+    {
+     "value": "EWS",
+     "synonyms": {
+      "en": [
+       "ews"
+      ],
+      "hi": [
+       "ईडब्ल्यूएस"
+      ]
+     }
+    }
+   ]
+  }
+ ],
+ "titles": {
+  "hi": "योजना पात्रता सलाह"
+ }
+}

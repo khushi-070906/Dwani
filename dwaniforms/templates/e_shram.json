@@ -1,0 +1,206 @@
+{
+ "id": "e_shram",
+ "title": "e-Shram registration",
+ "glossary": [
+  "e-Shram",
+  "UAN",
+  "Aadhaar",
+  "IFSC",
+  "eKYC"
+ ],
+ "fields": [
+  {
+   "id": "full_name",
+   "kind": "name",
+   "label": "Full name",
+   "prompt": {
+    "en": "What is your full name?",
+    "hi": "अपना पूरा नाम बताइए।"
+   }
+  },
+  {
+   "id": "father_name",
+   "kind": "name",
+   "label": "Father / husband name",
+   "prompt": {
+    "en": "What is your father's or husband's name?",
+    "hi": "अपने पिता या पति का नाम बताइए।"
+   }
+  },
+  {
+   "id": "dob",
+   "kind": "date",
+   "label": "Date of birth",
+   "prompt": {
+    "en": "What is your date of birth? Say day, month and year.",
+    "hi": "अपनी जन्म तिथि बताइए: दिन, महीना और साल।"
+   },
+   "params": {
+    "min_age": 16
+   }
+  },
+  {
+   "id": "gender",
+   "kind": "choice",
+   "label": "Gender",
+   "prompt": {
+    "en": "Are you male, female or other?",
+    "hi": "आप पुरुष हैं, महिला हैं या अन्य?"
+   },
+   "options": [
+    {
+     "value": "Male",
+     "synonyms": {
+      "en": [
+       "male",
+       "man",
+       "boy"
+      ],
+      "hi": [
+       "पुरुष",
+       "आदमी",
+       "मर्द",
+       "लड़का"
+      ]
+     }
+    },
+    {
+     "value": "Female",
+     "synonyms": {
+      "en": [
+       "female",
+       "woman",
+       "girl"
+      ],
+      "hi": [
+       "महिला",
+       "औरत",
+       "स्त्री",
+       "लड़की"
+      ]
+     }
+    },
+    {
+     "value": "Other",
+     "synonyms": {
+      "en": [
+       "other",
+       "transgender"
+      ],
+      "hi": [
+       "अन्य",
+       "ट्रांसजेंडर"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "mobile",
+   "kind": "mobile",
+   "label": "Mobile number",
+   "prompt": {
+    "en": "What is your mobile number?",
+    "hi": "अपना मोबाइल नंबर बताइए।"
+   }
+  },
+  {
+   "id": "aadhaar",
+   "kind": "aadhaar",
+   "label": "Aadhaar number",
+   "prompt": {
+    "en": "Please say your Aadhaar number, one digit at a time.",
+    "hi": "अपना आधार नंबर एक-एक अंक बोलकर बताइए।"
+   }
+  },
+  {
+   "id": "occupation",
+   "kind": "text",
+   "label": "Occupation",
+   "prompt": {
+    "en": "What work do you do?",
+    "hi": "आप क्या काम करते हैं?"
+   }
+  },
+  {
+   "id": "monthly_income",
+   "kind": "number",
+   "label": "Monthly income (INR)",
+   "prompt": {
+    "en": "About how much do you earn in a month, in rupees?",
+    "hi": "आप महीने में लगभग कितने रुपये कमाते हैं?"
+   },
+   "params": {
+    "minimum": 0,
+    "maximum": 10000000
+   }
+  },
+  {
+   "id": "village",
+   "kind": "place",
+   "label": "Village / town",
+   "prompt": {
+    "en": "Which village or town do you live in?",
+    "hi": "आप किस गाँव या शहर में रहते हैं?"
+   }
+  },
+  {
+   "id": "district",
+   "kind": "place",
+   "label": "District",
+   "prompt": {
+    "en": "Which district is that?",
+    "hi": "आपका ज़िला कौन सा है?"
+   }
+  },
+  {
+   "id": "state",
+   "kind": "place",
+   "label": "State",
+   "prompt": {
+    "en": "Which state?",
+    "hi": "आपका राज्य कौन सा है?"
+   }
+  },
+  {
+   "id": "pincode",
+   "kind": "pincode",
+   "label": "PIN code",
+   "prompt": {
+    "en": "What is your PIN code?",
+    "hi": "अपना पिन कोड बताइए।"
+   }
+  },
+  {
+   "id": "account_no",
+   "kind": "account",
+   "label": "Bank account number",
+   "prompt": {
+    "en": "Please say your bank account number, one digit at a time.",
+    "hi": "अपना बैंक खाता नंबर एक-एक अंक बोलकर बताइए।"
+   }
+  },
+  {
+   "id": "ifsc",
+   "kind": "ifsc",
+   "label": "IFSC code",
+   "prompt": {
+    "en": "Please say the IFSC code of your bank branch.",
+    "hi": "अपनी बैंक शाखा का आईएफ़एससी कोड बताइए।"
+   }
+  },
+  {
+   "id": "nominee",
+   "kind": "name",
+   "label": "Nominee name",
+   "prompt": {
+    "en": "Who is your nominee? Say the name.",
+    "hi": "आपका नॉमिनी कौन है? नाम बताइए।"
+   }
+  }
+ ],
+ "form_language": "en",
+ "titles": {
+  "hi": "ई-श्रम पंजीकरण"
+ }
+}

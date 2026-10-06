@@ -1,0 +1,273 @@
+{
+ "id": "pm_kisan",
+ "title": "PM-Kisan application",
+ "glossary": [
+  "PM-Kisan",
+  "khasra",
+  "khatauni",
+  "Aadhaar",
+  "IFSC"
+ ],
+ "fields": [
+  {
+   "id": "full_name",
+   "kind": "name",
+   "label": "Full name",
+   "prompt": {
+    "en": "What is your full name?",
+    "hi": "अपना पूरा नाम बताइए।"
+   }
+  },
+  {
+   "id": "father_name",
+   "kind": "name",
+   "label": "Father / husband name",
+   "prompt": {
+    "en": "What is your father's or husband's name?",
+    "hi": "अपने पिता या पति का नाम बताइए।"
+   }
+  },
+  {
+   "id": "dob",
+   "kind": "date",
+   "label": "Date of birth",
+   "prompt": {
+    "en": "What is your date of birth? Say day, month and year.",
+    "hi": "अपनी जन्म तिथि बताइए: दिन, महीना और साल।"
+   },
+   "params": {
+    "min_age": 18
+   }
+  },
+  {
+   "id": "gender",
+   "kind": "choice",
+   "label": "Gender",
+   "prompt": {
+    "en": "Are you male, female or other?",
+    "hi": "आप पुरुष हैं, महिला हैं या अन्य?"
+   },
+   "options": [
+    {
+     "value": "Male",
+     "synonyms": {
+      "en": [
+       "male",
+       "man",
+       "boy"
+      ],
+      "hi": [
+       "पुरुष",
+       "आदमी",
+       "मर्द",
+       "लड़का"
+      ]
+     }
+    },
+    {
+     "value": "Female",
+     "synonyms": {
+      "en": [
+       "female",
+       "woman",
+       "girl"
+      ],
+      "hi": [
+       "महिला",
+       "औरत",
+       "स्त्री",
+       "लड़की"
+      ]
+     }
+    },
+    {
+     "value": "Other",
+     "synonyms": {
+      "en": [
+       "other",
+       "transgender"
+      ],
+      "hi": [
+       "अन्य",
+       "ट्रांसजेंडर"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "category",
+   "kind": "choice",
+   "label": "Category",
+   "prompt": {
+    "en": "What is your category: General, OBC, SC, ST or EWS?",
+    "hi": "आपकी श्रेणी क्या है: सामान्य, ओबीसी, एससी, एसटी या ईडब्ल्यूएस?"
+   },
+   "options": [
+    {
+     "value": "General",
+     "synonyms": {
+      "en": [
+       "general",
+       "open"
+      ],
+      "hi": [
+       "सामान्य",
+       "जनरल"
+      ]
+     }
+    },
+    {
+     "value": "OBC",
+     "synonyms": {
+      "en": [
+       "obc",
+       "backward"
+      ],
+      "hi": [
+       "ओबीसी",
+       "पिछड़ा"
+      ]
+     }
+    },
+    {
+     "value": "SC",
+     "synonyms": {
+      "en": [
+       "sc",
+       "scheduled caste"
+      ],
+      "hi": [
+       "एससी",
+       "अनुसूचित जाति"
+      ]
+     }
+    },
+    {
+     "value": "ST",
+     "synonyms": {
+      "en": [
+       "st",
+       "scheduled tribe"
+      ],
+      "hi": [
+       "एसटी",
+       "अनुसूचित जनजाति"
+      ]
+     }
+    },
+    {
+     "value": "EWS",
+     "synonyms": {
+      "en": [
+       "ews"
+      ],
+      "hi": [
+       "ईडब्ल्यूएस"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "mobile",
+   "kind": "mobile",
+   "label": "Mobile number",
+   "prompt": {
+    "en": "What is your mobile number?",
+    "hi": "अपना मोबाइल नंबर बताइए।"
+   }
+  },
+  {
+   "id": "aadhaar",
+   "kind": "aadhaar",
+   "label": "Aadhaar number",
+   "prompt": {
+    "en": "Please say your Aadhaar number, one digit at a time.",
+    "hi": "अपना आधार नंबर एक-एक अंक बोलकर बताइए।"
+   }
+  },
+  {
+   "id": "village",
+   "kind": "place",
+   "label": "Village / town",
+   "prompt": {
+    "en": "Which village or town do you live in?",
+    "hi": "आप किस गाँव या शहर में रहते हैं?"
+   }
+  },
+  {
+   "id": "district",
+   "kind": "place",
+   "label": "District",
+   "prompt": {
+    "en": "Which district is that?",
+    "hi": "आपका ज़िला कौन सा है?"
+   }
+  },
+  {
+   "id": "state",
+   "kind": "place",
+   "label": "State",
+   "prompt": {
+    "en": "Which state?",
+    "hi": "आपका राज्य कौन सा है?"
+   }
+  },
+  {
+   "id": "pincode",
+   "kind": "pincode",
+   "label": "PIN code",
+   "prompt": {
+    "en": "What is your PIN code?",
+    "hi": "अपना पिन कोड बताइए।"
+   }
+  },
+  {
+   "id": "khasra",
+   "kind": "text",
+   "label": "Khasra / survey number",
+   "prompt": {
+    "en": "What is your khasra or survey number?",
+    "hi": "आपका खसरा या सर्वे नंबर क्या है?"
+   }
+  },
+  {
+   "id": "land_acres",
+   "kind": "number",
+   "label": "Land owned (acres)",
+   "prompt": {
+    "en": "How many acres of land do you own? You can say 2.5 or two and a half.",
+    "hi": "आपके पास कितने एकड़ ज़मीन है? जैसे ढाई या साढ़े तीन।"
+   },
+   "params": {
+    "minimum": 0,
+    "maximum": 1000,
+    "decimals": 2,
+    "unit": "acre"
+   }
+  },
+  {
+   "id": "account_no",
+   "kind": "account",
+   "label": "Bank account number",
+   "prompt": {
+    "en": "Please say your bank account number, one digit at a time.",
+    "hi": "अपना बैंक खाता नंबर एक-एक अंक बोलकर बताइए।"
+   }
+  },
+  {
+   "id": "ifsc",
+   "kind": "ifsc",
+   "label": "IFSC code",
+   "prompt": {
+    "en": "Please say the IFSC code of your bank branch.",
+    "hi": "अपनी बैंक शाखा का आईएफ़एससी कोड बताइए।"
+   }
+  }
+ ],
+ "form_language": "en",
+ "titles": {
+  "hi": "पीएम-किसान आवेदन"
+ }
+}
