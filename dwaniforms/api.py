@@ -62,6 +62,11 @@ def _resp(s, request: Request, reply=None, **extra) -> dict:
         from .session import mask_value
         if s.template.field_by_id(reply.field_id).sensitive:
             out["pending"] = mask_value(reply.pending)
+            # The read-back is SPOKEN in full (the citizen confirms by ear) but SHOWN masked, like the form sheet.
+            import re as _re
+            out["speak"] = reply.text
+            out["text"] = _re.sub(r"(?:[0-9A-Za-z]\s+){7,}[0-9A-Za-z]|[0-9A-Za-z]{8,}",
+                                  lambda m: mask_value(m.group(0).replace(" ", "")), reply.text)
     return {**out, "english_fallback": s.english_fallback, "fields": _sheet(s, s.form_values(mask=not _reveal(request))),
             "flow": s.template.flow, "title": s.template.title_in(s.lang), **({"outcome": s.outcome} if s.outcome else {}), **extra}
 
