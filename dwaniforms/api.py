@@ -57,10 +57,27 @@ def _reveal(request: Request) -> bool:
 
 def _resp(s, request: Request, reply=None, **extra) -> dict:
     out = _reply(reply) if reply is not None else {}
-    if reply is not None and reply.pending and not _reveal(request):
-        out["pending"] = None              # the spoken read-back already carries it; don't echo digits into the page
-    return {**out, "english_fallback": s.english_fallback, "fields": s.form_values(mask=not _reveal(request)),
-            "flow": s.template.flow, "title": s.template.title, **({"outcome": s.outcome} if s.outcome else {}), **extra}
+    if reply is not None and reply.pending and not _reveal(request) and reply.field_id:
+        # The form sheet pencils the pending answer in. Aadhaar / account / PAN show only their last 4 characters.
+        from .session import mask_value
+        if s.template.field_by_id(reply.field_id).sensitive:
+            out["pending"] = mask_value(reply.pending)
+    return {**out, "english_fallback": s.english_fallback, "fields": _sheet(s, s.form_values(mask=not _reveal(request))),
+            "flow": s.template.flow, "title": s.template.title_in(s.lang), **({"outcome": s.outcome} if s.outcome else {}), **extra}
+
+
+def _sheet(s, rows: list[dict]) -> list[dict]:
+    """Extra per-field detail the form-sheet UI draws (the citizen's-language label, checkbox options).
+    Exports keep using form_values() unchanged."""
+    for r in rows:
+        f = s.template.field_by_id(r["id"])
+        r["label_local"] = f.label_in(s.lang) or ""
+        r["required"] = f.required
+        if f.options:
+            r["options"] = [{"value": o.value,
+                             "label": o.value if s.lang == "en" else (o.synonyms.get(s.lang) or [o.value])[0]}
+                            for o in f.options]
+    return rows
 
 
 def create_router(service: FormService, prefix: str = "/form") -> APIRouter:
