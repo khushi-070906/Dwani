@@ -55,13 +55,22 @@ async function say(w, text) {
   ok(w.document.body.classList.contains("big") && w.localStorage.getItem("dwaniforms:big") === "1", "A+ makes text bigger and is remembered");
   for (const a of ["सुनीता देवी"]) await say(w, a);
   ok(!$(w, "yn").hidden, "confirm step shows big Yes / No buttons");
+  const row1 = () => $(w, "sheet-rows").querySelector('li[data-id="full_name"]');
+  ok(row1().classList.contains("current") && row1().classList.contains("pencil") && /सुनीता देवी/.test(row1().textContent),
+     "the answer is pencilled into the form until confirmed");
+  ok(/आवेदन पत्र/.test($(w, "sheet").textContent) && /शिकायत/.test($(w, "talk-title").textContent), "form sheet header in Hindi");
   $(w, "btn-yes").click(); await until(() => /मोबाइल/.test($(w, "question").textContent));
+  ok(row1().classList.contains("filled") && !row1().classList.contains("pencil") && row1().querySelector(".ok-tick, .review-flag"),
+     "after 'yes' it is inked in, with a tick (or a check-it flag)");
+  ok(w.document.querySelectorAll('#sheet-rows li[data-id="mobile"].current').length === 1, "the next field is highlighted");
   for (const a of ["98765 43210", "हाँ", "हमारे गाँव सोनपुर में 20 सितंबर से बिजली नहीं है, तहसील बिसवां जिला सीतापुर", "हाँ"]) await say(w, a);
   ok(/बिजली विभाग/.test($(w, "question").textContent), "department suggested from the complaint, in Hindi");
   for (const a of ["हाँ", "हाँ", "हाँ", "छोड़ो"]) await say(w, a);
   ok(/आपने जो बताया/.test($(w, "question").textContent), "whole draft read back before finishing");
-  ok(!$(w, "review").hidden && $(w, "review").querySelectorAll(".review-card").length >= 5, "answers shown as big cards during the read-back");
-  ok($(w, "ans-list").children.length >= 5 && $(w, "bar").style.width !== "0%", "answers list and progress bar");
+  ok($(w, "sheet").classList.contains("final"), "the whole form is outlined during the read-back");
+  ok($(w, "sheet-rows").querySelectorAll("li.filled").length >= 5 && $(w, "bar").style.width !== "0%", "form rows filled and progress bar");
+  const mob = $(w, "sheet-rows").querySelector('li[data-id="mobile"] .boxes');
+  ok(mob && mob.querySelectorAll(".b").length === 10 && mob.textContent === "9876543210", "mobile number written in 10 boxes");
   await say(w, "हाँ");
   await until(() => !$(w, "result").hidden);
   ok(!$(w, "draft").hidden && /सेवा में/.test($(w, "letter").textContent), "letter shown, Hindi tab first");
@@ -105,7 +114,14 @@ async function say(w, text) {
   let gotPrefill = false;
   for (const a of ["Ram Lal", "yes", "Shyam Lal", "yes", "15 August 1985", "yes"]) {
     await say(w, a);
-    if (/I noted Gender: Male/.test($(w, "question").textContent)) { gotPrefill = true; break; }
+    if (/I noted Gender: Male/.test($(w, "question").textContent)) {
+      gotPrefill = true;
+      const dob = $(w, "sheet-rows").querySelector('li[data-id="dob"] .boxes');
+      ok(dob && [...dob.querySelectorAll(".b")].map((b) => b.textContent).join("") === "15081985", "date of birth in DD / MM / YYYY boxes");
+      const g = $(w, "sheet-rows").querySelector('li[data-id="gender"]');
+      ok(g && g.classList.contains("pencil") && g.querySelector(".ck.on") && /Male/.test(g.querySelector(".ck.on").textContent), "carried-over gender pencilled as a ticked checkbox");
+      break;
+    }
   }
   ok(gotPrefill, "advisor answers carried over: 'I noted Gender: Male. Is this correct?'");
   w.close();

@@ -291,3 +291,38 @@ def test_http_flow_with_outcome(svc):
     assert r["done"] and r["outcome"]["type"] == "lookup" and r["flow"] == "lookup_ration"
     assert json.loads(c.get(f"/form/sessions/{sid}/export.json").text)["outcome"]["found"] is True
     assert c.post("/form/sessions", json={"form_id": "pm_kisan", "lang": "en", "prefill_from": "nothex!"}).status_code == 422
+
+
+def test_pending_answer_pencilled_but_aadhaar_masked(svc):
+    TestClient = pytest.importorskip("fastapi.testclient").TestClient
+    from fastapi import FastAPI
+    from dwaniforms.api import create_router
+    from dwaniforms.validators import verhoeff_append
+    app = FastAPI()
+    app.include_router(create_router(svc))
+    c = TestClient(app)
+    r = c.post("/form/sessions", json={"form_id": "pm_kisan", "lang": "hi"}).json()
+    assert r["title"] == "पीएम-किसान आवेदन"                                   # title in the citizen's language
+    sid = r["session_id"]
+    r = c.post(f"/form/sessions/{sid}/text", json={"text": "रमेश यादव"}).json()
+    assert r["phase"] == "confirm" and r["pending"] == "रमेश यादव"              # pencilled into the form sheet
+    name_row = next(f for f in r["fields"] if f["id"] == "full_name")
+    assert name_row["label_local"] and name_row["required"] is True
+    aadhaar = verhoeff_append("23456789012")
+    for _ in range(30):                                              # walk to the Aadhaar question
+        if r.get("field_id") == "aadhaar" and r["phase"] == "ask":
+            break
+        f = next(x for x in r["fields"] if x["id"] == r["field_id"])
+        answer = {"name": "श्याम यादव", "date": "15 August 1980", "mobile": "98765 43210"}.get(f["kind"]) or \
+            (f["options"][0]["label"] if f.get("options") else "हाँ")
+        r = c.post(f"/form/sessions/{sid}/text", json={"text": "हाँ" if r["phase"] == "confirm" else answer}).json()
+    assert r["field_id"] == "aadhaar"
+    r = c.post(f"/form/sessions/{sid}/text", json={"text": " ".join(aadhaar)}).json()
+    assert r["phase"] == "confirm" and aadhaar not in json.dumps(r) and r["pending"].endswith(aadhaar[-4:])
+    gender = next(f for f in r["fields"] if f["id"] == "gender")
+    assert [o["value"] for o in gender["options"]] == ["Male", "Female", "Other"] and gender["options"][0]["label"] == "पुरुष"
+
+
+def test_every_field_has_a_hindi_label():
+    for t in load_all().values():
+        assert all(f.label_in("hi") for f in t.fields), [f.id for f in t.fields if not f.label_in("hi")]
