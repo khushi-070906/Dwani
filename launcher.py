@@ -255,7 +255,7 @@ def run_console() -> None:
 SELF_TEST_IMPORTS = [
     "numpy", "fastapi", "starlette", "uvicorn", "websockets", "pydantic", "dotenv",
     "qrcode", "PIL", "cryptography", "sentencepiece", "ctranslate2", "faster_whisper",
-    "tokenizers", "certifi", "pypdf",
+    "tokenizers", "certifi", "pypdf", "python_multipart",
     "licensing", "activate", "session", "pipeline", "backends", "qa_pipeline",
     "nllb_tokenizer", "accessibility", "glossary", "translation_cache", "server",
     "gui", "model_setup", "updater", "phone_mic", "preflight", "notes", "talk_glossary", "crash_report",
@@ -312,7 +312,48 @@ def self_test() -> int:
         if not any(assets.glob("*.onnx")):
             raise FileNotFoundError(f"faster_whisper VAD assets missing in {assets}")
 
+    def _uploads():
+        """The Slides tab uploads files: request.form() needs python-multipart,
+        which nothing imports directly -- so check the real parsing path."""
+        import asyncio
+
+        from starlette.requests import Request
+
+        body = (b'--X\r\nContent-Disposition: form-data; name="file"; filename="t.txt"\r\n'
+                b"Content-Type: text/plain\r\n\r\nLSTM\r\n--X--\r\n")
+        scope = {"type": "http", "method": "POST", "path": "/", "query_string": b"",
+                 "headers": [(b"content-type", b"multipart/form-data; boundary=X")]}
+        sent = False
+
+        async def receive():
+            nonlocal sent
+            if sent:
+                return {"type": "http.disconnect"}
+            sent = True
+            return {"type": "http.request", "body": body, "more_body": False}
+
+        async def parse():
+            form = await Request(scope, receive).form()
+            if await form["file"].read() != b"LSTM":
+                raise RuntimeError("multipart upload parsed wrongly")
+        asyncio.run(parse())
+
+    def _pdf_slides():
+        import io
+
+        from pypdf import PdfWriter
+
+        import talk_glossary
+
+        w = PdfWriter()
+        w.add_blank_page(width=200, height=200)
+        buf = io.BytesIO()
+        w.write(buf)
+        talk_glossary.extract_text("slides.pdf", buf.getvalue())
+
     check("static_files", _static)
+    check("file_uploads", _uploads)
+    check("pdf_slides", _pdf_slides)
     check("ctranslate2_native", _ct2)
     check("faster_whisper_without_pyav", _whisper_class)
     check("faster_whisper_assets", _fw_assets)
