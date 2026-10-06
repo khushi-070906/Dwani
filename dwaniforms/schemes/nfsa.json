@@ -1,0 +1,46 @@
+{
+ "id": "nfsa",
+ "name": {
+  "en": "Ration card (National Food Security Act)",
+  "hi": "राशन कार्ड (राष्ट्रीय खाद्य सुरक्षा अधिनियम)"
+ },
+ "ministry": "State food & civil supplies department",
+ "source": "https://nfsa.gov.in",
+ "benefit": {
+  "en": "Subsidised / free food grains every month",
+  "hi": "हर महीने सस्ता / मुफ़्त अनाज"
+ },
+ "form": "income_certificate",
+ "apply": {
+  "en": "Apply on your state's food portal, at the tehsil, or at a CSC.",
+  "hi": "राज्य के खाद्य पोर्टल, तहसील या CSC पर आवेदन करें।"
+ },
+ "rules": [
+  {
+   "fact": "ration_card",
+   "in": [
+    "None"
+   ],
+   "why": {
+    "en": "for families without a ration card",
+    "hi": "जिनके पास राशन कार्ड नहीं है"
+   }
+  },
+  {
+   "fact": "income_tax_payer",
+   "eq": "No",
+   "soft": true,
+   "why": {
+    "en": "income-tax payers usually do not qualify",
+    "hi": "आयकर देने वाले आमतौर पर पात्र नहीं होते"
+   }
+  },
+  {
+   "check": {
+    "en": "Each state sets its own income and asset limits.",
+    "hi": "आय और संपत्ति की सीमा हर राज्य अलग तय करता है।"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

@@ -1,0 +1,41 @@
+{
+ "id": "ignoaps",
+ "name": {
+  "en": "Old age pension",
+  "hi": "वृद्धावस्था पेंशन"
+ },
+ "ministry": "Ministry of Rural Development (NSAP) + state",
+ "source": "https://nsap.nic.in",
+ "benefit": {
+  "en": "A monthly pension (central share ₹200-500; most states add more)",
+  "hi": "महीने की पेंशन (केंद्र का हिस्सा ₹200-500; ज़्यादातर राज्य और जोड़ते हैं)"
+ },
+ "form": "income_certificate",
+ "apply": {
+  "en": "Apply at the block / tehsil social welfare office or your state pension portal.",
+  "hi": "ब्लॉक / तहसील समाज कल्याण कार्यालय या राज्य पेंशन पोर्टल पर आवेदन करें।"
+ },
+ "rules": [
+  {
+   "fact": "age",
+   "gte": 60,
+   "why": {
+    "en": "for people aged 60 and above",
+    "hi": "60 साल और उससे ऊपर"
+   }
+  },
+  {
+   "fact": "ration_card",
+   "in": [
+    "AAY",
+    "PHH / BPL"
+   ],
+   "soft": true,
+   "why": {
+    "en": "for below-poverty-line households",
+    "hi": "गरीबी रेखा से नीचे के परिवारों के लिए"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

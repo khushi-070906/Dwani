@@ -1,0 +1,75 @@
+{
+ "id": "pmuy",
+ "name": {
+  "en": "Ujjwala gas connection",
+  "hi": "उज्ज्वला गैस कनेक्शन"
+ },
+ "ministry": "Ministry of Petroleum & Natural Gas",
+ "source": "https://pmuy.gov.in",
+ "benefit": {
+  "en": "A free LPG connection for the woman of a poor household",
+  "hi": "गरीब परिवार की महिला के नाम मुफ़्त एलपीजी कनेक्शन"
+ },
+ "form": null,
+ "apply": {
+  "en": "Apply at the nearest LPG distributor or on pmuy.gov.in.",
+  "hi": "नज़दीकी गैस एजेंसी या pmuy.gov.in पर आवेदन करें।"
+ },
+ "rules": [
+  {
+   "fact": "gender",
+   "eq": "Female",
+   "why": {
+    "en": "the connection is given to an adult woman",
+    "hi": "कनेक्शन वयस्क महिला के नाम दिया जाता है"
+   }
+  },
+  {
+   "fact": "age",
+   "gte": 18,
+   "why": {
+    "en": "you must be 18 or older",
+    "hi": "18 साल या उससे ऊपर"
+   }
+  },
+  {
+   "fact": "lpg",
+   "eq": "No",
+   "why": {
+    "en": "for households without an LPG connection",
+    "hi": "जिन घरों में गैस कनेक्शन नहीं है"
+   }
+  },
+  {
+   "any_of": [
+    {
+     "fact": "ration_card",
+     "in": [
+      "AAY",
+      "PHH / BPL"
+     ]
+    },
+    {
+     "fact": "category",
+     "in": [
+      "SC",
+      "ST"
+     ]
+    },
+    {
+     "fact": "house",
+     "in": [
+      "Kutcha house",
+      "No house"
+     ]
+    }
+   ],
+   "otherwise": "maybe",
+   "why": {
+    "en": "for poor households (or you can give a declaration of need)",
+    "hi": "गरीब परिवारों के लिए (या ज़रूरत का घोषणा-पत्र दे सकते हैं)"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

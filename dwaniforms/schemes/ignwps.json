@@ -1,0 +1,52 @@
+{
+ "id": "ignwps",
+ "name": {
+  "en": "Widow pension",
+  "hi": "विधवा पेंशन"
+ },
+ "ministry": "Ministry of Rural Development (NSAP) + state",
+ "source": "https://nsap.nic.in",
+ "benefit": {
+  "en": "A monthly pension for widows (central share ₹300; most states add more)",
+  "hi": "विधवा महिलाओं को महीने की पेंशन (केंद्र का हिस्सा ₹300; ज़्यादातर राज्य और जोड़ते हैं)"
+ },
+ "form": "income_certificate",
+ "apply": {
+  "en": "Apply at the block / tehsil social welfare office or your state pension portal.",
+  "hi": "ब्लॉक / तहसील समाज कल्याण कार्यालय या राज्य पेंशन पोर्टल पर आवेदन करें।"
+ },
+ "rules": [
+  {
+   "fact": "widow",
+   "eq": "Yes",
+   "why": {
+    "en": "for widows",
+    "hi": "विधवा महिलाओं के लिए"
+   },
+   "unknown": "no"
+  },
+  {
+   "fact": "age",
+   "gte": 40,
+   "lte": 79,
+   "soft": true,
+   "why": {
+    "en": "the central scheme covers ages 40-79 (many states cover all ages)",
+    "hi": "केंद्र की योजना 40-79 साल के लिए है (कई राज्य सभी उम्र को देते हैं)"
+   }
+  },
+  {
+   "fact": "ration_card",
+   "in": [
+    "AAY",
+    "PHH / BPL"
+   ],
+   "soft": true,
+   "why": {
+    "en": "for below-poverty-line households",
+    "hi": "गरीबी रेखा से नीचे के परिवारों के लिए"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

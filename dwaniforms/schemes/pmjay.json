@@ -1,0 +1,46 @@
+{
+ "id": "pmjay",
+ "name": {
+  "en": "Ayushman Bharat (PM-JAY) health cover",
+  "hi": "आयुष्मान भारत (पीएम-जय) स्वास्थ्य बीमा"
+ },
+ "ministry": "National Health Authority",
+ "source": "https://beneficiary.nha.gov.in",
+ "benefit": {
+  "en": "Free hospital treatment up to ₹5 lakh a year per family at listed hospitals",
+  "hi": "सूचीबद्ध अस्पतालों में परिवार को साल में ₹5 लाख तक मुफ़्त इलाज"
+ },
+ "form": null,
+ "apply": {
+  "en": "Check your name and get the card at beneficiary.nha.gov.in, the Ayushman app, or a CSC.",
+  "hi": "beneficiary.nha.gov.in, आयुष्मान ऐप या CSC पर नाम देखें और कार्ड बनवाएँ।"
+ },
+ "rules": [
+  {
+   "any_of": [
+    {
+     "fact": "age",
+     "gte": 70
+    },
+    {
+     "fact": "ration_card",
+     "in": [
+      "AAY"
+     ]
+    }
+   ],
+   "otherwise": "maybe",
+   "why": {
+    "en": "everyone aged 70 or more is covered; otherwise your family must be on the eligible list (SECC 2011 / state list)",
+    "hi": "70 साल या उससे ऊपर सभी शामिल हैं; बाकी परिवारों का पात्रता सूची (SECC 2011 / राज्य सूची) में होना ज़रूरी है"
+   }
+  },
+  {
+   "check": {
+    "en": "Check that your family is on the list at beneficiary.nha.gov.in.",
+    "hi": "beneficiary.nha.gov.in पर देखें कि परिवार सूची में है।"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

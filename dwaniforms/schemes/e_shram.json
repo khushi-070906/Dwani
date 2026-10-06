@@ -1,0 +1,61 @@
+{
+ "id": "e_shram",
+ "name": {
+  "en": "e-Shram card",
+  "hi": "ई-श्रम कार्ड"
+ },
+ "ministry": "Ministry of Labour & Employment",
+ "source": "https://eshram.gov.in",
+ "benefit": {
+  "en": "A registered unorganised-worker card; the route to labour welfare schemes",
+  "hi": "असंगठित श्रमिक पंजीकरण कार्ड; श्रमिक कल्याण योजनाओं का रास्ता"
+ },
+ "form": "e_shram",
+ "apply": {
+  "en": "Register free at a CSC or on eshram.gov.in with Aadhaar and a mobile number.",
+  "hi": "आधार और मोबाइल से CSC या eshram.gov.in पर मुफ़्त पंजीकरण करें।"
+ },
+ "rules": [
+  {
+   "fact": "age",
+   "gte": 16,
+   "lte": 59,
+   "why": {
+    "en": "for ages 16 to 59",
+    "hi": "16 से 59 साल की उम्र के लिए"
+   }
+  },
+  {
+   "fact": "occupation",
+   "in": [
+    "Farm labourer",
+    "Daily-wage / unorganised worker",
+    "Farmer",
+    "Self-employed / small business",
+    "Homemaker",
+    "Not working"
+   ],
+   "why": {
+    "en": "for unorganised-sector workers",
+    "hi": "असंगठित क्षेत्र के श्रमिकों के लिए"
+   }
+  },
+  {
+   "fact": "epfo",
+   "eq": "No",
+   "why": {
+    "en": "not for EPFO / ESIC members",
+    "hi": "ईपीएफओ / ईएसआईसी सदस्यों के लिए नहीं"
+   }
+  },
+  {
+   "fact": "income_tax_payer",
+   "eq": "No",
+   "why": {
+    "en": "not for income-tax payers",
+    "hi": "आयकर देने वालों के लिए नहीं"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

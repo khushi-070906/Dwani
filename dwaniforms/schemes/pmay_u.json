@@ -1,0 +1,54 @@
+{
+ "id": "pmay_u",
+ "name": {
+  "en": "PM Awas Yojana - Urban 2.0 (house)",
+  "hi": "प्रधानमंत्री आवास योजना - शहरी 2.0"
+ },
+ "ministry": "Ministry of Housing & Urban Affairs",
+ "source": "https://pmay-urban.gov.in",
+ "benefit": {
+  "en": "Help to build or buy a house for low-income urban families",
+  "hi": "शहरी कम-आय परिवारों को घर बनाने या खरीदने में मदद"
+ },
+ "form": "income_certificate",
+ "apply": {
+  "en": "Apply on pmay-urban.gov.in or at your municipal office.",
+  "hi": "pmay-urban.gov.in या नगर निकाय कार्यालय में आवेदन करें।"
+ },
+ "rules": [
+  {
+   "fact": "area",
+   "eq": "Urban",
+   "why": {
+    "en": "for towns and cities",
+    "hi": "शहरों और कस्बों के लिए"
+   }
+  },
+  {
+   "fact": "house",
+   "in": [
+    "Kutcha house",
+    "No house"
+   ],
+   "why": {
+    "en": "for families without a pucca house",
+    "hi": "जिनके पास पक्का घर नहीं है"
+   }
+  },
+  {
+   "fact": "annual_income",
+   "lte": 900000,
+   "why": {
+    "en": "family income up to ₹9 lakh a year",
+    "hi": "परिवार की आय ₹9 लाख साल तक"
+   }
+  },
+  {
+   "check": {
+    "en": "No one in the family may own a pucca house anywhere in India.",
+    "hi": "परिवार में किसी के नाम भारत में कहीं पक्का घर नहीं होना चाहिए।"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

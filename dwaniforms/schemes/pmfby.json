@@ -1,0 +1,37 @@
+{
+ "id": "pmfby",
+ "name": {
+  "en": "PM Fasal Bima Yojana (crop insurance)",
+  "hi": "प्रधानमंत्री फसल बीमा योजना"
+ },
+ "ministry": "Ministry of Agriculture & Farmers Welfare",
+ "source": "https://pmfby.gov.in",
+ "benefit": {
+  "en": "Insurance for your crop against drought, flood, pests and other losses, at a low premium",
+  "hi": "सूखा, बाढ़, कीट आदि से फसल नुकसान का बीमा, कम प्रीमियम पर"
+ },
+ "form": null,
+ "apply": {
+  "en": "Enrol through your bank, a CSC or pmfby.gov.in before the season's last date.",
+  "hi": "सीज़न की आख़िरी तारीख़ से पहले बैंक, CSC या pmfby.gov.in से जुड़ें।"
+ },
+ "rules": [
+  {
+   "fact": "occupation",
+   "in": [
+    "Farmer"
+   ],
+   "why": {
+    "en": "for farmers, including tenant farmers and sharecroppers",
+    "hi": "किसानों के लिए, बटाईदार और किरायेदार किसान भी"
+   }
+  },
+  {
+   "check": {
+    "en": "Enrolment closes on a fixed date each season.",
+    "hi": "हर सीज़न में नामांकन की आख़िरी तारीख़ तय होती है।"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

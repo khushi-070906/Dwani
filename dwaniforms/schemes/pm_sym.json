@@ -1,0 +1,70 @@
+{
+ "id": "pm_sym",
+ "name": {
+  "en": "PM Shram Yogi Maan-dhan (pension)",
+  "hi": "प्रधानमंत्री श्रम योगी मान-धन (पेंशन)"
+ },
+ "ministry": "Ministry of Labour & Employment",
+ "source": "https://maandhan.in",
+ "benefit": {
+  "en": "₹3,000 a month pension after 60; you pay ₹55-200 a month and the government matches it",
+  "hi": "60 के बाद ₹3,000 महीना पेंशन; आप ₹55-200 महीना देते हैं, उतना सरकार देती है"
+ },
+ "form": "e_shram",
+ "apply": {
+  "en": "Enrol at a CSC with Aadhaar and a savings account.",
+  "hi": "आधार और बचत खाते के साथ CSC पर जुड़ें।"
+ },
+ "rules": [
+  {
+   "fact": "age",
+   "gte": 18,
+   "lte": 40,
+   "why": {
+    "en": "you must join between 18 and 40",
+    "hi": "18 से 40 साल के बीच जुड़ना होता है"
+   }
+  },
+  {
+   "fact": "occupation",
+   "in": [
+    "Farm labourer",
+    "Daily-wage / unorganised worker",
+    "Farmer",
+    "Self-employed / small business",
+    "Homemaker",
+    "Not working"
+   ],
+   "why": {
+    "en": "for unorganised-sector workers",
+    "hi": "असंगठित क्षेत्र के श्रमिकों के लिए"
+   }
+  },
+  {
+   "fact": "annual_income",
+   "lte": 180000,
+   "soft": true,
+   "why": {
+    "en": "your own income must be ₹15,000 a month or less",
+    "hi": "आपकी अपनी आय ₹15,000 महीना या कम होनी चाहिए"
+   }
+  },
+  {
+   "fact": "epfo",
+   "eq": "No",
+   "why": {
+    "en": "not for EPFO / ESIC / NPS members",
+    "hi": "ईपीएफओ / ईएसआईसी / एनपीएस सदस्यों के लिए नहीं"
+   }
+  },
+  {
+   "fact": "income_tax_payer",
+   "eq": "No",
+   "why": {
+    "en": "not for income-tax payers",
+    "hi": "आयकर देने वालों के लिए नहीं"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

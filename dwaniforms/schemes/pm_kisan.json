@@ -1,0 +1,68 @@
+{
+ "id": "pm_kisan",
+ "name": {
+  "en": "PM-KISAN",
+  "hi": "पीएम-किसान"
+ },
+ "ministry": "Ministry of Agriculture & Farmers Welfare",
+ "source": "https://pmkisan.gov.in",
+ "benefit": {
+  "en": "₹6,000 a year, in three instalments, into your bank account",
+  "hi": "साल में ₹6,000, तीन किस्तों में, बैंक खाते में"
+ },
+ "form": "pm_kisan",
+ "apply": {
+  "en": "Apply at a CSC or on pmkisan.gov.in; e-KYC is required.",
+  "hi": "CSC या pmkisan.gov.in पर आवेदन करें; ई-केवाईसी ज़रूरी है।"
+ },
+ "rules": [
+  {
+   "fact": "occupation",
+   "in": [
+    "Farmer"
+   ],
+   "why": {
+    "en": "for farmer families",
+    "hi": "किसान परिवारों के लिए"
+   }
+  },
+  {
+   "fact": "land_acres",
+   "gt": 0,
+   "why": {
+    "en": "you must own cultivable land",
+    "hi": "आपके नाम खेती की ज़मीन होनी चाहिए"
+   }
+  },
+  {
+   "fact": "income_tax_payer",
+   "eq": "No",
+   "why": {
+    "en": "families with an income-tax payer are excluded",
+    "hi": "आयकर देने वाले परिवार बाहर हैं"
+   }
+  },
+  {
+   "fact": "govt_employee",
+   "eq": "No",
+   "soft": true,
+   "why": {
+    "en": "government employees and pensioners are mostly excluded (Group D / MTS staff are not)",
+    "hi": "सरकारी कर्मचारी और पेंशनर ज़्यादातर बाहर हैं (ग्रुप डी / एमटीएस नहीं)"
+   }
+  },
+  {
+   "check": {
+    "en": "The land must be in your name in the land records.",
+    "hi": "ज़मीन भूलेख में आपके नाम होनी चाहिए।"
+   }
+  },
+  {
+   "check": {
+    "en": "Your bank account must be linked to Aadhaar.",
+    "hi": "बैंक खाता आधार से जुड़ा होना चाहिए।"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

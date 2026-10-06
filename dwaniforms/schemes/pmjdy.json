@@ -1,0 +1,37 @@
+{
+ "id": "pmjdy",
+ "name": {
+  "en": "Jan Dhan bank account",
+  "hi": "जन धन बैंक खाता"
+ },
+ "ministry": "Ministry of Finance",
+ "source": "https://pmjdy.gov.in",
+ "benefit": {
+  "en": "A zero-balance bank account with a RuPay card and accident insurance",
+  "hi": "ज़ीरो बैलेंस बैंक खाता, रुपे कार्ड और दुर्घटना बीमा के साथ"
+ },
+ "form": "bank_kyc",
+ "apply": {
+  "en": "Open it at any bank branch or bank mitra with Aadhaar.",
+  "hi": "आधार के साथ किसी भी बैंक शाखा या बैंक मित्र पर खोलें।"
+ },
+ "rules": [
+  {
+   "fact": "bank_account",
+   "eq": "No",
+   "why": {
+    "en": "for people without a bank account",
+    "hi": "जिनका बैंक खाता नहीं है उनके लिए"
+   }
+  },
+  {
+   "fact": "age",
+   "gte": 10,
+   "why": {
+    "en": "for ages 10 and above",
+    "hi": "10 साल और उससे ऊपर"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

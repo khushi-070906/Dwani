@@ -1,0 +1,58 @@
+{
+ "id": "igndps",
+ "name": {
+  "en": "Disability pension",
+  "hi": "दिव्यांग पेंशन"
+ },
+ "ministry": "Ministry of Rural Development (NSAP) + state",
+ "source": "https://nsap.nic.in",
+ "benefit": {
+  "en": "A monthly pension for people with severe disability (central share ₹300-500)",
+  "hi": "गंभीर दिव्यांगता वालों को महीने की पेंशन (केंद्र का हिस्सा ₹300-500)"
+ },
+ "form": "income_certificate",
+ "apply": {
+  "en": "Apply at the block / tehsil social welfare office with your disability certificate.",
+  "hi": "दिव्यांग प्रमाणपत्र के साथ ब्लॉक / तहसील समाज कल्याण कार्यालय में आवेदन करें।"
+ },
+ "rules": [
+  {
+   "fact": "disability",
+   "eq": "Yes",
+   "why": {
+    "en": "for people with a disability certificate",
+    "hi": "दिव्यांग प्रमाणपत्र वालों के लिए"
+   },
+   "unknown": "no"
+  },
+  {
+   "fact": "age",
+   "gte": 18,
+   "lte": 79,
+   "soft": true,
+   "why": {
+    "en": "the central scheme covers ages 18-79",
+    "hi": "केंद्र की योजना 18-79 साल के लिए है"
+   }
+  },
+  {
+   "fact": "ration_card",
+   "in": [
+    "AAY",
+    "PHH / BPL"
+   ],
+   "soft": true,
+   "why": {
+    "en": "for below-poverty-line households",
+    "hi": "गरीबी रेखा से नीचे के परिवारों के लिए"
+   }
+  },
+  {
+   "check": {
+    "en": "The central scheme needs 80% or more disability; many states accept less.",
+    "hi": "केंद्र की योजना में 80% या अधिक दिव्यांगता चाहिए; कई राज्य कम पर भी देते हैं।"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

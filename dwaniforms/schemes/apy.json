@@ -1,0 +1,47 @@
+{
+ "id": "apy",
+ "name": {
+  "en": "Atal Pension Yojana",
+  "hi": "अटल पेंशन योजना"
+ },
+ "ministry": "Ministry of Finance (PFRDA)",
+ "source": "https://www.npscra.nsdl.co.in/scheme-details.php",
+ "benefit": {
+  "en": "A guaranteed pension of ₹1,000-5,000 a month after 60, depending on what you pay in",
+  "hi": "60 के बाद ₹1,000-5,000 महीना पक्की पेंशन, जमा राशि के हिसाब से"
+ },
+ "form": null,
+ "apply": {
+  "en": "Ask at the bank or post office where you have a savings account.",
+  "hi": "जिस बैंक या डाकघर में बचत खाता है, वहाँ पूछें।"
+ },
+ "rules": [
+  {
+   "fact": "age",
+   "gte": 18,
+   "lte": 40,
+   "why": {
+    "en": "you must join between 18 and 40",
+    "hi": "18 से 40 साल के बीच जुड़ना होता है"
+   }
+  },
+  {
+   "fact": "bank_account",
+   "eq": "Yes",
+   "soft": true,
+   "why": {
+    "en": "you need a savings bank account (a Jan Dhan account works)",
+    "hi": "बचत खाता चाहिए (जन धन खाता चलेगा)"
+   }
+  },
+  {
+   "fact": "income_tax_payer",
+   "eq": "No",
+   "why": {
+    "en": "income-tax payers cannot join",
+    "hi": "आयकर देने वाले नहीं जुड़ सकते"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}

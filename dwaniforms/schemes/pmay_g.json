@@ -1,0 +1,64 @@
+{
+ "id": "pmay_g",
+ "name": {
+  "en": "PM Awas Yojana - Gramin (house)",
+  "hi": "प्रधानमंत्री आवास योजना - ग्रामीण"
+ },
+ "ministry": "Ministry of Rural Development",
+ "source": "https://pmayg.nic.in",
+ "benefit": {
+  "en": "Help to build a pucca house (about ₹1.2 lakh in the plains, ₹1.3 lakh in hilly areas)",
+  "hi": "पक्का घर बनाने में मदद (मैदानी इलाकों में लगभग ₹1.2 लाख, पहाड़ी में ₹1.3 लाख)"
+ },
+ "form": "income_certificate",
+ "apply": {
+  "en": "Ask your gram panchayat / block office; the list comes from the Awaas+ survey.",
+  "hi": "ग्राम पंचायत / ब्लॉक कार्यालय में पूछें; सूची आवास+ सर्वे से बनती है।"
+ },
+ "rules": [
+  {
+   "fact": "area",
+   "eq": "Rural",
+   "why": {
+    "en": "for villages (towns have PMAY-Urban)",
+    "hi": "गाँवों के लिए (शहरों के लिए PMAY-शहरी है)"
+   }
+  },
+  {
+   "fact": "house",
+   "in": [
+    "Kutcha house",
+    "No house"
+   ],
+   "why": {
+    "en": "for families without a pucca house",
+    "hi": "जिनके पास पक्का घर नहीं है"
+   }
+  },
+  {
+   "fact": "govt_employee",
+   "eq": "No",
+   "soft": true,
+   "why": {
+    "en": "government employees are excluded",
+    "hi": "सरकारी कर्मचारी बाहर हैं"
+   }
+  },
+  {
+   "fact": "income_tax_payer",
+   "eq": "No",
+   "soft": true,
+   "why": {
+    "en": "income-tax payers are excluded",
+    "hi": "आयकर देने वाले बाहर हैं"
+   }
+  },
+  {
+   "check": {
+    "en": "Your family must be on the Awaas+ / SECC list approved by the gram sabha.",
+    "hi": "परिवार ग्राम सभा से मंज़ूर आवास+ / SECC सूची में होना चाहिए।"
+   }
+  }
+ ],
+ "last_reviewed": "2026-06-30"
+}
