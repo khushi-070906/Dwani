@@ -153,14 +153,32 @@
                outline: 1.5px dashed rgba(255,255,255,.55); outline-offset: 2px; }
 
   @media (max-width: 560px) { .nav-links a { display: none; } }
+
+  /* ---- DwaniForms logo: identical to the app's header (dwaniforms/static/app.html .brand) ---- */
+  .df-brand { display: inline-flex; align-items: center; gap: .7rem; text-decoration: none; }
+  .df-seal { width: 40px; height: 40px; border-radius: 50%; background: #1F5E4D; color: #fff; display: grid; place-items: center; position: relative;
+             font: 400 1.25rem/1 "Rozha One", Georgia, serif; flex: none; }
+  .df-seal::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; border: 1px dashed rgba(255,255,255,.55); }
+  .df-word { display: flex; flex-direction: column; line-height: 1.05; text-align: left; }
+  .df-word b { font: 400 1.45rem "Rozha One", Georgia, serif; color: #1F5E4D; }
+  .df-word b span { font: 600 1.3rem "Source Serif 4", "Noto Serif Devanagari", "Mukta", Georgia, serif; color: #1E2A44; margin-left: .1rem; }
+  .df-word small { font: 400 .72rem "Mukta", "Lato", sans-serif; color: #6B7385; }
+  .df-brand.sm { gap: .5rem; } .df-brand.sm .df-seal { width: 28px; height: 28px; font-size: .9rem; } .df-brand.sm .df-seal::after { inset: 3px; }
+  .df-brand.sm .df-word b { font-size: 1.05rem; } .df-brand.sm .df-word b span { font-size: .95rem; } .df-brand.sm .df-word small { display: none; }
+
+  .topbar { background: #fff; border-bottom: 1px solid #DCDFD6; position: relative; z-index: 3; }
+  .topbar nav { padding: .7rem 0; }
+  .topbar .nav-links a { color: #4A5468; } .topbar .nav-links a:hover { color: #1F5E4D; }
+  .topbar .lang { background: #fff; border: 1px solid #C9CEC2; color: #1E2A44; border-radius: 8px; font: 700 .88rem "Lato", "Mukta", sans-serif; padding: .4rem .7rem; }
+  .device-bar, .kiosk-top { background: #fff !important; border-bottom: 1px solid #DCDFD6; }
+  .device-bar small, .kiosk-top .scene { color: #6B7385 !important; }
 </style>
 </head>
 <body data-lang="en">
 
-<header class="hero">
-  <div class="wrap">
+<div class="topbar"><div class="wrap">
     <nav>
-      <a class="logo" href="#" aria-label="DwaniForms"><span class="emb" aria-hidden="true">ध</span><span class="dwani" lang="hi">ध्वनि</span><span class="forms">Forms</span></a>
+      <a class="df-brand" href="#" aria-label="DwaniForms"><span class="df-seal" aria-hidden="true">ध</span><span class="df-word"><b lang="hi">ध्वनि<span lang="en">Forms</span></b><small><span class="en">Fill forms by speaking</span><span class="hi" lang="hi">बोलकर फ़ॉर्म भरें</span></small></span></a>
       <div class="nav-links">
         <a class="hide-sm" href="#stories"><span class="en">See it in action</span><span class="hi" lang="hi">चलता हुआ देखिए</span></a>
         <a class="hide-sm" href="#what"><span class="en">What it does</span><span class="hi" lang="hi">क्या करता है</span></a>
@@ -168,6 +186,9 @@
         <button class="lang" id="lang" type="button" aria-label="Switch language">हिन्दी</button>
       </div>
     </nav>
+</div></div>
+<header class="hero">
+  <div class="wrap">
     <div class="hero-grid">
       <div>
         <span class="eyebrow"><b>NEW</b><span class="en">From the DwaniLive team</span><span class="hi" lang="hi">DwaniLive टीम की नई पेशकश</span></span>
@@ -184,7 +205,7 @@
         </div>
       </div>
       <div class="device" aria-hidden="true">
-        <div class="device-bar"><span class="logo"><span class="dwani">ध्वनि</span><span class="forms">Forms</span></span><small>CSC · सीतापुर</small></div>
+        <div class="device-bar"><span class="df-brand sm" aria-label="DwaniForms"><span class="df-seal" aria-hidden="true">ध</span><span class="df-word"><b lang="hi">ध्वनि<span lang="en">Forms</span></b><small><span class="en">Fill forms by speaking</span><span class="hi" lang="hi">बोलकर फ़ॉर्म भरें</span></small></span></span><small>CSC · सीतापुर</small></div>
         <div class="mini">
           <div class="bubble bot" lang="hi">आपके पास कितने एकड़ ज़मीन है?</div>
           <div class="bubble me" lang="hi">🗣 ढाई एकड़ है जी</div>
@@ -215,7 +236,7 @@
   </div>
   <div class="stage">
     <div class="kiosk">
-      <div class="kiosk-top"><span class="logo"><span class="dwani">ध्वनि</span><span class="forms">Forms</span></span><span class="scene" id="scene"></span></div>
+      <div class="kiosk-top"><span class="df-brand sm" aria-label="DwaniForms"><span class="df-seal" aria-hidden="true">ध</span><span class="df-word"><b lang="hi">ध्वनि<span lang="en">Forms</span></b><small><span class="en">Fill forms by speaking</span><span class="hi" lang="hi">बोलकर फ़ॉर्म भरें</span></small></span></span><span class="scene" id="scene"></span></div>
       <div class="progress"><i id="prog"></i></div>
       <div class="chat" id="chat" aria-live="polite"></div>
       <div class="kiosk-foot">
@@ -298,7 +319,7 @@
 </div></section>
 
 <div class="wrap"><footer>
-  <span><span lang="hi">ध्वनि</span> Forms · <span class="en">a</span> <a href="https://dhwani-elit.onrender.com">DwaniLive</a> <span class="en">project</span><span class="hi" lang="hi">की पहल</span></span>
+  <span><a class="df-brand sm" href="#" aria-label="DwaniForms"><span class="df-seal" aria-hidden="true">ध</span><span class="df-word"><b lang="hi">ध्वनि<span lang="en">Forms</span></b><small><span class="en">Fill forms by speaking</span><span class="hi" lang="hi">बोलकर फ़ॉर्म भरें</span></small></span></a> · <span class="en">a</span> <a href="https://dhwani-elit.onrender.com">DwaniLive</a> <span class="en">project</span><span class="hi" lang="hi">की पहल</span></span>
   <span><a href="privacy.html"><span class="en">Privacy</span><span class="hi" lang="hi">निजता</span></a></span>
   <p class="disclaimer"><span class="en">DwaniForms is an independent project. It is not a government website and is not affiliated with any government
     department. Official applications are decided by the department concerned; always check its official portal.</span>
