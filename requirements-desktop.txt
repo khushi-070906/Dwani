@@ -20,10 +20,13 @@ qrcode==8.2
 pillow==12.1.1
 cryptography==46.0.6
 certifi==2026.2.25
+# file uploads (presenter page Slides tab: FastAPI's request.form())
+python-multipart==0.0.32
+# reading PDF slides (talk_glossary.py)
+pypdf==5.9.0
 # optional VAD backend (server --vad-backend webrtcvad)
 # webrtcvad-wheels
 
 # build tools (pick one; build_exe.py --backend nuitka|pyinstaller)
 nuitka==4.2
 pyinstaller==6.22.3
-pypdf==5.9.0
