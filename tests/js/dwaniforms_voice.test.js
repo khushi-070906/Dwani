@@ -25,9 +25,8 @@ function boot(lang, voices) {
   return w;
 }
 async function open(w) {
-  for (let i = 0; i < 50 && w.document.querySelector('.tile[data-go="voice"]').disabled; i++) await wait(20);
-  w.document.querySelector('.tile[data-go="voice"]').click(); await wait(30);
-  w.document.querySelector("#pick-list button").click(); await wait(60);
+  for (let i = 0; i < 50 && !w.document.querySelector('[data-form="grievance"]'); i++) await wait(20);
+  w.document.querySelector('[data-form="grievance"]').click(); await wait(80);
 }
 (async () => {
   const HI = { name: "Lekha", lang: "hi-IN", localService: true }, EN = { name: "Samantha", lang: "en-US", localService: true };

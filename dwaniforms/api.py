@@ -71,6 +71,13 @@ def _resp(s, request: Request, reply=None, **extra) -> dict:
             "flow": s.template.flow, "title": s.template.title_in(s.lang), **({"outcome": s.outcome} if s.outcome else {}), **extra}
 
 
+import time as _time
+
+MAX_SESSIONS = 300          # open conversations at once
+NEW_PER_MINUTE = 20         # new forms per address per minute
+_new_by_ip: dict = {}
+
+
 def _sheet(s, rows: list[dict]) -> list[dict]:
     """Extra per-field detail the form-sheet UI draws (the citizen's-language label, checkbox options).
     Exports keep using form_values() unchanged."""
@@ -125,6 +132,19 @@ def create_router(service: FormService, prefix: str = "/form") -> APIRouter:
 
     @router.post("/sessions")
     async def create(body: NewSession, request: Request):
+        # Online (people using it from home) the server is shared: cap open sessions and new sessions per address.
+        service.purge_expired()
+        if len(service.sessions) >= MAX_SESSIONS:
+            raise HTTPException(503, "busy")
+        ip = (request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+              or (request.client.host if request.client else "?"))
+        now = _time.time()
+        recent = [t for t in _new_by_ip.get(ip, []) if now - t < 60]
+        if len(recent) >= NEW_PER_MINUTE:
+            raise HTTPException(429, "too many")
+        _new_by_ip[ip] = recent + [now]
+        if len(_new_by_ip) > 5000:
+            _new_by_ip.clear()
         try:
             s, reply = await service.create(body.form_id, body.lang, body.prefill_from)
         except KeyError:

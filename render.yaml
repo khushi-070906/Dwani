@@ -66,3 +66,13 @@ services:
     name: dwaniforms-site
     runtime: static
     staticPublishPath: ./dwaniforms_site
+
+  # DwaniForms app online, so people can use it from home (typed answers + browser voice typing).
+  # Fictional demo records only; real land/ration data stays on centre kiosks.
+  - type: web
+    name: dwaniforms-app
+    runtime: python
+    plan: free
+    buildCommand: pip install -r dwaniforms/requirements-web.txt
+    startCommand: python -m dwaniforms.standalone --text-only --demo-records --browser-voice --host 0.0.0.0 --port $PORT
+    healthCheckPath: /form/forms

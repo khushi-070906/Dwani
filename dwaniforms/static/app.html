@@ -2,374 +2,456 @@
 <html lang="hi">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DwaniForms</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F5E4D">
+<title>DwaniForms · बोलकर फ़ॉर्म भरें</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%231F5E4D'/><circle cx='32' cy='32' r='24' fill='none' stroke='%23ffffff' stroke-opacity='.5' stroke-dasharray='2 3'/><text x='50%25' y='62%25' font-size='30' text-anchor='middle' fill='white' font-family='serif'>ध</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Lato:wght@400;700&family=Noto+Serif+Devanagari:wght@500;600&display=swap">
 <style>
+  /* Bundled fallbacks so a kiosk with no internet still looks right */
   @font-face { font-family: "Rozha One"; src: url("assets/fonts/RozhaOne-Regular.ttf") format("truetype"); font-display: swap; }
   @font-face { font-family: "Mukta"; src: url("assets/fonts/Mukta-Regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
-  @font-face { font-family: "Mukta"; src: url("assets/fonts/Mukta-SemiBold.ttf") format("truetype"); font-weight: 600; font-display: swap; }
-  @font-face { font-family: "Mukta"; src: url("assets/fonts/Mukta-ExtraBold.ttf") format("truetype"); font-weight: 800; font-display: swap; }
+  @font-face { font-family: "Mukta"; src: url("assets/fonts/Mukta-SemiBold.ttf") format("truetype"); font-weight: 600 700; font-display: swap; }
   :root {
-    --green: #0b5d4b; --green-2: #12775f; --green-soft: #e3f0ea; --sand: #f6f1e6; --card: #fffdf8; --line: #e6dccb;
-    --ink: #1f2a26; --ink-2: #4a5550; --ink-3: #6f7a75; --marigold: #e8a317; --marigold-soft: #fdf2d8; --red: #b3261e;
-    --leaf: #12775f; --ink-blue: #1b3a8a;
-    --font: "Mukta", "Nirmala UI", "Noto Sans", system-ui, sans-serif;
+    --forest: #1F5E4D; --forest-2: #2B7562; --forest-soft: #E3EEE8; --navy: #1E2A44; --navy-2: #2C3B5C;
+    --sage: #EEF0EA; --sage-2: #E5E8E0; --card: #FFFFFF; --line: #DCDFD6; --line-2: #C9CEC2;
+    --ink: #1E2A44; --ink-2: #4A5468; --ink-3: #6B7385;
+    --amber: #FBF1DC; --amber-line: #E9CF95; --amber-ink: #7A5410;
+    --ok: #E3EFE7; --ok-ink: #1F5E4D; --bad: #F8E3E1; --bad-ink: #9B2C2C; --spark: #D9772B; --pen: #2449A6;
+    --serif: "Source Serif 4", "Noto Serif Devanagari", "Mukta", Georgia, serif;
+    --sans: "Lato", "Mukta", "Nirmala UI", system-ui, sans-serif;
+    --r: 10px;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--sand); color: var(--ink); font: 19px/1.55 var(--font); }
-  button { font: inherit; cursor: pointer; }
-  :focus-visible { outline: 4px solid var(--marigold); outline-offset: 2px; }
+  html, body { margin: 0; }
+  body { background: var(--sage); color: var(--ink); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  body.big { font-size: 19px; }
+  button { font: inherit; cursor: pointer; color: inherit; }
+  a { color: var(--forest); }
+  :focus-visible { outline: 3px solid var(--spark); outline-offset: 2px; }
   [hidden] { display: none !important; }
-
-  /* ---- header ---- */
-  header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.4rem;
-           background: var(--green); color: #fff; position: relative; overflow: hidden; border-bottom: 4px solid var(--marigold); }
-  header > * { position: relative; }
-  .logo { display: flex; align-items: baseline; gap: 0.35rem; text-decoration: none; color: inherit; background: none; border: 0; padding: 0; }
-  .logo .dwani { font-family: "Rozha One", Georgia, serif; font-size: 2.1rem; line-height: 1; color: #fff; }
-  .logo .forms { font-weight: 800; letter-spacing: 0.14em; font-size: 0.95rem; color: var(--marigold); text-transform: uppercase; }
-  .hdr-right { display: flex; align-items: center; gap: 0.7rem; }
-  .hdr-right select { font: 600 1rem var(--font); padding: 0.45rem 0.7rem; border-radius: 10px; border: 0; }
-  .op-toggle { background: transparent; color: #cfe5dc; border: 1px solid #3f8f7a; border-radius: 10px; padding: 0.35rem 0.7rem; font-size: 0.85rem; }
-
-  main { max-width: 980px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
-  h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0.4rem 0 1.2rem; line-height: 1.25; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
   .muted { color: var(--ink-3); }
-  .notice { background: var(--marigold-soft); border-left: 5px solid var(--marigold); padding: 0.7rem 1rem; border-radius: 0 12px 12px 0; margin: 0.8rem 0; }
-  .notice.bad { background: #fde8e6; border-color: var(--red); }
+  .kicker { font: 700 .72rem var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--forest); }
+  h1, h2, h3, .serif { font-family: var(--serif); font-weight: 600; color: var(--navy); letter-spacing: -.005em; }
+  h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.15; margin: .2rem 0 .4rem; }
+  h2 { font-size: 1.15rem; margin: 0 0 .7rem; }
+  .lead { color: var(--ink-2); margin: 0 0 1.4rem; max-width: 46rem; }
 
-  /* ---- home ---- */
-  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; }
-  .tile { text-align: left; background: var(--card); border: 2px solid var(--line); border-radius: 22px; padding: 1.3rem 1.2rem;
-          min-height: 170px; display: flex; flex-direction: column; gap: 0.4rem; transition: transform .08s, border-color .1s; }
-  .tile:hover, .tile:focus-visible { border-color: var(--green); transform: translateY(-2px); }
-  .tile:nth-child(odd) { border-top: 6px solid var(--green); } .tile:nth-child(even) { border-top: 6px solid var(--marigold); }
-  .tile .ico { width: 3.2rem; height: 3.2rem; display: grid; place-items: center; border-radius: 16px; background: var(--marigold-soft); }
-  .tile .ico { font-size: 2.4rem; line-height: 1; }
-  .tile b { font-size: 1.25rem; }
-  .tile span { color: var(--ink-2); font-size: 0.95rem; }
-  .tile:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-  .list { display: grid; gap: 0.7rem; }
-  .row-btn { text-align: left; background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 1rem 1.1rem; }
-  .row-btn:hover { border-color: var(--green); }
-  .row-btn b { display: block; font-size: 1.12rem; }
-  .back { background: none; border: 0; color: var(--green); font-weight: 700; padding: 0.3rem 0; margin-bottom: 0.4rem; }
+  /* ---------- top bar ---------- */
+  .top { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 64px; }
+  .brand { display: flex; align-items: center; gap: .7rem; background: none; border: 0; padding: 0; text-align: left; }
+  .seal { width: 40px; height: 40px; border-radius: 50%; background: var(--forest); color: #fff; display: grid; place-items: center; position: relative;
+          font: 400 1.25rem/1 "Rozha One", var(--serif); flex: none; }
+  .seal::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; border: 1px dashed rgba(255,255,255,.55); }
+  .word { display: flex; flex-direction: column; line-height: 1.05; }
+  .word b { font: 400 1.45rem "Rozha One", var(--serif); color: var(--forest); }
+  .word b span { font: 600 1.3rem var(--serif); color: var(--navy); margin-left: .1rem; }
+  .word small { font-size: .72rem; color: var(--ink-3); }
+  .tools { display: flex; align-items: center; gap: .5rem; }
+  .tools select, .tbtn { font: 700 .88rem var(--sans); border: 1px solid var(--line-2); background: var(--card); color: var(--navy); border-radius: 8px; padding: .4rem .65rem; }
+  .tbtn[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
 
-  /* ---- conversation ---- */
-  .progress { height: 10px; background: var(--line); border-radius: 999px; overflow: hidden; margin: 0.3rem 0 0.4rem; }
-  .progress > i { display: block; height: 100%; width: 0; background: var(--green); transition: width .3s; }
-  .q { background: var(--card); border: 2px solid var(--line); border-radius: 24px; padding: 1.5rem 1.4rem; font-size: clamp(1.25rem, 3vw, 1.6rem);
-       font-weight: 600; min-height: 7rem; }
-  .heard { margin: 0.6rem 0.4rem 0; color: var(--ink-2); font-size: 1rem; min-height: 1.4em; }
-  .talk { display: flex; flex-direction: column; align-items: center; gap: 1rem; margin: 1.4rem 0; }
-  .mic { width: 148px; height: 148px; border-radius: 50%; border: 0; background: var(--green); color: #fff; font-size: 3rem;
-         box-shadow: 0 10px 30px -10px rgba(11, 93, 75, .7); touch-action: none; user-select: none; -webkit-user-select: none; }
-  .mic.rec { background: var(--red); animation: pulse 1.2s ease-out infinite; }
-  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(179, 38, 30, .45); } 100% { box-shadow: 0 0 0 26px rgba(179, 38, 30, 0); } }
-  @media (prefers-reduced-motion: reduce) { .mic.rec { animation: none; box-shadow: 0 0 0 14px rgba(179, 38, 30, .18); } }
-  .qhead { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; margin-top: 0.6rem; }
-  .step-count { font-weight: 800; color: var(--green); background: var(--green-soft); border-radius: 999px; padding: 0.15rem 0.8rem; font-size: 0.95rem; }
-  .repeat { background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 0.35rem 0.8rem; font-weight: 700; color: var(--green); }
-  .big-btn { background: transparent; color: #fff; border: 1px solid #3f8f7a; border-radius: 10px; padding: 0.3rem 0.65rem; font-weight: 800; }
-  body.big { font-size: 23px; }
-  body.big .q { font-size: clamp(1.5rem, 4vw, 2rem); }
-  .review-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.7rem; margin: 1rem 0 0; }
-  .review-card { background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 0.8rem 1rem; }
-  .review-card .lbl { color: var(--ink-3); font-size: 0.85rem; }
-  .review-card .val { font-weight: 700; font-size: 1.1rem; word-break: break-word; }
-  .review-card button { margin-top: 0.4rem; background: none; border: 1px solid var(--line); border-radius: 10px; padding: 0.2rem 0.7rem; font-size: 0.85rem; color: var(--green); }
-  .mic:disabled { background: #9db5ad; box-shadow: none; }
-  .mic-label { font-weight: 700; color: var(--ink-2); }
-  .yn { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
-  .yn button { min-width: 150px; padding: 1rem 1.4rem; border-radius: 18px; border: 0; font-size: 1.3rem; font-weight: 800; }
-  .yes { background: var(--green); color: #fff; box-shadow: 0 5px 0 #06382c; }
-  .no { background: #fde8e6; color: var(--red); box-shadow: 0 5px 0 #f3c2bd; }
-  .yn button:active { transform: translateY(3px); box-shadow: none; }
-  .type { display: flex; gap: 0.6rem; width: 100%; max-width: 620px; }
-  .type input { flex: 1; font: inherit; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid var(--line); background: #fff; }
-  .type button, .btn { border: 0; border-radius: 14px; padding: 0.75rem 1.2rem; background: var(--green); color: #fff; font-weight: 700; }
-  .btn.ghost { background: transparent; color: var(--green); border: 2px solid var(--green); }
-  .btn.marigold { background: var(--marigold); color: #1f2a26; }
-  details.answers { margin-top: 1.4rem; border: 2px solid var(--line); border-radius: 8px; padding: 0.4rem 1rem 0.4rem 2.2rem; position: relative;
-    background: #fffdf7 linear-gradient(transparent 31px, #eef0f5 32px) 0 0 / 100% 32px; }
-  details.answers::before { content: ""; position: absolute; left: 1.4rem; top: 0; bottom: 0; width: 2px; background: #f6c5b6; }
-  .ans .val { color: #1b3a8a; }
-  .ans.fresh { animation: fresh 1.6s ease-out; }
-  @keyframes fresh { 0% { background: var(--marigold-soft); } 100% { background: transparent; } }
-  @media (min-width: 1100px) {
-    main { max-width: 1240px; }
-    #talk:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr) 400px; column-gap: 2rem; align-items: start; }
-    #talk > * { grid-column: 1; }
-    #talk > details.answers { grid-column: 2; grid-row: 1 / span 12; margin-top: 0; position: sticky; top: 1rem; }
-  }
-  details.answers summary { font-weight: 700; padding: 0.5rem 0; cursor: pointer; }
-  .ans { display: grid; grid-template-columns: 1fr auto; gap: 0.2rem 0.8rem; padding: 0.55rem 0; border-top: 1px dashed var(--line); font-size: 0.98rem; }
-  .ans .lbl { color: var(--ink-3); font-size: 0.85rem; grid-column: 1; }
-  .ans .val { grid-column: 1; font-weight: 600; }
-  .ans .review { color: var(--marigold); font-size: 0.8rem; font-weight: 700; }
-  .ans button { grid-row: 1 / span 2; grid-column: 2; align-self: center; background: none; border: 1px solid var(--line); border-radius: 10px; padding: 0.25rem 0.6rem; font-size: 0.85rem; }
-  .op { margin-top: 1rem; background: #eef3f1; border-radius: 16px; padding: 0.8rem 1rem; font-size: 0.92rem; }
-  .op input, .op select { font: inherit; padding: 0.4rem; border-radius: 8px; border: 1px solid var(--line); }
+  /* ---------- cards / rows / buttons ---------- */
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 1.1rem 1.2rem; }
+  .card + .card { margin-top: 1rem; }
+  .card h3 { font-size: 1rem; margin: 0 0 .4rem; }
+  .card p { margin: 0 0 .5rem; color: var(--ink-2); font-size: .92rem; }
+  .card.amber { background: var(--amber); border-color: var(--amber-line); }
+  .card.amber h3 { color: var(--amber-ink); }
+  .card.sagecard { background: var(--sage-2); border-color: var(--line); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; border-radius: 8px; padding: .7rem 1.1rem; font-weight: 700;
+         border: 1px solid var(--navy); background: var(--navy); color: #fff; text-decoration: none; }
+  .btn:hover { background: var(--navy-2); }
+  .btn.ghost { background: var(--card); color: var(--navy); border-color: var(--line-2); }
+  .btn.ghost:hover { border-color: var(--navy); }
+  .btn.forest { background: var(--forest); border-color: var(--forest); }
+  .btn[disabled] { opacity: .5; cursor: default; }
+  .rows { border-top: 1px solid var(--line); }
+  .row { display: flex; align-items: center; gap: 1rem; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line);
+         padding: 1rem .3rem; transition: background .15s; }
+  .row:hover:not([disabled]) { background: rgba(31,94,77,.05); }
+  .row .rt { flex: 1; min-width: 0; }
+  .row .rt b { display: block; font: 600 1.12rem var(--serif); color: var(--navy); }
+  .row .rt span { display: block; font-size: .9rem; color: var(--ink-2); }
+  .row .chev { color: var(--navy); font-size: 1.3rem; }
+  .row[disabled] { opacity: .5; cursor: default; }
+  .row .ri { width: 42px; height: 42px; border-radius: 50%; background: var(--forest-soft); color: var(--forest); display: grid; place-items: center; font-size: 1.15rem; flex: none; }
+  .groups { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem 2.2rem; }
+  .group h4 { margin: 1rem 0 .2rem; font: 700 .82rem var(--sans); color: var(--ink-3); }
+  .mini { display: block; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: .55rem 0; }
+  .mini b { display: block; font-size: .95rem; color: var(--navy); }
+  .mini span { font-size: .8rem; color: var(--ink-3); }
+  .mini:hover:not([disabled]) b { color: var(--forest); text-decoration: underline; }
+  .mini[disabled] { opacity: .5; cursor: default; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 1.6rem; align-items: start; padding: 1.8rem 0 3rem; }
+  .crumbs { font-size: .82rem; color: var(--ink-3); margin-bottom: .4rem; }
+  .crumbs button { background: none; border: 0; padding: 0; color: var(--forest); font-weight: 700; }
+  ol.how { margin: .2rem 0 0; padding-left: 1.1rem; color: var(--ink-2); font-size: .9rem; }
+  ol.how li { margin: .25rem 0; }
+  .pill { display: inline-block; border-radius: 999px; padding: .08rem .6rem; font-size: .74rem; font-weight: 700; }
+  .pill.ok { background: var(--ok); color: var(--ok-ink); } .pill.warn { background: var(--amber); color: var(--amber-ink); }
+  .alert { border-left: 4px solid var(--forest); background: var(--ok); padding: .7rem .9rem; border-radius: 6px; font-size: .92rem; color: var(--ok-ink); margin: .8rem 0; }
+  .alert.warn { border-color: #D9A441; background: var(--amber); color: var(--amber-ink); }
+  .alert.bad { border-color: var(--bad-ink); background: var(--bad); color: var(--bad-ink); }
 
-  /* ---- results ---- */
-  .cards { display: grid; gap: 0.9rem; }
-  .card { background: var(--card); border: 2px solid var(--line); border-radius: 20px; padding: 1.1rem 1.2rem; }
-  .card.likely { border-left: 8px solid var(--green); }
-  .card.maybe { border-left: 8px solid var(--marigold); }
-  .card h3 { margin: 0 0 0.25rem; font-size: 1.2rem; }
-  .card .benefit { font-weight: 600; }
-  .card ul { margin: 0.4rem 0; padding-left: 1.2rem; font-size: 0.95rem; }
-  .card .src { font-size: 0.8rem; color: var(--ink-3); }
-  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 0.3rem 1rem; }
-  .kv dt { color: var(--ink-3); } .kv dd { margin: 0; font-weight: 600; }
-  .tabs { display: flex; gap: 0.4rem; margin-bottom: 0.6rem; }
-  .tabs button { border: 2px solid var(--line); background: var(--card); border-radius: 12px; padding: 0.35rem 0.9rem; font-weight: 700; }
-  .tabs button[aria-pressed="true"] { border-color: var(--green); color: var(--green); }
-  .letter { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 1.6rem 1.8rem; white-space: pre-wrap;
-            font-size: 1rem; line-height: 1.6; }
-  .actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin: 1rem 0; }
-  footer { text-align: center; color: var(--ink-3); font-size: 0.85rem; padding: 1.5rem; }
-  @media (max-width: 560px) { .mic { width: 120px; height: 120px; } header { padding: 0.7rem 0.9rem; } .logo .dwani { font-size: 1.7rem; } }
-  @media print {
-    header, footer, .no-print, .actions, .tabs, .back { display: none !important; }
-    body, main { background: #fff; padding: 0; max-width: none; }
-    body.print-letter #result > :not(#draft) { display: none !important; }
-    body.print-letter #draft > :not(.letter) { display: none !important; }
-    .letter { border: 0; padding: 0; }
-  }
+  /* ---------- stepper ---------- */
+  .steps { display: flex; align-items: center; gap: .6rem; margin: .8rem 0 1.2rem; font-size: .82rem; font-weight: 700; color: var(--ink-3); }
+  .steps .s { display: flex; align-items: center; gap: .4rem; white-space: nowrap; }
+  .steps .s i { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--line-2); display: grid; place-items: center; font-style: normal; font-size: .72rem; background: var(--card); }
+  .steps .s.on { color: var(--navy); } .steps .s.on i { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .steps .s.done i { background: var(--forest); border-color: var(--forest); color: #fff; }
+  .steps .bar { flex: 1; height: 1.5px; background: var(--line-2); min-width: 18px; max-width: 120px; }
 
-  /* ---- conversation = a real form sheet + a talk dock ---- */
-  .talk-top { display: flex; justify-content: space-between; align-items: center; gap: .8rem; }
-  .sheet { background: #fffefa; border: 1.5px solid #d8ccb4; border-radius: 4px; margin: .6rem 0 1rem; position: relative;
-           box-shadow: 0 1px 0 #e9dfc8, 0 3px 0 #fffefa, 0 4px 0 #e2d6bd, 0 18px 40px -28px rgba(31,42,38,.45); }
-  .sheet.final { outline: 3px solid var(--marigold); outline-offset: 3px; }
-  .sheet-head { display: flex; gap: .9rem; align-items: center; padding: .9rem 1.1rem; border-bottom: 3px double #cbbd9f; }
-  .emblem { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--green); color: var(--green); display: grid; place-items: center;
-            font-family: "Rozha One", serif; font-size: 1.6rem; flex: none; }
-  .sheet-kicker { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; }
-  .sheet-head h2 { margin: 0; font-size: 1.25rem; line-height: 1.25; }
-  .sheet-no { margin-left: auto; font-size: .72rem; color: var(--ink-3); border: 1px solid #d8ccb4; padding: .15rem .5rem; border-radius: 3px; white-space: nowrap; }
-  .sheet-rows { list-style: none; margin: 0; padding: .4rem 0 .8rem; }
-  .srow { display: grid; grid-template-columns: 2rem minmax(0, 15rem) minmax(0, 1fr) auto; gap: .7rem; align-items: center;
-          padding: .55rem 1.1rem; border-bottom: 1px dashed #e6dccb; transition: background .3s; }
-  .srow:last-child { border-bottom: 0; }
-  .srow .no { width: 1.7rem; height: 1.7rem; border-radius: 50%; border: 1.5px solid #cbbd9f; display: grid; place-items: center; font-size: .8rem; font-weight: 700; color: var(--ink-3); }
-  .srow.filled .no { background: var(--green); border-color: var(--green); color: #fff; }
-  .srow .lbl b { display: block; font-size: .98rem; line-height: 1.25; }
-  .srow .lbl small { color: var(--ink-3); font-size: .76rem; }
-  .srow .lbl .req { color: var(--red); }
-  .srow.current { background: linear-gradient(90deg, rgba(232,163,23,.22), rgba(232,163,23,.06)); box-shadow: inset 5px 0 0 var(--marigold); }
-  .srow.current .no { border-color: var(--marigold); color: var(--ink); background: var(--marigold); }
-  .srow .redo { background: none; border: 1px solid var(--line); border-radius: 8px; padding: .15rem .55rem; font-size: .78rem; color: var(--green); visibility: hidden; }
+  /* ---------- the form sheet ---------- */
+  .sheet { padding: 0; overflow: hidden; }
+  .sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .9rem 1.2rem; border-bottom: 1px solid var(--line); background: var(--sage-2); }
+  .sheet-head .kicker { color: var(--ink-3); }
+  .sheet-head .count { font-size: .8rem; font-weight: 700; color: var(--forest); }
+  .progress { height: 3px; background: var(--line); } .progress i { display: block; height: 100%; width: 0; background: var(--forest); transition: width .4s; }
+  .sheet-rows { list-style: none; margin: 0; padding: .3rem 0; }
+  .srow { display: grid; grid-template-columns: minmax(0, 14rem) minmax(0, 1fr) auto; gap: .9rem; align-items: center; padding: .7rem 1.2rem;
+          border-left: 3px solid transparent; transition: background .25s, border-color .25s; }
+  .srow + .srow { border-top: 1px solid #EEF0EA; }
+  .srow .lbl b { display: block; font-size: .9rem; color: var(--navy); }
+  .srow .lbl small { font-size: .74rem; color: var(--ink-3); }
+  .srow .lbl .req { color: var(--bad-ink); }
+  .srow.current { background: #F6FAF8; border-left-color: var(--forest); }
+  .srow.current .lbl b::after { content: " ●"; color: var(--spark); font-size: .7rem; vertical-align: middle; }
+  .line { min-height: 2.35rem; border: 1px solid var(--line-2); border-radius: 6px; padding: .45rem .7rem; font-size: .98rem; color: var(--pen); font-weight: 700;
+          background: #fff; word-break: break-word; }
+  .srow:not(.filled):not(.current) .line { background: #FAFBF8; }
+  .boxes { display: flex; flex-wrap: nowrap; gap: 3px; align-items: center; }
+  .boxes .b { width: 1.55rem; height: 2.1rem; border: 1px solid var(--line-2); border-radius: 4px; display: grid; place-items: center; font-weight: 700; color: var(--pen); background: #fff; }
+  .boxes .gap { width: .45rem; } .boxes .sep { color: var(--ink-3); padding: 0 .12rem; }
+  .checks { display: flex; flex-wrap: wrap; gap: .35rem .5rem; }
+  .ck { display: inline-flex; align-items: center; gap: .35rem; border: 1px solid var(--line-2); border-radius: 999px; padding: .2rem .7rem .2rem .3rem; font-size: .9rem; background: #fff; }
+  .ck i { width: 1.05rem; height: 1.05rem; border-radius: 50%; border: 1.5px solid var(--line-2); display: grid; place-items: center; font-style: normal; font-size: .65rem; color: #fff; }
+  .ck.on { border-color: var(--forest); background: var(--forest-soft); color: var(--forest); font-weight: 700; }
+  .ck.on i { background: var(--forest); border-color: var(--forest); }
+  .pencil .line, .pencil .boxes .b, .pencil .ck.on { border-style: dashed; color: #7C8597; background: #FCFCF9; }
+  .pencil .ck.on i { background: #9AA1AE; border-color: #9AA1AE; }
+  .note-pen { font-size: .74rem; color: var(--spark); font-weight: 700; margin-top: .25rem; }
+  .note-ok { font-size: .74rem; color: var(--forest); font-weight: 700; margin-top: .2rem; }
+  .note-review { font-size: .74rem; color: var(--amber-ink); font-weight: 700; margin-top: .2rem; }
+  .redo { background: none; border: 1px solid var(--line-2); border-radius: 6px; padding: .2rem .55rem; font-size: .76rem; font-weight: 700; color: var(--navy); visibility: hidden; }
   .srow.filled .redo { visibility: visible; }
-  .line { min-height: 1.9rem; border-bottom: 1.5px solid #9aa39e; padding: 0 .2rem; font-size: 1.12rem; color: var(--ink-blue); font-weight: 600; word-break: break-word; }
-  .boxes { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
-  .boxes .b { width: 1.55rem; height: 1.95rem; border: 1.5px solid #9aa39e; border-radius: 2px; display: grid; place-items: center;
-              font: 700 1.05rem var(--font); color: var(--ink-blue); background: #fff; }
-  .boxes .gap { width: .5rem; } .boxes .sep { color: var(--ink-3); padding: 0 .1rem; }
-  .checks { display: flex; flex-wrap: wrap; gap: .3rem 1rem; }
-  .ck { display: inline-flex; align-items: center; gap: .35rem; font-size: .98rem; }
-  .ck i { width: 1.15rem; height: 1.15rem; border: 1.5px solid #9aa39e; border-radius: 2px; display: grid; place-items: center; font-style: normal;
-          font-weight: 800; color: var(--ink-blue); background: #fff; font-size: .9rem; }
-  .ck.on { color: var(--ink-blue); font-weight: 700; }
-  .pencil .line, .pencil .boxes .b, .pencil .ck.on, .pencil .ck.on i { color: #8a8f8c; border-style: dashed; }
-  .pencil-note { font-size: .74rem; color: var(--marigold); font-weight: 700; margin-top: .15rem; }
-  .ok-tick { color: var(--green); font-weight: 800; font-size: .8rem; margin-left: .35rem; }
-  .review-flag { color: var(--marigold); font-size: .74rem; font-weight: 700; }
-  .inked .line, .inked .boxes, .inked .checks { animation: ink .7s ease-out; }
-  @keyframes ink { from { opacity: .2; filter: blur(1.5px); } to { opacity: 1; filter: none; } }
-  .dock { background: var(--card); border: 2px solid var(--line); border-radius: 22px; padding: 1rem 1.1rem 1.1rem; position: sticky; bottom: .6rem; z-index: 5;
-          box-shadow: 0 -10px 30px -22px rgba(31,42,38,.5); }
-  .dock .q { min-height: 0; padding: 0; border: 0; background: none; font-size: clamp(1.15rem, 2.6vw, 1.45rem); }
-  .q-row { display: flex; gap: .7rem; align-items: flex-start; justify-content: space-between; }
-  .dock .talk { margin: .7rem 0 .2rem; gap: .7rem; }
-  .dock .mic { width: 104px; height: 104px; font-size: 2.4rem; }
-  @media (min-width: 1100px) {
-    main { max-width: 1260px; }
-    #talk:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr) 420px; column-gap: 1.6rem; align-items: start; }
-    #talk > * { grid-column: 1 / -1; }
-    #talk > .sheet { grid-column: 1; margin-top: .6rem; }
-    #talk > .dock { grid-column: 2; grid-row: 3; position: sticky; top: 1rem; bottom: auto; margin-top: .6rem; }
-  }
-  @media (max-width: 640px) {
-    .srow { grid-template-columns: 1.8rem minmax(0, 1fr) auto; }
-    .srow .val { grid-column: 2 / -1; }
-    .boxes .b { width: 1.35rem; height: 1.75rem; font-size: .95rem; }
-  }
-  @media print { .dock, .talk-top, .progress, .srow .redo { display: none !important; } .sheet { box-shadow: none; border-color: #999; } }
+  .inked .line, .inked .boxes, .inked .checks { animation: ink .6s ease-out; }
+  @keyframes ink { from { opacity: .25; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+  .sheet.final { box-shadow: 0 0 0 3px var(--amber-line); }
 
-  /* ---- polish after real screenshots ---- */
-  .boxes { flex-wrap: nowrap; gap: 2px; }
-  .boxes .b { width: 1.4rem; height: 1.85rem; font-size: 1rem; }
-  .repeat { white-space: nowrap; font-size: .85rem; padding: .3rem .7rem; flex: none; align-self: flex-start; }
-  .type { width: 100%; } .type input { min-width: 0; }
-  .card .actions:empty { display: none; }
-  @media (min-width: 900px) { .cards { grid-template-columns: 1fr 1fr; } }
-  .q-row .q { flex: 1; min-width: 0; }
-  @media (max-width: 640px) {
-    .srow { grid-template-columns: 1.8rem minmax(0, 1fr) auto; row-gap: .35rem; }
-    .srow .val { grid-column: 1 / -1; padding-left: 2.5rem; }
-    .srow .redo { grid-column: 3; grid-row: 1; }
-    .boxes { flex-wrap: nowrap; }
-    .boxes .b { width: 1.3rem; height: 1.7rem; font-size: .92rem; }
-    .dock { padding: .7rem .8rem .8rem; border-radius: 18px 18px 0 0; bottom: 0; margin: 0 -.6rem; }
-    .dock .q { font-size: 1.05rem; }
-    .repeat { font-size: 0; padding: .3rem .5rem; } .repeat::first-letter { font-size: 1.1rem; }
-    .dock .talk { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: .5rem; margin: .5rem 0 0; }
-    .dock .yn { display: contents; }
-    .dock .yn[hidden] { display: none !important; }
-    .yn button { min-width: 0; padding: .7rem .4rem; font-size: 1.05rem; }
-    #btn-yes { grid-column: 1; grid-row: 1; } #btn-no { grid-column: 3; grid-row: 1; }
-    .dock .mic { width: 68px; height: 68px; font-size: 1.7rem; grid-column: 2; grid-row: 1; }
-    .dock .mic-label { grid-column: 1 / -1; font-size: .8rem; text-align: center; }
-    .dock .type { grid-column: 1 / -1; } .dock #status { grid-column: 1 / -1; }
-    .dock .type button { padding: .6rem .8rem; }
-    .dock .heard:empty { display: none; }
+  /* ---------- assistant ---------- */
+  .assist { position: sticky; top: 84px; }
+  .assist .who { display: flex; align-items: center; gap: .5rem; margin-bottom: .6rem; }
+  .assist .who .seal { width: 28px; height: 28px; font-size: .9rem; }
+  .assist .who b { font-size: .82rem; color: var(--ink-3); letter-spacing: .08em; text-transform: uppercase; }
+  .assist .q { font: 600 1.3rem/1.45 var(--serif); color: var(--navy); margin: 0 0 .4rem; }
+  body.big .assist .q { font-size: 1.6rem; }
+  .welcome { position: relative; border: 1px solid var(--line); border-radius: var(--r); padding: 1.6rem 1.6rem 1.4rem; margin-bottom: 1.8rem; overflow: hidden; }
+  .welcome::after { content: ""; position: absolute; right: -40px; top: -40px; width: 180px; height: 180px; border-radius: 50%;
+                    border: 1px dashed rgba(31,94,77,.25); box-shadow: 0 0 0 18px rgba(31,94,77,.04), 0 0 0 40px rgba(31,94,77,.03); }
+  .welcome h1 { margin-top: 0; } .welcome .lead { margin-bottom: 1rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .chip { display: inline-flex; align-items: center; gap: .35rem; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: .3rem .8rem;
+          font-size: .82rem; font-weight: 700; color: var(--navy); }
+  .chip i { font-style: normal; color: var(--forest); }
+  .heard { font-size: .85rem; color: var(--ink-3); min-height: 1.2em; }
+  .heard:empty { display: none; }
+  .yn { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin: .9rem 0 .2rem; }
+  .yn button { padding: .8rem; border-radius: 8px; font-weight: 700; font-size: 1.05rem; }
+  .yes { background: var(--forest); border: 1px solid var(--forest); color: #fff; }
+  .no { background: var(--card); border: 1px solid var(--line-2); color: var(--bad-ink); }
+  .micwrap { display: flex; align-items: center; gap: .9rem; margin: 1rem 0 .4rem; }
+  .mic { width: 72px; height: 72px; border-radius: 50%; border: 0; background: var(--forest); color: #fff; font-size: 1.7rem; flex: none; position: relative;
+         box-shadow: 0 0 0 6px var(--forest-soft); transition: background .2s; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .mic.rec { background: var(--spark); box-shadow: 0 0 0 6px rgba(217,119,43,.18); animation: pulse 1.3s ease-out infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(217,119,43,.45); } 100% { box-shadow: 0 0 0 22px rgba(217,119,43,0); } }
+  .mic:disabled { background: #A9B3AE; box-shadow: none; cursor: default; }
+  .wave { display: flex; align-items: center; gap: 3px; height: 32px; flex: 1; }
+  .wave i { flex: 1; max-width: 5px; height: 4px; border-radius: 3px; background: var(--line-2); transition: height .1s; }
+  .wave.live i { background: var(--spark); }
+  .mic-label { font-size: .82rem; color: var(--ink-2); }
+  .type { display: flex; gap: .5rem; margin-top: .8rem; }
+  .type input { flex: 1; min-width: 0; font: inherit; border: 1px solid var(--line-2); border-radius: 8px; padding: .65rem .8rem; background: #fff; }
+  .type input:focus { border-color: var(--navy); outline: none; box-shadow: 0 0 0 3px rgba(30,42,68,.12); }
+  .assist-links { display: flex; justify-content: space-between; gap: .5rem; margin-top: .8rem; font-size: .8rem; }
+  .linkbtn { background: none; border: 0; padding: 0; color: var(--forest); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+  #status { font-size: .82rem; color: var(--ink-3); margin-top: .4rem; min-height: 1em; }
+  details.op { margin-top: 1rem; font-size: .85rem; }
+  details.op summary { cursor: pointer; color: var(--ink-3); font-weight: 700; }
+  .op input, .op select { font: inherit; padding: .35rem; border-radius: 6px; border: 1px solid var(--line-2); max-width: 100%; }
+
+  /* ---------- certificate (result) ---------- */
+  .lattice { background-color: #F4F6F1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M14 0 28 14 14 28 0 14Z' fill='none' stroke='%231F5E4D' stroke-opacity='.08'/%3E%3Ccircle cx='14' cy='14' r='3' fill='none' stroke='%231F5E4D' stroke-opacity='.08'/%3E%3C/svg%3E"); }
+  .cert { position: relative; border: 1px solid var(--line); border-radius: var(--r); padding: 1.3rem 1.4rem; overflow: hidden; }
+  .cert::before { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(31,94,77,.18); border-radius: 6px; pointer-events: none; }
+  .cert .seal { position: absolute; right: 1.2rem; top: 1.2rem; width: 52px; height: 52px; font-size: 1.6rem; }
+  .cert h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); margin: .2rem 0 .9rem; padding-right: 4rem; }
+  .cert dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .6rem 1.2rem; margin: 0; }
+  .cert dt { font-size: .74rem; color: var(--ink-3); } .cert dd { margin: 0; font-weight: 700; color: var(--navy); }
+  .mono { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: .86rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+  .tabs { display: flex; gap: .4rem; margin-bottom: .7rem; }
+  .tabs button { border: 1px solid var(--line-2); background: var(--card); border-radius: 6px; padding: .3rem .8rem; font-weight: 700; font-size: .85rem; color: var(--navy); }
+  .tabs button[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .letter { white-space: pre-wrap; font: 1rem/1.75 var(--serif); color: var(--navy); background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 1.4rem 1.6rem; }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: .35rem 1.2rem; margin: 0; }
+  .kv dt { color: var(--ink-3); font-size: .88rem; } .kv dd { margin: 0; font-weight: 700; color: var(--navy); }
+  .scheme { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .3rem 1rem; padding: 1rem 0; border-bottom: 1px solid var(--line); }
+  .scheme:last-child { border-bottom: 0; }
+  .scheme h3 { margin: 0; font-size: 1.08rem; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+  .scheme .ben { font-weight: 700; color: var(--ink); font-size: .95rem; }
+  .scheme p { margin: .2rem 0; font-size: .88rem; color: var(--ink-2); }
+  .scheme ul { margin: .25rem 0; padding-left: 1.1rem; font-size: .86rem; color: var(--ink-2); }
+  .scheme .src { font-size: .74rem; color: var(--ink-3); }
+  .scheme .act { align-self: start; }
+  footer.foot { border-top: 1px solid var(--line); padding: 1.4rem 0 2.4rem; font-size: .82rem; color: var(--ink-3); }
+  footer.foot .wrap { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: 1fr; }
+    .assist { position: static; }
+    .groups { grid-template-columns: 1fr; }
   }
+  @media (max-width: 640px) {
+    .word small { display: none; }
+    .srow { grid-template-columns: minmax(0, 1fr) auto; }
+    .srow .val { grid-column: 1 / -1; grid-row: 2; }
+    .boxes .b { width: 1.3rem; height: 1.8rem; font-size: .9rem; }
+    #talk .layout { padding-bottom: 0; }
+    #talk .assist { position: sticky; bottom: 0; top: auto; margin: 0 -1.25rem; border-radius: 14px 14px 0 0; box-shadow: 0 -8px 24px -12px rgba(30,42,68,.35); padding: .9rem 1rem 1rem; }
+    #talk .assist .who, #talk .assist-links, #talk details.op { display: none; }
+    #talk .assist .q { font-size: 1.08rem; }
+    .srow { scroll-margin-bottom: 300px; }
+    #talk .micwrap { margin: .6rem 0 0; } #talk .mic { width: 60px; height: 60px; font-size: 1.4rem; }
+    #talk .yn { margin: .6rem 0 0; } #talk .yn button { padding: .6rem; }
+  }
+  @media print {
+    .top, footer.foot, .no-print, .assist, .steps, .crumbs, .actions, .tabs { display: none !important; }
+    body { background: #fff; } .layout { display: block; padding: 0; }
+    body.print-letter #result .layout > :not(.main), body.print-letter #result .main > :not(#draft) { display: none !important; }
+    body.print-letter #draft > :not(.letter) { display: none !important; }
+    .card { border: 0; padding: 0; } .redo, .note-pen { display: none !important; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
-<header>
-  <button class="logo" id="home-link" type="button" aria-label="DwaniForms home"><span class="dwani" lang="hi">ध्वनि</span><span class="forms">Forms</span></button>
-  <div class="hdr-right">
-    <label class="sr" for="lang" hidden>Language</label>
-    <select id="lang" aria-label="Language / भाषा">
-      <option value="hi">हिन्दी</option><option value="en">English</option><option value="bn">বাংলা</option><option value="ta">தமிழ்</option>
-      <option value="te">తెలుగు</option><option value="mr">मराठी</option><option value="gu">ગુજરાતી</option><option value="kn">ಕನ್ನಡ</option>
-      <option value="ml">മലയാളം</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option>
-    </select>
-    <button class="big-btn no-print" id="big-btn" type="button" aria-pressed="false" aria-label="Bigger text">A+</button>
-    <button class="op-toggle no-print" id="op-toggle" type="button" aria-pressed="false" data-t="operator">Operator</button>
+<header class="top">
+  <div class="wrap">
+    <button class="brand" id="home-link" type="button" aria-label="DwaniForms home">
+      <span class="seal" aria-hidden="true">ध</span>
+      <span class="word"><b lang="hi">ध्वनि<span lang="en">Forms</span></b><small data-t="tagline">बोलकर फ़ॉर्म भरें</small></span>
+    </button>
+    <div class="tools">
+      <select id="lang" aria-label="Language / भाषा">
+        <option value="hi">हिन्दी</option><option value="en">English</option><option value="bn">বাংলা</option><option value="ta">தமிழ்</option>
+        <option value="te">తెలుగు</option><option value="mr">मराठी</option><option value="gu">ગુજરાતી</option><option value="kn">ಕನ್ನಡ</option>
+        <option value="ml">മലയാളം</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option>
+      </select>
+      <button class="tbtn no-print" id="big-btn" type="button" aria-pressed="false" aria-label="Bigger text">A+</button>
+    </div>
   </div>
 </header>
 
-<main>
+<main class="wrap">
   <!-- HOME -->
   <section id="home">
-    <h1 data-t="what">What would you like to do today?</h1>
-    <div class="tiles">
-      <button class="tile" disabled data-go="forms" type="button"><span class="ico" aria-hidden="true">📝</span><b data-t="t_forms">Fill a form</b><span data-t="t_forms_d">PM-Kisan, e-Shram, income certificate, bank KYC...</span></button>
-      <button class="tile" disabled data-go="voice" type="button"><span class="ico" aria-hidden="true">📢</span><b data-t="t_voice">Complaint or RTI</b><span data-t="t_voice_d">Speak your complaint; we write the letter</span></button>
-      <button class="tile" disabled data-go="records" type="button" id="tile-records"><span class="ico" aria-hidden="true">🔍</span><b data-t="t_records">Land / ration record</b><span data-t="t_records_d">Hear your khasra or ration card details</span></button>
-      <button class="tile" disabled data-go="advisor" type="button"><span class="ico" aria-hidden="true">💡</span><b data-t="t_advisor">Which schemes can I get?</b><span data-t="t_advisor_d">A few questions, then the schemes and forms for you</span></button>
-    </div>
-    <p class="muted" style="margin-top:1.6rem" data-t="privacy">Everything stays on this computer. Nothing is sent anywhere.</p>
-  </section>
-
-  <!-- PICK A FORM -->
-  <section id="pick" hidden>
-    <button class="back" type="button" data-back data-t="back">← Back</button>
-    <h1 id="pick-title"></h1>
-    <div class="list" id="pick-list"></div>
-  </section>
-
-  <!-- CONVERSATION: the form itself, filling in, with a talk dock -->
-  <section id="talk" hidden>
-    <div class="talk-top">
-      <button class="back no-print" type="button" id="talk-back" data-t="stop">← Stop and go back</button>
-      <span class="step-count" id="step-count"></span>
-    </div>
-    <div class="progress" aria-hidden="true"><i id="bar"></i></div>
-    <article class="sheet" id="sheet" aria-label="Form">
-      <header class="sheet-head">
-        <div class="emblem" aria-hidden="true">ध</div>
-        <div><div class="sheet-kicker" data-t="form_kicker">Application form</div><h2 id="talk-title"></h2></div>
-        <div class="sheet-no">DwaniForms</div>
-      </header>
-      <ol class="sheet-rows" id="sheet-rows"></ol>
-    </article>
-    <div class="dock">
-      <div class="q-row">
-        <div class="q" id="question" aria-live="polite"></div>
-        <button class="repeat" type="button" id="repeat" data-t="repeat">🔁 Hear the question again</button>
-      </div>
-      <div class="heard" id="heard" aria-live="polite"></div>
-      <div class="notice" id="voice-note" hidden></div>
-      <div class="notice" id="mt-note" hidden data-t="mt">Some questions are machine-translated. If one sounds odd, ask the operator.</div>
-      <div class="talk">
-        <div class="yn" id="yn" hidden>
-          <button class="yes" type="button" id="btn-yes" data-t="yes">✓ Yes</button>
-          <button class="no" type="button" id="btn-no" data-t="no">✗ No</button>
+    <div class="layout">
+      <div class="main">
+        <div class="welcome lattice">
+          <div class="kicker" data-t="welcome_kicker">Government forms, by voice</div>
+          <h1 data-t="hello">Namaste</h1>
+          <p class="lead" data-t="hello_sub">What would you like to do today? Choose below, then answer by speaking or typing. Every answer is read back to you before it goes on the form.</p>
+          <div class="chips">
+            <span class="chip"><i>🎙</i><span data-t="chip1">Speak or type</span></span>
+            <span class="chip"><i>✓</i><span data-t="chip2">Every answer checked</span></span>
+            <span class="chip"><i>🔒</i><span data-t="chip3">Deleted after 30 minutes</span></span>
+          </div>
         </div>
-        <button class="mic" id="mic" type="button" aria-label="Hold to speak" disabled>🎤</button>
-        <div class="mic-label" id="mic-label" data-t="hold">Tap the button and speak, tap again when done</div>
-        <form class="type" id="type-form">
-          <input id="type-input" autocomplete="off" aria-label="Type the answer" data-tp="type_ph" placeholder="Or type the answer here">
-          <button type="submit" data-t="send">Send</button>
-        </form>
-        <div class="muted" id="status" role="status"></div>
+        <h2 data-t="most">What people do most</h2>
+        <div class="rows" id="top-list"></div>
+        <h2 style="margin-top:2rem" data-t="everything">Everything else</h2>
+        <div class="groups" id="all-groups"></div>
       </div>
+      <aside>
+        <div class="card">
+          <h3 data-t="how_title">How it works</h3>
+          <ol class="how">
+            <li data-t="how1">Pick a form. Questions come one at a time.</li>
+            <li data-t="how2">Tap the mic and speak, or type. Your answer is read back: "Is this correct?"</li>
+            <li data-t="how3">At the end, download or print the filled form or letter.</li>
+          </ol>
+        </div>
+        <div class="card sagecard">
+          <h3 data-t="data_title">Your information</h3>
+          <p data-t="data_body">Answers are kept only for this session and deleted after 30 minutes. Aadhaar and account numbers are shown masked.</p>
+          <a href="https://dwaniforms.onrender.com/privacy.html" target="_blank" rel="noopener" data-t="privacy_link">Privacy policy</a>
+        </div>
+        <div class="card amber" id="demo-note" hidden>
+          <h3 data-t="demo_title">Demo version</h3>
+          <p data-t="demo_body">Land and ration records here are fictional. Forms and letters are drafts: the department decides.</p>
+        </div>
+      </aside>
     </div>
-    <div class="op" id="op-panel" hidden>
-      <b>Operator</b> ·
-      <label><input type="checkbox" id="reveal"> <span data-t="show_numbers">Show full numbers</span></label>
-      <div style="margin-top:.5rem">
-        <select id="op-field" aria-label="Field"></select>
-        <input id="op-value" aria-label="Value" placeholder="value">
-        <button class="btn" type="button" id="op-set">Set</button>
-        <span id="op-msg" class="muted"></span>
+  </section>
+
+  <!-- CONVERSATION -->
+  <section id="talk" hidden>
+    <div class="layout">
+      <div class="main">
+        <div class="crumbs"><button type="button" id="talk-back" data-t="home_crumb">Home</button> / <span id="crumb-title"></span></div>
+        <h1 id="talk-title"></h1>
+        <div class="steps" id="steps" aria-label="Progress">
+          <span class="s" data-step="1"><i>1</i><span data-t="step1">Fill in</span></span><span class="bar"></span>
+          <span class="s" data-step="2"><i>2</i><span data-t="step2">Check</span></span><span class="bar"></span>
+          <span class="s" data-step="3"><i>3</i><span data-t="step3">Ready</span></span>
+        </div>
+        <article class="card sheet" id="sheet" aria-label="Form">
+          <div class="sheet-head"><span class="kicker" data-t="form_kicker">Application form</span><span class="count" id="step-count"></span></div>
+          <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+          <ol class="sheet-rows" id="sheet-rows"></ol>
+        </article>
       </div>
+      <aside class="card assist" id="assist">
+        <div class="who"><span class="seal" aria-hidden="true">ध</span><b data-t="assistant">Assistant</b></div>
+        <p class="q" id="question" aria-live="polite"></p>
+        <div class="heard" id="heard" aria-live="polite"></div>
+        <div class="alert warn" id="voice-note" hidden></div>
+        <div class="alert warn" id="mt-note" hidden data-t="mt">Some questions are machine-translated. If one sounds odd, ask for help.</div>
+        <div class="yn" id="yn" hidden>
+          <button class="yes" type="button" id="btn-yes" data-t="yes">Yes, correct</button>
+          <button class="no" type="button" id="btn-no" data-t="no">No</button>
+        </div>
+        <div class="micwrap">
+          <button class="mic" id="mic" type="button" aria-label="Speak" disabled>🎤</button>
+          <div style="flex:1;min-width:0">
+            <div class="wave" id="wave" aria-hidden="true"></div>
+            <div class="mic-label" id="mic-label" data-t="tap">Tap the mic and speak; tap again when done</div>
+          </div>
+        </div>
+        <form class="type" id="type-form">
+          <input id="type-input" autocomplete="off" aria-label="Type the answer" data-tp="type_ph" placeholder="Or type your answer">
+          <button class="btn" type="submit" data-t="send">Send</button>
+        </form>
+        <div id="status" role="status"></div>
+        <div class="assist-links">
+          <button class="linkbtn" type="button" id="repeat" data-t="repeat">Hear the question again</button>
+          <span class="muted" id="voice-src"></span>
+        </div>
+        <details class="op" id="op-panel">
+          <summary data-t="operator">For the operator</summary>
+          <label><input type="checkbox" id="reveal"> <span data-t="show_numbers">Show full numbers</span></label>
+          <div style="margin-top:.5rem;display:flex;gap:.4rem;flex-wrap:wrap">
+            <select id="op-field" aria-label="Field"></select>
+            <input id="op-value" aria-label="Value" placeholder="value">
+            <button class="btn ghost" type="button" id="op-set">Set</button>
+          </div>
+          <span id="op-msg" class="muted"></span>
+        </details>
+      </aside>
     </div>
   </section>
 
   <!-- RESULT -->
   <section id="result" hidden>
-    <button class="back no-print" type="button" data-back data-t="home">← Home</button>
-    <h1 id="res-title"></h1>
-    <div class="notice" id="res-say"></div>
-    <div id="draft" hidden>
-      <div class="tabs" id="draft-tabs"></div>
-      <article class="letter" id="letter" tabindex="0"></article>
-      <div class="actions">
-        <button class="btn" type="button" id="print-letter" data-t="print">🖨 Print the letter</button>
-        <button class="btn ghost" type="button" id="pdf" data-t="pdf">PDF (English)</button>
+    <div class="layout">
+      <div class="main">
+        <div class="crumbs no-print"><button type="button" data-back data-t="home_crumb">Home</button> / <span id="res-crumb"></span></div>
+        <div class="steps no-print"><span class="s done"><i>✓</i><span data-t="step1">Fill in</span></span><span class="bar"></span>
+          <span class="s done"><i>✓</i><span data-t="step2">Check</span></span><span class="bar"></span><span class="s on"><i>3</i><span data-t="step3">Ready</span></span></div>
+        <div class="cert lattice" id="cert">
+          <span class="seal" aria-hidden="true">ध</span>
+          <div class="kicker" id="cert-kicker"></div>
+          <h2 id="res-title"></h2>
+          <dl id="cert-meta"></dl>
+        </div>
+        <div class="alert" id="res-say"></div>
+        <div id="draft" hidden>
+          <div class="tabs" id="draft-tabs"></div>
+          <article class="letter" id="letter" tabindex="0"></article>
+          <div class="card" style="margin-top:1rem"><h3 data-t="next">Next steps</h3><ul id="next-steps" style="margin:.2rem 0 0;padding-left:1.1rem;color:var(--ink-2);font-size:.92rem"></ul></div>
+        </div>
+        <div id="lookup" hidden></div>
+        <div id="advice" hidden></div>
+        <div id="formdone" hidden></div>
       </div>
-      <h3 data-t="next">Next steps</h3>
-      <ul id="next-steps"></ul>
-    </div>
-    <div id="lookup" hidden></div>
-    <div id="advice" hidden></div>
-    <div id="formdone" hidden>
-      <div class="actions">
-        <button class="btn" type="button" id="pdf2" data-t="pdf">PDF</button>
-        <button class="btn ghost" type="button" id="json" data-t="json">JSON (portal import)</button>
-      </div>
+      <aside>
+        <div class="card">
+          <h3 data-t="keep">Keep a copy</h3>
+          <div class="actions" style="flex-direction:column">
+            <button class="btn" type="button" id="pdf" data-t="pdf">Download PDF</button>
+            <button class="btn ghost" type="button" id="print-letter" data-t="print">Print</button>
+            <button class="btn ghost" type="button" id="json" data-t="json">Data file (for portal upload)</button>
+          </div>
+        </div>
+        <div class="card sagecard">
+          <h3 data-t="what_next">What next?</h3>
+          <p id="what-next-body" data-t="what_next_body">Check the printout, sign it, and submit it at the office or on the official portal. This is a draft prepared from what you said.</p>
+          <button class="btn ghost" type="button" data-back data-t="another">Start something else</button>
+        </div>
+      </aside>
     </div>
   </section>
 </main>
-<footer><span lang="hi">ध्वनि</span> Forms · <span data-t="footer">a DwaniLive project · works offline</span></footer>
+<footer class="foot no-print"><div class="wrap">
+  <span><span lang="hi">ध्वनि</span> Forms · <span data-t="footer">a DwaniLive project · not a government website</span></span>
+  <a href="https://dwaniforms.onrender.com/privacy.html" target="_blank" rel="noopener" data-t="privacy_link">Privacy policy</a>
+</div></footer>
 
 <script>
 (function () {
   "use strict";
-  var B = location.pathname.replace(/\/$/, "");          // mounted at /form
+  var B = location.pathname.replace(/\/$/, "");
   var $ = function (id) { return document.getElementById(id); };
   var UI = {
-    en: {},
-    hi: { what: "आज आप क्या करना चाहते हैं?", t_forms: "फ़ॉर्म भरें", t_forms_d: "पीएम-किसान, ई-श्रम, आय प्रमाण पत्र, बैंक केवाईसी...",
-      t_voice: "शिकायत या आरटीआई", t_voice_d: "अपनी शिकायत बोलिए, पत्र हम लिखेंगे", t_records: "ज़मीन / राशन रिकॉर्ड",
-      t_records_d: "खसरा या राशन कार्ड की जानकारी सुनिए", t_advisor: "कौन सी योजना मिलेगी?", t_advisor_d: "कुछ सवाल, फिर आपके लिए योजनाएँ और फ़ॉर्म",
-      privacy: "सब कुछ इसी कंप्यूटर पर रहता है। कहीं कुछ नहीं भेजा जाता।", back: "← वापस", stop: "← रोकें और वापस जाएँ", home: "← होम",
-      mt: "कुछ सवाल मशीन से अनुवादित हैं। कोई अजीब लगे तो ऑपरेटर से पूछिए।", yes: "✓ हाँ", no: "✗ नहीं", hold: "बटन दबाइए और बोलिए, बोल चुकें तो फिर दबाइए",
-      send: "भेजें", type_ph: "या यहाँ लिखकर जवाब दीजिए", answers: "आपके जवाब", show_numbers: "पूरे नंबर दिखाएँ", print: "🖨 पत्र प्रिंट करें",
-      pdf: "पीडीएफ़", json: "JSON (पोर्टल के लिए)", next: "आगे क्या करें", footer: "DwaniLive की एक पहल · बिना इंटरनेट चलता है",
-      operator: "ऑपरेटर", no_voice: "इस कंप्यूटर पर {lang} की आवाज़ नहीं है, इसलिए सवाल सिर्फ़ स्क्रीन पर लिखे आएँगे। ऑपरेटर: Windows Settings › Time & language › Speech में {lang} की आवाज़ जोड़ें।", form_kicker: "आवेदन पत्र", pencil: "पेंसिल से लिखा है: 'हाँ' कहने पर पक्का होगा", yes_word: "हाँ", no_word: "नहीं", repeat: "🔁 सवाल फिर से सुनें", step: "सवाल", of: "में से", tap_stop: "● सुन रहे हैं… बोलकर फिर से दबाइए", forms_title: "कौन सा फ़ॉर्म भरना है?", voice_title: "क्या करना है?", records_title: "कौन सा रिकॉर्ड देखना है?",
-      redo: "बदलें", review: "जाँचें", listening: "● सुन रहे हैं... छोड़ने पर भेजेंगे", working: "समझ रहे हैं...",
-      likely: "आपको मिल सकती हैं", maybe: "शायद मिल सकती हैं (जाँच ज़रूरी)", fill: "यह फ़ॉर्म भरें →", how: "कैसे लें",
-      checks: "जाँच लें", reviewed: "नियम आख़िरी बार जाँचे गए", stale: "इन नियमों की दोबारा जाँच ज़रूरी है", why_maybe: "क्यों 'शायद'",
-      not_matched: "अन्य योजनाएँ जिनके लिए आप पात्र नहीं लगते", from_copy: "रिकॉर्ड की कॉपी", demo: "डेमो रिकॉर्ड (असली नहीं)",
-      old: "यह कॉपी पुरानी है। सरकारी पोर्टल पर भी जाँचें।", voice_off: "इस भाषा में आवाज़ से जवाब उपलब्ध नहीं है, लिखकर जवाब दीजिए।",
-      mic_denied: "माइक नहीं मिला", unavailable: "अभी उपलब्ध नहीं (ऑपरेटर रिकॉर्ड जोड़ सकते हैं)" }
+    hi: { tagline: "बोलकर फ़ॉर्म भरें", hello: "नमस्ते", welcome_kicker: "सरकारी फ़ॉर्म, बोलकर", chip1: "बोलकर या लिखकर", chip2: "हर जवाब की जाँच", chip3: "30 मिनट बाद मिट जाता है", hello_sub: "आज क्या करना है? नीचे से चुनिए, फिर बोलकर या लिखकर जवाब दीजिए। हर जवाब फ़ॉर्म पर जाने से पहले आपको पढ़कर सुनाया जाएगा।",
+      most: "सबसे ज़्यादा किए जाने वाले काम", everything: "बाकी सब", how_title: "कैसे काम करता है", how1: "फ़ॉर्म चुनिए। सवाल एक-एक करके आएँगे।",
+      how2: "माइक दबाकर बोलिए, या लिखिए। हर जवाब पढ़कर सुनाया जाएगा: \"क्या यह सही है?\"", how3: "आख़िर में भरा हुआ फ़ॉर्म या पत्र डाउनलोड या प्रिंट कीजिए।",
+      data_title: "आपकी जानकारी", data_body: "जवाब सिर्फ़ इस सेशन तक रहते हैं और 30 मिनट बाद मिट जाते हैं। आधार और खाता नंबर छिपे हुए दिखते हैं।", privacy_link: "निजता नीति",
+      demo_title: "डेमो संस्करण", demo_body: "यहाँ ज़मीन और राशन के रिकॉर्ड काल्पनिक हैं। फ़ॉर्म और पत्र मसौदा हैं: फ़ैसला विभाग करता है।",
+      home_crumb: "होम", step1: "भरें", step2: "जाँचें", step3: "तैयार", form_kicker: "आवेदन पत्र", assistant: "सहायक",
+      mt: "कुछ सवाल मशीन से अनुवादित हैं। कोई अजीब लगे तो मदद लीजिए।", yes: "✓ हाँ, सही है", no: "✗ नहीं", tap: "माइक दबाइए और बोलिए, बोल चुकें तो फिर दबाइए",
+      send: "भेजें", type_ph: "या यहाँ लिखकर जवाब दीजिए", repeat: "सवाल फिर से सुनें", operator: "ऑपरेटर के लिए", show_numbers: "पूरे नंबर दिखाएँ",
+      next: "आगे क्या करें", keep: "प्रति रखें", pdf: "पीडीएफ़ डाउनलोड करें", print: "प्रिंट करें", json: "डेटा फ़ाइल (पोर्टल पर अपलोड के लिए)",
+      next_advisor: "जिस योजना के आगे 'यह फ़ॉर्म भरें' है, उसे दबाइए: आपके कुछ जवाब पहले से भरे मिलेंगे। अंतिम फ़ैसला विभाग करता है।",
+      next_lookup: "यह जानकारी सहेजी गई कॉपी से है। ज़रूरी काम के लिए आधिकारिक पोर्टल पर भी जाँच लीजिए।",
+      what_next: "अब क्या?", what_next_body: "प्रिंट जाँचिए, हस्ताक्षर कीजिए, और दफ़्तर में या आधिकारिक पोर्टल पर जमा कीजिए। यह आपकी कही बातों से बना मसौदा है।",
+      another: "कुछ और करें", footer: "DwaniLive की एक पहल · सरकारी वेबसाइट नहीं", unavailable: "अभी उपलब्ध नहीं", questions: "सवाल",
+      g_forms: "सरकारी फ़ॉर्म", g_voice: "शिकायत और आरटीआई", g_records: "रिकॉर्ड देखें", g_schemes: "योजनाएँ", advisor_title: "कौन सी योजना मिलेगी?",
+      advisor_desc: "कुछ सवाल, फिर आपके लिए योजनाएँ और भरने वाले फ़ॉर्म", step: "सवाल", of: "में से", redo: "बदलें", review: "जाँच लें",
+      pencil: "पेंसिल से: 'हाँ' कहने पर पक्का होगा", inked: "पक्का", listening: "सुन रहे हैं… बोल चुकें तो फिर दबाइए", working: "समझ रहे हैं…",
+      voice_off: "इस भाषा में आवाज़ से जवाब अभी नहीं, लिखकर जवाब दीजिए।", mic_denied: "माइक की अनुमति नहीं मिली", browser_voice: "आवाज़ आपका ब्राउज़र लिखता है",
+      no_voice: "इस डिवाइस पर {lang} की आवाज़ नहीं है, इसलिए सवाल सिर्फ़ लिखे आएँगे। आवाज़ जोड़ने के लिए: फ़ोन या कंप्यूटर की Settings › भाषा › Text-to-speech में {lang} जोड़ें।", yes_word: "हाँ", no_word: "नहीं",
+      k_form: "आवेदन तैयार", k_draft: "पत्र तैयार", k_found: "रिकॉर्ड मिला", k_notfound: "रिकॉर्ड नहीं मिला", k_advice: "आपके लिए योजनाएँ",
+      m_ref: "संदर्भ", m_date: "तैयार किया", m_lang: "भाषा", m_filled: "भरे गए", m_copy: "रिकॉर्ड की कॉपी", m_source: "स्रोत",
+      likely: "मिल सकती हैं", maybe: "जाँच ज़रूरी", fill: "यह फ़ॉर्म भरें →", how_get: "कैसे लें", why_maybe: "क्यों 'जाँच ज़रूरी'", checks: "पक्का कर लें",
+      reviewed: "नियम जाँचे गए", stale: "नियम दोबारा जाँचने हैं", not_matched: "अन्य योजनाएँ आपके जवाबों से मेल नहीं खातीं", demo_rec: "डेमो रिकॉर्ड, असली नहीं",
+      old: "यह कॉपी पुरानी है, आधिकारिक पोर्टल भी देखें।", busy: "अभी बहुत लोग इस्तेमाल कर रहे हैं, थोड़ी देर में फिर कोशिश कीजिए।",
+      offline: "DwaniForms से संपर्क नहीं हो पाया।" },
+    en: {}
   };
-  var EN = { no_voice: "This computer has no {lang} voice, so questions are shown on screen only. Operator: add the {lang} voice in Windows Settings › Time & language › Speech.", pencil: "In pencil: say 'yes' to ink it in", yes_word: "Yes", no_word: "No", repeat: "🔁 Hear the question again", step: "Question", of: "of", tap_stop: "● Listening… tap again when you're done",
-    hold: "Tap the button and speak, tap again when done", forms_title: "Which form?", voice_title: "What do you want to do?", records_title: "Which record?", redo: "Change",
-    review: "check", listening: "● Listening... release to send", working: "Understanding...", likely: "You may be able to get",
-    maybe: "You might be able to get (needs checking)", fill: "Fill this form →", how: "How to get it", checks: "Check",
-    reviewed: "Rules last reviewed", stale: "These rules need to be re-checked", why_maybe: "Why 'maybe'",
-    not_matched: "other schemes don't seem to match your answers", from_copy: "Copy of the records from", demo: "Demo records (not real)",
-    old: "This copy is old. Please also check the official portal.", voice_off: "Voice answers aren't available in this language yet; please type.",
-    mic_denied: "Microphone unavailable", unavailable: "Not available yet (the operator can add the records)" };
-  var lang = "hi", sid = null, cur = null, forms = [], caps = {}, reveal = false, done = null;
+  var EN = { next_advisor: "Tap 'Fill this form' next to a scheme: some of your answers will already be filled in. The department makes the final decision.",
+    next_lookup: "This comes from a saved copy of the records. For anything important, also check the official portal.",
+    tagline: "Fill forms by speaking", hello: "Namaste", unavailable: "Not available yet", questions: "questions", g_forms: "Government forms",
+    g_voice: "Complaints and RTI", g_records: "Look up records", g_schemes: "Schemes", advisor_title: "Which schemes can I get?",
+    advisor_desc: "A few questions, then the schemes and forms for you", step: "Question", of: "of", redo: "Change", review: "check",
+    pencil: "In pencil: say 'yes' to confirm", inked: "confirmed", listening: "Listening… tap again when you're done", working: "Understanding…",
+    voice_off: "Voice answers aren't available in this language yet; please type.", mic_denied: "Microphone permission was not given",
+    browser_voice: "Your browser turns speech into text", no_voice: "This device has no {lang} voice, so questions are shown as text only. To add one: phone or computer Settings › Language › Text-to-speech, add {lang}.",
+    yes_word: "Yes", no_word: "No", k_form: "Application ready", k_draft: "Letter ready", k_found: "Record found", k_notfound: "Record not found",
+    k_advice: "Schemes for you", m_ref: "Reference", m_date: "Prepared", m_lang: "Language", m_filled: "Filled", m_copy: "Copy of records",
+    m_source: "Source", likely: "You may get", maybe: "Needs checking", fill: "Fill this form →", how_get: "How to get it", why_maybe: "Why 'needs checking'",
+    checks: "Confirm", reviewed: "Rules reviewed", stale: "Rules need re-checking", not_matched: "other schemes don't match your answers",
+    demo_rec: "Demo records, not real", old: "This copy is old; check the official portal too.", busy: "Lots of people are using it right now; try again in a minute.",
+    offline: "Couldn't reach DwaniForms." };
+  var LANG_NAMES = { hi: "हिन्दी", en: "English", bn: "বাংলা", ta: "தமிழ்", te: "తెలుగు", mr: "मराठी", gu: "ગુજરાતી", kn: "ಕನ್ನಡ",
+                     ml: "മലയാളം", pa: "ਪੰਜਾਬੀ", ur: "اردو", or: "ଓଡ଼ିଆ", as: "অসমীয়া" };
+  var ICON = { form: "📝", grievance: "📢", rti: "📄", lookup_land: "🗺", lookup_ration: "🍚", advisor: "💡" };
+  var lang = "hi", sid = null, cur = null, forms = [], caps = {}, reveal = false, inkedBefore = {};
 
   function t(k) { return (UI[lang] && UI[lang][k]) || EN[k] || k; }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -389,94 +471,113 @@
     opt.headers = Object.assign({}, opt.headers || {}, reveal ? { "x-reveal-sensitive": "1" } : {});
     if (opt.json !== undefined) { opt.body = JSON.stringify(opt.json); opt.headers["content-type"] = "application/json"; delete opt.json; }
     return fetch(B + path, opt).then(function (r) {
-      return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.detail || ("HTTP " + r.status)); return j; });
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (!r.ok) throw new Error(r.status === 503 || r.status === 429 ? t("busy") : (j.detail || ("HTTP " + r.status)));
+        return j;
+      });
     });
   }
-  // Questions are read aloud with this computer's own voice for the language. If it has none, we don't read Hindi
-  // in an English voice: the text stays on screen and the operator is told which voice to install.
-  var LANG_NAMES = { hi: "हिन्दी", en: "English", bn: "বাংলা", ta: "தமிழ்", te: "తెలుగు", mr: "मराठी", gu: "ગુજરાતી", kn: "ಕನ್ನಡ",
-                     ml: "മലയാളം", pa: "ਪੰਜਾਬੀ", ur: "اردو", or: "ଓଡ଼ିଆ", as: "অসমীয়া" };
+  function show(id) { ["home", "talk", "result"].forEach(function (v) { $(v).hidden = v !== id; }); try { window.scrollTo(0, 0); } catch (e) {} }
+  function endSession() { if (!sid) return; var id = sid; sid = null; fetch(B + "/sessions/" + id, { method: "DELETE", keepalive: true }).catch(function () {}); }
+
+  // ---------- speaking (text to speech) ----------
   function voiceFor(l) {
-    if (!window.speechSynthesis || !speechSynthesis.getVoices) return undefined;      // can't tell: let the browser pick
+    if (!window.speechSynthesis || !speechSynthesis.getVoices) return undefined;
     var vs = speechSynthesis.getVoices() || [];
-    if (!vs.length) return undefined;                                                  // not loaded yet
+    if (!vs.length) return undefined;
     var m = vs.filter(function (v) { return (v.lang || "").toLowerCase().split(/[-_]/)[0] === l; });
-    return m.find(function (v) { return v.localService; }) || m[0] || null;          // null = none installed
+    return m.find(function (v) { return v.localService; }) || m[0] || null;
   }
   function voiceNote() {
     var v = voiceFor(lang), el = $("voice-note");
-    if (!el) return;
     el.hidden = v !== null;
-    if (v === null) el.textContent = t("no_voice").replace("{lang}", LANG_NAMES[lang] || lang);
+    if (v === null) el.textContent = t("no_voice").split("{lang}").join(LANG_NAMES[lang] || lang);
   }
   function speak(text) {
     try {
       speechSynthesis.cancel();
-      var v = voiceFor(lang);
-      voiceNote();
-      if (v === null) return;
+      var v = voiceFor(lang); voiceNote();
+      if (v === null || !text) return;
       var u = new SpeechSynthesisUtterance(text); u.lang = v ? v.lang : lang; if (v) u.voice = v;
       speechSynthesis.speak(u);
     } catch (e) {}
   }
   try { if (window.speechSynthesis && "onvoiceschanged" in speechSynthesis) speechSynthesis.onvoiceschanged = voiceNote; } catch (e) {}
-  function show(id) { ["home", "pick", "talk", "result"].forEach(function (v) { $(v).hidden = v !== id; }); try { window.scrollTo(0, 0); } catch (e) {} }
-  function endSession() {
-    if (!sid) return;
-    var id = sid; sid = null;
-    fetch(B + "/sessions/" + id, { method: "DELETE", keepalive: true }).catch(function () {});
-  }
 
-  // ---------------- home & pickers
-  var GROUPS = {
-    forms: { title: "forms_title", match: function (f) { return f.flow === "form"; } },
-    voice: { title: "voice_title", match: function (f) { return f.flow === "grievance" || f.flow === "rti"; } },
-    records: { title: "records_title", match: function (f) { return f.flow === "lookup_land" || f.flow === "lookup_ration"; } }
-  };
-  function pick(group) {
-    var g = GROUPS[group];
-    $("pick-title").textContent = t(g.title);
-    var list = $("pick-list"); list.innerHTML = "";
-    forms.filter(g.match).forEach(function (f) {
-      var b = document.createElement("button"); b.type = "button"; b.className = "row-btn";
-      var desc = (f.description && (f.description[lang] || f.description.en)) || "";
-      b.innerHTML = "<b></b><span class='muted'></span>";
-      b.querySelector("b").textContent = (f.titles && f.titles[lang]) || f.title;
-      b.querySelector("span").textContent = f.available ? desc : t("unavailable");
-      b.disabled = !f.available;
-      b.addEventListener("click", function () { start(f.id); });
-      list.appendChild(b);
-    });
-    show("pick");
+  // ---------- home ----------
+  function titleOf(f) { return (f.titles && f.titles[lang]) || f.title; }
+  function descOf(f) {
+    var d = f.description && (f.description[lang] || f.description.en);
+    return d || (f.fields ? f.fields + " " + t("questions") : "");
   }
-  document.querySelectorAll(".tile").forEach(function (b) {
-    b.addEventListener("click", function () { var g = b.dataset.go; if (g === "advisor") start("scheme_advisor"); else pick(g); });
-  });
-  document.querySelectorAll("[data-back]").forEach(function (b) { b.addEventListener("click", goHome); });
+  function rowBtn(f, cls) {
+    var b = document.createElement("button"); b.type = "button"; b.className = cls; b.dataset.form = f.id;
+    var unavailable = f.available === false;
+    if (cls === "row") {
+      b.innerHTML = "<span class='ri' aria-hidden='true'></span><span class='rt'><b></b><span></span></span><span class='chev' aria-hidden='true'>›</span>";
+      b.querySelector(".ri").textContent = ICON[f.flow] || "📝";
+    } else b.innerHTML = "<b></b><span></span>";
+    b.querySelector("b").textContent = titleOf(f);
+    b.querySelector("b + span, .rt span").textContent = unavailable ? t("unavailable") : descOf(f);
+    b.disabled = unavailable;
+    b.addEventListener("click", function () { start(f.id); });
+    return b;
+  }
+  function renderHome() {
+    var advisor = { id: "scheme_advisor", flow: "advisor", title: t("advisor_title"), titles: {}, description: { en: t("advisor_desc"), hi: t("advisor_desc") }, available: true };
+    var all = forms.concat([advisor]);
+    var byId = {}; all.forEach(function (f) { byId[f.id] = f; });
+    var top = ["pm_kisan", "grievance", "scheme_advisor", "land_record"].map(function (id) { return byId[id]; }).filter(Boolean);
+    var tl = $("top-list"); tl.innerHTML = "";
+    top.forEach(function (f) { tl.appendChild(rowBtn(f, "row")); });
+    var groups = [["g_forms", function (f) { return f.flow === "form"; }], ["g_voice", function (f) { return f.flow === "grievance" || f.flow === "rti"; }],
+                  ["g_records", function (f) { return f.flow === "lookup_land" || f.flow === "lookup_ration"; }], ["g_schemes", function (f) { return f.flow === "advisor"; }]];
+    var ag = $("all-groups"); ag.innerHTML = "";
+    groups.forEach(function (g) {
+      var items = all.filter(g[1]); if (!items.length) return;
+      var d = document.createElement("div"); d.className = "group";
+      var h = document.createElement("h4"); h.textContent = t(g[0]); d.appendChild(h);
+      items.forEach(function (f) { d.appendChild(rowBtn(f, "mini")); });
+      ag.appendChild(d);
+    });
+    var meta = (caps.records && caps.records.meta) || {};
+    $("demo-note").hidden = !Object.keys(meta).some(function (k) { return meta[k] && meta[k].demo; });
+  }
   $("home-link").addEventListener("click", goHome);
   $("talk-back").addEventListener("click", goHome);
-  function goHome() { endSession(); cur = null; try { speechSynthesis.cancel(); } catch (e) {} show("home"); }
+  document.querySelectorAll("[data-back]").forEach(function (b) { b.addEventListener("click", goHome); });
+  function goHome() { stopListening(); endSession(); cur = null; try { speechSynthesis.cancel(); } catch (e) {} renderHome(); show("home"); }
 
-  // ---------------- a flow
+  // ---------- a flow ----------
   function start(formId, prefillFrom) {
     var body = { form_id: formId, lang: lang };
     if (prefillFrom) body.prefill_from = prefillFrom;
     var prev = sid;
     api("/sessions", { method: "POST", json: body }).then(function (r) {
       if (prev && prev !== prefillFrom) fetch(B + "/sessions/" + prev, { method: "DELETE", keepalive: true }).catch(function () {});
-      sid = r.session_id; done = null; inkedBefore = {};
-      $("talk-title").textContent = r.title || "";
+      sid = r.session_id; inkedBefore = {};
+      $("talk-title").textContent = r.title || ""; $("crumb-title").textContent = r.title || "";
       $("heard").textContent = "";
-      show("talk");
-      render(r);
-    }).catch(function (e) { alert(e.message); });
+      show("talk"); render(r);
+    }).catch(function (e) { alert(e.message || t("offline")); });
   }
-  function voiceOK() { return caps.asr && (caps.asr_langs || []).indexOf(lang) > -1 && navigator.mediaDevices && window.isSecureContext; }
+  function serverVoiceOK() { return caps.asr && (caps.asr_langs || []).indexOf(lang) > -1 && navigator.mediaDevices && window.isSecureContext; }
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  function browserVoiceOK() { return !serverVoiceOK() && !!SR && window.isSecureContext !== false; }
+  function voiceOK() { return serverVoiceOK() || browserVoiceOK(); }
+  function setSteps(phase, done) {
+    var step = done ? 3 : (phase === "final" || phase === "fix") ? 2 : 1;
+    document.querySelectorAll("#steps .s").forEach(function (s) {
+      var n = +s.dataset.step;
+      s.className = "s" + (n < step ? " done" : n === step ? " on" : "");
+      s.querySelector("i").textContent = n < step ? "✓" : n;
+    });
+  }
   function render(r) {
     cur = r;
     if (r.done) { showResult(r); return; }
-    $("question").textContent = r.text;                 // shown (sensitive numbers masked)
-    speak(r.speak || r.text);                            // spoken (in full, so it can be confirmed by ear)
+    $("question").textContent = r.text;
+    speak(r.speak || r.text);
     $("mt-note").hidden = !r.machine_translated;
     $("yn").hidden = !(r.phase === "confirm" || r.phase === "final");
     var fields = r.fields || [];
@@ -485,15 +586,15 @@
     var pos = fields.findIndex(function (f) { return f.id === r.field_id; });
     $("step-count").textContent = pos > -1 ? t("step") + " " + (pos + 1) + " / " + fields.length : "✓ " + filled + " / " + fields.length;
     $("sheet").classList.toggle("final", r.phase === "final" || r.phase === "fix");
+    setSteps(r.phase, false);
     renderSheet(fields, r);
     var ok = voiceOK();
     $("mic").disabled = !ok;
-    $("mic-label").textContent = ok ? t("hold") : t("voice_off");
+    $("mic-label").textContent = ok ? t("tap") : t("voice_off");
+    $("voice-src").textContent = browserVoiceOK() ? t("browser_voice") : "";
     $("status").textContent = r.phase === "escalate" ? "⚠" : "";
-    if (r.phase === "escalate") $("op-panel").hidden = false;
+    if (r.phase === "escalate") $("op-panel").open = true;
   }
-
-  // ---- how each kind of field looks on paper
   var BOXES = { aadhaar: [4, 4, 4], mobile: [10], pincode: [6], ifsc: [4, 7], pan: [10] };
   function boxes(groups, text, sep) {
     var chars = String(text || "").replace(/\s/g, "").split(""), k = 0, h = "<span class='boxes'>";
@@ -507,7 +608,7 @@
     if (BOXES[f.kind]) return boxes(BOXES[f.kind], value);
     if (f.kind === "date") {
       var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || "");
-      return m ? boxes([2, 2, 4], m[3] + m[2] + m[1], "/") : boxes([2, 2, 4], "", "/");
+      return boxes([2, 2, 4], m ? m[3] + m[2] + m[1] : "", "/");
     }
     if (f.kind === "choice" || f.kind === "yesno") {
       var opts = f.options || [{ value: "Yes", label: t("yes_word") }, { value: "No", label: t("no_word") }];
@@ -519,11 +620,10 @@
     var shown = native && native !== value ? native : value;
     return "<div class='line'>" + esc(shown || "") + "</div>";
   }
-  var inkedBefore = {};
   function renderSheet(fields, r) {
     var ol = $("sheet-rows"); ol.innerHTML = "";
     var sel = $("op-field"); sel.innerHTML = "";
-    fields.forEach(function (f, i) {
+    fields.forEach(function (f) {
       var o = document.createElement("option"); o.value = f.id; o.textContent = f.label; sel.appendChild(o);
       var isCur = f.id === r.field_id, pending = isCur && r.phase === "confirm" && r.pending;
       var li = document.createElement("li");
@@ -532,20 +632,34 @@
       li.dataset.id = f.id;
       if (f.value) inkedBefore[f.id] = f.value;
       var local = f.label_local && lang !== "en" ? f.label_local : "";
-      li.innerHTML = "<span class='no'>" + (i + 1) + "</span>" +
-        "<div class='lbl'><b>" + esc(local || f.label) + (f.required === false ? "" : " <span class='req'>*</span>") + "</b>" +
+      li.innerHTML = "<div class='lbl'><b>" + esc(local || f.label) + (f.required === false ? "" : " <span class='req'>*</span>") + "</b>" +
         (local ? "<small>" + esc(f.label) + "</small>" : "") + "</div>" +
         "<div class='val'>" + paperValue(f, pending ? r.pending : f.value, pending ? "" : f.native) +
-        (pending ? "<div class='pencil-note'>✎ " + esc(t("pencil")) + "</div>" : "") +
-        (f.value && !pending ? (f.needs_review ? "<div class='review-flag'>• " + esc(t("review")) + "</div>" : "<span class='ok-tick'>✓</span>") : "") +
+        (pending ? "<div class='note-pen'>✎ " + esc(t("pencil")) + "</div>" : "") +
+        (f.value && !pending ? (f.needs_review ? "<div class='note-review'>• " + esc(t("review")) + "</div>" : "<div class='note-ok'>✓ " + esc(t("inked")) + "</div>") : "") +
         "</div><button type='button' class='redo'></button>";
       var b = li.querySelector(".redo"); b.textContent = t("redo");
       b.addEventListener("click", function () { api("/sessions/" + sid + "/redo", { method: "POST", json: { field_id: f.id } }).then(render); });
       ol.appendChild(li);
-      if (isCur) setTimeout(function () { try { li.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) {} }, 60);
+      if (isCur) setTimeout(function () { try { li.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) {} }, 60);
     });
   }
+  function send(text) {
+    if (!sid || !text) return;
+    $("status").textContent = t("working");
+    api("/sessions/" + sid + "/text", { method: "POST", json: { text: text } }).then(function (r) { $("status").textContent = ""; render(r); })
+      .catch(function (e) { $("status").textContent = e.message; });
+  }
+  $("type-form").addEventListener("submit", function (e) { e.preventDefault(); var v = $("type-input").value.trim(); $("type-input").value = ""; send(v); });
+  $("btn-yes").addEventListener("click", function () { send(lang === "hi" ? "हाँ" : "yes"); });
+  $("btn-no").addEventListener("click", function () { send(lang === "hi" ? "नहीं" : "no"); });
   $("repeat").addEventListener("click", function () { if (cur && cur.text) speak(cur.speak || cur.text); });
+  $("reveal").addEventListener("change", function () { reveal = this.checked; if (sid) api("/sessions/" + sid).then(function (s) { renderSheet(s.fields || [], cur || {}); }); });
+  $("op-set").addEventListener("click", function () {
+    api("/sessions/" + sid + "/operator", { method: "POST", json: { field_id: $("op-field").value, value: $("op-value").value } })
+      .then(function (r) { $("op-msg").textContent = "✓"; $("op-value").value = ""; render(r); })
+      .catch(function (e) { $("op-msg").textContent = e.message; });
+  });
   $("big-btn").addEventListener("click", function () {
     var on = !document.body.classList.contains("big");
     document.body.classList.toggle("big", on); this.setAttribute("aria-pressed", String(on));
@@ -553,117 +667,141 @@
   });
   try { if (localStorage.getItem("dwaniforms:big")) { document.body.classList.add("big"); $("big-btn").setAttribute("aria-pressed", "true"); } } catch (e) {}
 
-  function send(text) {
-    if (!sid || !text) return;
-    $("status").textContent = t("working");
-    api("/sessions/" + sid + "/text", { method: "POST", json: { text: text } }).then(render)
-      .catch(function (e) { $("status").textContent = e.message; });
-  }
-  $("type-form").addEventListener("submit", function (e) { e.preventDefault(); var v = $("type-input").value.trim(); $("type-input").value = ""; send(v); });
-  $("btn-yes").addEventListener("click", function () { send(lang === "hi" ? "हाँ" : "yes"); });
-  $("btn-no").addEventListener("click", function () { send(lang === "hi" ? "नहीं" : "no"); });
-  $("op-toggle").addEventListener("click", function () {
-    var on = $("op-panel").hidden; $("op-panel").hidden = !on; this.setAttribute("aria-pressed", String(on));
-  });
-  $("reveal").addEventListener("change", function () { reveal = this.checked; if (sid) api("/sessions/" + sid).then(function (s) { renderSheet(s.fields || [], cur || {}); }); });
-  $("op-set").addEventListener("click", function () {
-    api("/sessions/" + sid + "/operator", { method: "POST", json: { field_id: $("op-field").value, value: $("op-value").value } })
-      .then(function (r) { $("op-msg").textContent = "✓"; $("op-value").value = ""; render(r); })
-      .catch(function (e) { $("op-msg").textContent = e.message; });
-  });
-
-  // ---------------- results
+  // ---------- result ----------
   function showResult(r) {
-    done = r;
+    stopListening();
     var o = r.outcome || {};
-    $("res-title").textContent = r.title || "";
+    var fields = r.fields || [];
+    var kicker = o.type === "draft" ? t("k_draft") : o.type === "lookup" ? (o.found ? t("k_found") : t("k_notfound")) : o.type === "advisor" ? t("k_advice") : t("k_form");
+    $("cert-kicker").textContent = kicker;
+    $("what-next-body").textContent = o.type === "advisor" ? t("next_advisor") : o.type === "lookup" ? t("next_lookup") : t("what_next_body");
+    $("res-title").textContent = r.title || ""; $("res-crumb").textContent = r.title || "";
+    var meta = [[t("m_ref"), "<span class='mono'>DF-" + esc(String(sid || "").slice(0, 8).toUpperCase()) + "</span>"],
+                [t("m_date"), esc(new Date().toLocaleString(lang === "en" ? "en-IN" : "hi-IN", { dateStyle: "medium", timeStyle: "short" }))],
+                [t("m_lang"), esc(LANG_NAMES[lang] || lang)]];
+    if (!o.type) meta.push([t("m_filled"), fields.filter(function (f) { return f.value; }).length + " / " + fields.length]);
+    if (o.type === "lookup" && o.as_of) meta.push([t("m_copy"), esc(o.as_of)]);
+    $("cert-meta").innerHTML = meta.map(function (m) { return "<div><dt>" + esc(m[0]) + "</dt><dd>" + m[1] + "</dd></div>"; }).join("");
     $("res-say").textContent = o.say || r.text;
+    $("res-say").className = "alert" + (o.type === "lookup" && !o.found ? " warn" : "");
     speak(o.say || r.text);
     ["draft", "lookup", "advice", "formdone"].forEach(function (id) { $(id).hidden = true; });
+    $("pdf").hidden = o.type === "advisor" || o.type === "lookup";
+    $("json").hidden = !!o.type;
+    $("print-letter").hidden = false;
     if (o.type === "draft") renderDraft(o);
     else if (o.type === "lookup") renderLookup(o);
     else if (o.type === "advisor") renderAdvice(o);
-    else $("formdone").hidden = false;
+    else renderFormDone(fields);
+    setSteps("done", true);
     show("result");
+  }
+  function renderFormDone(fields) {
+    var box = $("formdone");
+    box.innerHTML = "<div class='card'><dl class='kv'>" + fields.filter(function (f) { return f.value; }).map(function (f) {
+      var v = f.native && f.native !== f.value && f.kind !== "date" ? f.native : f.value;
+      return "<dt>" + esc(f.label_local && lang !== "en" ? f.label_local : f.label) + "</dt><dd>" + esc(v) + "</dd>";
+    }).join("") + "</dl></div>";
+    box.hidden = false;
   }
   function renderDraft(o) {
     var tabs = $("draft-tabs"); tabs.innerHTML = "";
     var langs = Object.keys(o.drafts || {});
-    var pickLang = function (l) {
+    var pick = function (l) {
       $("letter").textContent = o.drafts[l]; $("letter").lang = l;
       tabs.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.l === l)); });
     };
     langs.forEach(function (l) {
       var b = document.createElement("button"); b.type = "button"; b.dataset.l = l; b.textContent = l === "hi" ? "हिन्दी" : "English";
-      b.addEventListener("click", function () { pickLang(l); }); tabs.appendChild(b);
+      b.addEventListener("click", function () { pick(l); }); tabs.appendChild(b);
     });
     tabs.hidden = langs.length < 2;
-    pickLang(langs.indexOf(lang) > -1 ? lang : langs[0]);
+    pick(langs.indexOf(lang) > -1 ? lang : langs[0]);
     var ul = $("next-steps"); ul.innerHTML = "";
-    (o.next_steps || []).forEach(function (s) { var li = document.createElement("li"); li.textContent = s; ul.appendChild(li); });
+    ((lang === "hi" && o.next_steps_hi) || o.next_steps || []).forEach(function (s) { var li = document.createElement("li"); li.textContent = s; ul.appendChild(li); });
     $("draft").hidden = false;
   }
-  function recordNote(o) {
-    var bits = [];
-    if (o.demo) bits.push("<div class='notice bad'>" + esc(t("demo")) + "</div>");
-    if (o.as_of) bits.push("<p class='muted'>" + esc(t("from_copy")) + " " + esc(o.as_of) + (o.source ? " · " + esc(o.source) : "") + "</p>");
-    if (o.stale) bits.push("<div class='notice'>" + esc(t("old")) + "</div>");
-    return bits.join("");
-  }
   function renderLookup(o) {
-    var h = recordNote(o);
+    var h = "";
+    if (o.demo) h += "<div class='alert warn'>" + esc(t("demo_rec")) + "</div>";
+    if (o.stale) h += "<div class='alert warn'>" + esc(t("old")) + "</div>";
     (o.results || []).forEach(function (row) {
-      h += "<div class='card'><dl class='kv'>" + Object.keys(row).map(function (k) {
-        return "<dt>" + esc(k) + "</dt><dd>" + esc(row[k]) + "</dd>"; }).join("") + "</dl></div>";
+      h += "<div class='card'><dl class='kv'>" + Object.keys(row).map(function (k) { return "<dt>" + esc(k) + "</dt><dd>" + esc(row[k]) + "</dd>"; }).join("") + "</dl></div>";
     });
+    if (o.source) h += "<p class='muted' style='font-size:.82rem'>" + esc(t("m_source")) + ": " + esc(o.source) + "</p>";
     $("lookup").innerHTML = h; $("lookup").hidden = false;
   }
   function renderAdvice(o) {
     var box = $("advice"); box.innerHTML = "";
-    function group(title, items, cls) {
-      if (!items.length) return;
-      var h = document.createElement("h2"); h.textContent = title; box.appendChild(h);
-      var wrap = document.createElement("div"); wrap.className = "cards"; box.appendChild(wrap);
+    var card = document.createElement("div"); card.className = "card"; box.appendChild(card);
+    var advisorSid = sid;
+    function add(items, status) {
       items.forEach(function (s) {
-        var c = document.createElement("div"); c.className = "card " + cls;
-        c.innerHTML = "<h3></h3><div class='benefit'></div><p class='how'></p>" +
-          (s.reasons && s.reasons.length ? "<div><b></b><ul class='reasons'></ul></div>" : "") +
-          (s.checks && s.checks.length ? "<div><b></b><ul class='checks'></ul></div>" : "") +
-          "<p class='src'></p><div class='actions'></div>";
-        c.querySelector("h3").textContent = s.name;
-        c.querySelector(".benefit").textContent = s.benefit;
-        c.querySelector(".how").textContent = t("how") + ": " + s.apply;
-        if (s.reasons && s.reasons.length) { c.querySelector("div b").textContent = t("why_maybe");
-          s.reasons.forEach(function (x) { var li = document.createElement("li"); li.textContent = x; c.querySelector(".reasons").appendChild(li); }); }
-        if (s.checks && s.checks.length) { var bs = c.querySelectorAll("div b"); bs[bs.length - 1].textContent = t("checks");
-          s.checks.forEach(function (x) { var li = document.createElement("li"); li.textContent = x; c.querySelector(".checks").appendChild(li); }); }
-        c.querySelector(".src").textContent = s.source + " · " + t("reviewed") + ": " + s.last_reviewed + (s.stale ? " ⚠ " + t("stale") : "");
+        var d = document.createElement("div"); d.className = "scheme";
+        d.innerHTML = "<div><h3><span class='nm'></span><span class='pill " + (status === "likely" ? "ok" : "warn") + "'></span></h3>" +
+          "<div class='ben'></div><p class='how'></p><ul class='rs'></ul><ul class='cs'></ul><div class='src'></div></div><div class='act'></div>";
+        d.querySelector(".nm").textContent = s.name;
+        d.querySelector(".pill").textContent = status === "likely" ? t("likely") : t("maybe");
+        d.querySelector(".ben").textContent = s.benefit;
+        d.querySelector(".how").textContent = t("how_get") + ": " + s.apply;
+        (s.reasons || []).forEach(function (x) { var li = document.createElement("li"); li.textContent = x; d.querySelector(".rs").appendChild(li); });
+        (s.checks || []).forEach(function (x) { var li = document.createElement("li"); li.textContent = "✓ " + x; d.querySelector(".cs").appendChild(li); });
+        d.querySelector(".src").textContent = s.source + " · " + t("reviewed") + " " + s.last_reviewed + (s.stale ? " · ⚠ " + t("stale") : "");
         if (s.form) {
-          var b = document.createElement("button"); b.type = "button"; b.className = "btn marigold";
-          b.textContent = t("fill") + " " + ((o.form_titles || {})[s.form] || "");
-          var advisorSid = sid;
+          var b = document.createElement("button"); b.type = "button"; b.className = "btn forest";
+          b.textContent = t("fill"); b.title = (o.form_titles || {})[s.form] || "";
           b.addEventListener("click", function () { start(s.form, advisorSid); });
-          c.querySelector(".actions").appendChild(b);
+          d.querySelector(".act").appendChild(b);
         }
-        wrap.appendChild(c);
+        card.appendChild(d);
       });
     }
-    group(t("likely"), o.likely || [], "likely");
-    group(t("maybe"), o.maybe || [], "maybe");
-    if (o.not_matched) { var p = document.createElement("p"); p.className = "muted"; p.textContent = o.not_matched + " " + t("not_matched"); box.appendChild(p); }
+    add(o.likely || [], "likely"); add(o.maybe || [], "maybe");
+    if (o.not_matched) { var p = document.createElement("p"); p.className = "muted"; p.style.fontSize = ".85rem"; p.textContent = o.not_matched + " " + t("not_matched"); box.appendChild(p); }
     box.hidden = false;
   }
   $("print-letter").addEventListener("click", function () {
-    document.body.classList.add("print-letter"); window.print();
+    var letter = !$("draft").hidden;
+    if (letter) document.body.classList.add("print-letter");
+    window.print();
     setTimeout(function () { document.body.classList.remove("print-letter"); }, 500);
   });
   $("pdf").addEventListener("click", function () { window.open(B + "/sessions/" + sid + "/export.pdf"); });
-  $("pdf2").addEventListener("click", function () { window.open(B + "/sessions/" + sid + "/export.pdf"); });
   $("json").addEventListener("click", function () { window.open(B + "/sessions/" + sid + "/export.json"); });
 
-  // ---------------- push-to-talk: mic -> 16 kHz PCM16 (box-filtered, no aliasing) -> POST raw bytes
+  // ---------- voice in: the kiosk's own model (server) or, at home, the browser's speech recognition ----------
+  var wave = $("wave"); for (var i = 0; i < 24; i++) wave.appendChild(document.createElement("i"));
+  var bars = wave.querySelectorAll("i"), waveTimer = null;
+  function waveOn(on) {
+    wave.classList.toggle("live", on); clearInterval(waveTimer);
+    if (on) waveTimer = setInterval(function () { bars.forEach(function (b) { b.style.height = (4 + Math.random() * 26) + "px"; }); }, 110);
+    else bars.forEach(function (b) { b.style.height = "4px"; });
+  }
+  var recog = null;
+  function listenBrowser() {
+    if (recog) { recog.stop(); return; }
+    try { speechSynthesis.cancel(); } catch (e) {}
+    recog = new SR();
+    recog.lang = lang === "en" ? "en-IN" : lang + "-IN";
+    recog.interimResults = true; recog.maxAlternatives = 1; recog.continuous = false;
+    var finalText = "";
+    recog.onresult = function (ev) {
+      var txt = "";
+      for (var k = ev.resultIndex; k < ev.results.length; k++) { txt += ev.results[k][0].transcript; if (ev.results[k].isFinal) finalText += ev.results[k][0].transcript; }
+      $("heard").textContent = "🗣 " + (finalText || txt);
+    };
+    recog.onerror = function (ev) { $("status").textContent = ev.error === "not-allowed" || ev.error === "service-not-allowed" ? t("mic_denied") : ev.error; };
+    recog.onend = function () {
+      recog = null; $("mic").classList.remove("rec"); waveOn(false); $("mic-label").textContent = t("tap");
+      if (finalText.trim()) send(finalText.trim());
+    };
+    recog.start();
+    $("mic").classList.add("rec"); waveOn(true); $("mic-label").textContent = t("listening");
+  }
+  function stopListening() { if (recog) { try { recog.abort(); } catch (e) {} recog = null; } if (rec) stopRec(true); $("mic").classList.remove("rec"); waveOn(false); }
+
   var WORKLET = "class R extends AudioWorkletProcessor{process(i){const c=i[0]&&i[0][0];if(c)this.port.postMessage(c.slice(0));return true}}registerProcessor('dwani-rec',R)";
-  var rec = null, want = false, mic = $("mic");
+  var rec = null, want = false;
   function toPCM16(chunks, rate) {
     var n = chunks.reduce(function (a, c) { return a + c.length; }, 0), all = new Float32Array(n), o = 0;
     chunks.forEach(function (c) { all.set(c, o); o += c.length; });
@@ -675,10 +813,9 @@
     }
     return pcm;
   }
-  function startRec(e) {
-    if (rec || want || !sid || mic.disabled) return; want = true;
+  function startRec() {
+    if (rec || want || !sid) return; want = true;
     try { speechSynthesis.cancel(); } catch (_) {}
-    try { if (e && e.pointerId !== undefined) mic.setPointerCapture(e.pointerId); } catch (_) {}
     navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }).then(function (stream) {
       if (!want) { stream.getTracks().forEach(function (tr) { tr.stop(); }); return; }
       var ctx = new AudioContext(), src = ctx.createMediaStreamSource(stream), chunks = [];
@@ -690,54 +827,48 @@
             node.onaudioprocess = function (ev) { chunks.push(new Float32Array(ev.inputBuffer.getChannelData(0))); }; return node; })());
       return setup.then(function (node) {
         src.connect(node); node.connect(sink); rec = { ctx: ctx, stream: stream, node: node, chunks: chunks };
-        mic.classList.add("rec"); $("mic-label").textContent = tapMode ? t("tap_stop") : t("listening");
+        $("mic").classList.add("rec"); waveOn(true); $("mic-label").textContent = t("listening");
         if (!want) stopRec();
       });
     }).catch(function (err) { want = false; $("status").textContent = t("mic_denied") + ": " + err.message; });
   }
-  function stopRec() {
+  function stopRec(discard) {
     want = false; if (!rec) return;
     var r = rec; rec = null;
     r.node.disconnect(); r.stream.getTracks().forEach(function (tr) { tr.stop(); });
     var rate = r.ctx.sampleRate; r.ctx.close();
-    mic.classList.remove("rec"); $("mic-label").textContent = t("hold");
-    var pcm = toPCM16(r.chunks, rate); if (pcm.length < 4800) return;   // < 0.3 s: an accidental tap
-    mic.disabled = true; $("status").textContent = t("working");
+    $("mic").classList.remove("rec"); waveOn(false); $("mic-label").textContent = t("tap");
+    if (discard) return;
+    var pcm = toPCM16(r.chunks, rate); if (pcm.length < 4800) return;
+    $("mic").disabled = true; $("status").textContent = t("working");
     fetch(B + "/sessions/" + sid + "/audio", { method: "POST", headers: Object.assign({ "x-sample-rate": "16000", "content-type": "application/octet-stream" },
       reveal ? { "x-reveal-sensitive": "1" } : {}), body: pcm.buffer })
       .then(function (res) { return res.json().then(function (j) { if (!res.ok) throw new Error(j.detail || res.status); return j; }); })
       .then(function (j) { $("heard").textContent = "🗣 " + j.transcript; $("status").textContent = ""; render(j); })
-      .catch(function (err) { $("status").textContent = err.message; mic.disabled = !voiceOK(); });
+      .catch(function (err) { $("status").textContent = err.message; $("mic").disabled = !voiceOK(); });
   }
-  // Tap to start / tap to stop (easier for older hands), or press and hold: a press longer than 600 ms
-  // is treated as hold-to-talk and stops on release.
-  var downAt = 0, tapMode = false;
-  mic.addEventListener("pointerdown", function (e) {
-    if (rec || want) { if (tapMode) { tapMode = false; stopRec(); } return; }
-    downAt = Date.now(); startRec(e);
+  $("mic").addEventListener("click", function () {
+    if (this.disabled) return;
+    if (serverVoiceOK()) { if (rec || want) stopRec(); else startRec(); }
+    else if (SR) listenBrowser();
   });
-  mic.addEventListener("pointerup", function () {
-    if (!downAt) return;
-    var held = Date.now() - downAt; downAt = 0;
-    if (held < 600) { tapMode = true; $("mic-label").textContent = t("tap_stop"); } else stopRec();
-  });
-  mic.addEventListener("pointercancel", function () { downAt = 0; if (!tapMode) stopRec(); });
-  mic.addEventListener("contextmenu", function (e) { e.preventDefault(); });
-  mic.addEventListener("keydown", function (e) { if ((e.key === " " || e.key === "Enter") && !e.repeat) { e.preventDefault(); startRec(); } });
-  mic.addEventListener("keyup", function (e) { if (e.key === " " || e.key === "Enter") { e.preventDefault(); stopRec(); } });
 
-  // ---------------- boot
-  $("lang").addEventListener("change", function () { lang = this.value; try { localStorage.setItem("dwaniforms:lang", lang); } catch (e) {} applyUI(); if (cur && !cur.done) goHome(); });
+  // ---------- boot ----------
+  $("lang").addEventListener("change", function () {
+    lang = this.value; try { localStorage.setItem("dwaniforms:lang", lang); } catch (e) {}
+    applyUI(); if (cur && !cur.done) goHome(); else renderHome();
+  });
   try { var saved = localStorage.getItem("dwaniforms:lang"); if (saved) { lang = saved; $("lang").value = saved; } } catch (e) {}
   applyUI();
   window.addEventListener("pagehide", endSession);
   Promise.all([api("/forms"), api("/capabilities")]).then(function (res) {
     forms = res[0]; caps = res[1];
-    // tiles stay disabled until the forms are known, so an early tap never opens an empty list
-    document.querySelectorAll(".tile").forEach(function (tile) { tile.disabled = false; });
-    var anyRecords = forms.some(function (f) { return GROUPS.records.match(f) && f.available; });
-    $("tile-records").disabled = !anyRecords;
-  }).catch(function () { $("status").textContent = "DwaniForms is not reachable on this computer."; });
+    if (!caps.translation) {                       // no translator (online version): only hand-written Hindi / English
+      [].forEach.call($("lang").options, function (o) { o.disabled = o.value !== "hi" && o.value !== "en"; });
+      if (lang !== "hi" && lang !== "en") { lang = "hi"; $("lang").value = "hi"; applyUI(); }
+    }
+    renderHome();
+  }).catch(function () { $("top-list").textContent = t("offline"); });
 })();
 </script>
 </body>

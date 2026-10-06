@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))   # reuse DwaniL
 
 
 def build_app(whisper_model: str | None, nllb_dir: str | None, sp_model: str, text_only: bool,
-              demo_records: bool = False):
+              demo_records: bool = False, browser_voice: bool = False):
     from fastapi import FastAPI
     from .api import create_router
     from .schema import load_all
@@ -41,6 +41,7 @@ def build_app(whisper_model: str | None, nllb_dir: str | None, sp_model: str, te
     else:
         store = RecordStore()              # what the operator imported (python -m dwaniforms.records import ...)
     service = FormService(asr, translator, templates, record_store=store)
+    service.browser_voice = browser_voice
 
     @asynccontextmanager
     async def lifespan(_app):
@@ -67,13 +68,16 @@ def main() -> None:
     ap.add_argument("--sentencepiece-model", default="sentencepiece.bpe.model")
     ap.add_argument("--text-only", action="store_true")
     ap.add_argument("--demo-records", action="store_true", help="use fictional land/ration records (demos only)")
+    ap.add_argument("--browser-voice", action="store_true",
+                    help="public web demo only: let the page use the browser's speech recognition (not offline)")
     ap.add_argument("--host", default="127.0.0.1")           # local only by default: this handles Aadhaar numbers
     ap.add_argument("--port", type=int, default=8100)
     ap.add_argument("--ssl-keyfile", default=None, help="serve over https (browsers only allow the microphone on https or localhost)")
     ap.add_argument("--ssl-certfile", default=None)
     a = ap.parse_args()
     import uvicorn
-    uvicorn.run(build_app(a.whisper_model, a.nllb_model_dir, a.sentencepiece_model, a.text_only, a.demo_records),
+    uvicorn.run(build_app(a.whisper_model, a.nllb_model_dir, a.sentencepiece_model, a.text_only, a.demo_records,
+                          a.browser_voice),
                 host=a.host, port=a.port,
                 ssl_keyfile=a.ssl_keyfile, ssl_certfile=a.ssl_certfile)
 

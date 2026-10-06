@@ -39,12 +39,17 @@ def _audio_segment_cls():
         return _AudioSegmentFallback
 
 
+MAX_SESSIONS = 300                                     # oldest idle sessions make way beyond this
+
 class FormService:
     def __init__(self, asr=None, translator=None, templates: dict[str, FormTemplate] | None = None, transliterate=None,
                  record_store: "records.RecordStore | None" = None):
         self.asr, self.translator, self.transliterate = asr, translator, transliterate
         self.templates = templates if templates is not None else load_all()
         self.records = record_store if record_store is not None else records.RecordStore()
+        # Public web demo only (standalone --browser-voice): no speech model on the server, so the page may use the
+        # browser's own speech recognition. A kiosk never sets this: its voice stays on the machine.
+        self.browser_voice = False
         self.sessions: dict[str, FormSession] = {}
         self._asr_lock = asyncio.Lock()      # RealWhisperBackend.set_language is global state: one utterance at a time
 
@@ -63,7 +68,8 @@ class FormService:
 
     def capabilities(self) -> dict:
         return {"asr": self.asr is not None, "asr_langs": sorted(ASR_LANGS) if self.asr is not None else [],
-                "translation": self.translator is not None, "records": self.records.available()}
+                "translation": self.translator is not None, "records": self.records.available(),
+                "browser_asr": bool(self.browser_voice and self.asr is None)}
 
     # ---- session lifetime ----------------------------------------------------------
     def purge_expired(self, now: float | None = None) -> int:
@@ -85,6 +91,10 @@ class FormService:
         """prefill_from: a finished scheme-advisor session; its answers (gender, income, land...) become
         one-tap confirmations in the new form instead of questions."""
         self.purge_expired()
+        if len(self.sessions) >= MAX_SESSIONS:        # a public demo must not be filled up by one visitor
+            oldest = sorted(self.sessions.values(), key=lambda x: x.last_active)[: len(self.sessions) - MAX_SESSIONS + 1]
+            for old in oldest:
+                self.sessions.pop(old.id, None)
         if form_id not in self.templates:
             raise KeyError(form_id)
         t = self.templates[form_id]

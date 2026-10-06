@@ -1,0 +1,6 @@
+# DwaniForms online (typed answers + the browser's own voice typing; no speech models on the server)
+fastapi==0.142.2
+starlette==1.7.0
+uvicorn==0.54.0
+pydantic==2.13.5
+reportlab==4.4.4

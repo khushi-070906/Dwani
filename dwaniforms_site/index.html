@@ -5,18 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DwaniForms: speak, and the form fills itself</title>
 <meta name="description" content="DwaniForms fills government forms, complaints and RTI applications, checks land and ration records, and finds schemes, just by speaking in your own language. Works offline at CSCs, panchayats and hospitals.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%230b5d4b'/><text x='50%25' y='60%25' font-size='42' text-anchor='middle' fill='%23e8a317' font-family='serif'>ध</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%231F5E4D'/><text x='50%25' y='60%25' font-size='42' text-anchor='middle' fill='%23D9772B' font-family='serif'>ध</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;600;800&family=Kalam:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;600;800&family=Kalam:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Lato:wght@400;700&family=Noto+Serif+Devanagari:wght@600&display=swap">
 <style>
   :root {
-    --peacock: #0b5d4b; --peacock-2: #12775f; --peacock-3: #06382c; --leaf: #12775f; --haldi: #e8a317; --haldi-soft: #fdf2d8;
-    --sindoor: #c0502a; --sindoor-soft: #f9e3d9; --paper: #fffdf8; --sand: #f6f1e6; --line: #e6dccb;
-    --ink: #1f2a26; --ink-2: #4a5550; --ink-3: #6f7a75;
+    /* PropertySetu family: forest + navy on sage, serif headings */
+    --peacock: #1F5E4D; --peacock-2: #2B7562; --peacock-3: #16463A; --leaf: #1F5E4D; --haldi: #D9772B; --haldi-soft: #FBF1DC;
+    --sindoor: #D9772B; --sindoor-soft: #FBEBDD; --paper: #FFFFFF; --sand: #EEF0EA; --line: #DCDFD6;
+    --ink: #1E2A44; --ink-2: #4A5468; --ink-3: #6B7385; --navy: #1E2A44;
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body { margin: 0; background: var(--sand); color: var(--ink); font: 18px/1.6 "Mukta", "Nirmala UI", system-ui, sans-serif; }
+  body { margin: 0; background: var(--sand); color: var(--ink); font: 18px/1.6 "Lato", "Mukta", "Nirmala UI", system-ui, sans-serif; }
+  h1, h2, h3 { font-family: "Source Serif 4", "Noto Serif Devanagari", Georgia, serif; color: var(--navy); }
+  .hero h1, .hero h2, .hero h3 { color: #fff; }
+  .use-now { display: inline-flex; align-items: center; gap: .5rem; background: #fff; color: var(--navy); text-decoration: none; font-weight: 800;
+             padding: .9rem 1.4rem; border-radius: 10px; margin: 0 .6rem .6rem 0; border: 2px solid #fff; }
+  .use-now:hover { background: var(--sand); }
+  .use-band { background: var(--navy); color: #fff; border-radius: 14px; padding: 1.8rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.2rem; flex-wrap: wrap; }
+  .use-band h2 { color: #fff; margin: 0 0 .3rem; } .use-band p { margin: 0; color: #C9D2E3; }
   a { color: var(--peacock-2); }
   .wrap { max-width: 1160px; margin: 0 auto; padding: 0 1.3rem; }
   [data-lang="hi"] .en, [data-lang="en"] .hi { display: none !important; }
@@ -139,6 +147,12 @@
   }
   @media (max-width: 560px) { .grid4 { grid-template-columns: 1fr; } .row { grid-template-columns: 1fr; gap: 0; } }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+  .logo .emb { align-self: center; width: 2.3rem; height: 2.3rem; border-radius: 50%; background: #fff; color: #1F5E4D; display: grid; place-items: center;
+               font-family: "Noto Serif Devanagari", Georgia, serif; font-size: 1.25rem; box-shadow: inset 0 0 0 3px #1F5E4D, inset 0 0 0 4px rgba(255,255,255,.9); margin-right: .2rem;
+               outline: 1.5px dashed rgba(255,255,255,.55); outline-offset: 2px; }
+
+  @media (max-width: 560px) { .nav-links a { display: none; } }
 </style>
 </head>
 <body data-lang="en">
@@ -146,7 +160,7 @@
 <header class="hero">
   <div class="wrap">
     <nav>
-      <a class="logo" href="#" aria-label="DwaniForms"><span class="dwani" lang="hi">ध्वनि</span><span class="forms">Forms</span></a>
+      <a class="logo" href="#" aria-label="DwaniForms"><span class="emb" aria-hidden="true">ध</span><span class="dwani" lang="hi">ध्वनि</span><span class="forms">Forms</span></a>
       <div class="nav-links">
         <a class="hide-sm" href="#stories"><span class="en">See it in action</span><span class="hi" lang="hi">चलता हुआ देखिए</span></a>
         <a class="hide-sm" href="#what"><span class="en">What it does</span><span class="hi" lang="hi">क्या करता है</span></a>
@@ -160,11 +174,12 @@
         <h1><span class="en">Speak.<br>The form <span class="hl">fills itself.</span></span><span class="hi" lang="hi">बोलिए।<br>फ़ॉर्म <span class="hl">ख़ुद भरेगा।</span></span></h1>
         <p class="sub"><span class="en">For everyone who has ever stood at a counter, unsure what to write. DwaniForms asks one question at a time in their own language, reads every answer back, and catches mistakes before they reach the office.</span>
           <span class="hi" lang="hi">हर उस इंसान के लिए जो कभी काउंटर पर खड़ा होकर सोचता रहा कि क्या लिखूँ। DwaniForms उनकी अपनी भाषा में एक-एक सवाल पूछता है, हर जवाब पढ़कर सुनाता है, और गलती दफ़्तर पहुँचने से पहले पकड़ लेता है।</span></p>
+        <a class="use-now" href="https://dwaniforms-app.onrender.com/form/"><span class="en">Use it now, from home →</span><span class="hi" lang="hi">अभी इस्तेमाल करें, घर से →</span></a>
         <a class="cta" href="#stories">▶ <span class="en">Watch a real form get filled</span><span class="hi" lang="hi">असली फ़ॉर्म भरता देखिए</span></a>
         <a class="cta ghost" href="#pilot"><span class="en">Run a pilot</span><span class="hi" lang="hi">पायलट चलाइए</span></a>
         <div class="stats">
           <div><b>13</b><span class="en">languages</span><span class="hi" lang="hi">भाषाएँ</span></div>
-          <div><b>0</b><span class="en">internet needed</span><span class="hi" lang="hi">इंटरनेट की ज़रूरत</span></div>
+          <div><b>2</b><span class="en">ways: phone at home · kiosk at a centre</span><span class="hi" lang="hi">तरीके: घर पर फ़ोन · केंद्र पर कियोस्क</span></div>
           <div><b>14</b><span class="en">schemes checked</span><span class="hi" lang="hi">योजनाओं की जाँच</span></div>
         </div>
       </div>
@@ -213,6 +228,15 @@
       </div>
     </div>
     <div class="paper" id="paper" aria-live="polite"></div>
+  </div>
+</div></section>
+
+<section style="padding-bottom:0"><div class="wrap">
+  <div class="use-band">
+    <div><h2><span class="en">Fill a form from home, right now</span><span class="hi" lang="hi">घर बैठे फ़ॉर्म भरिए, अभी</span></h2>
+      <p><span class="en">Open it on your phone or computer. Speak or type in Hindi or English. Download or print at the end.</span>
+         <span class="hi" lang="hi">फ़ोन या कंप्यूटर पर खोलिए। हिन्दी या अंग्रेज़ी में बोलिए या लिखिए। आख़िर में डाउनलोड या प्रिंट कीजिए।</span></p></div>
+    <a class="use-now" href="https://dwaniforms-app.onrender.com/form/"><span class="en">Open DwaniForms →</span><span class="hi" lang="hi">DwaniForms खोलें →</span></a>
   </div>
 </div></section>
 
@@ -456,6 +480,11 @@
     }, { threshold: 0.25 }).observe(document.getElementById("stories"));
   } else start(story);
 })();
+</script>
+
+<script>
+  // Wake the free online app while the visitor reads, so "Use it now" opens quickly.
+  try { fetch("https://dwaniforms-app.onrender.com/form/forms", { mode: "no-cors", cache: "no-store" }).catch(function () {}); } catch (e) {}
 </script>
 </body>
 </html>

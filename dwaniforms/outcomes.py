@@ -61,7 +61,7 @@ def grievance_draft(session, today: dt.date | None = None, **_) -> dict:
         _v(session, "complaint"),
     ]
     if when:
-        en.append(f"This happened on / since {_date_en(when)}.")
+        en.append(f"The problem began on {_date_en(when)}.")
     if _v(session, "relief"):
         en += ["", f"I request the following action: {_v(session, 'relief')}"]
     en += ["", "Kindly look into this and take action at the earliest.", "",
@@ -72,7 +72,7 @@ def grievance_draft(session, today: dt.date | None = None, **_) -> dict:
               (f" ({_v(session, 'location', True)})" if place else ""), "",
               f"विषय: {_dept_hi(dep)} से संबंधित शिकायत", "", "महोदय/महोदया,", "", _v(session, "complaint", True)]
         if when:
-            hi.append(f"यह {_hi_date(when)} को / से हो रहा है।")
+            hi.append(f"यह समस्या {_hi_date(when)} से है।")
         if _v(session, "relief"):
             hi += ["", f"मेरा अनुरोध है: {_v(session, 'relief', True)}"]
         hi += ["", "कृपया इस पर शीघ्र कार्रवाई करें।", "", "भवदीय,", _v(session, "full_name", True),
@@ -84,6 +84,11 @@ def grievance_draft(session, today: dt.date | None = None, **_) -> dict:
             "Print, sign and submit it at the office, or file it on your state's public grievance portal.",
             "For central government departments you can file it on CPGRAMS (pgportal.gov.in).",
             "Keep the acknowledgement / registration number you are given.",
+        ],
+        "next_steps_hi": [
+            "प्रिंट करके हस्ताक्षर कीजिए और दफ़्तर में जमा कीजिए, या अपने राज्य के शिकायत पोर्टल पर दर्ज कीजिए।",
+            "केंद्र सरकार के विभागों के लिए आप इसे CPGRAMS (pgportal.gov.in) पर भी दर्ज कर सकते हैं।",
+            "जो पावती / पंजीकरण नंबर मिले, उसे संभालकर रखिए।",
         ],
         "say_key": "outcome_grievance",
     }
@@ -150,6 +155,11 @@ def rti_draft(session, today: dt.date | None = None, **_) -> dict:
             "their own RTI portals.",
             "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can "
             "file a first appeal.",
+        ],
+        "next_steps_hi": [
+            "इसे विभाग के जन सूचना अधिकारी को डाक से या हाथ से, फ़ीस के साथ भेजिए (बीपीएल हों तो फ़ीस नहीं)।",
+            "केंद्रीय मंत्रालयों और विभागों के लिए rtionline.gov.in पर ऑनलाइन भी भर सकते हैं; कई राज्यों के अपने आरटीआई पोर्टल हैं।",
+            "जन सूचना अधिकारी को 30 दिन में जवाब देना होता है (जीवन या स्वतंत्रता से जुड़ा हो तो 48 घंटे)। जवाब न मिले तो प्रथम अपील कर सकते हैं।",
         ],
         "say_key": "outcome_rti",
     }
