@@ -60,3 +60,9 @@ services:
       # Opens /admin/crash-reports?token=... (error reports users choose to send). Unset = page disabled.
       - key: REPORTS_TOKEN
         generateValue: true
+
+  # DwaniForms website (its own site; the DwaniForms app itself runs on kiosks, not here)
+  - type: web
+    name: dwaniforms-site
+    runtime: static
+    staticPublishPath: ./dwaniforms_site
