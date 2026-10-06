@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DwaniForms: speak, and the form fills itself</title>
+<meta name="description" content="DwaniForms helps people fill government forms, file complaints and RTI applications, check land and ration records, and find schemes, just by speaking in their own language. Works offline at CSCs, panchayats and hospitals.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230b5d4b'/><text x='50%25' y='58%25' font-size='40' text-anchor='middle' fill='%23e8a317' font-family='serif'>ध</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;600;800&display=swap">
+<style>
+  :root { --green: #0b5d4b; --green-2: #12775f; --green-soft: #e3f0ea; --sand: #f6f1e6; --card: #fffdf8; --line: #e6dccb;
+          --ink: #1f2a26; --ink-2: #4a5550; --ink-3: #6f7a75; --marigold: #e8a317; --marigold-soft: #fdf2d8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--sand); color: var(--ink); font: 18px/1.6 "Mukta", "Nirmala UI", system-ui, sans-serif; }
+  a { color: var(--green); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.3rem; }
+  nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; }
+  .logo { display: flex; align-items: baseline; gap: 0.4rem; text-decoration: none; }
+  .logo .dwani { font-family: "Rozha One", Georgia, serif; font-size: 2rem; color: var(--green); line-height: 1; }
+  .logo .forms { font-weight: 800; letter-spacing: 0.16em; color: var(--marigold); text-transform: uppercase; font-size: 0.9rem; }
+  .nav-links { display: flex; gap: 1.2rem; align-items: center; font-weight: 600; }
+  .nav-links a { text-decoration: none; color: var(--ink-2); }
+  .lang { border: 2px solid var(--line); background: var(--card); border-radius: 999px; padding: 0.25rem 0.8rem; font: 700 0.9rem "Mukta", sans-serif; cursor: pointer; }
+  .hero { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 2.5rem; align-items: center; padding: 3rem 0 3.5rem; }
+  .hero h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.1; margin: 0 0 1rem; }
+  .hero h1 em { font-style: normal; color: var(--green); }
+  .hero p { font-size: 1.15rem; color: var(--ink-2); margin: 0 0 1.5rem; }
+  .cta { display: inline-block; background: var(--green); color: #fff; text-decoration: none; font-weight: 800; padding: 0.85rem 1.4rem; border-radius: 14px; margin-right: 0.6rem; }
+  .cta.ghost { background: transparent; color: var(--green); border: 2px solid var(--green); }
+  .kiosk { background: var(--card); border: 2px solid var(--line); border-radius: 28px; padding: 1.4rem; box-shadow: 0 30px 60px -30px rgba(11, 93, 75, .45); }
+  .kiosk .bubble { background: var(--green-soft); border-radius: 18px; padding: 0.8rem 1rem; margin-bottom: 0.6rem; font-weight: 600; }
+  .kiosk .bubble.me { background: var(--marigold-soft); margin-left: 2.5rem; font-weight: 400; }
+  .kiosk .mic { width: 84px; height: 84px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font-size: 2rem; margin: 1rem auto 0; }
+  section { padding: 3rem 0; }
+  h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); margin: 0 0 0.6rem; }
+  .lead { color: var(--ink-2); max-width: 720px; margin: 0 0 2rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; }
+  .card { background: var(--card); border: 2px solid var(--line); border-radius: 22px; padding: 1.3rem; }
+  .card .ico { font-size: 2rem; }
+  .card h3 { margin: 0.4rem 0 0.3rem; font-size: 1.2rem; }
+  .card p { margin: 0; color: var(--ink-2); font-size: 0.98rem; }
+  .steps { counter-reset: s; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+  .step { position: relative; background: var(--card); border-radius: 22px; padding: 1.3rem 1.3rem 1.3rem 4.2rem; border: 2px solid var(--line); }
+  .step::before { counter-increment: s; content: counter(s); position: absolute; left: 1.2rem; top: 1.2rem; width: 2.2rem; height: 2.2rem;
+                  border-radius: 50%; background: var(--marigold); display: grid; place-items: center; font-weight: 800; }
+  .band { background: var(--green); color: #fff; border-radius: 28px; padding: 2.2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.4rem; }
+  .band b { color: var(--marigold); display: block; font-size: 1.1rem; }
+  .pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .pill { background: var(--card); border: 2px solid var(--line); border-radius: 999px; padding: 0.35rem 0.9rem; font-weight: 600; font-size: 0.95rem; }
+  .pilot { background: var(--marigold-soft); border: 2px solid var(--marigold); border-radius: 28px; padding: 2.2rem; text-align: center; }
+  .note { font-size: 0.85rem; color: var(--ink-3); }
+  footer { padding: 2rem 0 3rem; color: var(--ink-3); font-size: 0.92rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  [data-lang="hi"] .en, [data-lang="en"] .hi { display: none; }
+  @media (max-width: 820px) { .hero { grid-template-columns: 1fr; padding-top: 1.5rem; } .nav-links a.hide-sm { display: none; } }
+</style>
+</head>
+<body data-lang="en">
+<div class="wrap">
+  <nav>
+    <a class="logo" href="#" aria-label="DwaniForms"><span class="dwani" lang="hi">ध्वनि</span><span class="forms">Forms</span></a>
+    <div class="nav-links">
+      <a class="hide-sm" href="#what"><span class="en">What it does</span><span class="hi" lang="hi">क्या करता है</span></a>
+      <a class="hide-sm" href="#how"><span class="en">How it works</span><span class="hi" lang="hi">कैसे चलता है</span></a>
+      <a href="#pilot"><span class="en">Run a pilot</span><span class="hi" lang="hi">पायलट</span></a>
+      <button class="lang" id="lang" type="button" aria-label="Switch language">हिन्दी</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div>
+      <h1><span class="en">Speak. <em>The form fills itself.</em></span><span class="hi" lang="hi">बोलिए। <em>फ़ॉर्म अपने आप भरेगा।</em></span></h1>
+      <p><span class="en">DwaniForms helps people who find forms hard to fill them by talking, in their own language. It asks one question at a time, reads every answer back, and catches mistakes before they reach the office.</span>
+         <span class="hi" lang="hi">जिन लोगों को फ़ॉर्म भरना मुश्किल लगता है, DwaniForms उनकी अपनी भाषा में बात करके फ़ॉर्म भरवाता है। एक बार में एक सवाल, हर जवाब पढ़कर सुनाता है, और गलती दफ़्तर पहुँचने से पहले पकड़ लेता है।</span></p>
+      <a class="cta" href="#pilot"><span class="en">Run a pilot with us</span><span class="hi" lang="hi">हमारे साथ पायलट चलाइए</span></a>
+      <a class="cta ghost" href="#what"><span class="en">See what it does</span><span class="hi" lang="hi">देखिए क्या करता है</span></a>
+    </div>
+    <div class="kiosk" aria-hidden="true">
+      <div class="bubble" lang="hi">अपनी शिकायत बताइए। क्या हुआ, कहाँ और कब से?</div>
+      <div class="bubble me" lang="hi">गाँव सोनपुर में 20 सितंबर से बिजली नहीं है, ट्रांसफार्मर जल गया…</div>
+      <div class="bubble" lang="hi">मैंने विभाग समझा: बिजली विभाग। क्या यह सही है?</div>
+      <div class="mic">🎤</div>
+    </div>
+  </div>
+</div>
+
+<section id="what"><div class="wrap">
+  <h2><span class="en">Four things, all by voice</span><span class="hi" lang="hi">चार काम, सब बोलकर</span></h2>
+  <p class="lead"><span class="en">Built for the counter at a CSC, a panchayat bhawan, a bank mitra or a hospital registration desk.</span>
+    <span class="hi" lang="hi">सीएससी, पंचायत भवन, बैंक मित्र या अस्पताल के पंजीकरण काउंटर के लिए बनाया गया।</span></p>
+  <div class="grid">
+    <div class="card"><div class="ico">📝</div><h3><span class="en">Fill government forms</span><span class="hi" lang="hi">सरकारी फ़ॉर्म भरें</span></h3>
+      <p><span class="en">PM-Kisan, e-Shram, income certificate, bank KYC, hospital registration. Aadhaar, mobile and IFSC are checked as they are spoken.</span>
+         <span class="hi" lang="hi">पीएम-किसान, ई-श्रम, आय प्रमाण पत्र, बैंक केवाईसी, अस्पताल पंजीकरण। आधार, मोबाइल और आईएफ़एससी बोलते ही जाँचे जाते हैं।</span></p></div>
+    <div class="card"><div class="ico">📢</div><h3><span class="en">Complaints and RTI</span><span class="hi" lang="hi">शिकायत और आरटीआई</span></h3>
+      <p><span class="en">Describe the problem aloud. The department, place and date are picked out, confirmed, and a ready-to-sign letter or RTI application is drafted.</span>
+         <span class="hi" lang="hi">समस्या बोलकर बताइए। विभाग, जगह और तारीख़ अपने आप निकलती है, पुष्टि होती है, और हस्ताक्षर के लिए तैयार पत्र या आरटीआई आवेदन बनता है।</span></p></div>
+    <div class="card"><div class="ico">🔍</div><h3><span class="en">Land and ration records</span><span class="hi" lang="hi">ज़मीन और राशन रिकॉर्ड</span></h3>
+      <p><span class="en">Say the khasra or ration card number and hear the record, from a copy kept on the kiosk, with the date of that copy.</span>
+         <span class="hi" lang="hi">खसरा या राशन कार्ड नंबर बोलिए और रिकॉर्ड सुनिए, कियोस्क पर रखी कॉपी से, उस कॉपी की तारीख़ के साथ।</span></p></div>
+    <div class="card"><div class="ico">💡</div><h3><span class="en">Which schemes can I get?</span><span class="hi" lang="hi">कौन सी योजना मिलेगी?</span></h3>
+      <p><span class="en">A short spoken interview, then the schemes the person likely qualifies for and the forms to fill, already partly filled in.</span>
+         <span class="hi" lang="hi">छोटी सी बातचीत, फिर वे योजनाएँ जो मिल सकती हैं और भरने वाले फ़ॉर्म, कुछ जानकारी पहले से भरी हुई।</span></p></div>
+  </div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <h2><span class="en">How it works at the counter</span><span class="hi" lang="hi">काउंटर पर कैसे चलता है</span></h2>
+  <div class="steps">
+    <div class="step"><span class="en">The person picks their language and what they need. Hindi, English, Bengali, Tamil, Telugu, Marathi and more.</span>
+      <span class="hi" lang="hi">व्यक्ति अपनी भाषा और काम चुनता है। हिन्दी, अंग्रेज़ी, बांग्ला, तमिल, तेलुगु, मराठी और भी।</span></div>
+    <div class="step"><span class="en">They answer one question at a time by holding the mic button. Every answer is read back: "Is this correct?"</span>
+      <span class="hi" lang="hi">माइक बटन दबाकर एक-एक सवाल का जवाब देते हैं। हर जवाब पढ़कर सुनाया जाता है: "क्या यह सही है?"</span></div>
+    <div class="step"><span class="en">The operator prints the filled form or letter, checks anything marked for review, and the person signs.</span>
+      <span class="hi" lang="hi">ऑपरेटर भरा हुआ फ़ॉर्म या पत्र प्रिंट करता है, जाँच वाले हिस्से देखता है, और व्यक्ति हस्ताक्षर करता है।</span></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="band">
+    <div><b><span class="en">Works offline</span><span class="hi" lang="hi">बिना इंटरनेट</span></b>
+      <span class="en">Speech recognition and translation run on the kiosk itself. Patchy internet doesn't stop the queue.</span>
+      <span class="hi" lang="hi">आवाज़ पहचान और अनुवाद कियोस्क पर ही चलते हैं। कमज़ोर इंटरनेट से लाइन नहीं रुकती।</span></div>
+    <div><b><span class="en">Private by design</span><span class="hi" lang="hi">निजता पहले</span></b>
+      <span class="en">Nothing is uploaded. Aadhaar and account numbers are masked on screen, and sessions are wiped after 30 minutes.</span>
+      <span class="hi" lang="hi">कुछ भी अपलोड नहीं होता। आधार और खाता नंबर स्क्रीन पर छिपे रहते हैं, और 30 मिनट बाद सेशन मिट जाता है।</span></div>
+    <div><b><span class="en">Honest about limits</span><span class="hi" lang="hi">सीमाएँ साफ़</span></b>
+      <span class="en">Scheme advice is guidance, with the source and review date of every rule. Records show the date of the copy.</span>
+      <span class="hi" lang="hi">योजना की सलाह सिर्फ़ जानकारी है, हर नियम के स्रोत और जाँच की तारीख़ के साथ। रिकॉर्ड के साथ कॉपी की तारीख़ दिखती है।</span></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2><span class="en">Forms and services today</span><span class="hi" lang="hi">अभी उपलब्ध फ़ॉर्म और सेवाएँ</span></h2>
+  <p class="lead"><span class="en">A new form is a small template file: no retraining.</span><span class="hi" lang="hi">नया फ़ॉर्म जोड़ना बस एक छोटी फ़ाइल है, कोई नई ट्रेनिंग नहीं।</span></p>
+  <div class="pills">
+    <span class="pill">PM-Kisan</span><span class="pill">e-Shram</span><span class="pill"><span class="en">Income certificate</span><span class="hi" lang="hi">आय प्रमाण पत्र</span></span>
+    <span class="pill">Bank KYC</span><span class="pill"><span class="en">Hospital registration</span><span class="hi" lang="hi">अस्पताल पंजीकरण</span></span>
+    <span class="pill"><span class="en">Public grievance</span><span class="hi" lang="hi">शिकायत</span></span><span class="pill">RTI</span>
+    <span class="pill"><span class="en">Land record (khasra)</span><span class="hi" lang="hi">खसरा</span></span><span class="pill"><span class="en">Ration card</span><span class="hi" lang="hi">राशन कार्ड</span></span>
+    <span class="pill"><span class="en">14-scheme eligibility advisor</span><span class="hi" lang="hi">14 योजनाओं की पात्रता सलाह</span></span>
+  </div>
+</div></section>
+
+<section id="pilot"><div class="wrap">
+  <div class="pilot">
+    <h2><span class="en">Run a pilot at your centre</span><span class="hi" lang="hi">अपने केंद्र पर पायलट चलाइए</span></h2>
+    <p><span class="en">We're looking for CSCs, panchayats, NGOs and hospitals to try DwaniForms with real users. Tell us where you are and which forms matter most.</span>
+       <span class="hi" lang="hi">हम सीएससी, पंचायत, एनजीओ और अस्पतालों के साथ असली लोगों पर DwaniForms आज़माना चाहते हैं। बताइए आप कहाँ हैं और कौन से फ़ॉर्म सबसे ज़रूरी हैं।</span></p>
+    <a class="cta" href="mailto:khushimittal070906@gmail.com?subject=DwaniForms%20pilot"><span class="en">Write to us</span><span class="hi" lang="hi">हमें लिखिए</span></a>
+    <p class="note"><span class="en">DwaniForms prepares drafts and guidance; the government office always makes the final decision.</span>
+      <span class="hi" lang="hi">DwaniForms मसौदा और जानकारी तैयार करता है; अंतिम फ़ैसला हमेशा सरकारी विभाग करता है।</span></p>
+  </div>
+</div></section>
+
+<div class="wrap">
+  <footer>
+    <span><span lang="hi">ध्वनि</span> Forms · <span class="en">a</span> <a href="https://dhwani-elit.onrender.com">DwaniLive</a> <span class="en">project</span><span class="hi" lang="hi">की पहल</span></span>
+    <span><a href="https://dhwani-elit.onrender.com/privacy.html"><span class="en">Privacy</span><span class="hi" lang="hi">निजता</span></a></span>
+  </footer>
+</div>
+<script>
+(function () {
+  var btn = document.getElementById("lang");
+  function set(l) {
+    document.body.dataset.lang = l; document.documentElement.lang = l;
+    btn.textContent = l === "hi" ? "English" : "हिन्दी";
+    try { localStorage.setItem("dwaniforms-site:lang", l); } catch (e) {}
+  }
+  var saved = null; try { saved = localStorage.getItem("dwaniforms-site:lang"); } catch (e) {}
+  set(saved || (/^hi/i.test(navigator.language || "") ? "hi" : "en"));
+  btn.addEventListener("click", function () { set(document.body.dataset.lang === "hi" ? "en" : "hi"); });
+})();
+</script>
+</body>
+</html>
