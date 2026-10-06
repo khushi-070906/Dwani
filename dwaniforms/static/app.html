@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DwaniForms</title>
+<style>
+  @font-face { font-family: "Rozha One"; src: url("assets/fonts/RozhaOne-Regular.ttf") format("truetype"); font-display: swap; }
+  @font-face { font-family: "Mukta"; src: url("assets/fonts/Mukta-Regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Mukta"; src: url("assets/fonts/Mukta-SemiBold.ttf") format("truetype"); font-weight: 600; font-display: swap; }
+  @font-face { font-family: "Mukta"; src: url("assets/fonts/Mukta-ExtraBold.ttf") format("truetype"); font-weight: 800; font-display: swap; }
+  :root {
+    --green: #0b5d4b; --green-2: #12775f; --green-soft: #e3f0ea; --sand: #f6f1e6; --card: #fffdf8; --line: #e6dccb;
+    --ink: #1f2a26; --ink-2: #4a5550; --ink-3: #6f7a75; --marigold: #e8a317; --marigold-soft: #fdf2d8; --red: #b3261e;
+    --font: "Mukta", "Nirmala UI", "Noto Sans", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--sand); color: var(--ink); font: 19px/1.55 var(--font); }
+  button { font: inherit; cursor: pointer; }
+  :focus-visible { outline: 4px solid var(--marigold); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+
+  /* ---- header ---- */
+  header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.4rem;
+           background: var(--green); color: #fff; }
+  .logo { display: flex; align-items: baseline; gap: 0.35rem; text-decoration: none; color: inherit; background: none; border: 0; padding: 0; }
+  .logo .dwani { font-family: "Rozha One", Georgia, serif; font-size: 2.1rem; line-height: 1; color: #fff; }
+  .logo .forms { font-weight: 800; letter-spacing: 0.14em; font-size: 0.95rem; color: var(--marigold); text-transform: uppercase; }
+  .hdr-right { display: flex; align-items: center; gap: 0.7rem; }
+  .hdr-right select { font: 600 1rem var(--font); padding: 0.45rem 0.7rem; border-radius: 10px; border: 0; }
+  .op-toggle { background: transparent; color: #cfe5dc; border: 1px solid #3f8f7a; border-radius: 10px; padding: 0.35rem 0.7rem; font-size: 0.85rem; }
+
+  main { max-width: 980px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+  h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0.4rem 0 1.2rem; line-height: 1.25; }
+  .muted { color: var(--ink-3); }
+  .notice { background: var(--marigold-soft); border-left: 5px solid var(--marigold); padding: 0.7rem 1rem; border-radius: 0 12px 12px 0; margin: 0.8rem 0; }
+  .notice.bad { background: #fde8e6; border-color: var(--red); }
+
+  /* ---- home ---- */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; }
+  .tile { text-align: left; background: var(--card); border: 2px solid var(--line); border-radius: 22px; padding: 1.3rem 1.2rem;
+          min-height: 170px; display: flex; flex-direction: column; gap: 0.4rem; transition: transform .08s, border-color .1s; }
+  .tile:hover, .tile:focus-visible { border-color: var(--green); transform: translateY(-2px); }
+  .tile .ico { font-size: 2.4rem; line-height: 1; }
+  .tile b { font-size: 1.25rem; }
+  .tile span { color: var(--ink-2); font-size: 0.95rem; }
+  .tile:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .list { display: grid; gap: 0.7rem; }
+  .row-btn { text-align: left; background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 1rem 1.1rem; }
+  .row-btn:hover { border-color: var(--green); }
+  .row-btn b { display: block; font-size: 1.12rem; }
+  .back { background: none; border: 0; color: var(--green); font-weight: 700; padding: 0.3rem 0; margin-bottom: 0.4rem; }
+
+  /* ---- conversation ---- */
+  .progress { height: 10px; background: var(--line); border-radius: 999px; overflow: hidden; margin: 0.3rem 0 0.4rem; }
+  .progress > i { display: block; height: 100%; width: 0; background: var(--green); transition: width .3s; }
+  .q { background: var(--card); border: 2px solid var(--line); border-radius: 24px; padding: 1.5rem 1.4rem; font-size: clamp(1.25rem, 3vw, 1.6rem);
+       font-weight: 600; min-height: 7rem; }
+  .heard { margin: 0.6rem 0.4rem 0; color: var(--ink-2); font-size: 1rem; min-height: 1.4em; }
+  .talk { display: flex; flex-direction: column; align-items: center; gap: 1rem; margin: 1.4rem 0; }
+  .mic { width: 148px; height: 148px; border-radius: 50%; border: 0; background: var(--green); color: #fff; font-size: 3rem;
+         box-shadow: 0 10px 30px -10px rgba(11, 93, 75, .7); touch-action: none; user-select: none; -webkit-user-select: none; }
+  .mic.rec { background: var(--red); animation: pulse 1.2s ease-out infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(179, 38, 30, .45); } 100% { box-shadow: 0 0 0 26px rgba(179, 38, 30, 0); } }
+  @media (prefers-reduced-motion: reduce) { .mic.rec { animation: none; box-shadow: 0 0 0 14px rgba(179, 38, 30, .18); } }
+  .qhead { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; margin-top: 0.6rem; }
+  .step-count { font-weight: 800; color: var(--green); background: var(--green-soft); border-radius: 999px; padding: 0.15rem 0.8rem; font-size: 0.95rem; }
+  .repeat { background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 0.35rem 0.8rem; font-weight: 700; color: var(--green); }
+  .big-btn { background: transparent; color: #fff; border: 1px solid #3f8f7a; border-radius: 10px; padding: 0.3rem 0.65rem; font-weight: 800; }
+  body.big { font-size: 23px; }
+  body.big .q { font-size: clamp(1.5rem, 4vw, 2rem); }
+  .review-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.7rem; margin: 1rem 0 0; }
+  .review-card { background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 0.8rem 1rem; }
+  .review-card .lbl { color: var(--ink-3); font-size: 0.85rem; }
+  .review-card .val { font-weight: 700; font-size: 1.1rem; word-break: break-word; }
+  .review-card button { margin-top: 0.4rem; background: none; border: 1px solid var(--line); border-radius: 10px; padding: 0.2rem 0.7rem; font-size: 0.85rem; color: var(--green); }
+  .mic:disabled { background: #9db5ad; box-shadow: none; }
+  .mic-label { font-weight: 700; color: var(--ink-2); }
+  .yn { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  .yn button { min-width: 150px; padding: 1rem 1.4rem; border-radius: 18px; border: 0; font-size: 1.3rem; font-weight: 800; }
+  .yes { background: var(--green); color: #fff; }
+  .no { background: #fde8e6; color: var(--red); }
+  .type { display: flex; gap: 0.6rem; width: 100%; max-width: 620px; }
+  .type input { flex: 1; font: inherit; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid var(--line); background: #fff; }
+  .type button, .btn { border: 0; border-radius: 14px; padding: 0.75rem 1.2rem; background: var(--green); color: #fff; font-weight: 700; }
+  .btn.ghost { background: transparent; color: var(--green); border: 2px solid var(--green); }
+  .btn.marigold { background: var(--marigold); color: #1f2a26; }
+  details.answers { margin-top: 1.4rem; background: var(--card); border: 2px solid var(--line); border-radius: 18px; padding: 0.4rem 1rem; }
+  details.answers summary { font-weight: 700; padding: 0.5rem 0; cursor: pointer; }
+  .ans { display: grid; grid-template-columns: 1fr auto; gap: 0.2rem 0.8rem; padding: 0.55rem 0; border-top: 1px dashed var(--line); font-size: 0.98rem; }
+  .ans .lbl { color: var(--ink-3); font-size: 0.85rem; grid-column: 1; }
+  .ans .val { grid-column: 1; font-weight: 600; }
+  .ans .review { color: var(--marigold); font-size: 0.8rem; font-weight: 700; }
+  .ans button { grid-row: 1 / span 2; grid-column: 2; align-self: center; background: none; border: 1px solid var(--line); border-radius: 10px; padding: 0.25rem 0.6rem; font-size: 0.85rem; }
+  .op { margin-top: 1rem; background: #eef3f1; border-radius: 16px; padding: 0.8rem 1rem; font-size: 0.92rem; }
+  .op input, .op select { font: inherit; padding: 0.4rem; border-radius: 8px; border: 1px solid var(--line); }
+
+  /* ---- results ---- */
+  .cards { display: grid; gap: 0.9rem; }
+  .card { background: var(--card); border: 2px solid var(--line); border-radius: 20px; padding: 1.1rem 1.2rem; }
+  .card.likely { border-left: 8px solid var(--green); }
+  .card.maybe { border-left: 8px solid var(--marigold); }
+  .card h3 { margin: 0 0 0.25rem; font-size: 1.2rem; }
+  .card .benefit { font-weight: 600; }
+  .card ul { margin: 0.4rem 0; padding-left: 1.2rem; font-size: 0.95rem; }
+  .card .src { font-size: 0.8rem; color: var(--ink-3); }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 0.3rem 1rem; }
+  .kv dt { color: var(--ink-3); } .kv dd { margin: 0; font-weight: 600; }
+  .tabs { display: flex; gap: 0.4rem; margin-bottom: 0.6rem; }
+  .tabs button { border: 2px solid var(--line); background: var(--card); border-radius: 12px; padding: 0.35rem 0.9rem; font-weight: 700; }
+  .tabs button[aria-pressed="true"] { border-color: var(--green); color: var(--green); }
+  .letter { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 1.6rem 1.8rem; white-space: pre-wrap;
+            font-size: 1rem; line-height: 1.6; }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin: 1rem 0; }
+  footer { text-align: center; color: var(--ink-3); font-size: 0.85rem; padding: 1.5rem; }
+  @media (max-width: 560px) { .mic { width: 120px; height: 120px; } header { padding: 0.7rem 0.9rem; } .logo .dwani { font-size: 1.7rem; } }
+  @media print {
+    header, footer, .no-print, .actions, .tabs, .back { display: none !important; }
+    body, main { background: #fff; padding: 0; max-width: none; }
+    body.print-letter #result > :not(#draft) { display: none !important; }
+    body.print-letter #draft > :not(.letter) { display: none !important; }
+    .letter { border: 0; padding: 0; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <button class="logo" id="home-link" type="button" aria-label="DwaniForms home"><span class="dwani" lang="hi">ध्वनि</span><span class="forms">Forms</span></button>
+  <div class="hdr-right">
+    <label class="sr" for="lang" hidden>Language</label>
+    <select id="lang" aria-label="Language / भाषा">
+      <option value="hi">हिन्दी</option><option value="en">English</option><option value="bn">বাংলা</option><option value="ta">தமிழ்</option>
+      <option value="te">తెలుగు</option><option value="mr">मराठी</option><option value="gu">ગુજરાતી</option><option value="kn">ಕನ್ನಡ</option>
+      <option value="ml">മലയാളം</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option>
+    </select>
+    <button class="big-btn no-print" id="big-btn" type="button" aria-pressed="false" aria-label="Bigger text">A+</button>
+    <button class="op-toggle no-print" id="op-toggle" type="button" aria-pressed="false" data-t="operator">Operator</button>
+  </div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section id="home">
+    <h1 data-t="what">What would you like to do today?</h1>
+    <div class="tiles">
+      <button class="tile" disabled data-go="forms" type="button"><span class="ico" aria-hidden="true">📝</span><b data-t="t_forms">Fill a form</b><span data-t="t_forms_d">PM-Kisan, e-Shram, income certificate, bank KYC...</span></button>
+      <button class="tile" disabled data-go="voice" type="button"><span class="ico" aria-hidden="true">📢</span><b data-t="t_voice">Complaint or RTI</b><span data-t="t_voice_d">Speak your complaint; we write the letter</span></button>
+      <button class="tile" disabled data-go="records" type="button" id="tile-records"><span class="ico" aria-hidden="true">🔍</span><b data-t="t_records">Land / ration record</b><span data-t="t_records_d">Hear your khasra or ration card details</span></button>
+      <button class="tile" disabled data-go="advisor" type="button"><span class="ico" aria-hidden="true">💡</span><b data-t="t_advisor">Which schemes can I get?</b><span data-t="t_advisor_d">A few questions, then the schemes and forms for you</span></button>
+    </div>
+    <p class="muted" style="margin-top:1.6rem" data-t="privacy">Everything stays on this computer. Nothing is sent anywhere.</p>
+  </section>
+
+  <!-- PICK A FORM -->
+  <section id="pick" hidden>
+    <button class="back" type="button" data-back data-t="back">← Back</button>
+    <h1 id="pick-title"></h1>
+    <div class="list" id="pick-list"></div>
+  </section>
+
+  <!-- CONVERSATION -->
+  <section id="talk" hidden>
+    <button class="back no-print" type="button" id="talk-back" data-t="stop">← Stop and go back</button>
+    <div class="muted" id="talk-title"></div>
+    <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+    <div class="qhead">
+      <span class="step-count" id="step-count"></span>
+      <button class="repeat" type="button" id="repeat" data-t="repeat">🔁 Hear the question again</button>
+    </div>
+    <div class="q" id="question" aria-live="polite"></div>
+    <div class="review-grid" id="review" hidden></div>
+    <div class="heard" id="heard" aria-live="polite"></div>
+    <div class="notice" id="mt-note" hidden data-t="mt">Some questions are machine-translated. If one sounds odd, ask the operator.</div>
+    <div class="talk">
+      <div class="yn" id="yn" hidden>
+        <button class="yes" type="button" id="btn-yes" data-t="yes">✓ Yes</button>
+        <button class="no" type="button" id="btn-no" data-t="no">✗ No</button>
+      </div>
+      <button class="mic" id="mic" type="button" aria-label="Hold to speak" disabled>🎤</button>
+      <div class="mic-label" id="mic-label" data-t="hold">Tap the button and speak, tap again when done</div>
+      <form class="type" id="type-form">
+        <input id="type-input" autocomplete="off" aria-label="Type the answer" data-tp="type_ph" placeholder="Or type the answer here">
+        <button type="submit" data-t="send">Send</button>
+      </form>
+      <div class="muted" id="status" role="status"></div>
+    </div>
+    <details class="answers" id="answers"><summary data-t="answers">Your answers</summary><div id="ans-list"></div></details>
+    <div class="op" id="op-panel" hidden>
+      <b>Operator</b> ·
+      <label><input type="checkbox" id="reveal"> <span data-t="show_numbers">Show full numbers</span></label>
+      <div style="margin-top:.5rem">
+        <select id="op-field" aria-label="Field"></select>
+        <input id="op-value" aria-label="Value" placeholder="value">
+        <button class="btn" type="button" id="op-set">Set</button>
+        <span id="op-msg" class="muted"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" hidden>
+    <button class="back no-print" type="button" data-back data-t="home">← Home</button>
+    <h1 id="res-title"></h1>
+    <div class="notice" id="res-say"></div>
+    <div id="draft" hidden>
+      <div class="tabs" id="draft-tabs"></div>
+      <article class="letter" id="letter" tabindex="0"></article>
+      <div class="actions">
+        <button class="btn" type="button" id="print-letter" data-t="print">🖨 Print the letter</button>
+        <button class="btn ghost" type="button" id="pdf" data-t="pdf">PDF (English)</button>
+      </div>
+      <h3 data-t="next">Next steps</h3>
+      <ul id="next-steps"></ul>
+    </div>
+    <div id="lookup" hidden></div>
+    <div id="advice" hidden></div>
+    <div id="formdone" hidden>
+      <div class="actions">
+        <button class="btn" type="button" id="pdf2" data-t="pdf">PDF</button>
+        <button class="btn ghost" type="button" id="json" data-t="json">JSON (portal import)</button>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><span lang="hi">ध्वनि</span> Forms · <span data-t="footer">a DwaniLive project · works offline</span></footer>
+
+<script>
+(function () {
+  "use strict";
+  var B = location.pathname.replace(/\/$/, "");          // mounted at /form
+  var $ = function (id) { return document.getElementById(id); };
+  var UI = {
+    en: {},
+    hi: { what: "आज आप क्या करना चाहते हैं?", t_forms: "फ़ॉर्म भरें", t_forms_d: "पीएम-किसान, ई-श्रम, आय प्रमाण पत्र, बैंक केवाईसी...",
+      t_voice: "शिकायत या आरटीआई", t_voice_d: "अपनी शिकायत बोलिए, पत्र हम लिखेंगे", t_records: "ज़मीन / राशन रिकॉर्ड",
+      t_records_d: "खसरा या राशन कार्ड की जानकारी सुनिए", t_advisor: "कौन सी योजना मिलेगी?", t_advisor_d: "कुछ सवाल, फिर आपके लिए योजनाएँ और फ़ॉर्म",
+      privacy: "सब कुछ इसी कंप्यूटर पर रहता है। कहीं कुछ नहीं भेजा जाता।", back: "← वापस", stop: "← रोकें और वापस जाएँ", home: "← होम",
+      mt: "कुछ सवाल मशीन से अनुवादित हैं। कोई अजीब लगे तो ऑपरेटर से पूछिए।", yes: "✓ हाँ", no: "✗ नहीं", hold: "बटन दबाइए और बोलिए, बोल चुकें तो फिर दबाइए",
+      send: "भेजें", type_ph: "या यहाँ लिखकर जवाब दीजिए", answers: "आपके जवाब", show_numbers: "पूरे नंबर दिखाएँ", print: "🖨 पत्र प्रिंट करें",
+      pdf: "पीडीएफ़", json: "JSON (पोर्टल के लिए)", next: "आगे क्या करें", footer: "DwaniLive की एक पहल · बिना इंटरनेट चलता है",
+      operator: "ऑपरेटर", repeat: "🔁 सवाल फिर से सुनें", step: "सवाल", of: "में से", tap_stop: "● सुन रहे हैं… बोलकर फिर से दबाइए", forms_title: "कौन सा फ़ॉर्म भरना है?", voice_title: "क्या करना है?", records_title: "कौन सा रिकॉर्ड देखना है?",
+      redo: "बदलें", review: "जाँचें", listening: "● सुन रहे हैं... छोड़ने पर भेजेंगे", working: "समझ रहे हैं...",
+      likely: "आपको मिल सकती हैं", maybe: "शायद मिल सकती हैं (जाँच ज़रूरी)", fill: "यह फ़ॉर्म भरें →", how: "कैसे लें",
+      checks: "जाँच लें", reviewed: "नियम आख़िरी बार जाँचे गए", stale: "इन नियमों की दोबारा जाँच ज़रूरी है", why_maybe: "क्यों 'शायद'",
+      not_matched: "अन्य योजनाएँ जिनके लिए आप पात्र नहीं लगते", from_copy: "रिकॉर्ड की कॉपी", demo: "डेमो रिकॉर्ड (असली नहीं)",
+      old: "यह कॉपी पुरानी है। सरकारी पोर्टल पर भी जाँचें।", voice_off: "इस भाषा में आवाज़ से जवाब उपलब्ध नहीं है, लिखकर जवाब दीजिए।",
+      mic_denied: "माइक नहीं मिला", unavailable: "अभी उपलब्ध नहीं (ऑपरेटर रिकॉर्ड जोड़ सकते हैं)" }
+  };
+  var EN = { repeat: "🔁 Hear the question again", step: "Question", of: "of", tap_stop: "● Listening… tap again when you're done",
+    hold: "Tap the button and speak, tap again when done", forms_title: "Which form?", voice_title: "What do you want to do?", records_title: "Which record?", redo: "Change",
+    review: "check", listening: "● Listening... release to send", working: "Understanding...", likely: "You may be able to get",
+    maybe: "You might be able to get (needs checking)", fill: "Fill this form →", how: "How to get it", checks: "Check",
+    reviewed: "Rules last reviewed", stale: "These rules need to be re-checked", why_maybe: "Why 'maybe'",
+    not_matched: "other schemes don't seem to match your answers", from_copy: "Copy of the records from", demo: "Demo records (not real)",
+    old: "This copy is old. Please also check the official portal.", voice_off: "Voice answers aren't available in this language yet; please type.",
+    mic_denied: "Microphone unavailable", unavailable: "Not available yet (the operator can add the records)" };
+  var lang = "hi", sid = null, cur = null, forms = [], caps = {}, reveal = false, done = null;
+
+  function t(k) { return (UI[lang] && UI[lang][k]) || EN[k] || k; }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function applyUI() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-t]").forEach(function (el) {
+      if (!el.dataset.en) el.dataset.en = el.textContent;
+      el.textContent = (UI[lang] && UI[lang][el.dataset.t]) || el.dataset.en;
+    });
+    document.querySelectorAll("[data-tp]").forEach(function (el) {
+      if (!el.dataset.enp) el.dataset.enp = el.placeholder;
+      el.placeholder = (UI[lang] && UI[lang][el.dataset.tp]) || el.dataset.enp;
+    });
+  }
+  function api(path, opt) {
+    opt = opt || {};
+    opt.headers = Object.assign({}, opt.headers || {}, reveal ? { "x-reveal-sensitive": "1" } : {});
+    if (opt.json !== undefined) { opt.body = JSON.stringify(opt.json); opt.headers["content-type"] = "application/json"; delete opt.json; }
+    return fetch(B + path, opt).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.detail || ("HTTP " + r.status)); return j; });
+    });
+  }
+  function speak(text) {
+    try { speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(text); u.lang = lang; speechSynthesis.speak(u); } catch (e) {}
+  }
+  function show(id) { ["home", "pick", "talk", "result"].forEach(function (v) { $(v).hidden = v !== id; }); try { window.scrollTo(0, 0); } catch (e) {} }
+  function endSession() {
+    if (!sid) return;
+    var id = sid; sid = null;
+    fetch(B + "/sessions/" + id, { method: "DELETE", keepalive: true }).catch(function () {});
+  }
+
+  // ---------------- home & pickers
+  var GROUPS = {
+    forms: { title: "forms_title", match: function (f) { return f.flow === "form"; } },
+    voice: { title: "voice_title", match: function (f) { return f.flow === "grievance" || f.flow === "rti"; } },
+    records: { title: "records_title", match: function (f) { return f.flow === "lookup_land" || f.flow === "lookup_ration"; } }
+  };
+  function pick(group) {
+    var g = GROUPS[group];
+    $("pick-title").textContent = t(g.title);
+    var list = $("pick-list"); list.innerHTML = "";
+    forms.filter(g.match).forEach(function (f) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "row-btn";
+      var desc = (f.description && (f.description[lang] || f.description.en)) || "";
+      b.innerHTML = "<b></b><span class='muted'></span>";
+      b.querySelector("b").textContent = (f.titles && f.titles[lang]) || f.title;
+      b.querySelector("span").textContent = f.available ? desc : t("unavailable");
+      b.disabled = !f.available;
+      b.addEventListener("click", function () { start(f.id); });
+      list.appendChild(b);
+    });
+    show("pick");
+  }
+  document.querySelectorAll(".tile").forEach(function (b) {
+    b.addEventListener("click", function () { var g = b.dataset.go; if (g === "advisor") start("scheme_advisor"); else pick(g); });
+  });
+  document.querySelectorAll("[data-back]").forEach(function (b) { b.addEventListener("click", goHome); });
+  $("home-link").addEventListener("click", goHome);
+  $("talk-back").addEventListener("click", goHome);
+  function goHome() { endSession(); cur = null; try { speechSynthesis.cancel(); } catch (e) {} show("home"); }
+
+  // ---------------- a flow
+  function start(formId, prefillFrom) {
+    var body = { form_id: formId, lang: lang };
+    if (prefillFrom) body.prefill_from = prefillFrom;
+    var prev = sid;
+    api("/sessions", { method: "POST", json: body }).then(function (r) {
+      if (prev && prev !== prefillFrom) fetch(B + "/sessions/" + prev, { method: "DELETE", keepalive: true }).catch(function () {});
+      sid = r.session_id; done = null;
+      $("talk-title").textContent = r.title || "";
+      $("heard").textContent = "";
+      show("talk");
+      render(r);
+    }).catch(function (e) { alert(e.message); });
+  }
+  function voiceOK() { return caps.asr && (caps.asr_langs || []).indexOf(lang) > -1 && navigator.mediaDevices && window.isSecureContext; }
+  function render(r) {
+    cur = r;
+    if (r.done) { showResult(r); return; }
+    $("question").textContent = r.text;
+    speak(r.text);
+    $("mt-note").hidden = !r.machine_translated;
+    $("yn").hidden = !(r.phase === "confirm" || r.phase === "final");
+    var fields = r.fields || [];
+    var filled = fields.filter(function (f) { return f.value; }).length;
+    $("bar").style.width = (fields.length ? Math.round(100 * filled / fields.length) : 0) + "%";
+    var pos = fields.findIndex(function (f) { return f.id === r.field_id; });
+    $("step-count").textContent = pos > -1 ? t("step") + " " + (pos + 1) + " / " + fields.length : "✓ " + filled + " / " + fields.length;
+    renderAnswers(fields);
+    renderReview(r.phase === "final" || r.phase === "fix" ? fields : []);
+    var ok = voiceOK();
+    $("mic").disabled = !ok;
+    $("mic-label").textContent = ok ? t("hold") : t("voice_off");
+    $("status").textContent = r.phase === "escalate" ? "⚠" : "";
+    if (r.phase === "escalate") $("op-panel").hidden = false;
+  }
+  function renderAnswers(fields) {
+    var box = $("ans-list"); box.innerHTML = "";
+    var sel = $("op-field"); sel.innerHTML = "";
+    fields.forEach(function (f) {
+      var o = document.createElement("option"); o.value = f.id; o.textContent = f.label; sel.appendChild(o);
+      if (!f.value) return;
+      var d = document.createElement("div"); d.className = "ans";
+      d.innerHTML = "<span class='lbl'></span><span class='val'></span><button type='button'></button>";
+      d.querySelector(".lbl").textContent = f.label;
+      d.querySelector(".val").textContent = f.native && f.native !== f.value && f.kind !== "date" ? f.native : f.value;
+      if (f.needs_review) d.querySelector(".lbl").insertAdjacentHTML("beforeend", " <span class='review'>• " + esc(t("review")) + "</span>");
+      var b = d.querySelector("button"); b.textContent = t("redo");
+      b.addEventListener("click", function () { api("/sessions/" + sid + "/redo", { method: "POST", json: { field_id: f.id } }).then(render); });
+      box.appendChild(d);
+    });
+  }
+  function renderReview(fields) {
+    var box = $("review"); box.innerHTML = "";
+    fields.filter(function (f) { return f.value; }).forEach(function (f) {
+      var c = document.createElement("div"); c.className = "review-card";
+      c.innerHTML = "<div class='lbl'></div><div class='val'></div><button type='button'></button>";
+      c.querySelector(".lbl").textContent = f.label;
+      c.querySelector(".val").textContent = f.native && f.native !== f.value && f.kind !== "date" ? f.native : f.value;
+      var b = c.querySelector("button"); b.textContent = t("redo");
+      b.addEventListener("click", function () { api("/sessions/" + sid + "/redo", { method: "POST", json: { field_id: f.id } }).then(render); });
+      box.appendChild(c);
+    });
+    box.hidden = !box.children.length;
+  }
+  $("repeat").addEventListener("click", function () { if (cur && cur.text) speak(cur.text); });
+  $("big-btn").addEventListener("click", function () {
+    var on = !document.body.classList.contains("big");
+    document.body.classList.toggle("big", on); this.setAttribute("aria-pressed", String(on));
+    try { localStorage.setItem("dwaniforms:big", on ? "1" : ""); } catch (e) {}
+  });
+  try { if (localStorage.getItem("dwaniforms:big")) { document.body.classList.add("big"); $("big-btn").setAttribute("aria-pressed", "true"); } } catch (e) {}
+
+  function send(text) {
+    if (!sid || !text) return;
+    $("status").textContent = t("working");
+    api("/sessions/" + sid + "/text", { method: "POST", json: { text: text } }).then(render)
+      .catch(function (e) { $("status").textContent = e.message; });
+  }
+  $("type-form").addEventListener("submit", function (e) { e.preventDefault(); var v = $("type-input").value.trim(); $("type-input").value = ""; send(v); });
+  $("btn-yes").addEventListener("click", function () { send(lang === "hi" ? "हाँ" : "yes"); });
+  $("btn-no").addEventListener("click", function () { send(lang === "hi" ? "नहीं" : "no"); });
+  $("op-toggle").addEventListener("click", function () {
+    var on = $("op-panel").hidden; $("op-panel").hidden = !on; this.setAttribute("aria-pressed", String(on));
+  });
+  $("reveal").addEventListener("change", function () { reveal = this.checked; if (sid) api("/sessions/" + sid).then(function (s) { renderAnswers(s.fields || []); }); });
+  $("op-set").addEventListener("click", function () {
+    api("/sessions/" + sid + "/operator", { method: "POST", json: { field_id: $("op-field").value, value: $("op-value").value } })
+      .then(function (r) { $("op-msg").textContent = "✓"; $("op-value").value = ""; render(r); })
+      .catch(function (e) { $("op-msg").textContent = e.message; });
+  });
+
+  // ---------------- results
+  function showResult(r) {
+    done = r;
+    var o = r.outcome || {};
+    $("res-title").textContent = r.title || "";
+    $("res-say").textContent = o.say || r.text;
+    speak(o.say || r.text);
+    ["draft", "lookup", "advice", "formdone"].forEach(function (id) { $(id).hidden = true; });
+    if (o.type === "draft") renderDraft(o);
+    else if (o.type === "lookup") renderLookup(o);
+    else if (o.type === "advisor") renderAdvice(o);
+    else $("formdone").hidden = false;
+    show("result");
+  }
+  function renderDraft(o) {
+    var tabs = $("draft-tabs"); tabs.innerHTML = "";
+    var langs = Object.keys(o.drafts || {});
+    var pickLang = function (l) {
+      $("letter").textContent = o.drafts[l]; $("letter").lang = l;
+      tabs.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.l === l)); });
+    };
+    langs.forEach(function (l) {
+      var b = document.createElement("button"); b.type = "button"; b.dataset.l = l; b.textContent = l === "hi" ? "हिन्दी" : "English";
+      b.addEventListener("click", function () { pickLang(l); }); tabs.appendChild(b);
+    });
+    tabs.hidden = langs.length < 2;
+    pickLang(langs.indexOf(lang) > -1 ? lang : langs[0]);
+    var ul = $("next-steps"); ul.innerHTML = "";
+    (o.next_steps || []).forEach(function (s) { var li = document.createElement("li"); li.textContent = s; ul.appendChild(li); });
+    $("draft").hidden = false;
+  }
+  function recordNote(o) {
+    var bits = [];
+    if (o.demo) bits.push("<div class='notice bad'>" + esc(t("demo")) + "</div>");
+    if (o.as_of) bits.push("<p class='muted'>" + esc(t("from_copy")) + " " + esc(o.as_of) + (o.source ? " · " + esc(o.source) : "") + "</p>");
+    if (o.stale) bits.push("<div class='notice'>" + esc(t("old")) + "</div>");
+    return bits.join("");
+  }
+  function renderLookup(o) {
+    var h = recordNote(o);
+    (o.results || []).forEach(function (row) {
+      h += "<div class='card'><dl class='kv'>" + Object.keys(row).map(function (k) {
+        return "<dt>" + esc(k) + "</dt><dd>" + esc(row[k]) + "</dd>"; }).join("") + "</dl></div>";
+    });
+    $("lookup").innerHTML = h; $("lookup").hidden = false;
+  }
+  function renderAdvice(o) {
+    var box = $("advice"); box.innerHTML = "";
+    function group(title, items, cls) {
+      if (!items.length) return;
+      var h = document.createElement("h2"); h.textContent = title; box.appendChild(h);
+      var wrap = document.createElement("div"); wrap.className = "cards"; box.appendChild(wrap);
+      items.forEach(function (s) {
+        var c = document.createElement("div"); c.className = "card " + cls;
+        c.innerHTML = "<h3></h3><div class='benefit'></div><p class='how'></p>" +
+          (s.reasons && s.reasons.length ? "<div><b></b><ul class='reasons'></ul></div>" : "") +
+          (s.checks && s.checks.length ? "<div><b></b><ul class='checks'></ul></div>" : "") +
+          "<p class='src'></p><div class='actions'></div>";
+        c.querySelector("h3").textContent = s.name;
+        c.querySelector(".benefit").textContent = s.benefit;
+        c.querySelector(".how").textContent = t("how") + ": " + s.apply;
+        if (s.reasons && s.reasons.length) { c.querySelector("div b").textContent = t("why_maybe");
+          s.reasons.forEach(function (x) { var li = document.createElement("li"); li.textContent = x; c.querySelector(".reasons").appendChild(li); }); }
+        if (s.checks && s.checks.length) { var bs = c.querySelectorAll("div b"); bs[bs.length - 1].textContent = t("checks");
+          s.checks.forEach(function (x) { var li = document.createElement("li"); li.textContent = x; c.querySelector(".checks").appendChild(li); }); }
+        c.querySelector(".src").textContent = s.source + " · " + t("reviewed") + ": " + s.last_reviewed + (s.stale ? " ⚠ " + t("stale") : "");
+        if (s.form) {
+          var b = document.createElement("button"); b.type = "button"; b.className = "btn marigold";
+          b.textContent = t("fill") + " " + ((o.form_titles || {})[s.form] || "");
+          var advisorSid = sid;
+          b.addEventListener("click", function () { start(s.form, advisorSid); });
+          c.querySelector(".actions").appendChild(b);
+        }
+        wrap.appendChild(c);
+      });
+    }
+    group(t("likely"), o.likely || [], "likely");
+    group(t("maybe"), o.maybe || [], "maybe");
+    if (o.not_matched) { var p = document.createElement("p"); p.className = "muted"; p.textContent = o.not_matched + " " + t("not_matched"); box.appendChild(p); }
+    box.hidden = false;
+  }
+  $("print-letter").addEventListener("click", function () {
+    document.body.classList.add("print-letter"); window.print();
+    setTimeout(function () { document.body.classList.remove("print-letter"); }, 500);
+  });
+  $("pdf").addEventListener("click", function () { window.open(B + "/sessions/" + sid + "/export.pdf"); });
+  $("pdf2").addEventListener("click", function () { window.open(B + "/sessions/" + sid + "/export.pdf"); });
+  $("json").addEventListener("click", function () { window.open(B + "/sessions/" + sid + "/export.json"); });
+
+  // ---------------- push-to-talk: mic -> 16 kHz PCM16 (box-filtered, no aliasing) -> POST raw bytes
+  var WORKLET = "class R extends AudioWorkletProcessor{process(i){const c=i[0]&&i[0][0];if(c)this.port.postMessage(c.slice(0));return true}}registerProcessor('dwani-rec',R)";
+  var rec = null, want = false, mic = $("mic");
+  function toPCM16(chunks, rate) {
+    var n = chunks.reduce(function (a, c) { return a + c.length; }, 0), all = new Float32Array(n), o = 0;
+    chunks.forEach(function (c) { all.set(c, o); o += c.length; });
+    var ratio = rate / 16000, m = Math.floor(n / ratio), pcm = new Int16Array(m);
+    for (var i = 0; i < m; i++) {
+      var a = Math.floor(i * ratio), b = Math.max(a + 1, Math.min(n, Math.floor((i + 1) * ratio))), s = 0;
+      for (var j = a; j < b; j++) s += all[j];
+      s = Math.max(-1, Math.min(1, s / (b - a))); pcm[i] = s < 0 ? s * 32768 : s * 32767;
+    }
+    return pcm;
+  }
+  function startRec(e) {
+    if (rec || want || !sid || mic.disabled) return; want = true;
+    try { speechSynthesis.cancel(); } catch (_) {}
+    try { if (e && e.pointerId !== undefined) mic.setPointerCapture(e.pointerId); } catch (_) {}
+    navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }).then(function (stream) {
+      if (!want) { stream.getTracks().forEach(function (tr) { tr.stop(); }); return; }
+      var ctx = new AudioContext(), src = ctx.createMediaStreamSource(stream), chunks = [];
+      var sink = ctx.createGain(); sink.gain.value = 0; sink.connect(ctx.destination);
+      var setup = ctx.audioWorklet
+        ? ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: "application/javascript" }))).then(function () {
+            var node = new AudioWorkletNode(ctx, "dwani-rec"); node.port.onmessage = function (ev) { chunks.push(ev.data); }; return node; })
+        : Promise.resolve((function () { var node = ctx.createScriptProcessor(4096, 1, 1);
+            node.onaudioprocess = function (ev) { chunks.push(new Float32Array(ev.inputBuffer.getChannelData(0))); }; return node; })());
+      return setup.then(function (node) {
+        src.connect(node); node.connect(sink); rec = { ctx: ctx, stream: stream, node: node, chunks: chunks };
+        mic.classList.add("rec"); $("mic-label").textContent = tapMode ? t("tap_stop") : t("listening");
+        if (!want) stopRec();
+      });
+    }).catch(function (err) { want = false; $("status").textContent = t("mic_denied") + ": " + err.message; });
+  }
+  function stopRec() {
+    want = false; if (!rec) return;
+    var r = rec; rec = null;
+    r.node.disconnect(); r.stream.getTracks().forEach(function (tr) { tr.stop(); });
+    var rate = r.ctx.sampleRate; r.ctx.close();
+    mic.classList.remove("rec"); $("mic-label").textContent = t("hold");
+    var pcm = toPCM16(r.chunks, rate); if (pcm.length < 4800) return;   // < 0.3 s: an accidental tap
+    mic.disabled = true; $("status").textContent = t("working");
+    fetch(B + "/sessions/" + sid + "/audio", { method: "POST", headers: Object.assign({ "x-sample-rate": "16000", "content-type": "application/octet-stream" },
+      reveal ? { "x-reveal-sensitive": "1" } : {}), body: pcm.buffer })
+      .then(function (res) { return res.json().then(function (j) { if (!res.ok) throw new Error(j.detail || res.status); return j; }); })
+      .then(function (j) { $("heard").textContent = "🗣 " + j.transcript; $("status").textContent = ""; render(j); })
+      .catch(function (err) { $("status").textContent = err.message; mic.disabled = !voiceOK(); });
+  }
+  // Tap to start / tap to stop (easier for older hands), or press and hold: a press longer than 600 ms
+  // is treated as hold-to-talk and stops on release.
+  var downAt = 0, tapMode = false;
+  mic.addEventListener("pointerdown", function (e) {
+    if (rec || want) { if (tapMode) { tapMode = false; stopRec(); } return; }
+    downAt = Date.now(); startRec(e);
+  });
+  mic.addEventListener("pointerup", function () {
+    if (!downAt) return;
+    var held = Date.now() - downAt; downAt = 0;
+    if (held < 600) { tapMode = true; $("mic-label").textContent = t("tap_stop"); } else stopRec();
+  });
+  mic.addEventListener("pointercancel", function () { downAt = 0; if (!tapMode) stopRec(); });
+  mic.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  mic.addEventListener("keydown", function (e) { if ((e.key === " " || e.key === "Enter") && !e.repeat) { e.preventDefault(); startRec(); } });
+  mic.addEventListener("keyup", function (e) { if (e.key === " " || e.key === "Enter") { e.preventDefault(); stopRec(); } });
+
+  // ---------------- boot
+  $("lang").addEventListener("change", function () { lang = this.value; try { localStorage.setItem("dwaniforms:lang", lang); } catch (e) {} applyUI(); if (cur && !cur.done) goHome(); });
+  try { var saved = localStorage.getItem("dwaniforms:lang"); if (saved) { lang = saved; $("lang").value = saved; } } catch (e) {}
+  applyUI();
+  window.addEventListener("pagehide", endSession);
+  Promise.all([api("/forms"), api("/capabilities")]).then(function (res) {
+    forms = res[0]; caps = res[1];
+    // tiles stay disabled until the forms are known, so an early tap never opens an empty list
+    document.querySelectorAll(".tile").forEach(function (tile) { tile.disabled = false; });
+    var anyRecords = forms.some(function (f) { return GROUPS.records.match(f) && f.available; });
+    $("tile-records").disabled = !anyRecords;
+  }).catch(function () { $("status").textContent = "DwaniForms is not reachable on this computer."; });
+})();
+</script>
+</body>
+</html>
