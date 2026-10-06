@@ -4,172 +4,457 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DwaniForms: speak, and the form fills itself</title>
-<meta name="description" content="DwaniForms helps people fill government forms, file complaints and RTI applications, check land and ration records, and find schemes, just by speaking in their own language. Works offline at CSCs, panchayats and hospitals.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230b5d4b'/><text x='50%25' y='58%25' font-size='40' text-anchor='middle' fill='%23e8a317' font-family='serif'>ध</text></svg>">
+<meta name="description" content="DwaniForms fills government forms, complaints and RTI applications, checks land and ration records, and finds schemes, just by speaking in your own language. Works offline at CSCs, panchayats and hospitals.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%230b5d4b'/><text x='50%25' y='60%25' font-size='42' text-anchor='middle' fill='%23e8a317' font-family='serif'>ध</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;600;800&family=Kalam:wght@400;700&display=swap">
 <style>
-  :root { --green: #0b5d4b; --green-2: #12775f; --green-soft: #e3f0ea; --sand: #f6f1e6; --card: #fffdf8; --line: #e6dccb;
-          --ink: #1f2a26; --ink-2: #4a5550; --ink-3: #6f7a75; --marigold: #e8a317; --marigold-soft: #fdf2d8; }
+  :root {
+    --peacock: #0b5d4b; --peacock-2: #12775f; --peacock-3: #06382c; --leaf: #12775f; --haldi: #e8a317; --haldi-soft: #fdf2d8;
+    --sindoor: #c0502a; --sindoor-soft: #f9e3d9; --paper: #fffdf8; --sand: #f6f1e6; --line: #e6dccb;
+    --ink: #1f2a26; --ink-2: #4a5550; --ink-3: #6f7a75;
+  }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body { margin: 0; background: var(--sand); color: var(--ink); font: 18px/1.6 "Mukta", "Nirmala UI", system-ui, sans-serif; }
-  a { color: var(--green); }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.3rem; }
-  nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; }
-  .logo { display: flex; align-items: baseline; gap: 0.4rem; text-decoration: none; }
-  .logo .dwani { font-family: "Rozha One", Georgia, serif; font-size: 2rem; color: var(--green); line-height: 1; }
-  .logo .forms { font-weight: 800; letter-spacing: 0.16em; color: var(--marigold); text-transform: uppercase; font-size: 0.9rem; }
-  .nav-links { display: flex; gap: 1.2rem; align-items: center; font-weight: 600; }
-  .nav-links a { text-decoration: none; color: var(--ink-2); }
-  .lang { border: 2px solid var(--line); background: var(--card); border-radius: 999px; padding: 0.25rem 0.8rem; font: 700 0.9rem "Mukta", sans-serif; cursor: pointer; }
-  .hero { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 2.5rem; align-items: center; padding: 3rem 0 3.5rem; }
-  .hero h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.1; margin: 0 0 1rem; }
-  .hero h1 em { font-style: normal; color: var(--green); }
-  .hero p { font-size: 1.15rem; color: var(--ink-2); margin: 0 0 1.5rem; }
-  .cta { display: inline-block; background: var(--green); color: #fff; text-decoration: none; font-weight: 800; padding: 0.85rem 1.4rem; border-radius: 14px; margin-right: 0.6rem; }
-  .cta.ghost { background: transparent; color: var(--green); border: 2px solid var(--green); }
-  .kiosk { background: var(--card); border: 2px solid var(--line); border-radius: 28px; padding: 1.4rem; box-shadow: 0 30px 60px -30px rgba(11, 93, 75, .45); }
-  .kiosk .bubble { background: var(--green-soft); border-radius: 18px; padding: 0.8rem 1rem; margin-bottom: 0.6rem; font-weight: 600; }
-  .kiosk .bubble.me { background: var(--marigold-soft); margin-left: 2.5rem; font-weight: 400; }
-  .kiosk .mic { width: 84px; height: 84px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font-size: 2rem; margin: 1rem auto 0; }
-  section { padding: 3rem 0; }
-  h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); margin: 0 0 0.6rem; }
-  .lead { color: var(--ink-2); max-width: 720px; margin: 0 0 2rem; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; }
-  .card { background: var(--card); border: 2px solid var(--line); border-radius: 22px; padding: 1.3rem; }
-  .card .ico { font-size: 2rem; }
-  .card h3 { margin: 0.4rem 0 0.3rem; font-size: 1.2rem; }
-  .card p { margin: 0; color: var(--ink-2); font-size: 0.98rem; }
-  .steps { counter-reset: s; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
-  .step { position: relative; background: var(--card); border-radius: 22px; padding: 1.3rem 1.3rem 1.3rem 4.2rem; border: 2px solid var(--line); }
-  .step::before { counter-increment: s; content: counter(s); position: absolute; left: 1.2rem; top: 1.2rem; width: 2.2rem; height: 2.2rem;
-                  border-radius: 50%; background: var(--marigold); display: grid; place-items: center; font-weight: 800; }
-  .band { background: var(--green); color: #fff; border-radius: 28px; padding: 2.2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.4rem; }
-  .band b { color: var(--marigold); display: block; font-size: 1.1rem; }
-  .pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-  .pill { background: var(--card); border: 2px solid var(--line); border-radius: 999px; padding: 0.35rem 0.9rem; font-weight: 600; font-size: 0.95rem; }
-  .pilot { background: var(--marigold-soft); border: 2px solid var(--marigold); border-radius: 28px; padding: 2.2rem; text-align: center; }
-  .note { font-size: 0.85rem; color: var(--ink-3); }
-  footer { padding: 2rem 0 3rem; color: var(--ink-3); font-size: 0.92rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-  [data-lang="hi"] .en, [data-lang="en"] .hi { display: none; }
-  @media (max-width: 820px) { .hero { grid-template-columns: 1fr; padding-top: 1.5rem; } .nav-links a.hide-sm { display: none; } }
+  a { color: var(--peacock-2); }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 1.3rem; }
+  [data-lang="hi"] .en, [data-lang="en"] .hi { display: none !important; }
+  .hero { background: var(--peacock); color: #fff; position: relative; overflow: hidden; }
+  .hero::after { content: ""; position: absolute; width: 620px; height: 620px; border-radius: 50%; right: -180px; top: -220px;
+    background: radial-gradient(circle, rgba(232,163,23,.28), rgba(192,80,42,.08) 45%, transparent 70%); }
+  nav { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 0; }
+  .logo { display: flex; align-items: baseline; gap: 0.45rem; text-decoration: none; }
+  .logo .dwani { font-family: "Rozha One", Georgia, serif; font-size: 2.2rem; color: #fff; line-height: 1; }
+  .logo .forms { font-weight: 800; letter-spacing: .18em; color: var(--haldi); text-transform: uppercase; font-size: .92rem; }
+  .nav-links { display: flex; gap: 1.3rem; align-items: center; font-weight: 600; }
+  .nav-links a { text-decoration: none; color: #d3e9e0; }
+  .nav-links a:hover { color: #fff; }
+  .lang { border: 0; background: var(--haldi); color: var(--ink); border-radius: 999px; padding: .3rem .9rem; font: 800 .9rem "Mukta", sans-serif; cursor: pointer; }
+  .hero-grid { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: center; padding: 2.5rem 0 4.5rem; }
+  .eyebrow { display: inline-flex; gap: .5rem; align-items: center; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+    border-radius: 999px; padding: .25rem .8rem; font-size: .9rem; color: #e3f1ea; }
+  .eyebrow b { background: var(--sindoor); color: #fff; border-radius: 999px; padding: 0 .5rem; font-size: .78rem; }
+  .hero h1 { font-size: clamp(2.4rem, 5.4vw, 4rem); line-height: 1.04; margin: 1rem 0; letter-spacing: -.01em; }
+  .hero h1 .hl { color: var(--haldi); position: relative; white-space: nowrap; }
+  .hero h1 .hl::after { content: ""; position: absolute; left: 0; right: 0; bottom: .05em; height: .14em; background: var(--sindoor); border-radius: 4px; transform: rotate(-1deg); }
+  .hero p.sub { color: #d3e9e0; font-size: 1.18rem; margin: 0 0 1.6rem; max-width: 34rem; }
+  .cta { display: inline-flex; align-items: center; gap: .5rem; background: var(--haldi); color: var(--ink); text-decoration: none; font-weight: 800;
+         padding: .9rem 1.4rem; border-radius: 16px; margin: 0 .6rem .6rem 0; box-shadow: 0 8px 0 #a87410; transition: transform .1s, box-shadow .1s; }
+  .cta:active { transform: translateY(4px); box-shadow: 0 4px 0 #a87410; }
+  .cta.ghost { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,.5); box-shadow: none; }
+  .stats { display: flex; gap: 1.6rem; margin-top: 1.4rem; flex-wrap: wrap; }
+  .stats div { font-size: .9rem; color: #c0ddd1; }
+  .stats b { display: block; font-size: 1.6rem; color: #fff; line-height: 1.1; }
+  .device { background: var(--paper); color: var(--ink); border-radius: 30px; border: 8px solid #06382c;
+            box-shadow: 0 40px 80px -30px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.1); transform: rotate(1.5deg); overflow: hidden; }
+  .device-bar { background: var(--peacock-3); display: flex; justify-content: space-between; align-items: center; padding: .55rem 1rem; }
+  .device-bar .logo .dwani { font-size: 1.35rem; } .device-bar .logo .forms { font-size: .7rem; }
+  .device-bar small { color: #9cc8b8; font-size: .78rem; }
+  .device .mini { padding: 1rem; display: grid; gap: .55rem; }
+  .bubble { border-radius: 18px; padding: .65rem .9rem; max-width: 88%; font-size: .98rem; line-height: 1.45; }
+  .bubble.bot { background: #e3f0ea; border-bottom-left-radius: 6px; }
+  .bubble.me { background: var(--haldi-soft); justify-self: end; align-self: flex-end; border-bottom-right-radius: 6px; }
+  .bubble.sys { background: var(--sindoor-soft); justify-self: center; align-self: center; font-size: .82rem; color: #8a2d12; font-weight: 600; }
+  .device .microw { display: flex; justify-content: center; padding: .4rem 0 1rem; }
+  section { padding: 4.5rem 0; }
+  h2 { font-size: clamp(1.8rem, 3.8vw, 2.6rem); line-height: 1.15; margin: 0 0 .6rem; }
+  .lead { color: var(--ink-2); max-width: 760px; margin: 0 0 2rem; font-size: 1.1rem; }
+  .kicker { color: var(--sindoor); font-weight: 800; letter-spacing: .14em; text-transform: uppercase; font-size: .82rem; }
+  #stories { background: var(--paper); border-top: 6px solid var(--haldi); }
+  .people { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9rem; margin: 1.5rem 0 1.4rem; }
+  .person { display: flex; gap: .8rem; align-items: center; text-align: left; background: #fff; border: 2px solid var(--line); border-radius: 20px;
+            padding: .8rem 1rem; cursor: pointer; font: inherit; color: inherit; transition: border-color .15s, transform .15s; }
+  .person:hover { transform: translateY(-2px); }
+  .person[aria-pressed="true"] { border-color: var(--peacock); background: #e9f3ee; }
+  .avatar { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; font-size: 1.6rem; flex: none; }
+  .person b { display: block; font-size: 1.05rem; } .person span { color: var(--ink-2); font-size: .88rem; line-height: 1.3; display: block; }
+  .stage { display: grid; grid-template-columns: 1.05fr .95fr; gap: 1.4rem; align-items: start; }
+  .kiosk { background: #fff; border-radius: 28px; border: 2px solid var(--line); overflow: hidden; box-shadow: 0 30px 60px -40px rgba(11,93,75,.6); }
+  .kiosk-top { background: var(--peacock); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: .6rem 1rem; }
+  .kiosk-top .logo .dwani { font-size: 1.4rem; } .kiosk-top .logo .forms { font-size: .7rem; }
+  .scene { color: #cfe5dc; font-size: .82rem; }
+  .progress { height: 8px; background: #e6efe9; } .progress i { display: block; height: 100%; width: 0; background: var(--haldi); transition: width .5s; }
+  .chat { height: 420px; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: .55rem; scroll-behavior: smooth; }
+  .chat .bubble { animation: pop .35s ease-out both; }
+  .chat .bubble .tr { display: block; font-size: .8rem; color: var(--ink-3); margin-top: .15rem; }
+  .chat .bubble.me::before { content: "🗣 "; }
+  @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.97); } to { opacity: 1; transform: none; } }
+  .typing { display: inline-flex; gap: 4px; } .typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--peacock-2); animation: blink 1s infinite; }
+  .typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+  .kiosk-foot { border-top: 2px dashed var(--line); padding: .9rem 1rem 1.1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .mic { width: 74px; height: 74px; border-radius: 50%; border: 0; background: var(--peacock); color: #fff; font-size: 1.9rem; display: grid; place-items: center; flex: none; }
+  .mic.live { background: var(--sindoor); animation: ring 1.1s infinite; }
+  @keyframes ring { 0% { box-shadow: 0 0 0 0 rgba(192,80,42,.45); } 100% { box-shadow: 0 0 0 22px rgba(192,80,42,0); } }
+  .wave { display: flex; align-items: center; gap: 3px; height: 34px; flex: 1; }
+  .wave i { flex: 1; max-width: 6px; height: 6px; border-radius: 4px; background: var(--line); transition: height .12s; }
+  .wave.live i { background: var(--sindoor); }
+  .controls { display: flex; gap: .5rem; }
+  .ctl { border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: .45rem .8rem; font: 700 .9rem "Mukta", sans-serif; cursor: pointer; color: var(--peacock); }
+  .ctl.primary { background: var(--peacock); border-color: var(--peacock); color: #fff; }
+  .paper { background: #fffdf7; border-radius: 6px; padding: 1.6rem 1.6rem 1.8rem; position: relative; min-height: 560px;
+           box-shadow: 0 1px 0 #e9dfc8, 0 2px 0 #fff, 0 3px 0 #e9dfc8, 0 24px 50px -30px rgba(30,36,51,.45);
+           background-image: linear-gradient(transparent 31px, #eef0f5 32px); background-size: 100% 32px; }
+  .paper::before { content: ""; position: absolute; left: 2.2rem; top: 0; bottom: 0; width: 2px; background: #f6c5b6; }
+  .paper .gov { text-align: center; font-weight: 800; letter-spacing: .06em; color: var(--peacock); font-size: .82rem; text-transform: uppercase; }
+  .paper h3 { text-align: center; margin: .1rem 0 1rem; font-size: 1.25rem; }
+  .row { display: grid; grid-template-columns: 9.5rem 1fr; gap: .6rem; align-items: end; padding: .3rem 0 .3rem 1.2rem; border-radius: 6px; }
+  .row .k { font-size: .82rem; color: var(--ink-3); }
+  .row .v { font-family: "Kalam", "Mukta", cursive; font-size: 1.15rem; color: #1b3a8a; border-bottom: 1.5px dotted #b9c0cf; min-height: 1.6rem; word-break: break-word; }
+  .row.fill { animation: glow 1.4s ease-out; }
+  @keyframes glow { 0% { background: var(--haldi-soft); } 100% { background: transparent; } }
+  .tick { color: var(--leaf); font-weight: 800; font-family: "Mukta", sans-serif; font-size: .8rem; margin-left: .4rem; }
+  .flag { color: var(--sindoor); font-size: .78rem; font-family: "Mukta", sans-serif; margin-left: .3rem; }
+  .stamp { position: absolute; right: 1.4rem; bottom: 1.4rem; border: 3px solid var(--leaf); color: var(--leaf); border-radius: 10px; padding: .3rem .8rem;
+           font-weight: 800; transform: rotate(-8deg) scale(1.6); opacity: 0; transition: transform .35s cubic-bezier(.2,1.6,.4,1), opacity .2s; text-align: center; line-height: 1.2; }
+  .stamp.on { transform: rotate(-8deg) scale(1); opacity: 1; }
+  .letter-body { font-family: "Kalam", "Mukta", cursive; color: #1b3a8a; white-space: pre-wrap; font-size: 1.02rem; line-height: 2rem; padding-left: 1.2rem; }
+  .scheme { background: #fff; border: 2px solid var(--line); border-left: 8px solid var(--leaf); padding: .6rem .9rem; margin: .5rem 0 .5rem 1.2rem; animation: pop .4s both; }
+  .scheme.maybe { border-left-color: var(--haldi); }
+  .scheme b { display: block; } .scheme span { font-size: .85rem; color: var(--ink-2); }
+  .chip-row { display: flex; gap: .4rem; flex-wrap: wrap; padding-left: 1.2rem; margin: .4rem 0; }
+  .chip { background: var(--peacock); color: #fff; border-radius: 999px; padding: .15rem .7rem; font-size: .82rem; font-weight: 700; animation: pop .4s both; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  .feat { border-radius: 24px; padding: 1.4rem; color: #fff; min-height: 220px; display: flex; flex-direction: column; gap: .4rem; }
+  .feat .ico { font-size: 2.2rem; } .feat h3 { margin: .2rem 0; font-size: 1.2rem; } .feat p { margin: 0; font-size: .96rem; opacity: .92; }
+  .f1 { background: var(--peacock); } .f2 { background: var(--sindoor); } .f3 { background: #3d6a87; } .f4 { background: var(--leaf); }
+  .how { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; counter-reset: s; }
+  .how div { background: #fff; border: 2px solid var(--line); border-radius: 24px; padding: 1.3rem 1.3rem 1.3rem 4.4rem; position: relative; }
+  .how div::before { counter-increment: s; content: counter(s); position: absolute; left: 1.2rem; top: 1.2rem; width: 2.4rem; height: 2.4rem; border-radius: 12px;
+                     background: var(--haldi); display: grid; place-items: center; font-weight: 800; transform: rotate(-6deg); }
+  .trust { background: var(--peacock-3); color: #fff; border-radius: 32px; padding: 2.4rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
+  .trust b { color: var(--haldi); display: block; font-size: 1.15rem; margin-bottom: .2rem; } .trust span { color: #c3ded2; }
+  .pills { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .pill { background: #fff; border: 2px solid var(--line); border-radius: 999px; padding: .4rem 1rem; font-weight: 600; }
+  .pilot { background: var(--haldi); border-radius: 32px; padding: 2.6rem; text-align: center; position: relative; overflow: hidden; }
+  .pilot h2 { margin-top: 0; }
+  .pilot .cta { background: var(--peacock); color: #fff; box-shadow: 0 8px 0 #06382c; }
+  .note { font-size: .86rem; color: #5b4500; margin-top: 1rem; }
+  .disclaimer { flex-basis: 100%; margin: .4rem 0 0; font-size: .8rem; color: var(--ink-3); border-top: 1px solid var(--line); padding-top: .8rem; }
+  footer { padding: 2rem 0 3rem; color: var(--ink-3); font-size: .92rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  @media (max-width: 960px) {
+    .hero-grid, .stage { grid-template-columns: 1fr; } .grid4 { grid-template-columns: 1fr 1fr; } .how, .trust { grid-template-columns: 1fr; }
+    .people { grid-template-columns: 1fr; } .device { transform: none; } .nav-links a.hide-sm { display: none; } .chat { height: 360px; }
+  }
+  @media (max-width: 560px) { .grid4 { grid-template-columns: 1fr; } .row { grid-template-columns: 1fr; gap: 0; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body data-lang="en">
-<div class="wrap">
-  <nav>
-    <a class="logo" href="#" aria-label="DwaniForms"><span class="dwani" lang="hi">ध्वनि</span><span class="forms">Forms</span></a>
-    <div class="nav-links">
-      <a class="hide-sm" href="#what"><span class="en">What it does</span><span class="hi" lang="hi">क्या करता है</span></a>
-      <a class="hide-sm" href="#how"><span class="en">How it works</span><span class="hi" lang="hi">कैसे चलता है</span></a>
-      <a href="#pilot"><span class="en">Run a pilot</span><span class="hi" lang="hi">पायलट</span></a>
-      <button class="lang" id="lang" type="button" aria-label="Switch language">हिन्दी</button>
-    </div>
-  </nav>
 
-  <div class="hero">
-    <div>
-      <h1><span class="en">Speak. <em>The form fills itself.</em></span><span class="hi" lang="hi">बोलिए। <em>फ़ॉर्म अपने आप भरेगा।</em></span></h1>
-      <p><span class="en">DwaniForms helps people who find forms hard to fill them by talking, in their own language. It asks one question at a time, reads every answer back, and catches mistakes before they reach the office.</span>
-         <span class="hi" lang="hi">जिन लोगों को फ़ॉर्म भरना मुश्किल लगता है, DwaniForms उनकी अपनी भाषा में बात करके फ़ॉर्म भरवाता है। एक बार में एक सवाल, हर जवाब पढ़कर सुनाता है, और गलती दफ़्तर पहुँचने से पहले पकड़ लेता है।</span></p>
-      <a class="cta" href="#pilot"><span class="en">Run a pilot with us</span><span class="hi" lang="hi">हमारे साथ पायलट चलाइए</span></a>
-      <a class="cta ghost" href="#what"><span class="en">See what it does</span><span class="hi" lang="hi">देखिए क्या करता है</span></a>
-    </div>
-    <div class="kiosk" aria-hidden="true">
-      <div class="bubble" lang="hi">अपनी शिकायत बताइए। क्या हुआ, कहाँ और कब से?</div>
-      <div class="bubble me" lang="hi">गाँव सोनपुर में 20 सितंबर से बिजली नहीं है, ट्रांसफार्मर जल गया…</div>
-      <div class="bubble" lang="hi">मैंने विभाग समझा: बिजली विभाग। क्या यह सही है?</div>
-      <div class="mic">🎤</div>
+<header class="hero">
+  <div class="wrap">
+    <nav>
+      <a class="logo" href="#" aria-label="DwaniForms"><span class="dwani" lang="hi">ध्वनि</span><span class="forms">Forms</span></a>
+      <div class="nav-links">
+        <a class="hide-sm" href="#stories"><span class="en">See it in action</span><span class="hi" lang="hi">चलता हुआ देखिए</span></a>
+        <a class="hide-sm" href="#what"><span class="en">What it does</span><span class="hi" lang="hi">क्या करता है</span></a>
+        <a href="#pilot"><span class="en">Run a pilot</span><span class="hi" lang="hi">पायलट</span></a>
+        <button class="lang" id="lang" type="button" aria-label="Switch language">हिन्दी</button>
+      </div>
+    </nav>
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow"><b>NEW</b><span class="en">From the DwaniLive team</span><span class="hi" lang="hi">DwaniLive टीम की नई पेशकश</span></span>
+        <h1><span class="en">Speak.<br>The form <span class="hl">fills itself.</span></span><span class="hi" lang="hi">बोलिए।<br>फ़ॉर्म <span class="hl">ख़ुद भरेगा।</span></span></h1>
+        <p class="sub"><span class="en">For everyone who has ever stood at a counter, unsure what to write. DwaniForms asks one question at a time in their own language, reads every answer back, and catches mistakes before they reach the office.</span>
+          <span class="hi" lang="hi">हर उस इंसान के लिए जो कभी काउंटर पर खड़ा होकर सोचता रहा कि क्या लिखूँ। DwaniForms उनकी अपनी भाषा में एक-एक सवाल पूछता है, हर जवाब पढ़कर सुनाता है, और गलती दफ़्तर पहुँचने से पहले पकड़ लेता है।</span></p>
+        <a class="cta" href="#stories">▶ <span class="en">Watch a real form get filled</span><span class="hi" lang="hi">असली फ़ॉर्म भरता देखिए</span></a>
+        <a class="cta ghost" href="#pilot"><span class="en">Run a pilot</span><span class="hi" lang="hi">पायलट चलाइए</span></a>
+        <div class="stats">
+          <div><b>13</b><span class="en">languages</span><span class="hi" lang="hi">भाषाएँ</span></div>
+          <div><b>0</b><span class="en">internet needed</span><span class="hi" lang="hi">इंटरनेट की ज़रूरत</span></div>
+          <div><b>14</b><span class="en">schemes checked</span><span class="hi" lang="hi">योजनाओं की जाँच</span></div>
+        </div>
+      </div>
+      <div class="device" aria-hidden="true">
+        <div class="device-bar"><span class="logo"><span class="dwani">ध्वनि</span><span class="forms">Forms</span></span><small>CSC · सीतापुर</small></div>
+        <div class="mini">
+          <div class="bubble bot" lang="hi">आपके पास कितने एकड़ ज़मीन है?</div>
+          <div class="bubble me" lang="hi">🗣 ढाई एकड़ है जी</div>
+          <div class="bubble bot" lang="hi">आपने कहा: 2.5 एकड़। क्या यह सही है?</div>
+          <div class="bubble sys">✓ PM-Kisan · 8 / 9</div>
+        </div>
+        <div class="microw"><div class="mic live">🎤</div></div>
+      </div>
     </div>
   </div>
-</div>
+</header>
+
+<section id="stories"><div class="wrap">
+  <span class="kicker"><span class="en">Real life, three times</span><span class="hi" lang="hi">असली ज़िंदगी, तीन बार</span></span>
+  <h2><span class="en">Watch DwaniForms at the counter</span><span class="hi" lang="hi">काउंटर पर DwaniForms देखिए</span></h2>
+  <p class="lead"><span class="en">Pick someone. On the left is what they hear and say at the kiosk; on the right, the paper the operator prints, filling in as they speak.</span>
+    <span class="hi" lang="hi">किसी को चुनिए। बाईं ओर कियोस्क पर जो वे सुनते और बोलते हैं; दाईं ओर वह कागज़ जो ऑपरेटर प्रिंट करेगा, जो उनके बोलते-बोलते भरता है।</span></p>
+  <div class="people" role="group" aria-label="Choose a story">
+    <button class="person" type="button" data-story="farmer" aria-pressed="true"><span class="avatar" style="background:#e3f0ea">👨🏽‍🌾</span>
+      <span><b><span class="en">Ramesh, 46 · farmer</span><span class="hi" lang="hi">रमेश, 46 · किसान</span></b>
+      <span><span class="en">Applies for PM-Kisan at the village CSC</span><span class="hi" lang="hi">गाँव के सीएससी पर पीएम-किसान का आवेदन</span></span></span></button>
+    <button class="person" type="button" data-story="complaint" aria-pressed="false"><span class="avatar" style="background:var(--sindoor-soft)">👩🏽</span>
+      <span><b><span class="en">Sunita, 34 · complaint</span><span class="hi" lang="hi">सुनीता, 34 · शिकायत</span></b>
+      <span><span class="en">No electricity in her village for two weeks</span><span class="hi" lang="hi">गाँव में दो हफ़्ते से बिजली नहीं</span></span></span></button>
+    <button class="person" type="button" data-story="schemes" aria-pressed="false"><span class="avatar" style="background:var(--haldi-soft)">👵🏽</span>
+      <span><b><span class="en">Kamla ji, 62 · schemes</span><span class="hi" lang="hi">कमला जी, 62 · योजनाएँ</span></b>
+      <span><span class="en">A widow who doesn't know what she can claim</span><span class="hi" lang="hi">विधवा हैं, नहीं जानतीं क्या-क्या मिल सकता है</span></span></span></button>
+  </div>
+  <div class="stage">
+    <div class="kiosk">
+      <div class="kiosk-top"><span class="logo"><span class="dwani">ध्वनि</span><span class="forms">Forms</span></span><span class="scene" id="scene"></span></div>
+      <div class="progress"><i id="prog"></i></div>
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <div class="kiosk-foot">
+        <div class="mic" id="mic" aria-hidden="true">🎤</div>
+        <div class="wave" id="wave" aria-hidden="true"></div>
+        <div class="controls">
+          <button class="ctl" type="button" id="restart" aria-label="Restart">↺</button>
+          <button class="ctl primary" type="button" id="play"><span class="en">Pause</span><span class="hi" lang="hi">रोकें</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="paper" id="paper" aria-live="polite"></div>
+  </div>
+</div></section>
 
 <section id="what"><div class="wrap">
-  <h2><span class="en">Four things, all by voice</span><span class="hi" lang="hi">चार काम, सब बोलकर</span></h2>
+  <span class="kicker"><span class="en">Four services</span><span class="hi" lang="hi">चार सेवाएँ</span></span>
+  <h2><span class="en">Everything people queue for, by voice</span><span class="hi" lang="hi">जिनके लिए लोग लाइन में लगते हैं, सब बोलकर</span></h2>
   <p class="lead"><span class="en">Built for the counter at a CSC, a panchayat bhawan, a bank mitra or a hospital registration desk.</span>
-    <span class="hi" lang="hi">सीएससी, पंचायत भवन, बैंक मित्र या अस्पताल के पंजीकरण काउंटर के लिए बनाया गया।</span></p>
-  <div class="grid">
-    <div class="card"><div class="ico">📝</div><h3><span class="en">Fill government forms</span><span class="hi" lang="hi">सरकारी फ़ॉर्म भरें</span></h3>
-      <p><span class="en">PM-Kisan, e-Shram, income certificate, bank KYC, hospital registration. Aadhaar, mobile and IFSC are checked as they are spoken.</span>
-         <span class="hi" lang="hi">पीएम-किसान, ई-श्रम, आय प्रमाण पत्र, बैंक केवाईसी, अस्पताल पंजीकरण। आधार, मोबाइल और आईएफ़एससी बोलते ही जाँचे जाते हैं।</span></p></div>
-    <div class="card"><div class="ico">📢</div><h3><span class="en">Complaints and RTI</span><span class="hi" lang="hi">शिकायत और आरटीआई</span></h3>
-      <p><span class="en">Describe the problem aloud. The department, place and date are picked out, confirmed, and a ready-to-sign letter or RTI application is drafted.</span>
-         <span class="hi" lang="hi">समस्या बोलकर बताइए। विभाग, जगह और तारीख़ अपने आप निकलती है, पुष्टि होती है, और हस्ताक्षर के लिए तैयार पत्र या आरटीआई आवेदन बनता है।</span></p></div>
-    <div class="card"><div class="ico">🔍</div><h3><span class="en">Land and ration records</span><span class="hi" lang="hi">ज़मीन और राशन रिकॉर्ड</span></h3>
-      <p><span class="en">Say the khasra or ration card number and hear the record, from a copy kept on the kiosk, with the date of that copy.</span>
-         <span class="hi" lang="hi">खसरा या राशन कार्ड नंबर बोलिए और रिकॉर्ड सुनिए, कियोस्क पर रखी कॉपी से, उस कॉपी की तारीख़ के साथ।</span></p></div>
-    <div class="card"><div class="ico">💡</div><h3><span class="en">Which schemes can I get?</span><span class="hi" lang="hi">कौन सी योजना मिलेगी?</span></h3>
-      <p><span class="en">A short spoken interview, then the schemes the person likely qualifies for and the forms to fill, already partly filled in.</span>
-         <span class="hi" lang="hi">छोटी सी बातचीत, फिर वे योजनाएँ जो मिल सकती हैं और भरने वाले फ़ॉर्म, कुछ जानकारी पहले से भरी हुई।</span></p></div>
+    <span class="hi" lang="hi">सीएससी, पंचायत भवन, बैंक मित्र या अस्पताल के पंजीकरण काउंटर के लिए।</span></p>
+  <div class="grid4">
+    <div class="feat f1"><div class="ico">📝</div><h3><span class="en">Government forms</span><span class="hi" lang="hi">सरकारी फ़ॉर्म</span></h3>
+      <p><span class="en">PM-Kisan, e-Shram, income certificate, bank KYC, hospital registration. Aadhaar, mobile and IFSC checked as they're spoken.</span><span class="hi" lang="hi">पीएम-किसान, ई-श्रम, आय प्रमाण पत्र, बैंक केवाईसी, अस्पताल पंजीकरण। आधार, मोबाइल, आईएफ़एससी बोलते ही जाँचे जाते हैं।</span></p></div>
+    <div class="feat f2"><div class="ico">📢</div><h3><span class="en">Complaints and RTI</span><span class="hi" lang="hi">शिकायत और आरटीआई</span></h3>
+      <p><span class="en">Say what happened. Department, place and date are picked out, and a ready-to-sign letter is drafted.</span><span class="hi" lang="hi">बताइए क्या हुआ। विभाग, जगह, तारीख़ अपने आप निकलती है और पत्र तैयार होता है।</span></p></div>
+    <div class="feat f3"><div class="ico">🔍</div><h3><span class="en">Land and ration records</span><span class="hi" lang="hi">ज़मीन और राशन रिकॉर्ड</span></h3>
+      <p><span class="en">"एक सौ पैंतालीस बटा दो" becomes khasra 145/2, read back from the kiosk's saved copy.</span><span class="hi" lang="hi">"एक सौ पैंतालीस बटा दो" बन जाता है खसरा 145/2, कियोस्क की सहेजी कॉपी से।</span></p></div>
+    <div class="feat f4"><div class="ico">💡</div><h3><span class="en">Which schemes can I get?</span><span class="hi" lang="hi">कौन सी योजना मिलेगी?</span></h3>
+      <p><span class="en">A short chat, then the schemes they likely qualify for and the forms to fill, already partly filled in.</span><span class="hi" lang="hi">छोटी सी बातचीत, फिर योजनाएँ और भरने वाले फ़ॉर्म, कुछ पहले से भरे हुए।</span></p></div>
   </div>
 </div></section>
 
-<section id="how"><div class="wrap">
+<section style="padding-top:0"><div class="wrap">
   <h2><span class="en">How it works at the counter</span><span class="hi" lang="hi">काउंटर पर कैसे चलता है</span></h2>
-  <div class="steps">
-    <div class="step"><span class="en">The person picks their language and what they need. Hindi, English, Bengali, Tamil, Telugu, Marathi and more.</span>
-      <span class="hi" lang="hi">व्यक्ति अपनी भाषा और काम चुनता है। हिन्दी, अंग्रेज़ी, बांग्ला, तमिल, तेलुगु, मराठी और भी।</span></div>
-    <div class="step"><span class="en">They answer one question at a time by holding the mic button. Every answer is read back: "Is this correct?"</span>
-      <span class="hi" lang="hi">माइक बटन दबाकर एक-एक सवाल का जवाब देते हैं। हर जवाब पढ़कर सुनाया जाता है: "क्या यह सही है?"</span></div>
-    <div class="step"><span class="en">The operator prints the filled form or letter, checks anything marked for review, and the person signs.</span>
-      <span class="hi" lang="hi">ऑपरेटर भरा हुआ फ़ॉर्म या पत्र प्रिंट करता है, जाँच वाले हिस्से देखता है, और व्यक्ति हस्ताक्षर करता है।</span></div>
+  <div class="how">
+    <div><span class="en">They pick a language and a task on the touch screen. Hindi, English, Bengali, Tamil, Telugu, Marathi and more.</span><span class="hi" lang="hi">टच स्क्रीन पर भाषा और काम चुनते हैं। हिन्दी, अंग्रेज़ी, बांग्ला, तमिल, तेलुगु, मराठी और भी।</span></div>
+    <div><span class="en">One tap on the mic, one answer at a time. Every answer comes back: "Is this correct?"</span><span class="hi" lang="hi">माइक पर एक टैप, एक-एक जवाब। हर जवाब लौटकर आता है: "क्या यह सही है?"</span></div>
+    <div><span class="en">The operator prints the form or letter, checks anything flagged, and the person signs.</span><span class="hi" lang="hi">ऑपरेटर फ़ॉर्म या पत्र प्रिंट करता है, निशान लगे हिस्से जाँचता है, और व्यक्ति हस्ताक्षर करता है।</span></div>
   </div>
 </div></section>
 
-<section><div class="wrap">
-  <div class="band">
-    <div><b><span class="en">Works offline</span><span class="hi" lang="hi">बिना इंटरनेट</span></b>
-      <span class="en">Speech recognition and translation run on the kiosk itself. Patchy internet doesn't stop the queue.</span>
-      <span class="hi" lang="hi">आवाज़ पहचान और अनुवाद कियोस्क पर ही चलते हैं। कमज़ोर इंटरनेट से लाइन नहीं रुकती।</span></div>
-    <div><b><span class="en">Private by design</span><span class="hi" lang="hi">निजता पहले</span></b>
-      <span class="en">Nothing is uploaded. Aadhaar and account numbers are masked on screen, and sessions are wiped after 30 minutes.</span>
-      <span class="hi" lang="hi">कुछ भी अपलोड नहीं होता। आधार और खाता नंबर स्क्रीन पर छिपे रहते हैं, और 30 मिनट बाद सेशन मिट जाता है।</span></div>
-    <div><b><span class="en">Honest about limits</span><span class="hi" lang="hi">सीमाएँ साफ़</span></b>
-      <span class="en">Scheme advice is guidance, with the source and review date of every rule. Records show the date of the copy.</span>
-      <span class="hi" lang="hi">योजना की सलाह सिर्फ़ जानकारी है, हर नियम के स्रोत और जाँच की तारीख़ के साथ। रिकॉर्ड के साथ कॉपी की तारीख़ दिखती है।</span></div>
+<section style="padding-top:0"><div class="wrap">
+  <div class="trust">
+    <div><b><span class="en">Works offline</span><span class="hi" lang="hi">बिना इंटरनेट</span></b><span class="en">Speech recognition and translation run on the kiosk. Patchy internet never stops the queue.</span><span class="hi" lang="hi">आवाज़ पहचान और अनुवाद कियोस्क पर ही चलते हैं। कमज़ोर इंटरनेट से लाइन नहीं रुकती।</span></div>
+    <div><b><span class="en">Private by design</span><span class="hi" lang="hi">निजता पहले</span></b><span class="en">Nothing is uploaded. Aadhaar and account numbers are masked, and sessions are wiped after 30 minutes.</span><span class="hi" lang="hi">कुछ भी अपलोड नहीं होता। आधार और खाता नंबर छिपे रहते हैं, 30 मिनट बाद सेशन मिट जाता है।</span></div>
+    <div><b><span class="en">Honest about limits</span><span class="hi" lang="hi">सीमाएँ साफ़</span></b><span class="en">Scheme advice shows the source and review date of every rule. Records show the date of the copy.</span><span class="hi" lang="hi">योजना की सलाह के साथ हर नियम का स्रोत और जाँच की तारीख़। रिकॉर्ड के साथ कॉपी की तारीख़।</span></div>
   </div>
 </div></section>
 
-<section><div class="wrap">
-  <h2><span class="en">Forms and services today</span><span class="hi" lang="hi">अभी उपलब्ध फ़ॉर्म और सेवाएँ</span></h2>
-  <p class="lead"><span class="en">A new form is a small template file: no retraining.</span><span class="hi" lang="hi">नया फ़ॉर्म जोड़ना बस एक छोटी फ़ाइल है, कोई नई ट्रेनिंग नहीं।</span></p>
+<section style="padding-top:0"><div class="wrap">
+  <h2><span class="en">Ready today</span><span class="hi" lang="hi">अभी तैयार</span></h2>
+  <p class="lead"><span class="en">A new form is one small template file. No retraining.</span><span class="hi" lang="hi">नया फ़ॉर्म बस एक छोटी फ़ाइल। कोई नई ट्रेनिंग नहीं।</span></p>
   <div class="pills">
     <span class="pill">PM-Kisan</span><span class="pill">e-Shram</span><span class="pill"><span class="en">Income certificate</span><span class="hi" lang="hi">आय प्रमाण पत्र</span></span>
     <span class="pill">Bank KYC</span><span class="pill"><span class="en">Hospital registration</span><span class="hi" lang="hi">अस्पताल पंजीकरण</span></span>
     <span class="pill"><span class="en">Public grievance</span><span class="hi" lang="hi">शिकायत</span></span><span class="pill">RTI</span>
     <span class="pill"><span class="en">Land record (khasra)</span><span class="hi" lang="hi">खसरा</span></span><span class="pill"><span class="en">Ration card</span><span class="hi" lang="hi">राशन कार्ड</span></span>
-    <span class="pill"><span class="en">14-scheme eligibility advisor</span><span class="hi" lang="hi">14 योजनाओं की पात्रता सलाह</span></span>
+    <span class="pill"><span class="en">14-scheme advisor</span><span class="hi" lang="hi">14 योजनाओं की सलाह</span></span>
   </div>
 </div></section>
 
-<section id="pilot"><div class="wrap">
+<section id="pilot" style="padding-top:0"><div class="wrap">
   <div class="pilot">
-    <h2><span class="en">Run a pilot at your centre</span><span class="hi" lang="hi">अपने केंद्र पर पायलट चलाइए</span></h2>
-    <p><span class="en">We're looking for CSCs, panchayats, NGOs and hospitals to try DwaniForms with real users. Tell us where you are and which forms matter most.</span>
-       <span class="hi" lang="hi">हम सीएससी, पंचायत, एनजीओ और अस्पतालों के साथ असली लोगों पर DwaniForms आज़माना चाहते हैं। बताइए आप कहाँ हैं और कौन से फ़ॉर्म सबसे ज़रूरी हैं।</span></p>
+    <h2><span class="en">Bring DwaniForms to your centre</span><span class="hi" lang="hi">DwaniForms अपने केंद्र पर लाइए</span></h2>
+    <p><span class="en">We're looking for CSCs, panchayats, NGOs and hospitals to try it with real people. Tell us where you are and which forms matter most.</span>
+      <span class="hi" lang="hi">हम सीएससी, पंचायत, एनजीओ और अस्पतालों के साथ असली लोगों पर इसे आज़माना चाहते हैं। बताइए आप कहाँ हैं और कौन से फ़ॉर्म सबसे ज़रूरी हैं।</span></p>
     <a class="cta" href="mailto:khushimittal070906@gmail.com?subject=DwaniForms%20pilot"><span class="en">Write to us</span><span class="hi" lang="hi">हमें लिखिए</span></a>
-    <p class="note"><span class="en">DwaniForms prepares drafts and guidance; the government office always makes the final decision.</span>
-      <span class="hi" lang="hi">DwaniForms मसौदा और जानकारी तैयार करता है; अंतिम फ़ैसला हमेशा सरकारी विभाग करता है।</span></p>
+    <p class="note"><span class="en">The stories above are illustrations with invented people. DwaniForms prepares drafts and guidance; the government office always decides.</span>
+      <span class="hi" lang="hi">ऊपर की कहानियाँ काल्पनिक लोगों के उदाहरण हैं। DwaniForms मसौदा और जानकारी तैयार करता है; फ़ैसला हमेशा सरकारी विभाग करता है।</span></p>
   </div>
 </div></section>
 
-<div class="wrap">
-  <footer>
-    <span><span lang="hi">ध्वनि</span> Forms · <span class="en">a</span> <a href="https://dhwani-elit.onrender.com">DwaniLive</a> <span class="en">project</span><span class="hi" lang="hi">की पहल</span></span>
-    <span><a href="https://dhwani-elit.onrender.com/privacy.html"><span class="en">Privacy</span><span class="hi" lang="hi">निजता</span></a></span>
-  </footer>
-</div>
+<div class="wrap"><footer>
+  <span><span lang="hi">ध्वनि</span> Forms · <span class="en">a</span> <a href="https://dhwani-elit.onrender.com">DwaniLive</a> <span class="en">project</span><span class="hi" lang="hi">की पहल</span></span>
+  <span><a href="privacy.html"><span class="en">Privacy</span><span class="hi" lang="hi">निजता</span></a></span>
+  <p class="disclaimer"><span class="en">DwaniForms is an independent project. It is not a government website and is not affiliated with any government
+    department. Official applications are decided by the department concerned; always check its official portal.</span>
+    <span class="hi" lang="hi">DwaniForms एक स्वतंत्र परियोजना है। यह सरकारी वेबसाइट नहीं है और किसी सरकारी विभाग से जुड़ी नहीं है। आवेदन पर फ़ैसला
+    संबंधित विभाग करता है; हमेशा उसका आधिकारिक पोर्टल देखें।</span></p>
+</footer></div>
+
 <script>
 (function () {
+  "use strict";
+  var STORIES = {
+    farmer: { scene: "CSC · सीतापुर", title: { hi: "प्रधानमंत्री किसान सम्मान निधि: आवेदन", en: "PM-Kisan application" }, gov: "Illustration · PM-Kisan form",
+      steps: [
+        ["bot", "नमस्ते। मैं आपका पीएम-किसान फ़ॉर्म भरने में मदद करूँगा। अपना पूरा नाम बताइए।", "Hello. I'll help you fill the PM-Kisan form. What is your full name?"],
+        ["me", "रमेश कुमार यादव", "Ramesh Kumar Yadav"],
+        ["bot", "आपने कहा: रमेश कुमार यादव। क्या यह सही है?", "You said: Ramesh Kumar Yadav. Is this correct?"],
+        ["me", "हाँ जी", "Yes", { k: "Applicant name", v: "रमेश कुमार यादव", flag: "check spelling" }],
+        ["bot", "अपनी जन्म तिथि बताइए: दिन, महीना और साल।", "Your date of birth: day, month, year."],
+        ["me", "पंद्रह अगस्त उन्नीस सौ अस्सी", "Fifteenth August, nineteen eighty"],
+        ["bot", "आपने कहा: 15 अगस्त 1980। क्या यह सही है?", "You said: 15 August 1980. Correct?"],
+        ["me", "हाँ", "Yes", { k: "Date of birth", v: "15/08/1980" }],
+        ["bot", "अपना आधार नंबर धीरे-धीरे बोलिए।", "Say your Aadhaar number slowly."],
+        ["me", "दो तीन चार पाँच… डबल सात… चार आठ दो एक", "two three four five… double seven… four eight two one"],
+        ["sys", "✓ 12 अंक · चेक-डिजिट सही (Verhoeff)", "✓ 12 digits · checksum valid (Verhoeff)"],
+        ["bot", "आपने कहा: XXXX XXXX 4821। क्या यह सही है?", "You said: XXXX XXXX 4821. Correct?"],
+        ["me", "हाँ", "Yes", { k: "Aadhaar", v: "•••• •••• 4821", tick: true }],
+        ["bot", "आपके पास कितने एकड़ ज़मीन है? जैसे ढाई या साढ़े तीन।", "How many acres of land? Like 2.5 or 3.5."],
+        ["me", "ढाई एकड़ है जी", "Two and a half acres"],
+        ["bot", "आपने कहा: 2.5 एकड़। क्या यह सही है?", "You said: 2.5 acres. Correct?"],
+        ["me", "हाँ, कोई दिक्कत नहीं", "Yes, no problem"],
+        ["sys", "‘कोई दिक्कत नहीं’ = हाँ ✓", "'no problem' understood as yes ✓", { k: "Land (acres)", v: "2.5" }],
+        ["bot", "बैंक का आईएफ़एससी कोड बोलिए।", "Say your bank's IFSC code."],
+        ["me", "एस बी आई एन, ज़ीरो ज़ीरो ज़ीरो, एक दो तीन चार", "S B I N, zero zero zero, one two three four"],
+        ["me", "हाँ", "Yes", { k: "IFSC", v: "SBIN0001234", tick: true }],
+        ["bot", "फ़ॉर्म पूरा हो गया। ऑपरेटर इसे प्रिंट करेंगे, आप हस्ताक्षर कीजिए।", "The form is complete. The operator will print it for your signature.", null, { stamp: "✓ READY TO PRINT<br>पूरा भरा" }]
+      ] },
+    complaint: { scene: "पंचायत भवन · बिसवां", title: { hi: "शिकायत पत्र", en: "Complaint letter" }, gov: "Illustration · complaint letter",
+      steps: [
+        ["bot", "अपनी शिकायत बताइए। क्या हुआ, कहाँ और कब से?", "Tell me your complaint. What happened, where, since when?"],
+        ["me", "हमारे गाँव सोनपुर में 20 सितंबर से बिजली नहीं है, ट्रांसफार्मर जल गया है, तहसील बिसवां जिला सीतापुर", "In our village Sonpur there's been no electricity since 20 September, the transformer burnt out, tehsil Biswan, district Sitapur"],
+        ["sys", "पहचाना: विभाग · जगह · तारीख़", "Picked out: department · place · date", null, { chips: ["⚡ बिजली विभाग", "📍 सोनपुर, बिसवां, सीतापुर", "📅 20 सितंबर"] }],
+        ["bot", "मैंने विभाग समझा: बिजली विभाग। क्या यह सही है?", "I noted the department: Electricity. Correct?"],
+        ["me", "हाँ", "Yes", { k: "Department", v: "बिजली विभाग" }],
+        ["bot", "मैंने जगह समझा: सोनपुर, बिसवां, सीतापुर। सही है?", "I noted the place: Sonpur, Biswan, Sitapur. Correct?"],
+        ["me", "हाँ जी", "Yes", { k: "Place", v: "सोनपुर, बिसवां, सीतापुर" }],
+        ["bot", "मैंने तारीख़ समझा: 20 सितंबर 2026। सही है?", "I noted the date: 20 September 2026. Correct?"],
+        ["me", "हाँ", "Yes", { k: "Since", v: "20/09/2026" }],
+        ["bot", "आप विभाग से क्या कार्रवाई चाहते हैं?", "What action do you want?"],
+        ["me", "नया ट्रांसफार्मर जल्दी लगवाया जाए", "A new transformer, quickly"],
+        ["bot", "आपने जो बताया वह यह है… क्या सब सही है?", "Here's everything you said… is it all correct?"],
+        ["me", "हाँ, सब सही है", "Yes, all correct", null, { letter: "सेवा में,\nप्रभारी अधिकारी, बिजली विभाग\n\nविषय: बिजली आपूर्ति बंद होने की शिकायत\n\nहमारे गाँव सोनपुर में 20 सितंबर से बिजली नहीं है, ट्रांसफार्मर जल गया है।\nनिवेदन: नया ट्रांसफार्मर जल्दी लगवाया जाए।\n\nभवदीया,\nसुनीता देवी" }],
+        ["bot", "आपका शिकायत पत्र तैयार है। प्रिंट करके हस्ताक्षर कीजिए।", "Your complaint letter is ready. Print it and sign it.", null, { stamp: "✓ LETTER READY<br>पत्र तैयार" }]
+      ] },
+    schemes: { scene: "सीएससी · लखीमपुर", title: { hi: "आपके लिए योजनाएँ", en: "Schemes for you" }, gov: "Illustration · scheme advisor",
+      steps: [
+        ["bot", "आपकी उम्र कितनी है?", "How old are you?"],
+        ["me", "बासठ साल", "Sixty-two"],
+        ["me", "हाँ", "Yes", { k: "Age", v: "62" }],
+        ["bot", "आप गाँव में रहते हैं या शहर में?", "Village or town?"],
+        ["me", "गाँव में", "Village", { k: "Area", v: "गाँव" }],
+        ["bot", "क्या आप विधवा हैं? चाहें तो ‘छोड़ो’ कहिए।", "Are you a widow? You can say skip."],
+        ["me", "हाँ बेटा", "Yes", { k: "Widow", v: "हाँ" }],
+        ["bot", "आपके परिवार का राशन कार्ड कैसा है?", "What ration card does your family have?"],
+        ["me", "अंत्योदय वाला", "Antyodaya", { k: "Ration card", v: "अंत्योदय (AAY)" }],
+        ["bot", "क्या घर में गैस कनेक्शन है?", "Is there an LPG connection at home?"],
+        ["me", "नहीं, चूल्हे पर बनाते हैं", "No, we cook on a chulha", { k: "LPG", v: "नहीं" }],
+        ["bot", "आपको 5 योजनाएँ मिल सकती हैं। पूरी जानकारी स्क्रीन पर है।", "You may be able to get 5 schemes. Details on screen.", null,
+          { schemes: [["विधवा पेंशन", "हर महीने पेंशन (केंद्र + राज्य)", 1], ["वृद्धावस्था पेंशन", "60+ के लिए मासिक पेंशन", 1],
+                      ["उज्ज्वला गैस कनेक्शन", "मुफ़्त एलपीजी कनेक्शन, महिला के नाम", 1], ["आयुष्मान भारत", "₹5 लाख तक मुफ़्त इलाज (अंत्योदय)", 1],
+                      ["जन धन खाता", "ज़ीरो बैलेंस बैंक खाता", 0]] }],
+        ["bot", "‘आय प्रमाण पत्र’ भरें? आपकी उम्र और जानकारी पहले से भरी होगी।", "Fill the income certificate? Your details are carried over.", null, { stamp: "✓ 5 SCHEMES<br>फ़ॉर्म तैयार" }]
+      ] }
+  };
+
+  var lang = "en", story = "farmer", step = 0, timer = null, playing = true;
+  var chat = document.getElementById("chat"), paper = document.getElementById("paper"), mic = document.getElementById("mic"), wave = document.getElementById("wave");
+  for (var i = 0; i < 26; i++) wave.appendChild(document.createElement("i"));
+  var bars = wave.querySelectorAll("i"), waveTimer = null;
+
+  function speak(on) {
+    mic.classList.toggle("live", on); wave.classList.toggle("live", on);
+    clearInterval(waveTimer);
+    if (on) waveTimer = setInterval(function () { bars.forEach(function (b) { b.style.height = (6 + Math.random() * 28) + "px"; }); }, 110);
+    else bars.forEach(function (b) { b.style.height = "6px"; });
+  }
+  function paperReset(s) {
+    paper.innerHTML = "<div class='gov'></div><h3></h3><div id='rows'></div><div class='stamp' id='stamp'></div>";
+    paper.querySelector(".gov").textContent = s.gov;
+    paper.querySelector("h3").textContent = s.title[lang] || s.title.en;
+  }
+  function addRow(f) {
+    var rows = paper.querySelector("#rows"), r = document.createElement("div");
+    r.className = "row fill";
+    r.innerHTML = "<span class='k'></span><span class='v'></span>";
+    r.querySelector(".k").textContent = f.k;
+    var v = r.querySelector(".v");
+    rows.appendChild(r);
+    var text = f.v, n = 0;
+    var t = setInterval(function () {
+      n++; v.textContent = text.slice(0, n);
+      if (n >= text.length) {
+        clearInterval(t);
+        if (f.tick) v.insertAdjacentHTML("beforeend", "<span class='tick'>✓</span>");
+        if (f.flag) { var fl = document.createElement("span"); fl.className = "flag"; fl.textContent = "• " + f.flag; v.appendChild(fl); }
+      }
+    }, 45);
+  }
+  function addBubble(who, hi, en) {
+    var b = document.createElement("div");
+    b.className = "bubble " + who;
+    var useHi = lang === "hi" || who === "me";
+    var main = document.createElement("span"); main.textContent = useHi ? hi : en; main.lang = useHi ? "hi" : "en";
+    b.appendChild(main);
+    if (lang === "en" && who === "me") { var tr = document.createElement("span"); tr.className = "tr"; tr.textContent = en; b.appendChild(tr); }
+    if (lang === "en" && who === "bot") { var trh = document.createElement("span"); trh.className = "tr"; trh.lang = "hi"; trh.textContent = hi; b.appendChild(trh); }
+    chat.appendChild(b); chat.scrollTop = chat.scrollHeight;
+  }
+  function typing() {
+    var b = document.createElement("div"); b.className = "bubble bot"; b.id = "typing";
+    b.innerHTML = "<span class='typing'><i></i><i></i><i></i></span>"; chat.appendChild(b); chat.scrollTop = chat.scrollHeight;
+  }
+  function untype() { var t = document.getElementById("typing"); if (t) t.remove(); }
+  function run() {
+    var s = STORIES[story];
+    document.getElementById("prog").style.width = Math.round(100 * step / s.steps.length) + "%";
+    if (step >= s.steps.length) { speak(false); timer = setTimeout(function () { start(next(story)); }, 6000); return; }
+    var st = s.steps[step], who = st[0], extra = st[4] || {};
+    var go = function () {
+      untype(); speak(false);
+      addBubble(who, st[1], st[2]);
+      if (st[3]) addRow(st[3]);
+      var rows = paper.querySelector("#rows");
+      if (extra.chips) { var row = document.createElement("div"); row.className = "chip-row";
+        extra.chips.forEach(function (c, i) { var ch = document.createElement("span"); ch.className = "chip"; ch.style.animationDelay = (i * .25) + "s"; ch.textContent = c; row.appendChild(ch); });
+        rows.appendChild(row); }
+      if (extra.letter) { var l = document.createElement("div"); l.className = "letter-body"; rows.appendChild(l);
+        var n = 0, txt = extra.letter, lt = setInterval(function () { n += 2; l.textContent = txt.slice(0, n); if (n >= txt.length) clearInterval(lt); }, 25); }
+      if (extra.schemes) extra.schemes.forEach(function (x, i) {
+        var d = document.createElement("div"); d.className = "scheme" + (x[2] ? "" : " maybe"); d.style.animationDelay = (i * .3) + "s";
+        d.innerHTML = "<b></b><span></span>"; d.querySelector("b").textContent = (x[2] ? "✓ " : "? ") + x[0]; d.querySelector("span").textContent = x[1];
+        rows.appendChild(d); });
+      if (extra.stamp) setTimeout(function () { var sp = document.getElementById("stamp"); if (sp) { sp.innerHTML = extra.stamp; sp.classList.add("on"); } }, 900);
+      step++;
+      if (playing) timer = setTimeout(run, who === "me" ? 1300 : 1900 + Math.min(1600, st[1].length * 18));
+    };
+    if (who === "me") { speak(true); timer = setTimeout(go, 1100 + Math.min(1400, st[1].length * 22)); }
+    else if (who === "bot") { typing(); timer = setTimeout(go, 700); }
+    else go();
+  }
+  function next(id) { var k = Object.keys(STORIES); return k[(k.indexOf(id) + 1) % k.length]; }
+  function start(id) {
+    clearTimeout(timer); speak(false);
+    story = id; step = 0; chat.innerHTML = "";
+    document.getElementById("scene").textContent = STORIES[id].scene;
+    document.querySelectorAll(".person").forEach(function (p) { p.setAttribute("aria-pressed", String(p.dataset.story === id)); });
+    paperReset(STORIES[id]);
+    if (playing) timer = setTimeout(run, 500);
+  }
+  document.querySelectorAll(".person").forEach(function (p) { p.addEventListener("click", function () { start(p.dataset.story); }); });
+  document.getElementById("restart").addEventListener("click", function () { start(story); });
+  document.getElementById("play").addEventListener("click", function () {
+    playing = !playing;
+    this.innerHTML = playing ? "<span class='en'>Pause</span><span class='hi' lang='hi'>रोकें</span>" : "<span class='en'>Play</span><span class='hi' lang='hi'>चलाएँ</span>";
+    if (playing) run(); else { clearTimeout(timer); speak(false); }
+  });
   var btn = document.getElementById("lang");
-  function set(l) {
-    document.body.dataset.lang = l; document.documentElement.lang = l;
+  function setLang(l) {
+    lang = l; document.body.dataset.lang = l; document.documentElement.lang = l;
     btn.textContent = l === "hi" ? "English" : "हिन्दी";
     try { localStorage.setItem("dwaniforms-site:lang", l); } catch (e) {}
   }
   var saved = null; try { saved = localStorage.getItem("dwaniforms-site:lang"); } catch (e) {}
-  set(saved || (/^hi/i.test(navigator.language || "") ? "hi" : "en"));
-  btn.addEventListener("click", function () { set(document.body.dataset.lang === "hi" ? "en" : "hi"); });
+  setLang(saved || (/^hi/i.test(navigator.language || "") ? "hi" : "en"));
+  btn.addEventListener("click", function () { setLang(lang === "hi" ? "en" : "hi"); start(story); });
+  if ("IntersectionObserver" in window) {
+    var seen = false;
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting && !seen) { seen = true; start(story); } });
+    }, { threshold: 0.25 }).observe(document.getElementById("stories"));
+  } else start(story);
 })();
 </script>
 </body>
