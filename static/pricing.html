@@ -357,6 +357,21 @@
   .feature p { margin: 0; color: var(--ink-dim); font-size: 0.92rem; line-height: 1.5; }
   .release-line { color: var(--ink-faint); font-size: 0.78rem; margin: 0.35rem 0 0; text-align: center; min-height: 1.1em; }
   .release-line a { color: var(--accent-deep); font-weight: 700; }
+
+  /* ---- DwaniForms promotion (a separate product, so its own green palette) ---- */
+  .promo-forms { padding: 0.5rem 0 3rem; }
+  .promo-card { display: grid; grid-template-columns: 1.6fr 1fr; gap: 1.5rem; align-items: center; background: #0b5d4b; color: #fff;
+                border-radius: 26px; padding: 2rem 2.2rem; }
+  .promo-tag { display: inline-block; background: #e8a317; color: #1f2a26; font-weight: 800; font-size: 0.8rem; border-radius: 999px; padding: 0.2rem 0.75rem; }
+  .promo-card h2 { margin: 0.6rem 0 0.4rem; display: flex; align-items: baseline; gap: 0.4rem; }
+  .promo-dwani { font-family: var(--font-display); font-weight: 400; font-size: 2.4rem; }
+  .promo-forms-word { font-weight: 800; letter-spacing: 0.16em; color: #e8a317; text-transform: uppercase; font-size: 1.1rem; }
+  .promo-card p { color: #dcefe7; margin: 0 0 0.6rem; }
+  .promo-card ul { margin: 0 0 1.2rem; padding-left: 1.2rem; color: #dcefe7; }
+  .promo-cta { display: inline-block; background: #e8a317; color: #1f2a26; font-weight: 800; text-decoration: none; padding: 0.75rem 1.2rem; border-radius: 12px; }
+  .promo-visual { display: flex; justify-content: center; gap: 0.8rem; font-size: 2.6rem; }
+  .promo-visual span { background: rgba(255,255,255,0.1); border-radius: 22px; padding: 0.8rem 1rem; }
+  @media (max-width: 760px) { .promo-card { grid-template-columns: 1fr; padding: 1.5rem; } .promo-visual { display: none; } }
 </style>
 
 <style>
@@ -577,6 +592,24 @@
   </div>
 </section>
 
+<section class="promo-forms wrap" id="dwaniforms" aria-labelledby="dwaniforms-title">
+  <div class="promo-card">
+    <div class="promo-text">
+      <span class="promo-tag">New from the DwaniLive team</span>
+      <h2 id="dwaniforms-title"><span lang="hi" class="promo-dwani">ध्वनि</span> <span class="promo-forms-word">Forms</span></h2>
+      <p>Government forms, complaints, RTI applications and scheme advice, filled in just by speaking, in your own language.
+         Built for CSCs, panchayats and hospital desks, and it works offline, like DwaniLive.</p>
+      <ul>
+        <li>PM-Kisan, e-Shram, income certificate, bank KYC and more, with every answer read back</li>
+        <li>Speak a complaint or RTI request and get a ready-to-sign letter</li>
+        <li>Check land (khasra) and ration records, and find the schemes you can apply for</li>
+      </ul>
+      <a class="promo-cta" href="https://dwaniforms.onrender.com" rel="noopener">Visit DwaniForms →</a>
+    </div>
+    <div class="promo-visual" aria-hidden="true"><span>🎤</span><span>📝</span><span>✓</span></div>
+  </div>
+</section>
+
 <main class="wrap">
   <div class="billing-toggle">
     <span>Monthly</span>
@@ -694,7 +727,7 @@
 </main>
 
 <footer class="wrap">
-  DwaniLive · Built for in-person academic conferences · <a href="/changelog">What's new</a> · <a href="/careers/">Careers</a>
+  DwaniLive · Built for in-person academic conferences · <a href="/changelog">What's new</a> · <a href="https://dwaniforms.onrender.com">DwaniForms</a> · <a href="/careers/">Careers</a>
 </footer>
 
 <!-- Checkout status modal -->
