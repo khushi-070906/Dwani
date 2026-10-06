@@ -319,6 +319,10 @@ def test_pending_answer_pencilled_but_aadhaar_masked(svc):
     assert r["field_id"] == "aadhaar"
     r = c.post(f"/form/sessions/{sid}/text", json={"text": " ".join(aadhaar)}).json()
     assert r["phase"] == "confirm" and aadhaar not in json.dumps(r) and r["pending"].endswith(aadhaar[-4:])
+    import re as _re
+    digits = lambda t: _re.sub(r"\D", "", t)                       # however the digits are spaced out
+    assert aadhaar not in digits(r["text"]) and digits(r["text"]).endswith(aadhaar[-4:])   # shown masked...
+    assert aadhaar in digits(r["speak"])                                                  # ...spoken in full
     gender = next(f for f in r["fields"] if f["id"] == "gender")
     assert [o["value"] for o in gender["options"]] == ["Male", "Female", "Other"] and gender["options"][0]["label"] == "पुरुष"
 
