@@ -14,6 +14,9 @@
    "prompt": {
     "en": "What is your full name?",
     "hi": "अपना पूरा नाम बताइए।"
+   },
+   "labels": {
+    "hi": "पूरा नाम"
    }
   },
   {
@@ -23,6 +26,9 @@
    "prompt": {
     "en": "What is your father's or husband's name?",
     "hi": "अपने पिता या पति का नाम बताइए।"
+   },
+   "labels": {
+    "hi": "पिता / पति का नाम"
    }
   },
   {
@@ -33,7 +39,10 @@
     "en": "What is your date of birth? Say day, month and year.",
     "hi": "अपनी जन्म तिथि बताइए: दिन, महीना और साल।"
    },
-   "params": {}
+   "params": {},
+   "labels": {
+    "hi": "जन्म तिथि"
+   }
   },
   {
    "id": "gender",
@@ -89,7 +98,10 @@
       ]
      }
     }
-   ]
+   ],
+   "labels": {
+    "hi": "लिंग"
+   }
   },
   {
    "id": "mobile",
@@ -98,6 +110,9 @@
    "prompt": {
     "en": "What is your mobile number?",
     "hi": "अपना मोबाइल नंबर बताइए।"
+   },
+   "labels": {
+    "hi": "मोबाइल नंबर"
    }
   },
   {
@@ -108,7 +123,10 @@
     "en": "Please say your Aadhaar number, one digit at a time. You may skip this.",
     "hi": "अपना आधार नंबर एक-एक अंक बोलकर बताइए। आप इसे छोड़ सकते हैं।"
    },
-   "required": false
+   "required": false,
+   "labels": {
+    "hi": "आधार नंबर"
+   }
   },
   {
    "id": "village",
@@ -117,6 +135,9 @@
    "prompt": {
     "en": "Which village or town do you live in?",
     "hi": "आप किस गाँव या शहर में रहते हैं?"
+   },
+   "labels": {
+    "hi": "गाँव / कस्बा"
    }
   },
   {
@@ -126,6 +147,9 @@
    "prompt": {
     "en": "Which district is that?",
     "hi": "आपका ज़िला कौन सा है?"
+   },
+   "labels": {
+    "hi": "जिला"
    }
   },
   {
@@ -135,6 +159,9 @@
    "prompt": {
     "en": "What is your PIN code?",
     "hi": "अपना पिन कोड बताइए।"
+   },
+   "labels": {
+    "hi": "पिन कोड"
    }
   },
   {
@@ -220,7 +247,10 @@
       ]
      }
     }
-   ]
+   ],
+   "labels": {
+    "hi": "विभाग"
+   }
   },
   {
    "id": "complaint",
@@ -229,6 +259,9 @@
    "prompt": {
     "en": "What is the problem? Tell me in a few words.",
     "hi": "क्या तकलीफ़ है? थोड़े शब्दों में बताइए।"
+   },
+   "labels": {
+    "hi": "मुख्य तकलीफ़"
    }
   }
  ],

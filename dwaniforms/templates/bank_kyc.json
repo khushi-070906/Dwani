@@ -15,6 +15,9 @@
    "prompt": {
     "en": "What is your full name?",
     "hi": "अपना पूरा नाम बताइए।"
+   },
+   "labels": {
+    "hi": "पूरा नाम"
    }
   },
   {
@@ -24,6 +27,9 @@
    "prompt": {
     "en": "What is your father's or husband's name?",
     "hi": "अपने पिता या पति का नाम बताइए।"
+   },
+   "labels": {
+    "hi": "पिता / पति का नाम"
    }
   },
   {
@@ -36,6 +42,9 @@
    },
    "params": {
     "min_age": 18
+   },
+   "labels": {
+    "hi": "जन्म तिथि"
    }
   },
   {
@@ -92,7 +101,10 @@
       ]
      }
     }
-   ]
+   ],
+   "labels": {
+    "hi": "लिंग"
+   }
   },
   {
    "id": "mobile",
@@ -101,6 +113,9 @@
    "prompt": {
     "en": "What is your mobile number?",
     "hi": "अपना मोबाइल नंबर बताइए।"
+   },
+   "labels": {
+    "hi": "मोबाइल नंबर"
    }
   },
   {
@@ -110,6 +125,9 @@
    "prompt": {
     "en": "Please say your Aadhaar number, one digit at a time.",
     "hi": "अपना आधार नंबर एक-एक अंक बोलकर बताइए।"
+   },
+   "labels": {
+    "hi": "आधार नंबर"
    }
   },
   {
@@ -120,7 +138,10 @@
     "en": "Please say your PAN, letter by letter.",
     "hi": "अपना पैन अक्षर-अक्षर बोलकर बताइए।"
    },
-   "required": false
+   "required": false,
+   "labels": {
+    "hi": "पैन"
+   }
   },
   {
    "id": "address_line",
@@ -129,6 +150,9 @@
    "prompt": {
     "en": "What is your address?",
     "hi": "आपका पता क्या है?"
+   },
+   "labels": {
+    "hi": "पता"
    }
   },
   {
@@ -138,6 +162,9 @@
    "prompt": {
     "en": "Which village or town do you live in?",
     "hi": "आप किस गाँव या शहर में रहते हैं?"
+   },
+   "labels": {
+    "hi": "गाँव / कस्बा"
    }
   },
   {
@@ -147,6 +174,9 @@
    "prompt": {
     "en": "Which district is that?",
     "hi": "आपका ज़िला कौन सा है?"
+   },
+   "labels": {
+    "hi": "जिला"
    }
   },
   {
@@ -156,6 +186,9 @@
    "prompt": {
     "en": "Which state?",
     "hi": "आपका राज्य कौन सा है?"
+   },
+   "labels": {
+    "hi": "राज्य"
    }
   },
   {
@@ -165,6 +198,9 @@
    "prompt": {
     "en": "What is your PIN code?",
     "hi": "अपना पिन कोड बताइए।"
+   },
+   "labels": {
+    "hi": "पिन कोड"
    }
   },
   {
@@ -174,6 +210,9 @@
    "prompt": {
     "en": "What is your occupation?",
     "hi": "आपका पेशा क्या है?"
+   },
+   "labels": {
+    "hi": "व्यवसाय"
    }
   },
   {
@@ -187,6 +226,9 @@
    "params": {
     "minimum": 0,
     "maximum": 1000000000
+   },
+   "labels": {
+    "hi": "सालाना आय (₹)"
    }
   },
   {
@@ -196,6 +238,9 @@
    "prompt": {
     "en": "Are you, or a close relative, a person holding a high public office? Yes or no.",
     "hi": "क्या आप या आपके करीबी रिश्तेदार किसी बड़े सरकारी पद पर हैं? हाँ या नहीं।"
+   },
+   "labels": {
+    "hi": "राजनीतिक रूप से प्रभावशाली व्यक्ति"
    }
   }
  ],

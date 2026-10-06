@@ -15,6 +15,9 @@
    "prompt": {
     "en": "What is your full name?",
     "hi": "अपना पूरा नाम बताइए।"
+   },
+   "labels": {
+    "hi": "पूरा नाम"
    }
   },
   {
@@ -24,6 +27,9 @@
    "prompt": {
     "en": "What is your father's or husband's name?",
     "hi": "अपने पिता या पति का नाम बताइए।"
+   },
+   "labels": {
+    "hi": "पिता / पति का नाम"
    }
   },
   {
@@ -36,6 +42,9 @@
    },
    "params": {
     "min_age": 18
+   },
+   "labels": {
+    "hi": "जन्म तिथि"
    }
   },
   {
@@ -92,7 +101,10 @@
       ]
      }
     }
-   ]
+   ],
+   "labels": {
+    "hi": "लिंग"
+   }
   },
   {
    "id": "category",
@@ -166,7 +178,10 @@
       ]
      }
     }
-   ]
+   ],
+   "labels": {
+    "hi": "श्रेणी"
+   }
   },
   {
    "id": "mobile",
@@ -175,6 +190,9 @@
    "prompt": {
     "en": "What is your mobile number?",
     "hi": "अपना मोबाइल नंबर बताइए।"
+   },
+   "labels": {
+    "hi": "मोबाइल नंबर"
    }
   },
   {
@@ -184,6 +202,9 @@
    "prompt": {
     "en": "Please say your Aadhaar number, one digit at a time.",
     "hi": "अपना आधार नंबर एक-एक अंक बोलकर बताइए।"
+   },
+   "labels": {
+    "hi": "आधार नंबर"
    }
   },
   {
@@ -194,7 +215,10 @@
     "en": "Please say your ration card number, one digit at a time.",
     "hi": "अपना राशन कार्ड नंबर एक-एक अंक बोलकर बताइए।"
    },
-   "required": false
+   "required": false,
+   "labels": {
+    "hi": "राशन कार्ड नंबर"
+   }
   },
   {
    "id": "village",
@@ -203,6 +227,9 @@
    "prompt": {
     "en": "Which village or town do you live in?",
     "hi": "आप किस गाँव या शहर में रहते हैं?"
+   },
+   "labels": {
+    "hi": "गाँव / कस्बा"
    }
   },
   {
@@ -212,6 +239,9 @@
    "prompt": {
     "en": "Which tehsil?",
     "hi": "आपकी तहसील कौन सी है?"
+   },
+   "labels": {
+    "hi": "तहसील"
    }
   },
   {
@@ -221,6 +251,9 @@
    "prompt": {
     "en": "Which district is that?",
     "hi": "आपका ज़िला कौन सा है?"
+   },
+   "labels": {
+    "hi": "जिला"
    }
   },
   {
@@ -230,6 +263,9 @@
    "prompt": {
     "en": "Which state?",
     "hi": "आपका राज्य कौन सा है?"
+   },
+   "labels": {
+    "hi": "राज्य"
    }
   },
   {
@@ -239,6 +275,9 @@
    "prompt": {
     "en": "What is your PIN code?",
     "hi": "अपना पिन कोड बताइए।"
+   },
+   "labels": {
+    "hi": "पिन कोड"
    }
   },
   {
@@ -252,6 +291,9 @@
    "params": {
     "minimum": 0,
     "maximum": 1000000000
+   },
+   "labels": {
+    "hi": "परिवार की सालाना आय (₹)"
    }
   },
   {
@@ -261,6 +303,9 @@
    "prompt": {
     "en": "Why do you need the certificate?",
     "hi": "आपको प्रमाण पत्र किसलिए चाहिए?"
+   },
+   "labels": {
+    "hi": "प्रयोजन"
    }
   }
  ],

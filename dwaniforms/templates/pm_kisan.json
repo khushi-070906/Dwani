@@ -16,6 +16,9 @@
    "prompt": {
     "en": "What is your full name?",
     "hi": "अपना पूरा नाम बताइए।"
+   },
+   "labels": {
+    "hi": "पूरा नाम"
    }
   },
   {
@@ -25,6 +28,9 @@
    "prompt": {
     "en": "What is your father's or husband's name?",
     "hi": "अपने पिता या पति का नाम बताइए।"
+   },
+   "labels": {
+    "hi": "पिता / पति का नाम"
    }
   },
   {
@@ -37,6 +43,9 @@
    },
    "params": {
     "min_age": 18
+   },
+   "labels": {
+    "hi": "जन्म तिथि"
    }
   },
   {
@@ -93,7 +102,10 @@
       ]
      }
     }
-   ]
+   ],
+   "labels": {
+    "hi": "लिंग"
+   }
   },
   {
    "id": "category",
@@ -167,7 +179,10 @@
       ]
      }
     }
-   ]
+   ],
+   "labels": {
+    "hi": "श्रेणी"
+   }
   },
   {
    "id": "mobile",
@@ -176,6 +191,9 @@
    "prompt": {
     "en": "What is your mobile number?",
     "hi": "अपना मोबाइल नंबर बताइए।"
+   },
+   "labels": {
+    "hi": "मोबाइल नंबर"
    }
   },
   {
@@ -185,6 +203,9 @@
    "prompt": {
     "en": "Please say your Aadhaar number, one digit at a time.",
     "hi": "अपना आधार नंबर एक-एक अंक बोलकर बताइए।"
+   },
+   "labels": {
+    "hi": "आधार नंबर"
    }
   },
   {
@@ -194,6 +215,9 @@
    "prompt": {
     "en": "Which village or town do you live in?",
     "hi": "आप किस गाँव या शहर में रहते हैं?"
+   },
+   "labels": {
+    "hi": "गाँव / कस्बा"
    }
   },
   {
@@ -203,6 +227,9 @@
    "prompt": {
     "en": "Which district is that?",
     "hi": "आपका ज़िला कौन सा है?"
+   },
+   "labels": {
+    "hi": "जिला"
    }
   },
   {
@@ -212,6 +239,9 @@
    "prompt": {
     "en": "Which state?",
     "hi": "आपका राज्य कौन सा है?"
+   },
+   "labels": {
+    "hi": "राज्य"
    }
   },
   {
@@ -221,6 +251,9 @@
    "prompt": {
     "en": "What is your PIN code?",
     "hi": "अपना पिन कोड बताइए।"
+   },
+   "labels": {
+    "hi": "पिन कोड"
    }
   },
   {
@@ -230,6 +263,9 @@
    "prompt": {
     "en": "What is your khasra or survey number?",
     "hi": "आपका खसरा या सर्वे नंबर क्या है?"
+   },
+   "labels": {
+    "hi": "खसरा / सर्वे नंबर"
    }
   },
   {
@@ -245,6 +281,9 @@
     "maximum": 1000,
     "decimals": 2,
     "unit": "acre"
+   },
+   "labels": {
+    "hi": "अपनी ज़मीन (एकड़)"
    }
   },
   {
@@ -254,6 +293,9 @@
    "prompt": {
     "en": "Please say your bank account number, one digit at a time.",
     "hi": "अपना बैंक खाता नंबर एक-एक अंक बोलकर बताइए।"
+   },
+   "labels": {
+    "hi": "बैंक खाता संख्या"
    }
   },
   {
@@ -263,6 +305,9 @@
    "prompt": {
     "en": "Please say the IFSC code of your bank branch.",
     "hi": "अपनी बैंक शाखा का आईएफ़एससी कोड बताइए।"
+   },
+   "labels": {
+    "hi": "आईएफ़एससी कोड"
    }
   }
  ],
