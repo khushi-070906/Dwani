@@ -197,6 +197,35 @@
     .boxes .b { width: 1.35rem; height: 1.75rem; font-size: .95rem; }
   }
   @media print { .dock, .talk-top, .progress, .srow .redo { display: none !important; } .sheet { box-shadow: none; border-color: #999; } }
+
+  /* ---- polish after real screenshots ---- */
+  .boxes { flex-wrap: nowrap; gap: 2px; }
+  .boxes .b { width: 1.4rem; height: 1.85rem; font-size: 1rem; }
+  .repeat { white-space: nowrap; font-size: .85rem; padding: .3rem .7rem; flex: none; align-self: flex-start; }
+  .type { width: 100%; } .type input { min-width: 0; }
+  .card .actions:empty { display: none; }
+  @media (min-width: 900px) { .cards { grid-template-columns: 1fr 1fr; } }
+  .q-row .q { flex: 1; min-width: 0; }
+  @media (max-width: 640px) {
+    .srow { grid-template-columns: 1.8rem minmax(0, 1fr) auto; row-gap: .35rem; }
+    .srow .val { grid-column: 1 / -1; padding-left: 2.5rem; }
+    .srow .redo { grid-column: 3; grid-row: 1; }
+    .boxes { flex-wrap: nowrap; }
+    .boxes .b { width: 1.3rem; height: 1.7rem; font-size: .92rem; }
+    .dock { padding: .7rem .8rem .8rem; border-radius: 18px 18px 0 0; bottom: 0; margin: 0 -.6rem; }
+    .dock .q { font-size: 1.05rem; }
+    .repeat { font-size: 0; padding: .3rem .5rem; } .repeat::first-letter { font-size: 1.1rem; }
+    .dock .talk { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: .5rem; margin: .5rem 0 0; }
+    .dock .yn { display: contents; }
+    .dock .yn[hidden] { display: none !important; }
+    .yn button { min-width: 0; padding: .7rem .4rem; font-size: 1.05rem; }
+    #btn-yes { grid-column: 1; grid-row: 1; } #btn-no { grid-column: 3; grid-row: 1; }
+    .dock .mic { width: 68px; height: 68px; font-size: 1.7rem; grid-column: 2; grid-row: 1; }
+    .dock .mic-label { grid-column: 1 / -1; font-size: .8rem; text-align: center; }
+    .dock .type { grid-column: 1 / -1; } .dock #status { grid-column: 1 / -1; }
+    .dock .type button { padding: .6rem .8rem; }
+    .dock .heard:empty { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -446,8 +475,8 @@
   function render(r) {
     cur = r;
     if (r.done) { showResult(r); return; }
-    $("question").textContent = r.text;
-    speak(r.text);
+    $("question").textContent = r.text;                 // shown (sensitive numbers masked)
+    speak(r.speak || r.text);                            // spoken (in full, so it can be confirmed by ear)
     $("mt-note").hidden = !r.machine_translated;
     $("yn").hidden = !(r.phase === "confirm" || r.phase === "final");
     var fields = r.fields || [];
@@ -516,7 +545,7 @@
       if (isCur) setTimeout(function () { try { li.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) {} }, 60);
     });
   }
-  $("repeat").addEventListener("click", function () { if (cur && cur.text) speak(cur.text); });
+  $("repeat").addEventListener("click", function () { if (cur && cur.text) speak(cur.speak || cur.text); });
   $("big-btn").addEventListener("click", function () {
     var on = !document.body.classList.contains("big");
     document.body.classList.toggle("big", on); this.setAttribute("aria-pressed", String(on));
