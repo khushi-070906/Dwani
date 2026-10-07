@@ -53,6 +53,8 @@ def build_app(whisper_model: str | None, nllb_dir: str | None, sp_model: str, te
 
     app = FastAPI(title="DwaniForms", lifespan=lifespan)
     app.include_router(create_router(service))
+    from .hardening import install
+    install(app, service, version="1.0")
 
     @app.get("/", include_in_schema=False)
     async def root():

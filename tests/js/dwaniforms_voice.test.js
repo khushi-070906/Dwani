@@ -4,24 +4,26 @@ const html = fs.readFileSync(path.join(__dirname, "..", "..", "dwaniforms", "sta
 const ok = (c, m) => { console.log((c ? "PASS " : "FAIL ") + m); if (!c) process.exitCode = 1; };
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const FORMS = [{ id: "grievance", flow: "grievance", title: "Grievance", titles: { hi: "शिकायत" }, available: true, description: {} }];
-function boot(lang, voices) {
-  const spoken = [];
+function boot(lang, voices, opts) {
+  opts = Object.assign({ consent: true, kiosk: false }, opts || {});
+  const spoken = [], posts = [];
   const w = new JSDOM(html, { url: "http://127.0.0.1:8100/form/", runScripts: "dangerously", pretendToBeVisual: true,
     beforeParse(w) {
       w.localStorage.setItem("dwaniforms:lang", lang);
+      if (opts.consent) w.sessionStorage.setItem("dwaniforms:consent", "v1");
       w.speechSynthesis = { cancel() {}, speak(u) { spoken.push(u); }, getVoices: () => voices, onvoiceschanged: null };
       w.SpeechSynthesisUtterance = function (t) { this.text = t; };
       w.fetch = (u, opt) => {
         let body = {};
         if (u.endsWith("/forms")) body = FORMS;
-        else if (u.endsWith("/capabilities")) body = { asr: false, asr_langs: [], translation: true };
-        else if (u.endsWith("/sessions") && opt && opt.method === "POST")
+        else if (u.endsWith("/capabilities")) body = { asr: opts.kiosk, asr_langs: opts.kiosk ? ["hi", "en"] : [], translation: true };
+        else if (u.endsWith("/sessions") && opt && opt.method === "POST" && posts.push(1))
           body = { session_id: "abc", text: lang === "hi" ? "अपना पूरा नाम बताइए।" : "What is your name?", phase: "ask", field_id: "full_name",
                    title: "शिकायत", fields: [{ id: "full_name", label: "Name", kind: "name", value: "", native: "", required: true }] };
         return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(body) });
       };
     } }).window;
-  w.__spoken = spoken;
+  w.__spoken = spoken; w.__posts = posts;
   return w;
 }
 async function open(w) {
@@ -53,5 +55,23 @@ async function open(w) {
      "Hindi speech: years, khasra and fractions");
   ok(hs("साल में ₹6,000, तीन") === "साल में छह हज़ार रुपये, तीन", "Hindi speech: rupee amounts, commas kept");
   ok(w.__spoken.length && !/\d/.test(w.__spoken[w.__spoken.length - 1].text), "nothing is handed to the Hindi voice as digits");
+  w.close();
+  // ---- consent (DPDP): nothing is sent before the person agrees
+  w = boot("hi", [EN, HI], { consent: false });
+  await open(w);
+  const dlg = w.document.getElementById("consent");
+  ok(!dlg.hidden && /30 मिनट/.test(dlg.textContent) && /सरकारी वेबसाइट नहीं/.test(dlg.textContent), "consent shown before a form starts (what, how long, not government)");
+  ok(w.__posts.length === 0, "no session is created before agreeing");
+  w.document.getElementById("consent-cancel").click(); await wait(50);
+  ok(dlg.hidden && w.__posts.length === 0, "'Not now' starts nothing");
+  await open(w);
+  w.document.getElementById("consent-agree").click(); await wait(80);
+  ok(w.__posts.length === 1 && !w.document.getElementById("talk").hidden, "after agreeing the form starts");
+  ok(w.sessionStorage.getItem("dwaniforms:consent") === "v1", "phone: agreement remembered for this visit");
+  w.close();
+  w = boot("hi", [EN, HI], { consent: true, kiosk: true });
+  await open(w);
+  ok(!w.document.getElementById("consent").hidden && /इसी कंप्यूटर/.test(w.document.getElementById("consent").textContent),
+     "kiosk: asks every new person, with the on-this-computer wording");
   w.close();
 })();

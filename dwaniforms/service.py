@@ -78,8 +78,15 @@ class FormService:
         dead = [k for k, s in self.sessions.items()
                 if now - s.last_active > (COMPLETED_IDLE_TTL if s.phase == "done" else SESSION_IDLE_TTL)]
         for k in dead:
-            del self.sessions[k]
+            s = self.sessions.pop(k)
+            if s.phase != "done":                            # anonymous: which form, which question people left at
+                self._count("abandoned_at", s.template.id, s.current.id if s.current else None)
         return len(dead)
+
+    def _count(self, kind: str, form_id: str, field_id: str | None = None) -> None:
+        m = getattr(self, "metrics", None)
+        if m is not None:
+            m.event(kind, form_id, field_id)
 
     async def sweep_forever(self, interval: float = SWEEP_INTERVAL) -> None:
         """Run as a background task so idle sessions are purged even when nobody creates a new one."""
@@ -108,10 +115,14 @@ class FormService:
             if src is not None and src.template.flow == "advisor":
                 s.prefill(eligibility.prefill_for(src, t))
         self.sessions[s.id] = s
+        self._count("started", s.template.id)
         return s, await self.finish(s, await s.start())
 
     async def finish(self, s: FormSession, reply: Reply) -> Reply:
         """When a flow completes: build its outcome (draft / record / schemes) once and say it."""
+        if reply.done and not getattr(s, "_counted_done", False):
+            s._counted_done = True
+            self._count("finished", s.template.id)
         if not reply.done or s.outcome is not None:
             if reply.done and s.outcome is not None:
                 reply.outcome = s.outcome
@@ -146,7 +157,11 @@ class FormService:
 
     async def answer_text(self, sid: str, text: str) -> Reply:
         s = self.get(sid)
-        return await self.finish(s, await s.submit(text))
+        before = (s.current.id if s.current else None, s.phase)
+        reply = await self.finish(s, await s.submit(text))
+        if before[1] == "ask" and reply.phase == "ask" and reply.field_id == before[0]:
+            self._count("retries", s.template.id, before[0])      # the same question had to be asked again
+        return reply
 
     async def answer_audio(self, sid: str, pcm16: bytes, sample_rate: int = 16_000) -> tuple[str, Reply]:
         """Raw little-endian PCM16 mono in -> (transcript, Reply)."""

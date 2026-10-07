@@ -239,6 +239,18 @@
     .card { border: 0; padding: 0; } .redo, .note-pen { display: none !important; }
   }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+  /* consent + network banner */
+  .consent-wrap { position: fixed; inset: 0; background: rgba(30,42,68,.45); display: grid; place-items: center; z-index: 50; padding: 1rem; }
+  .consent { max-width: 560px; width: 100%; max-height: 90vh; overflow: auto; }
+  .consent h2 { margin-top: 0; }
+  .consent ul { padding-left: 1.2rem; } .consent li { margin: .45rem 0; }
+  .consent-actions { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: .8rem; }
+  #consent-cancel { background: #fff; color: #1E2A44; border: 1px solid #C9CEC2; box-shadow: none; }
+  .small { font-size: .85rem; }
+  .banner { position: fixed; left: 50%; transform: translateX(-50%); bottom: 1rem; z-index: 60; background: #FBE9E7; color: #8a2d12;
+            border: 1px solid #f0b9a6; border-radius: 12px; padding: .6rem .8rem; display: flex; gap: .6rem; align-items: center;
+            max-width: calc(100% - 2rem); box-shadow: 0 8px 24px -12px rgba(30,42,68,.4); }
 </style>
 </head>
 <body>
@@ -399,6 +411,20 @@
     </div>
   </section>
 </main>
+
+<!-- Consent (DPDP Act 2023): what is taken, why, for how long, before anything is collected -->
+<div class="consent-wrap" id="consent" hidden>
+  <div class="card consent" role="dialog" aria-modal="true" aria-labelledby="consent-title">
+    <h2 id="consent-title" data-t="c_title">Before you start</h2>
+    <ul id="consent-points"></ul>
+    <p class="muted small"><a href="https://dwaniforms.onrender.com/privacy.html" target="_blank" rel="noopener" data-t="c_policy">Read the full privacy policy</a></p>
+    <div class="consent-actions">
+      <button class="btn primary" type="button" id="consent-agree" data-t="c_agree">I agree, start</button>
+      <button class="btn" type="button" id="consent-cancel" data-t="c_cancel">Not now</button>
+    </div>
+  </div>
+</div>
+<div class="banner" id="net-banner" role="alert" hidden><span id="net-msg"></span> <button class="btn" type="button" id="net-retry" data-t="retry">Try again</button></div>
 <footer class="foot no-print"><div class="wrap">
   <span><span lang="hi">ध्वनि</span> Forms · <span data-t="footer">a DwaniLive project · not a government website</span></span>
   <a href="https://dwaniforms.onrender.com/privacy.html" target="_blank" rel="noopener" data-t="privacy_link">Privacy policy</a>
@@ -433,7 +459,13 @@
       likely: "मिल सकती हैं", maybe: "जाँच ज़रूरी", fill: "यह फ़ॉर्म भरें →", how_get: "कैसे लें", why_maybe: "क्यों 'जाँच ज़रूरी'", checks: "पक्का कर लें",
       reviewed: "नियम जाँचे गए", stale: "नियम दोबारा जाँचने हैं", not_matched: "अन्य योजनाएँ आपके जवाबों से मेल नहीं खातीं", demo_rec: "डेमो रिकॉर्ड, असली नहीं",
       old: "यह कॉपी पुरानी है, आधिकारिक पोर्टल भी देखें।", busy: "अभी बहुत लोग इस्तेमाल कर रहे हैं, थोड़ी देर में फिर कोशिश कीजिए।",
-      offline: "DwaniForms से संपर्क नहीं हो पाया।" },
+      offline: "DwaniForms से संपर्क नहीं हो पाया। इंटरनेट देखिए, या थोड़ी देर में फिर कोशिश कीजिए।", retry: "फिर कोशिश करें",
+      c_title: "शुरू करने से पहले", c_agree: "मैं सहमत हूँ, शुरू करें", c_cancel: "अभी नहीं", c_policy: "पूरी निजता नीति पढ़ें",
+      c_what: "आपके जवाब (जैसे नाम, आधार, पता) सिर्फ़ इसी फ़ॉर्म या सेवा के लिए लिए जाते हैं।",
+      c_online: "ये हमारे सर्वर की मेमोरी में रहते हैं और 30 मिनट में अपने-आप मिट जाते हैं। हम इन्हें सहेजते, बेचते या किसी को देते नहीं।",
+      c_google: "बोलकर जवाब देने पर आपका ब्राउज़र आवाज़ को लिखने के लिए Google को भेजता है। न चाहें तो लिखकर जवाब दीजिए।",
+      c_kiosk: "सब कुछ इसी कंप्यूटर पर रहता है, आवाज़ भी यहीं समझी जाती है। जवाब 30 मिनट में मिट जाते हैं; प्रिंट या सेव ऑपरेटर करता है।",
+      c_gov: "यह सरकारी वेबसाइट नहीं है। फ़ॉर्म और पत्र मसौदा हैं; फ़ैसला संबंधित विभाग करता है।" },
     en: {}
   };
   var EN = { next_advisor: "Tap 'Fill this form' next to a scheme: some of your answers will already be filled in. The department makes the final decision.",
@@ -449,7 +481,13 @@
     m_source: "Source", likely: "You may get", maybe: "Needs checking", fill: "Fill this form →", how_get: "How to get it", why_maybe: "Why 'needs checking'",
     checks: "Confirm", reviewed: "Rules reviewed", stale: "Rules need re-checking", not_matched: "other schemes don't match your answers",
     demo_rec: "Demo records, not real", old: "This copy is old; check the official portal too.", busy: "Lots of people are using it right now; try again in a minute.",
-    offline: "Couldn't reach DwaniForms." };
+    offline: "Couldn't reach DwaniForms. Check the internet, or try again in a minute.", retry: "Try again",
+    c_title: "Before you start", c_agree: "I agree, start", c_cancel: "Not now", c_policy: "Read the full privacy policy",
+    c_what: "Your answers (such as name, Aadhaar, address) are taken only for this form or service.",
+    c_online: "They stay in our server's memory and are deleted automatically within 30 minutes. We don't save, sell or share them.",
+    c_google: "If you answer by speaking, your browser sends your voice to Google to turn it into text. If you'd rather not, type your answers.",
+    c_kiosk: "Everything stays on this computer, including your voice. Answers are deleted within 30 minutes; the operator prints or saves the form.",
+    c_gov: "This is not a government website. Forms and letters are drafts; the department concerned decides." };
   var LANG_NAMES = { hi: "हिन्दी", en: "English", bn: "বাংলা", ta: "தமிழ்", te: "తెలుగు", mr: "मराठी", gu: "ગુજરાતી", kn: "ಕನ್ನಡ",
                      ml: "മലയാളം", pa: "ਪੰਜਾਬੀ", ur: "اردو", or: "ଓଡ଼ିଆ", as: "অসমীয়া" };
   var ICON = { form: "📝", grievance: "📢", rti: "📄", lookup_land: "🗺", lookup_ration: "🍚", advisor: "💡" };
@@ -583,7 +621,35 @@
   function goHome() { stopListening(); endSession(); cur = null; try { speechSynthesis.cancel(); } catch (e) {} renderHome(); show("home"); }
 
   // ---------- a flow ----------
-  function start(formId, prefillFrom) {
+  // ---- consent before anything is collected. Phones: once per visit. Kiosk (shared): every new person/form.
+  var CONSENT_V = "v1";
+  function onlineMode() { return !caps.asr; }
+  function needConsent(go, skip) {
+    var kept = false; try { kept = sessionStorage.getItem("dwaniforms:consent") === CONSENT_V; } catch (e) {}
+    if (skip || (onlineMode() && kept)) { go(); return; }
+    var pts = [t("c_what"), onlineMode() ? t("c_online") : t("c_kiosk")];
+    if (onlineMode() && browserVoiceOK && browserVoiceOK()) pts.push(t("c_google"));
+    pts.push(t("c_gov"));
+    var ul = $("consent-points"); ul.innerHTML = "";
+    pts.forEach(function (p) { var li = document.createElement("li"); li.textContent = p; ul.appendChild(li); });
+    $("consent").hidden = false; $("consent-agree").focus();
+    $("consent-agree").onclick = function () {
+      $("consent").hidden = true;
+      if (onlineMode()) { try { sessionStorage.setItem("dwaniforms:consent", CONSENT_V); } catch (e) {} }
+      go();
+    };
+    $("consent-cancel").onclick = function () { $("consent").hidden = true; };
+  }
+  // ---- friendly network errors with a retry, instead of alert("Failed to fetch")
+  function netError(e, retry) {
+    var msg = (e && e.message && !/fetch|network|load failed/i.test(e.message)) ? e.message : t("offline");
+    $("net-msg").textContent = msg; $("net-banner").hidden = false;
+    $("net-retry").hidden = !retry;
+    $("net-retry").onclick = function () { $("net-banner").hidden = true; if (retry) retry(); };
+  }
+  function start(formId, prefillFrom) { needConsent(function () { doStart(formId, prefillFrom); }, !!prefillFrom); }
+  function doStart(formId, prefillFrom) {
+    $("net-banner").hidden = true;
     var body = { form_id: formId, lang: lang };
     if (prefillFrom) body.prefill_from = prefillFrom;
     var prev = sid;
@@ -593,7 +659,7 @@
       $("talk-title").textContent = r.title || ""; $("crumb-title").textContent = r.title || "";
       $("heard").textContent = "";
       show("talk"); render(r);
-    }).catch(function (e) { alert(e.message || t("offline")); });
+    }).catch(function (e) { netError(e, function () { doStart(formId, prefillFrom); }); });
   }
   function serverVoiceOK() { return caps.asr && (caps.asr_langs || []).indexOf(lang) > -1 && navigator.mediaDevices && window.isSecureContext; }
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -682,7 +748,7 @@
     if (!sid || !text) return;
     $("status").textContent = t("working");
     api("/sessions/" + sid + "/text", { method: "POST", json: { text: text } }).then(function (r) { $("status").textContent = ""; render(r); })
-      .catch(function (e) { $("status").textContent = e.message; });
+      .catch(function (e) { netError(e); $("status").textContent = ""; });
   }
   $("type-form").addEventListener("submit", function (e) { e.preventDefault(); var v = $("type-input").value.trim(); $("type-input").value = ""; send(v); });
   $("btn-yes").addEventListener("click", function () { send(lang === "hi" ? "हाँ" : "yes"); });

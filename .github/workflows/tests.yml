@@ -65,3 +65,15 @@ jobs:
           DWANIFORMS_URL=http://127.0.0.1:8130 node dwaniforms_kiosk.test.js
       - name: No server errors
         run: "! grep -q Traceback dwaniforms.log || (cat dwaniforms.log; exit 1)"
+
+  security:
+    # Known vulnerabilities in the online app's dependencies (fails the check so they get upgraded)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pip-audit
+      - run: pip-audit -r dwaniforms/requirements-web.txt

@@ -75,4 +75,11 @@ services:
     plan: free
     buildCommand: pip install -r dwaniforms/requirements-web.txt
     startCommand: python -m dwaniforms.standalone --text-only --demo-records --browser-voice --host 0.0.0.0 --port $PORT
-    healthCheckPath: /form/forms
+    healthCheckPath: /form/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: DWANIFORMS_TRUST_PROXY        # Render sits behind a proxy: rate limits per real visitor
+        value: "1"
+      - key: DWANIFORMS_METRICS_TOKEN      # opens /form/metrics (anonymous counts) for whoever sends it
+        generateValue: true

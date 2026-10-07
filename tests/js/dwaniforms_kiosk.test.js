@@ -10,6 +10,7 @@ function boot(lang) {
   const spoken = [];
   const w = new JSDOM(html, { url: BASE + "/form/", runScripts: "dangerously", pretendToBeVisual: true,
     beforeParse(w) {
+      w.sessionStorage.setItem("dwaniforms:consent", "v1");     // consent itself is tested in dwaniforms_voice.test.js
       w.fetch = (u, opt) => fetch(new URL(u, BASE + "/form/").href, opt);
       w.speechSynthesis = { cancel() {}, speak(u) { spoken.push(u.text); } };
       w.SpeechSynthesisUtterance = function (t) { this.text = t; };
