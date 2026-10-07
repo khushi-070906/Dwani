@@ -5,7 +5,7 @@
   "hi": "उज्ज्वला गैस कनेक्शन"
  },
  "ministry": "Ministry of Petroleum & Natural Gas",
- "source": "https://pmuy.gov.in",
+ "source": "https://www.pmuy.gov.in",
  "benefit": {
   "en": "A free LPG connection for the woman of a poor household",
   "hi": "गरीब परिवार की महिला के नाम मुफ़्त एलपीजी कनेक्शन"
@@ -41,35 +41,11 @@
    }
   },
   {
-   "any_of": [
-    {
-     "fact": "ration_card",
-     "in": [
-      "AAY",
-      "PHH / BPL"
-     ]
-    },
-    {
-     "fact": "category",
-     "in": [
-      "SC",
-      "ST"
-     ]
-    },
-    {
-     "fact": "house",
-     "in": [
-      "Kutcha house",
-      "No house"
-     ]
-    }
-   ],
-   "otherwise": "maybe",
-   "why": {
-    "en": "for poor households (or you can give a declaration of need)",
-    "hi": "गरीब परिवारों के लिए (या ज़रूरत का घोषणा-पत्र दे सकते हैं)"
+   "check": {
+    "en": "You sign a 'deprivation declaration' saying your household is poor (the simplified rule since 2025).",
+    "hi": "आपको 'वंचना घोषणा-पत्र' भरना होता है कि आपका परिवार गरीब है (2025 से यही आसान नियम है)।"
    }
   }
  ],
- "last_reviewed": "2026-06-30"
+ "last_reviewed": "2026-10-07"
 }

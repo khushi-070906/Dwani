@@ -21,26 +21,20 @@
     {
      "fact": "age",
      "gte": 70
-    },
-    {
-     "fact": "ration_card",
-     "in": [
-      "AAY"
-     ]
     }
    ],
    "otherwise": "maybe",
    "why": {
-    "en": "everyone aged 70 or more is covered; otherwise your family must be on the eligible list (SECC 2011 / state list)",
-    "hi": "70 साल या उससे ऊपर सभी शामिल हैं; बाकी परिवारों का पात्रता सूची (SECC 2011 / राज्य सूची) में होना ज़रूरी है"
+    "en": "everyone aged 70 or more gets ₹5 lakh cover (Ayushman Vay Vandana card); below 70, your family must be on the PM-JAY list",
+    "hi": "70 साल या उससे ऊपर सभी को ₹5 लाख का कवर (आयुष्मान वय वंदना कार्ड); 70 से कम उम्र पर परिवार का PM-JAY सूची में होना ज़रूरी है"
    }
   },
   {
    "check": {
-    "en": "Check that your family is on the list at beneficiary.nha.gov.in.",
-    "hi": "beneficiary.nha.gov.in पर देखें कि परिवार सूची में है।"
+    "en": "Below 70: check that your family is on the list at beneficiary.nha.gov.in or the Ayushman app.",
+    "hi": "70 से कम: beneficiary.nha.gov.in या आयुष्मान ऐप पर देखें कि परिवार सूची में है।"
    }
   }
  ],
- "last_reviewed": "2026-06-30"
+ "last_reviewed": "2026-10-07"
 }

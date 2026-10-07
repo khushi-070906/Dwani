@@ -7,8 +7,8 @@
  "ministry": "Ministry of Housing & Urban Affairs",
  "source": "https://pmay-urban.gov.in",
  "benefit": {
-  "en": "Help to build or buy a house for low-income urban families",
-  "hi": "शहरी कम-आय परिवारों को घर बनाने या खरीदने में मदद"
+  "en": "Up to ₹3 lakh a year: help to build or buy a house; up to ₹9 lakh a year: a home-loan interest subsidy (up to ₹1.8 lakh)",
+  "hi": "₹3 लाख साल तक: घर बनाने या खरीदने में मदद; ₹9 लाख साल तक: होम-लोन के ब्याज पर छूट (₹1.8 लाख तक)"
  },
  "form": "income_certificate",
  "apply": {
@@ -50,5 +50,5 @@
    }
   }
  ],
- "last_reviewed": "2026-06-30"
+ "last_reviewed": "2026-10-07"
 }

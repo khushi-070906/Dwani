@@ -36,6 +36,15 @@
    }
   },
   {
+   "fact": "annual_income",
+   "lte": 180000,
+   "soft": true,
+   "why": {
+    "en": "households earning more than ₹15,000 a month are excluded",
+    "hi": "₹15,000 महीने से ज़्यादा कमाने वाले परिवार बाहर हैं"
+   }
+  },
+  {
    "fact": "govt_employee",
    "eq": "No",
    "soft": true,
@@ -60,5 +69,5 @@
    }
   }
  ],
- "last_reviewed": "2026-06-30"
+ "last_reviewed": "2026-10-07"
 }

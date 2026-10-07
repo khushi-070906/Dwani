@@ -5,7 +5,7 @@
   "hi": "अटल पेंशन योजना"
  },
  "ministry": "Ministry of Finance (PFRDA)",
- "source": "https://www.npscra.nsdl.co.in/scheme-details.php",
+ "source": "https://www.myscheme.gov.in/schemes/apy",
  "benefit": {
   "en": "A guaranteed pension of ₹1,000-5,000 a month after 60, depending on what you pay in",
   "hi": "60 के बाद ₹1,000-5,000 महीना पक्की पेंशन, जमा राशि के हिसाब से"
@@ -43,5 +43,5 @@
    }
   }
  ],
- "last_reviewed": "2026-06-30"
+ "last_reviewed": "2026-10-07"
 }

@@ -62,7 +62,13 @@
     "en": "Your bank account must be linked to Aadhaar.",
     "hi": "बैंक खाता आधार से जुड़ा होना चाहिए।"
    }
+  },
+  {
+   "check": {
+    "en": "Excluded: professionals (doctors, engineers, lawyers, CAs), pensioners getting ₹10,000 or more a month, and holders of constitutional posts.",
+    "hi": "बाहर: पेशेवर (डॉक्टर, इंजीनियर, वकील, सीए), ₹10,000 या ज़्यादा मासिक पेंशन वाले, और संवैधानिक पद वाले परिवार।"
+   }
   }
  ],
- "last_reviewed": "2026-06-30"
+ "last_reviewed": "2026-10-07"
 }
