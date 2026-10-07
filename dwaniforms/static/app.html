@@ -495,7 +495,39 @@
     el.hidden = v !== null;
     if (v === null) el.textContent = t("no_voice").split("{lang}").join(LANG_NAMES[lang] || lang);
   }
+  // Hindi voices often read "2345" or "1980" in English. Before speaking Hindi, numbers become Hindi words:
+  // single digits one by one, years as "उन्नीस सौ अस्सी", long numbers digit by digit, 145/2 as "बटा", 2.5 as "ढाई".
+  var HI_0_99 = ["शून्य", "एक", "दो", "तीन", "चार", "पाँच", "छह", "सात", "आठ", "नौ", "दस", "ग्यारह", "बारह", "तेरह", "चौदह", "पंद्रह", "सोलह", "सत्रह", "अठारह", "उन्नीस", "बीस", "इक्कीस", "बाईस", "तेईस", "चौबीस", "पच्चीस", "छब्बीस", "सत्ताईस", "अट्ठाईस", "उनतीस", "तीस", "इकतीस", "बत्तीस", "तैंतीस", "चौंतीस", "पैंतीस", "छत्तीस", "सैंतीस", "अड़तीस", "उनतालीस", "चालीस", "इकतालीस", "बयालीस", "तैंतालीस", "चौवालीस", "पैंतालीस", "छियालीस", "सैंतालीस", "अड़तालीस", "उनचास", "पचास", "इक्यावन", "बावन", "तिरपन", "चौवन", "पचपन", "छप्पन", "सत्तावन", "अट्ठावन", "उनसठ", "साठ", "इकसठ", "बासठ", "तिरसठ", "चौंसठ", "पैंसठ", "छियासठ", "सड़सठ", "अड़सठ", "उनहत्तर", "सत्तर", "इकहत्तर", "बहत्तर", "तिहत्तर", "चौहत्तर", "पचहत्तर", "छिहत्तर", "सतहत्तर", "अठहत्तर", "उनासी", "अस्सी", "इक्यासी", "बयासी", "तिरासी", "चौरासी", "पचासी", "छियासी", "सत्तासी", "अट्ठासी", "नवासी", "नब्बे", "इक्यानवे", "बानवे", "तिरानवे", "चौरानवे", "पचानवे", "छियानवे", "सत्तानवे", "अट्ठानवे", "निन्यानवे"];
+  function hiNumber(n) {
+    if (n < 100) return HI_0_99[n];
+    if (n < 1000) return HI_0_99[Math.floor(n / 100)] + " सौ" + (n % 100 ? " " + HI_0_99[n % 100] : "");
+    if (n < 100000) return hiNumber(Math.floor(n / 1000)) + " हज़ार" + (n % 1000 ? " " + hiNumber(n % 1000) : "");
+    if (n < 10000000) return hiNumber(Math.floor(n / 100000)) + " लाख" + (n % 100000 ? " " + hiNumber(n % 100000) : "");
+    return String(n).split("").map(function (d) { return HI_0_99[+d]; }).join(" ");
+  }
+  function hiSpeakable(text) {
+    var FRAC = { "0.5": "आधा", "1.5": "डेढ़", "2.5": "ढाई" };
+    return text
+      .replace(/\d(?:[ \u00a0]+\d){2,}/g, function (m) {                  // "2 3 4 5  6 7 8 9": spelled digits
+        return m.split(/[ \u00a0]{2,}/).map(function (g) { return g.trim().split(/\s+/).map(function (d) { return HI_0_99[+d]; }).join(" "); }).join(", ");
+      })
+      .replace(/(\d+)\/(\d+)/g, function (_, a, b) { return hiNumber(+a) + " बटा " + hiNumber(+b); })
+      .replace(/\d+\.\d+/g, function (m) {
+        if (FRAC[m]) return FRAC[m];
+        var p = m.split("."); return hiNumber(+p[0]) + " दशमलव " + p[1].split("").map(function (d) { return HI_0_99[+d]; }).join(" ");
+      })
+      .replace(/₹\s?(\d+(?:,\d+)*)/g, function (_, m) { return hiNumber(+m.replace(/,/g, "")) + " रुपये"; })
+      .replace(/\d+(?:,\d+)*/g, function (m) {
+        var digits = m.replace(/,/g, "");
+        if (digits.length > 7 || (digits.length > 1 && digits[0] === "0")) return digits.split("").map(function (d) { return HI_0_99[+d]; }).join(" ");
+        var n = +digits;
+        if (digits.length === 4 && n >= 1100 && n <= 1999) return HI_0_99[Math.floor(n / 100)] + " सौ" + (n % 100 ? " " + HI_0_99[n % 100] : "");
+        return hiNumber(n);
+      });
+  }
+  window.__hiSpeakable = hiSpeakable;   // exposed for tests
   function speak(text) {
+    if (lang === "hi" && text) text = hiSpeakable(text);
     try {
       speechSynthesis.cancel();
       var v = voiceFor(lang); voiceNote();
@@ -811,7 +843,9 @@
       $("heard").textContent = "🗣 " + (finalText || txt);
     };
     recog.onerror = function (ev) { $("status").textContent = ev.error === "not-allowed" || ev.error === "service-not-allowed" ? t("mic_denied") : ev.error; };
+    var cap = setTimeout(function () { if (recog) recog.stop(); }, 15000);   // never keep listening: 15 s at most
     recog.onend = function () {
+      clearTimeout(cap);
       recog = null; $("mic").classList.remove("rec"); waveOn(false); $("mic-label").textContent = t("tap");
       if (finalText.trim()) send(finalText.trim());
     };

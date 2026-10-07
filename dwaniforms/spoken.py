@@ -105,7 +105,80 @@ def _digit_word(tok: str) -> int | None:
     return None
 
 
+# Zero as speech recognisers write it in Hindi ("जीरो") and as people say it.
+_ZERO_WORDS = {_norm(w) for w in ("जीरो", "ज़ीरो", "जेरो", "ज़ेरो", "ज़िरो", "जिरो", "सिफ़र", "सिफर", "zero", "jiro", "zeero")}
+
+
+def _number_word(tok: str) -> int | None:
+    """0-99 as one spoken word in any table ("पैंतालीस" -> 45, "twenty" -> 20, "जीरो" -> 0)."""
+    if tok in _ZERO_WORDS:
+        return 0
+    for table in (_EN_UNITS, _EN_TENS, _HI_NUM, _HI_ROMAN, *LANG_DIGIT_WORDS.values()):
+        v = table.get(tok)
+        if v is not None:
+            return v
+    return None
+
+
 def spoken_to_digits(text: str) -> str:
+    """Digits of an Aadhaar / mobile / PIN / account number, however it was said or transcribed:
+    one digit at a time ("दो तीन चार"), in pairs as people read phone numbers ("तेईस पैंतालीस" -> 2345),
+    in groups ("दो हज़ार तीन सौ पैंतालीस" -> 2345), as numerals ("2345 6789"), with "double / डबल",
+    and with zero written as "जीरो". Returns only the digits found."""
+    out: list[str] = []
+    repeat = 1
+    group = None            # value of a "दो हज़ार तीन सौ पैंतालीस"-style group being built
+    after_scale = False     # the previous token was सौ / हज़ार: a following number word adds to the group
+    en_tens = False         # the previous token was an English tens word: "twenty three" -> 23
+
+    def flush():
+        nonlocal group
+        if group is not None:
+            out.append(str(group))
+            group = None
+
+    for tok in _tokens(text):
+        if tok in _REPEAT:
+            flush(); repeat = _REPEAT[tok]; after_scale = en_tens = False
+            continue
+        if tok.isdecimal():
+            flush()
+            out.append(tok * repeat if repeat > 1 and len(tok) == 1 else tok)
+            repeat, after_scale, en_tens = 1, False, False
+            continue
+        if tok in _SCALES and _SCALES[tok] in (100, 1000):
+            base = int(out.pop()) if out and not after_scale and group is None and out[-1].isdecimal() and len(out[-1]) <= 2 else None
+            if group is None:
+                group = (base if base is not None else 1) * _SCALES[tok]
+            elif _SCALES[tok] == 100:
+                last = group % 1000
+                group = group - last + (last or 1) * 100
+            else:
+                group = (group or 1) * 1000
+            after_scale, en_tens = True, False
+            continue
+        n = _number_word(tok)
+        if n is None:
+            if tok not in _FILLER:
+                repeat = 1
+            continue
+        if group is not None and after_scale:
+            group += n
+            after_scale = False
+            continue
+        if en_tens and 1 <= n <= 9 and out:
+            out[-1] = str(int(out[-1]) + n)
+            en_tens = False
+            continue
+        flush()
+        out.append(str(n) * repeat if repeat > 1 and n <= 9 else str(n))
+        repeat, after_scale = 1, False
+        en_tens = tok in _EN_TENS
+    flush()
+    return "".join(out)
+
+
+def _spoken_to_digits_strict(text: str) -> str:
     """Digit-by-digit reading (Aadhaar, mobile, PIN, account no.).
 
     "nine eight seven ... double five" / "९८७६ ५४३२ १०" / "9876 54 3210" -> "98765432..."

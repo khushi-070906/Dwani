@@ -45,5 +45,13 @@ async function open(w) {
   w = boot("hi", []);                      // voices not loaded yet: let the browser choose rather than stay silent
   await open(w);
   ok(w.__spoken.length === 1 && w.__spoken[0].lang === "hi", "voices still loading: speaks with the language tag");
+  w = boot("hi", [EN, HI]);
+  await open(w);
+  const hs = w.__hiSpeakable;
+  ok(hs("आपने कहा: 2 3 4 5  6 7 8 9  0 1 2 4.") === "आपने कहा: दो तीन चार पाँच, छह सात आठ नौ, शून्य एक दो चार.", "Hindi speech: spelled digits as Hindi words");
+  ok(hs("15 अगस्त 1980") === "पंद्रह अगस्त उन्नीस सौ अस्सी" && hs("145/2") === "एक सौ पैंतालीस बटा दो" && hs("2.5 एकड़") === "ढाई एकड़",
+     "Hindi speech: years, khasra and fractions");
+  ok(hs("साल में ₹6,000, तीन") === "साल में छह हज़ार रुपये, तीन", "Hindi speech: rupee amounts, commas kept");
+  ok(w.__spoken.length && !/\d/.test(w.__spoken[w.__spoken.length - 1].text), "nothing is handed to the Hindi voice as digits");
   w.close();
 })();

@@ -42,6 +42,9 @@ class Reply:
     outcome: dict | None = None      # draft letter / record found / schemes, when the flow is complete
 
 
+DIGIT_LENGTHS = {"aadhaar": 12, "mobile": 10, "pincode": 6}   # numbers people often say in pieces
+
+
 @dataclass
 class FormSession:
     template: FormTemplate
@@ -69,6 +72,9 @@ class FormSession:
     _final_ok: bool = False
     _fix_attempts: int = 0
     outcome: dict | None = None                              # set by the service when the flow finishes
+    # Digits already heard for a fixed-length number, when the speech recogniser stopped at a pause
+    # ("2345" ... "6789 0124"): kept and joined with the next answer. field_id -> digits
+    partial_digits: dict = field(default_factory=dict)
 
     def touch(self) -> None:
         self.last_active = time.time()
@@ -250,7 +256,18 @@ class FormSession:
     async def _on_answer(self, text: str) -> Reply:
         f = self.current
         assert f is not None
+        need = DIGIT_LENGTHS.get(f.kind)
+        prev = self.partial_digits.pop(f.id, "") if need else ""
+        if prev:
+            text = prev + " " + text                     # continue the number from where the pause cut it
         ok, value, err, review = await self._parse(f, text)
+        if not ok and need:
+            from .spoken import spoken_to_digits
+            got = spoken_to_digits(text)
+            if 0 < len(got) < need:                      # an incomplete number, not a wrong one: ask for the rest
+                self.partial_digits[f.id] = got
+                return Reply(await self.msg("partial_digits", got=len(got), left=need - len(got)), f.id, "ask",
+                             machine_translated=self.machine_translated_used)
         if ok and self.checker is not None and value:
             ok, value, err = self.checker(f, value, self)
             if ok and f.params.get("lookup"):
@@ -310,6 +327,7 @@ class FormSession:
         self.idx = next(i for i, f in enumerate(self.template.fields) if f.id == field_id)
         self.answers.pop(field_id, None)
         self.suggestions.pop(field_id, None)
+        self.partial_digits.pop(field_id, None)
         self._final_ok = False
         self.outcome = None                               # the draft / result must be rebuilt from the new answer
         return await self._ask()

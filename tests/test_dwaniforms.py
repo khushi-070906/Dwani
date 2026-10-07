@@ -112,9 +112,10 @@ def test_full_happy_path_hindi_pm_kisan():
 def test_invalid_then_retry_then_escalate():
     s = make(); run(s.start()); say(s, "रमेश", "हाँ", "सुरेश", "हाँ", "15 August 1985", "हाँ", "male", "general")
     assert s.current.id == "mobile"
-    r = say(s, "12345"); assert r.phase == "ask" and "10 अंक" in r.text
-    r = say(s, "123"); assert r.phase == "ask"
-    r = say(s, "99"); assert r.phase == "escalate" and "ऑपरेटर" in r.text
+    # a number that is too LONG is wrong (a too-short one is treated as "said in pieces": see the next test)
+    r = say(s, "123456789012"); assert r.phase == "ask" and "10 अंक" in r.text
+    r = say(s, "1234567890123"); assert r.phase == "ask"
+    r = say(s, "99999999999"); assert r.phase == "escalate" and "ऑपरेटर" in r.text
     ok, err = s.operator_set("mobile", "9876543210"); assert ok and s.current.id == "aadhaar"
     assert s.operator_set("aadhaar", "123456789012")[1] == "aadhaar_invalid"
 
@@ -376,3 +377,11 @@ def test_api_text_answer_roundtrip(client):
     sid = _new(client)
     r = client.post(f"/form/sessions/{sid}/text", json={"text": "Ramesh Kumar"}).json()
     assert r["phase"] == "confirm" and "Ramesh Kumar" in r["text"] and r["english_fallback"] is False
+
+
+def test_number_said_in_pieces_is_joined():
+    """Phone speech recognition stops at a pause: "98765" ... "43210" must still make one mobile number."""
+    s = make(); run(s.start()); say(s, "रमेश", "हाँ", "सुरेश", "हाँ", "15 August 1985", "हाँ", "male", "general")
+    r = say(s, "अट्ठानवे छिहत्तर"); assert r.phase == "ask" and "बाकी 6 अंक" in r.text
+    r = say(s, "जीरो चौवन बत्तीस"); assert r.phase == "ask" and "बाकी 1 अंक" in r.text
+    r = say(s, "एक"); assert r.phase == "confirm" and r.pending == "9876054321"
