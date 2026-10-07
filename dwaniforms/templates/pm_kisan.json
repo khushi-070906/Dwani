@@ -258,7 +258,7 @@
   },
   {
    "id": "khasra",
-   "kind": "text",
+   "kind": "khasra",
    "label": "Khasra / survey number",
    "prompt": {
     "en": "What is your khasra or survey number?",

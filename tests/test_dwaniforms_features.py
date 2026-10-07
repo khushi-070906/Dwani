@@ -330,3 +330,10 @@ def test_pending_answer_pencilled_but_aadhaar_masked(svc):
 def test_every_field_has_a_hindi_label():
     for t in load_all().values():
         assert all(f.label_in("hi") for f in t.fields), [f.id for f in t.fields if not f.label_in("hi")]
+
+
+def test_khasra_fields_are_validated_as_khasra_numbers():
+    for t in load_all().values():
+        for f in t.fields:
+            if "khasra" in f.id:
+                assert f.kind == "khasra", (t.id, f.id)   # a paragraph must never be accepted as a khasra number

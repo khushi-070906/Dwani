@@ -211,6 +211,8 @@
   footer.foot { border-top: 1px solid var(--line); padding: 1.4rem 0 2.4rem; font-size: .82rem; color: var(--ink-3); }
   footer.foot .wrap { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 
+  .layout > * { min-width: 0; }          /* grid items may shrink: long English questions must wrap, not widen the page */
+  .assist .q, .assist .heard { overflow-wrap: anywhere; }
   @media (max-width: 960px) {
     .layout { grid-template-columns: 1fr; }
     .assist { position: static; }
@@ -696,10 +698,28 @@
     setSteps("done", true);
     show("result");
   }
+  // How a filled-in value reads to a person: dates in words, choices and yes/no in the chosen language.
+  function shownValue(f) {
+    var v = f.value || "";
+    if (f.kind === "date") {
+      var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
+      if (m) {
+        try { return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(lang === "en" ? "en-IN" : "hi-IN", { day: "numeric", month: "long", year: "numeric" }); }
+        catch (e) { return m[3] + "/" + m[2] + "/" + m[1]; }
+      }
+      return v;
+    }
+    if (f.kind === "yesno") return v === "Yes" ? (lang === "en" ? "Yes" : "हाँ") : v === "No" ? (lang === "en" ? "No" : "नहीं") : v;
+    if (f.options && f.options.length) {
+      var o = f.options.filter(function (x) { return x.value === v; })[0];
+      if (o) return o.label;
+    }
+    return f.native && f.native !== v ? f.native : v;
+  }
   function renderFormDone(fields) {
     var box = $("formdone");
     box.innerHTML = "<div class='card'><dl class='kv'>" + fields.filter(function (f) { return f.value; }).map(function (f) {
-      var v = f.native && f.native !== f.value && f.kind !== "date" ? f.native : f.value;
+      var v = shownValue(f);
       return "<dt>" + esc(f.label_local && lang !== "en" ? f.label_local : f.label) + "</dt><dd>" + esc(v) + "</dd>";
     }).join("") + "</dl></div>";
     box.hidden = false;
