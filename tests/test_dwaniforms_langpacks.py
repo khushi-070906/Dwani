@@ -27,8 +27,8 @@ def run(coro):
     return asyncio.run(coro)
 
 
-def test_six_packs_are_installed():
-    assert LANGS == ["bn", "gu", "mr", "pa", "ta", "te"]
+def test_every_pack_is_installed():
+    assert LANGS == ["bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"]
     assert langpacks.langs()[:2] == ["hi", "en"]
 
 
@@ -198,7 +198,7 @@ def test_ui_strings_endpoint_and_capabilities(tmp_path):
     assert {p["lang"]: p["speech"] for p in caps["lang_packs"]}["pa"] == "pa-Guru-IN"
     r = c.get("/form/ui/ta").json()
     assert r["ui"]["yes_word"] == "ஆம்" and r["speech"] == "ta-IN"
-    assert c.get("/form/ui/kn").status_code == 404 and c.get("/form/ui/hi").status_code == 404
+    assert c.get("/form/ui/or").status_code == 404 and c.get("/form/ui/hi").status_code == 404
 
 
 def test_messages_have_the_same_placeholders():
