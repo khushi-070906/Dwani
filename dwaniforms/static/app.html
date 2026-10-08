@@ -6,6 +6,11 @@
 <meta name="theme-color" content="#1F5E4D">
 <title>DwaniForms · बोलकर फ़ॉर्म भरें</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%231F5E4D'/><circle cx='32' cy='32' r='24' fill='none' stroke='%23ffffff' stroke-opacity='.5' stroke-dasharray='2 3'/><text x='50%25' y='62%25' font-size='30' text-anchor='middle' fill='white' font-family='serif'>ध</text></svg>">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ध्वनिForms">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Lato:wght@400;700&family=Noto+Serif+Devanagari:wght@500;600&display=swap">
 <style>
@@ -159,6 +164,9 @@
   .chip { display: inline-flex; align-items: center; gap: .35rem; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: .3rem .8rem;
           font-size: .82rem; font-weight: 700; color: var(--navy); }
   .chip i { font-style: normal; color: var(--forest); }
+  /* "Add to phone": shown only when the browser actually offers to install, so it never sits there doing nothing */
+  .chip.install { margin-top: .6rem; border-color: var(--forest); color: var(--forest); background: var(--forest-soft); }
+  .chip.install i { font-size: 1.05rem; line-height: 1; }
   .heard { font-size: .85rem; color: var(--ink-3); min-height: 1.2em; }
   .heard:empty { display: none; }
   .yn { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin: .9rem 0 .2rem; }
@@ -287,6 +295,7 @@
             <span class="chip"><i>✓</i><span data-t="chip2">Every answer checked</span></span>
             <span class="chip"><i>🔒</i><span data-t="chip3">Deleted after 30 minutes</span></span>
           </div>
+          <button class="chip install no-print" id="install-btn" type="button" hidden><i>⤓</i><span data-t="install">Add to phone</span></button>
         </div>
         <h2 data-t="most">What people do most</h2>
         <div class="rows" id="top-list"></div>
@@ -439,7 +448,7 @@
   var B = location.pathname.replace(/\/$/, "");
   var $ = function (id) { return document.getElementById(id); };
   var UI = {
-    hi: { tagline: "बोलकर फ़ॉर्म भरें", hello: "नमस्ते", welcome_kicker: "सरकारी फ़ॉर्म, बोलकर", chip1: "बोलकर या लिखकर", chip2: "हर जवाब की जाँच", chip3: "30 मिनट बाद मिट जाता है", hello_sub: "आज क्या करना है? नीचे से चुनिए, फिर बोलकर या लिखकर जवाब दीजिए। हर जवाब फ़ॉर्म पर जाने से पहले आपको पढ़कर सुनाया जाएगा।",
+    hi: { install: "फ़ोन में लगाएँ", tagline: "बोलकर फ़ॉर्म भरें", hello: "नमस्ते", welcome_kicker: "सरकारी फ़ॉर्म, बोलकर", chip1: "बोलकर या लिखकर", chip2: "हर जवाब की जाँच", chip3: "30 मिनट बाद मिट जाता है", hello_sub: "आज क्या करना है? नीचे से चुनिए, फिर बोलकर या लिखकर जवाब दीजिए। हर जवाब फ़ॉर्म पर जाने से पहले आपको पढ़कर सुनाया जाएगा।",
       most: "सबसे ज़्यादा किए जाने वाले काम", everything: "बाकी सब", how_title: "कैसे काम करता है", how1: "फ़ॉर्म चुनिए। सवाल एक-एक करके आएँगे।",
       how2: "माइक दबाकर बोलिए, या लिखिए। हर जवाब पढ़कर सुनाया जाएगा: \"क्या यह सही है?\"", how3: "आख़िर में भरा हुआ फ़ॉर्म या पत्र डाउनलोड या प्रिंट कीजिए।",
       data_title: "आपकी जानकारी", data_body: "जवाब सिर्फ़ इस सेशन तक रहते हैं और 30 मिनट बाद मिट जाते हैं। आधार और खाता नंबर छिपे हुए दिखते हैं।", privacy_link: "निजता नीति",
@@ -477,7 +486,7 @@
   };
   var EN = { next_advisor: "Tap 'Fill this form' next to a scheme: some of your answers will already be filled in. The department makes the final decision.",
     next_lookup: "This comes from a saved copy of the records. For anything important, also check the official portal.",
-    tagline: "Fill forms by speaking", hello: "Namaste", unavailable: "Not available yet", questions: "questions", g_forms: "Government forms",
+    install: "Add to phone", tagline: "Fill forms by speaking", hello: "Namaste", unavailable: "Not available yet", questions: "questions", g_forms: "Government forms",
     g_voice: "Complaints and RTI", g_records: "Look up records", g_schemes: "Schemes", advisor_title: "Which schemes can I get?",
     advisor_desc: "A few questions, then the schemes and forms for you", step: "Question", of: "of", redo: "Change", review: "check",
     pencil: "In pencil: say 'yes' to confirm", inked: "confirmed", listening: "Listening… tap again when you're done", working: "Understanding…",
@@ -535,7 +544,15 @@
     });
   }
   function show(id) { ["home", "talk", "result"].forEach(function (v) { $(v).hidden = v !== id; }); try { window.scrollTo(0, 0); } catch (e) {} }
-  function endSession() { if (!sid) return; var id = sid; sid = null; fetch(B + "/sessions/" + id, { method: "DELETE", keepalive: true }).catch(function () {}); }
+  // The id of the form being filled, kept for THIS TAB only, so a reload or a phone that went to sleep can pick the
+  // same form up again. Only the id is stored: every answer stays on the server and is dropped there after 30 minutes.
+  var SID_KEY = "dwaniforms:sid";
+  function remember(id) { try { id ? sessionStorage.setItem(SID_KEY, id) : sessionStorage.removeItem(SID_KEY); } catch (e) {} }
+  function endSession() {
+    if (!sid) return;
+    var id = sid; sid = null; remember(null);
+    fetch(B + "/sessions/" + id, { method: "DELETE", keepalive: true }).catch(function () {});
+  }
 
   // ---------- speaking (text to speech) ----------
   function voiceFor(l) {
@@ -673,7 +690,7 @@
     var prev = sid;
     api("/sessions", { method: "POST", json: body }).then(function (r) {
       if (prev && prev !== prefillFrom) fetch(B + "/sessions/" + prev, { method: "DELETE", keepalive: true }).catch(function () {});
-      sid = r.session_id; inkedBefore = {};
+      sid = r.session_id; remember(sid); inkedBefore = {};
       $("talk-title").textContent = r.title || ""; $("crumb-title").textContent = r.title || "";
       $("heard").textContent = "";
       show("talk"); render(r);
@@ -1008,7 +1025,42 @@
   });
   try { var saved = localStorage.getItem("dwaniforms:lang"); if (saved) { lang = saved; $("lang").value = saved; } } catch (e) {}
   applyUI();
-  window.addEventListener("pagehide", endSession);
+  // Leaving the page ends the session -- unless a form is half filled. A phone that sleeps or switches app also fires
+  // this, and throwing away a half-filled form there would be cruel; the server drops it after 30 idle minutes anyway.
+  window.addEventListener("pagehide", function (e) {
+    if (e.persisted || (cur && !cur.done)) return;
+    endSession();
+  });
+
+  // ---------- installing on the phone, and coming back ----------
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+  }
+  var installPrompt = null;
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault(); installPrompt = e; $("install-btn").hidden = false;
+  });
+  $("install-btn").addEventListener("click", function () {
+    if (!installPrompt) return;
+    $("install-btn").hidden = true;
+    installPrompt.prompt(); installPrompt = null;
+  });
+  window.addEventListener("appinstalled", function () { $("install-btn").hidden = true; installPrompt = null; });
+  window.addEventListener("online", function () { $("net-banner").hidden = true; });
+  window.addEventListener("offline", function () { netError({ message: "" }, null); });
+
+  function resume() {
+    var id = null;
+    try { id = sessionStorage.getItem(SID_KEY); } catch (e) {}
+    if (!id) return Promise.resolve(false);
+    return api("/sessions/" + id + "/resume", { method: "POST" }).then(function (r) {
+      sid = r.session_id; inkedBefore = {};
+      $("talk-title").textContent = r.title || ""; $("crumb-title").textContent = r.title || "";
+      $("heard").textContent = "";
+      show(r.done ? "result" : "talk"); render(r);
+      return true;
+    }).catch(function () { remember(null); return false; });       // expired or already finished: start fresh
+  }
   Promise.all([api("/forms"), api("/capabilities")]).then(function (res) {
     forms = res[0]; caps = res[1];
     (caps.lang_packs || []).forEach(function (p) { PACKS[p.lang] = p; });
@@ -1017,7 +1069,7 @@
       [].forEach.call($("lang").options, function (o) { o.disabled = ok.indexOf(o.value) < 0; });
       if (ok.indexOf(lang) < 0) { lang = "hi"; $("lang").value = "hi"; }
     }
-    return loadUI(lang).then(function () { applyUI(); renderHome(); });
+    return loadUI(lang).then(function () { applyUI(); renderHome(); return resume(); });
   }).catch(function () { $("top-list").textContent = t("offline"); });
 })();
 </script>
