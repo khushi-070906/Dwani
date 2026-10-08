@@ -188,4 +188,8 @@ class FormService:
         return transcript, await self.finish(s, await s.submit(transcript))
 
     def delete(self, sid: str) -> None:
-        self.sessions.pop(sid, None)
+        s = self.sessions.pop(sid, None)
+        # Pressing "stop and go back", or closing the page, is the usual way of giving up -- count it like a session
+        # that simply went quiet, or "where people stopped" would only ever show the ones who timed out.
+        if s is not None and s.phase != "done":
+            self._count("abandoned_at", s.template.id, s.current.id if s.current else None)
