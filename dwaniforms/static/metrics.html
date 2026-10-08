@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DwaniForms · pilot numbers</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%231F5E4D'/><text x='50%25' y='62%25' font-size='30' text-anchor='middle' fill='white' font-family='serif'>ध</text></svg>">
+<style>
+  :root { --forest: #1F5E4D; --forest-soft: #E3EEE8; --sage: #EEF0EA; --card: #fff; --line: #DCDFD6;
+          --ink: #1E2A44; --ink-2: #4A5468; --ink-3: #6B7385; --bad: #9B2C2C; --spark: #D9772B; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--sage); color: var(--ink);
+         font: 16px/1.6 "Lato", "Nirmala UI", system-ui, sans-serif; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 1.5rem 1.1rem 3rem; }
+  h1 { font-size: 1.5rem; margin: 0 0 .15rem; }
+  h2 { font-size: 1.05rem; margin: 1.8rem 0 .5rem; color: var(--forest); }
+  .muted { color: var(--ink-3); font-size: .88rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem; margin: .8rem 0; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: .7rem; }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: .8rem .9rem; }
+  .tile b { display: block; font-size: 1.7rem; line-height: 1.1; color: var(--forest); font-weight: 700; }
+  .tile span { font-size: .82rem; color: var(--ink-3); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: .45rem .3rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); font-weight: 700; }
+  td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bar { height: 6px; border-radius: 3px; background: var(--forest-soft); margin-top: .3rem; }
+  .bar i { display: block; height: 100%; border-radius: 3px; background: var(--forest); }
+  .bar.warn i { background: var(--spark); }
+  input, button { font: inherit; }
+  input { width: 100%; padding: .6rem .7rem; border: 1px solid var(--line); border-radius: 8px; }
+  button { background: var(--forest); color: #fff; border: 0; border-radius: 8px; padding: .6rem 1.1rem; cursor: pointer; font-weight: 700; }
+  button.ghost { background: none; color: var(--forest); border: 1px solid var(--line); font-weight: 400; }
+  .row { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
+  .err { color: var(--bad); }
+  .note { background: var(--forest-soft); border-radius: 10px; padding: .7rem .9rem; font-size: .88rem; color: var(--ink-2); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>DwaniForms · pilot numbers</h1>
+  <p class="muted">Counts only. No name, number or answer any citizen gave is recorded, here or on the server.</p>
+
+  <form class="card" id="gate">
+    <label for="token"><b>Metrics token</b></label>
+    <p class="muted" style="margin:.2rem 0 .6rem">The value of <code>DWANIFORMS_METRICS_TOKEN</code> on the server. It is
+      kept for this tab only and sent as a header, so it never appears in the address bar.</p>
+    <input id="token" type="password" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <p class="row" style="margin:.8rem 0 0"><button type="submit">Show</button> <span class="err" id="gate-err"></span></p>
+  </form>
+
+  <div id="report" hidden>
+    <div class="tiles" id="tiles"></div>
+    <p class="row muted" style="margin-top:.9rem">
+      <span id="since"></span>
+      <button class="ghost" type="button" id="refresh">Refresh</button>
+      <button class="ghost" type="button" id="forget">Forget token</button>
+    </p>
+
+    <h2>By service</h2>
+    <div class="card"><table id="forms"><thead><tr><th>Service</th><th class="n">Started</th><th class="n">Finished</th><th class="n">Done</th></tr></thead><tbody></tbody></table></div>
+
+    <h2>Where people stopped</h2>
+    <p class="muted" style="margin:.1rem 0 .5rem">The question someone was on when they left. The top of this list is
+      where the form is hardest.</p>
+    <div class="card"><table id="stopped"><thead><tr><th>Question</th><th class="n">People</th></tr></thead><tbody></tbody></table></div>
+
+    <h2>Questions that had to be repeated</h2>
+    <p class="muted" style="margin:.1rem 0 .5rem">Answered wrongly or not understood the first time. Usually the wording,
+      or a number that is hard to say aloud.</p>
+    <div class="card"><table id="retries"><thead><tr><th>Question</th><th class="n">Times</th></tr></thead><tbody></tbody></table></div>
+
+    <p class="note" id="empty" hidden>Nothing has been counted yet. The numbers start from the moment the server last
+      restarted, and they are not written to disk — note them down before a redeploy.</p>
+  </div>
+</div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = "dwaniforms:metrics-token";
+  var base = location.pathname.replace(/\/metrics\/view\/?$/, "");
+
+  function token() { try { return sessionStorage.getItem(KEY) || ""; } catch (e) { return ""; } }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+  function load() {
+    return fetch(base + "/metrics", { headers: { "x-metrics-token": token() } }).then(function (r) {
+      if (r.status === 404) throw new Error("That token was not accepted.");
+      if (!r.ok) throw new Error("Could not read the numbers (HTTP " + r.status + ").");
+      return r.json();
+    });
+  }
+
+  function name(d, key) { return (d.labels && d.labels[key]) || key; }
+  function pair(d, key) {                       // "pm_kisan:aadhaar" -> "PM-Kisan · Aadhaar number"
+    var i = key.indexOf(":");
+    if (i < 0) return esc(name(d, key));
+    return esc(name(d, key.slice(0, i))) + " <span class='muted'>· " + esc(name(d, key)) + "</span>";
+  }
+
+  function rows(table, d, obj, warn) {
+    var body = $(table).querySelector("tbody");
+    var entries = Object.keys(obj || {}).map(function (k) { return [k, obj[k]]; });
+    body.innerHTML = "";
+    if (!entries.length) { body.innerHTML = '<tr><td colspan="2" class="muted">nothing yet</td></tr>'; return; }
+    var max = entries[0][1];
+    entries.forEach(function (e) {
+      var tr = document.createElement("tr");
+      tr.innerHTML = "<td>" + pair(d, e[0]) + '<div class="bar' + (warn ? " warn" : "") + '"><i style="width:' +
+                     Math.round(100 * e[1] / max) + '%"></i></div></td><td class="n">' + e[1] + "</td>";
+      body.appendChild(tr);
+    });
+  }
+
+  function render(d) {
+    var t = d.totals || {};
+    $("tiles").innerHTML =
+      '<div class="tile"><b>' + (t.started || 0) + '</b><span>forms started</span></div>' +
+      '<div class="tile"><b>' + (t.finished || 0) + '</b><span>finished</span></div>' +
+      '<div class="tile"><b>' + (t.completion_rate == null ? "–" : Math.round(t.completion_rate * 100) + "%") +
+        '</b><span>completed</span></div>' +
+      '<div class="tile"><b>' + (d.open_sessions || 0) + '</b><span>open right now</span></div>';
+    $("since").textContent = "Counting since " + (d.since || "?") + ".";
+
+    var body = $("forms").querySelector("tbody");
+    body.innerHTML = "";
+    var ids = Object.keys(d.started || {});
+    if (!ids.length) body.innerHTML = '<tr><td colspan="4" class="muted">nothing yet</td></tr>';
+    ids.forEach(function (id) {
+      var s = d.started[id], f = (d.finished || {})[id] || 0;
+      var tr = document.createElement("tr");
+      tr.innerHTML = "<td>" + esc(name(d, id)) + '<div class="bar"><i style="width:' + Math.round(100 * f / s) +
+                     '%"></i></div></td><td class="n">' + s + '</td><td class="n">' + f +
+                     '</td><td class="n">' + Math.round(100 * f / s) + "%</td>";
+      body.appendChild(tr);
+    });
+    rows("stopped", d, d.abandoned_at, true);
+    rows("retries", d, d.retries, true);
+    $("empty").hidden = !!(t.started);
+    $("gate").hidden = true; $("report").hidden = false;
+  }
+
+  function show() {
+    load().then(render).catch(function (e) {
+      $("gate-err").textContent = e.message;
+      $("gate").hidden = false; $("report").hidden = true;
+    });
+  }
+
+  $("gate").addEventListener("submit", function (e) {
+    e.preventDefault();
+    $("gate-err").textContent = "";
+    try { sessionStorage.setItem(KEY, $("token").value.trim()); } catch (err) {}
+    show();
+  });
+  $("refresh").addEventListener("click", show);
+  $("forget").addEventListener("click", function () {
+    try { sessionStorage.removeItem(KEY); } catch (e) {}
+    location.reload();
+  });
+  if (token()) show();
+})();
+</script>
+</body>
+</html>

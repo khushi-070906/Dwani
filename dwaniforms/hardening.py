@@ -5,6 +5,8 @@
   * /form/health: liveness for Render / uptime monitors. No personal data.
   * /form/metrics: anonymous counters for a pilot report (forms started / finished / where people stopped),
     behind DWANIFORMS_METRICS_TOKEN. Never answers, names or numbers: only form ids, field ids and counts.
+  * /form/metrics/view: the same numbers as a page you can open on a phone. The token is typed into the page and
+    sent as a header, so it never lands in a URL, a browser history or a server log.
 
 Settings (environment):
   DWANIFORMS_TRUST_PROXY=1     read the client IP from X-Forwarded-For (set on Render, which sits behind a proxy)
@@ -20,7 +22,7 @@ import time
 from collections import defaultdict, deque
 
 from fastapi import Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 # (requests, seconds) per client IP
 LIMITS = {
@@ -94,6 +96,18 @@ class Metrics:
                 **out}
 
 
+def _labels() -> dict:
+    """Form and question names for the counter keys, so a pilot report reads "PM-Kisan · Aadhaar number" instead of
+    "pm_kisan:aadhaar". Template metadata only -- nothing anyone typed or said."""
+    from .schema import load_all
+    out = {}
+    for t in load_all().values():
+        out[t.id] = t.title
+        for f in t.fields:
+            out[f"{t.id}:{f.id}"] = f.label
+    return out
+
+
 def install(app, service, prefix: str = "/form", version: str = "") -> None:
     limiter = RateLimiter()
     metrics = Metrics()
@@ -130,10 +144,22 @@ def install(app, service, prefix: str = "/form", version: str = "") -> None:
         return {"status": "ok", "version": version, "uptime_s": int(time.time() - started_at),
                 "open_sessions": len(service.sessions)}
 
+    def _authorised(request: Request) -> bool:
+        token = os.environ.get("DWANIFORMS_METRICS_TOKEN", "")
+        return bool(token) and hmac.compare_digest(request.headers.get("x-metrics-token", ""), token)
+
     @app.get(prefix + "/metrics", include_in_schema=False)
     async def metrics_view(request: Request):
-        token = os.environ.get("DWANIFORMS_METRICS_TOKEN", "")
-        given = request.headers.get("x-metrics-token", "")
-        if not token or not hmac.compare_digest(given, token):
+        if not _authorised(request):
             return JSONResponse({"detail": "Not Found"}, status_code=404)
-        return {**metrics.snapshot(), "open_sessions": len(service.sessions)}
+        return {**metrics.snapshot(), "open_sessions": len(service.sessions), "labels": _labels()}
+
+    @app.get(prefix + "/metrics/view", include_in_schema=False)
+    async def metrics_page():
+        """The counters as a readable page. Opening it shows only a box asking for the token: the page holds no
+        numbers of its own and fetches them with the token as a header."""
+        if not os.environ.get("DWANIFORMS_METRICS_TOKEN", ""):
+            return JSONResponse({"detail": "Not Found"}, status_code=404)
+        from pathlib import Path as _Path
+        return FileResponse(_Path(__file__).parent / "static" / "metrics.html",
+                            headers={"Cache-Control": "no-store"})
