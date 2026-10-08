@@ -276,6 +276,7 @@ def test_date_readback_is_spoken_not_iso():
     assert FormSession.readback(f, "1990-08-15") == "15 August 1990"
     assert FormSession.readback(f, "1990-08-15", "hi") == "15 अगस्त 1990"
     assert FormSession.readback(f, "1990-08-15", "kn") == "15 8 1990"            # no month names for this language
+    assert FormSession.readback(f, "1990-08-15", "ta") == "15 ஆகஸ்ட் 1990"       # Tamil language pack
 
 
 def test_masking_in_form_values_json_and_pdf():
