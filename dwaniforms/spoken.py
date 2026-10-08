@@ -91,6 +91,14 @@ _QTY_IGNORE = {"to", "too", "for", "ate", "o", "oh", "no", "sat", "ath", "che"}
 LANG_DIGIT_WORDS: dict[str, dict[str, int]] = {}
 
 
+def _lang_number(tok: str) -> int | None:
+    """A number word from a language pack (lang/*.json: words.digits, 0-10)."""
+    for table in LANG_DIGIT_WORDS.values():
+        if tok in table:
+            return table[tok]
+    return None
+
+
 def _tokens(text: str) -> list[str]:
     text = ascii_digits(unicodedata.normalize("NFC", text))
     text = re.sub(r"[,;:।|/\\()\[\]\-–—_.]+", " ", text)   # separators people say/ASR emits inside numbers
@@ -311,6 +319,8 @@ def spoken_to_number(text: str):
             value = Decimal(_HI_NUM[tok])
         elif tok in _HI_ROMAN:
             value = Decimal(_HI_ROMAN[tok])
+        elif _lang_number(tok) is not None:
+            value = Decimal(_lang_number(tok))
         if value is not None:
             if mod is not None:
                 value += mod
@@ -351,6 +361,8 @@ def spoken_to_int(text: str) -> int | None:
             current += _HI_NUM[tok]; seen = True
         elif tok in _HI_ROMAN:
             current += _HI_ROMAN[tok]; seen = True
+        elif _lang_number(tok) is not None:
+            current += _lang_number(tok); seen = True
     return total + current if seen else None
 
 
@@ -448,7 +460,8 @@ def spoken_to_date(text: str, today: "dt.date | None" = None) -> tuple[int, int,
     if m:
         d, mo, y = int(m[1]), int(m[2]), int(m[3])
         return d, mo, _expand_year(y, this_year)
-    toks = _tokens(text)
+    # "15th", "১৫ই", "১লা", "15ஆம்", "15వ": day numbers carry an ordinal ending in many languages
+    toks = _tokens(re.sub(r"(\d+)[^\s\d/.\-]+", r"\1 ", ascii_digits(unicodedata.normalize("NFC", text))))
     month_idx = next((i for i, tk in enumerate(toks) if tk in _MONTHS), None)
     if month_idx is None:
         return None
@@ -474,3 +487,28 @@ MONTH_NAMES = {
            "December"],
     "hi": ["जनवरी", "फ़रवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"],
 }
+
+
+# ---- language packs (lang/*.json): number words, scale words, months ------------------------------------------
+def _install_packs() -> None:
+    from . import langpacks
+    for lang, p in langpacks.packs().items():
+        w = p.get("words", {})
+        LANG_DIGIT_WORDS[lang] = {_norm(k): int(v) for k, v in w.get("digits", {}).items()}
+        _SCALES.update({_norm(k): int(v) for k, v in w.get("scales", {}).items()})
+        _FILLER.update(_norm(k) for k in w.get("filler", []))
+        months = w.get("months", [])
+        if len(months) == 12:
+            MONTH_NAMES[lang] = list(months)
+            _MONTHS.update({_norm(m): i + 1 for i, m in enumerate(months)})
+        _MONTHS.update({_norm(k): int(v) for k, v in w.get("month_aliases", {}).items()})
+        _FRACTION_WORDS.update({_norm(k): str(v) for k, v in w.get("fractions", {}).items()})
+        _FRACTION_MODS.update({_norm(k): str(v) for k, v in w.get("fraction_mods", {}).items()})
+        _POINT.update(_norm(k) for k in w.get("point", []))
+        _HECTARE.update(_norm(k) for k in w.get("hectare", []))
+        _LOCAL_LAND_UNITS.update(_norm(k) for k in w.get("local_land_units", []))
+        _KHASRA_SEP.update(_norm(k) for k in w.get("khasra_sep", []))
+        _KHASRA_FILLER.update(_norm(k) for k in w.get("khasra_filler", []))
+
+
+_install_packs()

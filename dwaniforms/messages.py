@@ -119,6 +119,7 @@ _SKIP_FILLER = {"please", "pls", "ok", "okay", "i", "have", "do", "not", "dont",
 
 
 def _words(text: str) -> list[str]:
+    text = unicodedata.normalize("NFC", text)      # Bengali য় / ড় arrive both precomposed and with a nukta
     cleaned = "".join(" " if (unicodedata.category(c).startswith(("P", "S"))) else c for c in text.lower())
     return [w for w in cleaned.split() if w]
 
@@ -153,3 +154,23 @@ def is_skip(text: str) -> bool:
     words = [w for w in _words(text) if w not in _SKIP_FILLER or w in _SKIP]
     t = " ".join(words)
     return t in _SKIP or (bool(words) and all(w in _SKIP for w in words) and len(words) <= 2)
+
+
+# ---- language packs (lang/*.json): their messages and answer words --------------------------------------------
+def _install_packs() -> None:
+    from . import langpacks
+    for s in (_YES, _NO, _SKIP, _SKIP_FILLER):               # one spelling (NFC) on both sides of every comparison
+        norm = {" ".join(_words(x)) for x in s}
+        s.clear(); s.update(norm)
+    for lang, p in langpacks.packs().items():
+        MESSAGES.setdefault(lang, {}).update(p.get("messages", {}))
+        w = p.get("words", {})
+        _YES.update(" ".join(_words(x)) for x in w.get("yes", []))
+        _NO.update(" ".join(_words(x)) for x in w.get("no", []))
+        _SKIP.update(" ".join(_words(x)) for x in w.get("skip", []))
+        _SKIP_PHRASES.update(" ".join(_words(x)) for x in w.get("skip_phrases", []))
+        _SKIP_FILLER.update(" ".join(_words(x)) for x in w.get("skip_filler", []))
+        _BENIGN_NEGATIONS.extend(w.get("benign_negations", []))
+
+
+_install_packs()

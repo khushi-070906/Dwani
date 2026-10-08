@@ -23,6 +23,9 @@ def mask_value(v: str) -> str:
     return "•" * max(len(v) - 4, 0) + v[-4:] if v else v
 
 
+_DANDA_LANGS = {"hi", "bn", "pa", "as", "or", "ne", "sa"}   # sentences end with । not .
+
+
 @dataclass
 class Answer:
     value: str                       # what goes on the form (form language / canonical)
@@ -296,7 +299,8 @@ class FormSession:
             return await self._ask()
         self._pending = (value, text, review)
         self.phase = "confirm"
-        rb = f"{await self.msg('you_said')} {self.say_value(f, value, text)}. {await self.msg('is_correct')}"
+        stop = "।" if self.lang in _DANDA_LANGS else "."
+        rb = f"{await self.msg('you_said')} {self.say_value(f, value, text)}{stop} {await self.msg('is_correct')}"
         return Reply(rb, f.id, "confirm", pending=value, machine_translated=self.machine_translated_used)
 
     async def _on_confirm(self, text: str) -> Reply:
