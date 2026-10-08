@@ -7,7 +7,7 @@ import inspect
 import time
 from dataclasses import dataclass
 
-from . import eligibility, extract, records
+from . import eligibility, extract, langpacks, records
 from .outcomes import OUTCOMES
 from .schema import FormTemplate, load_all
 from .session import FormSession, Reply
@@ -69,7 +69,9 @@ class FormService:
     def capabilities(self) -> dict:
         return {"asr": self.asr is not None, "asr_langs": sorted(ASR_LANGS) if self.asr is not None else [],
                 "translation": self.translator is not None, "records": self.records.available(),
-                "browser_asr": bool(self.browser_voice and self.asr is None)}
+                "browser_asr": bool(self.browser_voice and self.asr is None),
+                # languages whose questions are hand-written (usable without a translation model) + review status
+                "langs": langpacks.langs(), "lang_packs": langpacks.meta()}
 
     # ---- session lifetime ----------------------------------------------------------
     def purge_expired(self, now: float | None = None) -> int:

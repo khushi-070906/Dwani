@@ -124,6 +124,14 @@ def create_router(service: FormService, prefix: str = "/form") -> APIRouter:
     async def capabilities():
         return service.capabilities()
 
+    @router.get("/ui/{lang}")
+    async def ui_strings(lang: str):
+        """Screen text of a language pack (lang/*.json) for the app; Hindi and English live in app.html itself."""
+        from . import langpacks
+        if lang not in langpacks.packs():
+            raise HTTPException(404, "no such language pack")
+        return {"lang": lang, "ui": langpacks.ui(lang), "speech": langpacks.packs()[lang].get("speech", lang + "-IN")}
+
     @router.get("/schemes")
     async def schemes():
         from .eligibility import load_schemes, stale
