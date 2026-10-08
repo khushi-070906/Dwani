@@ -82,3 +82,17 @@ kiosk UI (`static/app.html`, bundled Rozha One + Mukta fonts) and the website (`
 - Tests: `tests/test_dwaniforms_pwa.py` (13: manifest, icon sizes, worker scope and what it may cache, what the page
   stores, resume incl. an unconfirmed answer and an expired session) and `tests/js/dwaniforms_pwa.test.js` (10: the real
   app in jsdom, filled then reloaded). CI runs the browser one against a live server.
+
+## Terms of use, and a named grievance officer
+
+- **New page `dwaniforms_site/terms.html`** (English + Hindi, same shell as the privacy page): who runs this and that it
+  is not a government service; that DwaniForms prepares a form but **submits nothing anywhere**; that scheme advice is
+  guidance and the department decides; that look-ups read a saved copy (demo records online); that speech misheard is
+  why every answer is read back, so check before signing; fair use; that Aadhaar / account / PAN are checked only for
+  shape, with **no UIDAI verification or e-KYC**; availability; limits of responsibility, without claiming to remove
+  rights Indian law does not allow to be given up; Indian law, Delhi courts. Linked from the site and privacy footers.
+- **Privacy policy**: names a grievance officer (DPDP Act 2023 expects a person, not just an address) with a 30-day
+  reply, and gains a "What is kept on your phone" section now that the app can be installed -- the page, icons and
+  fonts are kept, the answers are not, and the session id lives in one tab only.
+- Tests: `tests/js/dwaniforms_legal.test.js` (31: both pages bilingual, the named officer, what the browser keeps, the
+  promises the terms must make, and every link between the three pages resolving to a file that exists). In `npm test`.
