@@ -105,6 +105,18 @@ def create_router(service: FormService, prefix: str = "/form") -> APIRouter:
     async def ui():
         return FileResponse(STATIC / "app.html", headers={"Cache-Control": "no-cache"})
 
+    @router.get("/manifest.webmanifest")
+    async def manifest():
+        """Lets a phone add DwaniForms to the home screen (name, colours, icons)."""
+        return FileResponse(STATIC / "manifest.webmanifest", media_type="application/manifest+json",
+                            headers={"Cache-Control": "public, max-age=3600"})
+
+    @router.get("/sw.js")
+    async def service_worker():
+        """Served from under /form/, so the worker's scope is /form/ and it can never see the rest of the site."""
+        return FileResponse(STATIC / "sw.js", media_type="text/javascript",
+                            headers={"Cache-Control": "no-cache", "Service-Worker-Allowed": prefix + "/"})
+
     @router.get("/assets/{kind}/{name}")
     async def asset(kind: str, name: str):
         """Logo and fonts, bundled so a kiosk with no internet still looks right."""
@@ -186,6 +198,15 @@ def create_router(service: FormService, prefix: str = "/form") -> APIRouter:
         except RuntimeError as e:
             raise HTTPException(422, str(e))
         return _resp(s, request, reply, transcript=transcript)
+
+    @router.post("/sessions/{sid}/resume")
+    async def resume(sid: str, request: Request):
+        """The page came back (phone slept, network dropped, app reopened): ask the current question again.
+
+        The browser remembers only the session id, for this tab; every answer stays here on the server. An answer that
+        had been read back but not yet confirmed is asked once more rather than quietly kept."""
+        s = session(sid)
+        return _resp(s, request, await service.finish(s, await s.ask_current()), session_id=s.id)
 
     @router.post("/sessions/{sid}/redo")
     async def redo(sid: str, body: RedoIn, request: Request):
