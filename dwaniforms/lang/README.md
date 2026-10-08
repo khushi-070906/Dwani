@@ -7,6 +7,8 @@ text, the scheme details, and the words people use when they answer (yes / no, n
 |---|---|---|
 | `bn.json` | বাংলা Bengali | draft |
 | `gu.json` | ગુજરાતી Gujarati | draft |
+| `kn.json` | ಕನ್ನಡ Kannada | draft |
+| `ml.json` | മലയാളം Malayalam | draft |
 | `mr.json` | मराठी Marathi | draft |
 | `pa.json` | ਪੰਜਾਬੀ Punjabi | draft |
 | `ta.json` | தமிழ் Tamil | draft |
@@ -38,9 +40,9 @@ draft, the app shows a small note under each question: "not yet checked by a nat
 
 ## Adding a language
 
-`python -m dwaniforms.langpacks skeleton > dwaniforms/lang/kn.json`, set `"lang"`, `"name"` and `"speech"` (the speech
-recogniser's language tag, e.g. `kn-IN`), and translate every value. Add the language to the list in
-`tests/test_dwaniforms_langpacks.py::test_six_packs_are_installed`. The app offers it online automatically once the file
+`python -m dwaniforms.langpacks skeleton > dwaniforms/lang/or.json`, set `"lang"`, `"name"` and `"speech"` (the speech
+recogniser's language tag, e.g. `or-IN`), and translate every value. Add the language to the list in
+`tests/test_dwaniforms_langpacks.py::test_every_pack_is_installed`. The app offers it online automatically once the file
 is there.
 
 ## When the English changes

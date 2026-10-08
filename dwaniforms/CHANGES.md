@@ -96,3 +96,19 @@ kiosk UI (`static/app.html`, bundled Rozha One + Mukta fonts) and the website (`
   fonts are kept, the answers are not, and the session id lives in one tab only.
 - Tests: `tests/js/dwaniforms_legal.test.js` (31: both pages bilingual, the named officer, what the browser keeps, the
   promises the terms must make, and every link between the three pages resolving to a file that exists). In `npm test`.
+
+## Kannada and Malayalam (10 languages online)
+
+- **Two more hand-written language packs**, `lang/kn.json` and `lang/ml.json`, built the same way as the first six: all
+  226 questions, labels and scheme texts, the 46 system messages, the 116 screen strings, every answer option with the
+  words people actually say, and the spoken words for yes / no / skip, 0-10, hundred-thousand-lakh-crore, "two and a
+  half" (ಎರಡೂವರೆ, രണ്ടര), the months, and the local land units a speaker is likely to use (ಗುಂಟೆ, സെന്റ്) -- which the
+  app answers by asking for acres instead of guessing. Online that makes **ten** languages with no translator at all.
+- Both are `"status": "draft"`: written by an AI assistant, **not yet checked by a native speaker**, and the app says so
+  under every question in that language.
+- **The kiosk test no longer hard-codes the language list**; it asks `/form/capabilities` and checks the page offers
+  exactly what the server can do. That was the real reason the `dwaniforms-ui` CI job went red on the commits that added
+  the first packs. A stray `console.log("DEBUG", ...)` left in that test is gone too.
+- The machine-translation tests moved from Kannada to Odia, which still has no pack.
+- Still not offered: Odia, Urdu, Assamese. Odia and Assamese have no browser speech recognition to fall back on, so a
+  pack there would be typing-only; worth doing, but it buys less.
