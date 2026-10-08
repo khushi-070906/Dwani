@@ -9,6 +9,7 @@
 | Privacy | Consent screen before anything is collected (phone: once per visit; kiosk: every person); answers in memory only, deleted after 30 min (15 once finished); Aadhaar/account/PAN masked on screen and in the PDF; no personal data in logs (tested) | `static/app.html`, `service.py`, `tests/test_dwaniforms_hardening.py` |
 | Monitoring | `/form/health` (no personal data) for Render and uptime monitors; `/form/metrics` anonymous counts (started / finished / where people stopped / which questions needed repeating) behind `DWANIFORMS_METRICS_TOKEN` | `hardening.py` |
 | Reliability | Friendly offline / busy messages with retry; numbers said in pieces are joined; 15 s mic cap | `static/app.html`, `session.py` |
+| On the phone | Installable from the browser ("Add to phone"), then opens full screen; a service worker keeps the page, icons and fonts (never `/sessions`); a reload or a sleeping phone no longer loses a half-filled form | `static/manifest.webmanifest`, `static/sw.js`, `api.py` |
 | Supply chain | `pip-audit` on the online app's dependencies in CI | `.github/workflows/tests.yml` |
 | Capacity | Load test: 50 people at once p95 ≈ 120 ms, 150 at once p95 ≈ 380 ms, 0 errors (1 CPU) | `tests/load/dwaniforms_load.py` |
 
@@ -20,6 +21,7 @@
 - [ ] **Legal review**: DPDP Act 2023 and the DPDP Rules; whether a private service may take Aadhaar numbers to prepare forms (Aadhaar Act); Terms of Use. Then name a **grievance officer** in the privacy policy.
 - [ ] **Pilot** with a CSC / NGO / panchayat: 20-50 real people, older and less literate users included. Read `/form/metrics` weekly.
 - [ ] **Native-speaker review** of Hindi and of the six language packs in `lang/` (Bengali, Marathi, Gujarati, Punjabi, Tamil, Telugu). Each pack says `"status": "draft"` and the app shows a small "not yet checked by a native speaker" note until a reviewer sets it to `"reviewed"`. See `lang/README.md`. Kannada, Malayalam, Odia, Urdu, Assamese: add a pack (`python -m dwaniforms.langpacks skeleton`) or use NLLB / Bhashini on a bigger server.
+- [ ] **Try the install on a real phone** (Android Chrome and an iPhone): "Add to phone" needs HTTPS, which Render gives; on an iPhone there is no prompt, the person uses Share › Add to Home Screen. Check the icon, the full-screen opening, and that a half-filled form survives locking the phone.
 - [ ] **Real records** only with the data owner's permission; until then the online app shows clearly-marked demo records.
 - [ ] Re-check scheme rules every 6 months (`python -m dwaniforms.eligibility` lists any that are due).
 

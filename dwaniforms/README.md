@@ -34,6 +34,18 @@ python -m dwaniforms.standalone --whisper-model small --nllb-model-dir nllb-200-
 - **New forms**: add a JSON file to `templates/` (field kinds in `schema.py`; `when` asks a question only when it
   applies; `extract` mines a free-text answer; `final_readback` reads the draft back).
 
+## On a phone
+
+Online, DwaniForms is installable: the browser offers "Add to phone" (`static/manifest.webmanifest`) and after that it
+opens from the home screen like an app, full screen, with no address bar. A small service worker (`static/sw.js`, scope
+`/form/`) keeps the page, the icons, the bundled fonts and the three public lists, so it opens at once and a weak signal
+no longer leaves a blank screen. It never touches `/sessions`: answers are not stored in the browser.
+
+If the page reloads -- the phone slept, the signal dropped, the app was reopened -- the half-filled form comes back
+(`POST /form/sessions/{id}/resume`). The browser keeps only the session id, for that one tab (`sessionStorage`); every
+answer stays on the server and is still dropped there after 30 idle minutes. An answer that had been read back but not
+yet confirmed is asked once more rather than quietly kept.
+
 ## Privacy
 
 Nothing leaves the machine. Aadhaar / account / PAN are masked in responses and the default PDF; sessions are dropped

@@ -64,3 +64,21 @@ kiosk UI (`static/app.html`, bundled Rozha One + Mukta fonts) and the website (`
 - Tests: `tests/test_dwaniforms_langpacks.py` (81: completeness, placeholders, yes/no and option collisions, digits,
   dates, fractions, khasra, full flows in each language with no translator, endpoints) + a Bengali run of the real
   app in `tests/js/dwaniforms_kiosk.test.js`.
+
+## DwaniForms on the phone (installable, survives a reload)
+
+- **Add to phone**: `static/manifest.webmanifest` + icons drawn from the header seal (192, 512, maskable 512, Apple 180,
+  `static/img/`). Chrome and Edge offer the install; the home screen shows a small "फ़ोन में लगाएँ" chip only when the
+  browser actually offers it. Once installed it opens full screen, with no address bar.
+- **Service worker** `static/sw.js`, served from `/form/sw.js` so its scope cannot reach the rest of the site. It keeps
+  the page, icons, bundled fonts and the three public lists (`/forms`, `/capabilities`, `/ui/{lang}`): the app opens at
+  once and a weak signal no longer gives a blank screen. It never touches `/sessions` -- a citizen's answers are not
+  stored in the browser, and the server still marks them `no-store`.
+- **A reload no longer loses the form.** `POST /sessions/{id}/resume` re-asks the current question; the browser keeps
+  only the session id, for that one tab. An answer read back but not yet confirmed is asked again instead of being kept.
+  Leaving the page still ends the session, except while a form is half filled -- a phone that sleeps or switches app
+  fires the same event, and the server drops the session after 30 idle minutes anyway.
+- Fixed on the way: the website's favicon was a different mark (orange ध in a rounded square) from the app's seal.
+- Tests: `tests/test_dwaniforms_pwa.py` (13: manifest, icon sizes, worker scope and what it may cache, what the page
+  stores, resume incl. an unconfirmed answer and an expired session) and `tests/js/dwaniforms_pwa.test.js` (10: the real
+  app in jsdom, filled then reloaded). CI runs the browser one against a live server.
