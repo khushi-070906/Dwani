@@ -24,7 +24,12 @@ DATA = Path(__file__).parent / "data"
 
 @lru_cache(maxsize=1)
 def departments() -> dict:
-    return json.loads((DATA / "departments.json").read_text(encoding="utf-8"))["departments"]
+    deps = json.loads((DATA / "departments.json").read_text(encoding="utf-8"))["departments"]
+    from . import langpacks                       # a complaint said in Bengali / Tamil / ... names its department too
+    for p in langpacks.packs().values():
+        for dep, info in deps.items():
+            info["words"] = [*info["words"], *p.get("options", {}).get(dep, [])[1:]]
+    return deps
 
 
 def _toks(text: str) -> list[str]:

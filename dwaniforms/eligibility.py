@@ -32,7 +32,8 @@ NOT_APPLICABLE = "N/A"     # fact of a question that wasn't asked because it did
 @lru_cache(maxsize=1)
 def load_schemes(directory: str | None = None) -> list[dict]:
     d = Path(directory) if directory else SCHEMES_DIR
-    return [json.loads(p.read_text(encoding="utf-8")) for p in sorted(d.glob("*.json"))]
+    from . import langpacks
+    return [langpacks.localize_tree(json.loads(p.read_text(encoding="utf-8"))) for p in sorted(d.glob("*.json"))]
 
 
 def _num(v):
@@ -149,7 +150,7 @@ def advisor_outcome(session, service=None, **_) -> dict:
     res = advise(facts_of(session), session.lang, getattr(service, "templates", None))
     titles = {}
     if service is not None:
-        titles = {tid: service.templates[tid].title for tid in res["forms"] if tid in service.templates}
+        titles = {tid: service.templates[tid].title_in(session.lang) for tid in res["forms"] if tid in service.templates}
     names = ", ".join(i["name"] for i in res["likely"] + res["maybe"])
     n = len(res["likely"]) + len(res["maybe"])
     return {"type": "advisor", "title": "Schemes you may be able to get", **res, "form_titles": titles,

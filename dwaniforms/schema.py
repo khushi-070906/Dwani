@@ -6,6 +6,8 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from . import langpacks
+
 KINDS = {"aadhaar", "mobile", "pincode", "account", "pan", "ifsc", "date", "number",
          "name", "text", "place", "choice", "yesno", "khasra", "ration_card"}
 # name/place: kept as spoken (transliteration hook), flagged for operator review.
@@ -64,15 +66,16 @@ def _field(d: dict) -> FormField:
         raise ValueError(f"field {d.get('id')!r}: unknown kind {d['kind']!r}")
     if "en" not in d["prompt"]:
         raise ValueError(f"field {d['id']!r}: prompt needs an 'en' entry")
-    opts = [Option(o["value"], o.get("synonyms", {})) for o in d.get("options", [])]
+    # language packs (lang/*.json) add their questions, labels and spoken option names here
+    opts = [Option(o["value"], langpacks.option_synonyms(o["value"], o.get("synonyms", {}))) for o in d.get("options", [])]
     if d["kind"] == "choice" and len(opts) < 2:
         raise ValueError(f"field {d['id']!r}: choice needs >= 2 options")
     when = d.get("when")
     if when is not None and not ({"field"} <= set(when) and set(when) & {"in", "not_in", "gte", "lte", "eq"}):
         raise ValueError(f"field {d['id']!r}: 'when' needs a field and one of in/not_in/gte/lte/eq")
-    return FormField(d["id"], d["kind"], d["label"], d["prompt"], d.get("required", True), opts,
+    return FormField(d["id"], d["kind"], d["label"], langpacks.localize(d["prompt"]), d.get("required", True), opts,
                      d.get("params", {}), d.get("sensitive", d["kind"] in {"aadhaar", "account", "pan"}),
-                     when, d.get("labels", {}))
+                     when, langpacks.localize_label(d["label"], d.get("labels", {})))
 
 
 def parse_template(data: dict) -> FormTemplate:
@@ -87,8 +90,9 @@ def parse_template(data: dict) -> FormTemplate:
         if f.when and f.when["field"] not in ids[:ids.index(f.id)]:
             raise ValueError(f"field {f.id!r}: 'when' must refer to an earlier field")
     return FormTemplate(data["id"], data["title"], data.get("form_language", "en"), fields, data.get("glossary", []),
-                        data.get("flow", "form"), data.get("description", {}), ex, data.get("final_readback", False),
-                        data.get("hidden", False), data.get("titles", {}))
+                        data.get("flow", "form"), langpacks.localize(data.get("description", {})), ex,
+                        data.get("final_readback", False), data.get("hidden", False),
+                        langpacks.localize_label(data["title"], data.get("titles", {})))
 
 
 def load_template(path: str | Path) -> FormTemplate:
