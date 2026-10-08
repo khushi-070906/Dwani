@@ -34,6 +34,8 @@
   .wrap { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
   .muted { color: var(--ink-3); }
   .kicker { font: 700 .72rem var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--forest); }
+  /* Spacing letters apart breaks Indic conjuncts (விண்ணப்பம் -> வி ண் ண ப்...): only Latin text gets it */
+  html:not([lang="en"]) .kicker, html:not([lang="en"]) .assist .who b { letter-spacing: 0; font-size: .8rem; }
   h1, h2, h3, .serif { font-family: var(--serif); font-weight: 600; color: var(--navy); letter-spacing: -.005em; }
   h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.15; margin: .2rem 0 .4rem; }
   h2 { font-size: 1.15rem; margin: 0 0 .7rem; }
@@ -336,6 +338,7 @@
         <div class="heard" id="heard" aria-live="polite"></div>
         <div class="alert warn" id="voice-note" hidden></div>
         <div class="alert warn" id="mt-note" hidden data-t="mt">Some questions are machine-translated. If one sounds odd, ask for help.</div>
+        <div class="alert" id="draft-note" hidden data-t="draft_note" style="font-size:.8rem;padding:.45rem .7rem">Questions in this language were written by hand but have not yet been checked by a native speaker. Tell us if anything sounds odd.</div>
         <div class="yn" id="yn" hidden>
           <button class="yes" type="button" id="btn-yes" data-t="yes">Yes, correct</button>
           <button class="no" type="button" id="btn-no" data-t="no">No</button>
@@ -465,7 +468,11 @@
       c_online: "ये हमारे सर्वर की मेमोरी में रहते हैं और 30 मिनट में अपने-आप मिट जाते हैं। हम इन्हें सहेजते, बेचते या किसी को देते नहीं।",
       c_google: "बोलकर जवाब देने पर आपका ब्राउज़र आवाज़ को लिखने के लिए Google को भेजता है। न चाहें तो लिखकर जवाब दीजिए।",
       c_kiosk: "सब कुछ इसी कंप्यूटर पर रहता है, आवाज़ भी यहीं समझी जाती है। जवाब 30 मिनट में मिट जाते हैं; प्रिंट या सेव ऑपरेटर करता है।",
-      c_gov: "यह सरकारी वेबसाइट नहीं है। फ़ॉर्म और पत्र मसौदा हैं; फ़ैसला संबंधित विभाग करता है।" },
+      c_gov: "यह सरकारी वेबसाइट नहीं है। फ़ॉर्म और पत्र मसौदा हैं; फ़ैसला संबंधित विभाग करता है।",
+      r_khasra: "खसरा", r_village: "गाँव", r_owners: "मालिक", r_area: "रकबा", r_land_type: "भूमि का प्रकार", r_khata: "खाता / खतौनी नंबर",
+      r_card: "कार्ड नंबर", r_head: "परिवार के मुखिया", r_category: "श्रेणी", r_members: "सदस्य", r_shop: "राशन दुकान", r_district: "जिला",
+      draft_note: "इस भाषा के सवाल हाथ से लिखे गए हैं, पर अभी किसी मूल भाषी ने जाँचे नहीं हैं। कुछ अजीब लगे तो बताइए।",
+      no_recog: "इस ब्राउज़र में इस भाषा में बोलकर जवाब नहीं हो पा रहा। लिखकर जवाब दीजिए।", by_word: "बटा" },
     en: {}
   };
   var EN = { next_advisor: "Tap 'Fill this form' next to a scheme: some of your answers will already be filled in. The department makes the final decision.",
@@ -487,7 +494,17 @@
     c_online: "They stay in our server's memory and are deleted automatically within 30 minutes. We don't save, sell or share them.",
     c_google: "If you answer by speaking, your browser sends your voice to Google to turn it into text. If you'd rather not, type your answers.",
     c_kiosk: "Everything stays on this computer, including your voice. Answers are deleted within 30 minutes; the operator prints or saves the form.",
-    c_gov: "This is not a government website. Forms and letters are drafts; the department concerned decides." };
+    c_gov: "This is not a government website. Forms and letters are drafts; the department concerned decides.",
+    r_khasra: "Khasra", r_village: "Village", r_owners: "Owner(s)", r_area: "Area", r_land_type: "Land type", r_khata: "Khata / khatauni no.",
+    r_card: "Card no.", r_head: "Head of family", r_category: "Category", r_members: "Members", r_shop: "Ration shop", r_district: "District",
+    draft_note: "Questions in this language were written by hand but have not yet been checked by a native speaker. Tell us if anything sounds odd.",
+    no_recog: "This browser can't take spoken answers in this language. Please type your answers.", by_word: "by" };
+  // Record lookup results come with English keys; show them in the chosen language.
+  var RKEY = { "Khasra": "r_khasra", "Village": "r_village", "Owner(s)": "r_owners", "Area": "r_area", "Land type": "r_land_type",
+               "Khata / khatauni no.": "r_khata", "Card no.": "r_card", "Head of family": "r_head", "Category": "r_category",
+               "Members": "r_members", "Ration shop": "r_shop", "District": "r_district" };
+  function locale() { return lang === "en" ? "en-IN" : lang + "-IN"; }
+  var PACKS = {};        // lang -> {speech, status} for hand-written language packs (from /capabilities)
   var LANG_NAMES = { hi: "हिन्दी", en: "English", bn: "বাংলা", ta: "தமிழ்", te: "తెలుగు", mr: "मराठी", gu: "ગુજરાતી", kn: "ಕನ್ನಡ",
                      ml: "മലയാളം", pa: "ਪੰਜਾਬੀ", ur: "اردو", or: "ଓଡ଼ିଆ", as: "অসমীয়া" };
   var ICON = { form: "📝", grievance: "📢", rti: "📄", lookup_land: "🗺", lookup_ration: "🍚", advisor: "💡" };
@@ -566,6 +583,7 @@
   window.__hiSpeakable = hiSpeakable;   // exposed for tests
   function speak(text) {
     if (lang === "hi" && text) text = hiSpeakable(text);
+    else if (text) text = text.replace(/(\d)\s*\/\s*(\d)/g, "$1 " + t("by_word") + " $2");   // khasra 145/2 -> "145 by 2"
     try {
       speechSynthesis.cancel();
       var v = voiceFor(lang); voiceNote();
@@ -663,7 +681,8 @@
   }
   function serverVoiceOK() { return caps.asr && (caps.asr_langs || []).indexOf(lang) > -1 && navigator.mediaDevices && window.isSecureContext; }
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  function browserVoiceOK() { return !serverVoiceOK() && !!SR && window.isSecureContext !== false; }
+  var noRecog = {};      // languages this browser's recogniser refused ("language-not-supported")
+  function browserVoiceOK() { return !serverVoiceOK() && !!SR && window.isSecureContext !== false && !noRecog[lang]; }
   function voiceOK() { return serverVoiceOK() || browserVoiceOK(); }
   function setSteps(phase, done) {
     var step = done ? 3 : (phase === "final" || phase === "fix") ? 2 : 1;
@@ -679,6 +698,7 @@
     $("question").textContent = r.text;
     speak(r.speak || r.text);
     $("mt-note").hidden = !r.machine_translated;
+    $("draft-note").hidden = !(PACKS[lang] && PACKS[lang].status !== "reviewed");
     $("yn").hidden = !(r.phase === "confirm" || r.phase === "final");
     var fields = r.fields || [];
     var filled = fields.filter(function (f) { return f.value; }).length;
@@ -751,8 +771,8 @@
       .catch(function (e) { netError(e); $("status").textContent = ""; });
   }
   $("type-form").addEventListener("submit", function (e) { e.preventDefault(); var v = $("type-input").value.trim(); $("type-input").value = ""; send(v); });
-  $("btn-yes").addEventListener("click", function () { send(lang === "hi" ? "हाँ" : "yes"); });
-  $("btn-no").addEventListener("click", function () { send(lang === "hi" ? "नहीं" : "no"); });
+  $("btn-yes").addEventListener("click", function () { send(lang === "en" ? "yes" : t("yes_word")); });
+  $("btn-no").addEventListener("click", function () { send(lang === "en" ? "no" : t("no_word")); });
   $("repeat").addEventListener("click", function () { if (cur && cur.text) speak(cur.speak || cur.text); });
   $("reveal").addEventListener("change", function () { reveal = this.checked; if (sid) api("/sessions/" + sid).then(function (s) { renderSheet(s.fields || [], cur || {}); }); });
   $("op-set").addEventListener("click", function () {
@@ -777,7 +797,7 @@
     $("what-next-body").textContent = o.type === "advisor" ? t("next_advisor") : o.type === "lookup" ? t("next_lookup") : t("what_next_body");
     $("res-title").textContent = r.title || ""; $("res-crumb").textContent = r.title || "";
     var meta = [[t("m_ref"), "<span class='mono'>DF-" + esc(String(sid || "").slice(0, 8).toUpperCase()) + "</span>"],
-                [t("m_date"), esc(new Date().toLocaleString(lang === "en" ? "en-IN" : "hi-IN", { dateStyle: "medium", timeStyle: "short" }))],
+                [t("m_date"), esc(new Date().toLocaleString(locale(), { dateStyle: "medium", timeStyle: "short" }))],
                 [t("m_lang"), esc(LANG_NAMES[lang] || lang)]];
     if (!o.type) meta.push([t("m_filled"), fields.filter(function (f) { return f.value; }).length + " / " + fields.length]);
     if (o.type === "lookup" && o.as_of) meta.push([t("m_copy"), esc(o.as_of)]);
@@ -802,12 +822,12 @@
     if (f.kind === "date") {
       var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
       if (m) {
-        try { return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(lang === "en" ? "en-IN" : "hi-IN", { day: "numeric", month: "long", year: "numeric" }); }
+        try { return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(locale(), { day: "numeric", month: "long", year: "numeric" }); }
         catch (e) { return m[3] + "/" + m[2] + "/" + m[1]; }
       }
       return v;
     }
-    if (f.kind === "yesno") return v === "Yes" ? (lang === "en" ? "Yes" : "हाँ") : v === "No" ? (lang === "en" ? "No" : "नहीं") : v;
+    if (f.kind === "yesno") return v === "Yes" ? t("yes_word") : v === "No" ? t("no_word") : v;
     if (f.options && f.options.length) {
       var o = f.options.filter(function (x) { return x.value === v; })[0];
       if (o) return o.label;
@@ -830,13 +850,13 @@
       tabs.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.l === l)); });
     };
     langs.forEach(function (l) {
-      var b = document.createElement("button"); b.type = "button"; b.dataset.l = l; b.textContent = l === "hi" ? "हिन्दी" : "English";
+      var b = document.createElement("button"); b.type = "button"; b.dataset.l = l; b.textContent = LANG_NAMES[l] || l;
       b.addEventListener("click", function () { pick(l); }); tabs.appendChild(b);
     });
     tabs.hidden = langs.length < 2;
     pick(langs.indexOf(lang) > -1 ? lang : langs[0]);
     var ul = $("next-steps"); ul.innerHTML = "";
-    ((lang === "hi" && o.next_steps_hi) || o.next_steps || []).forEach(function (s) { var li = document.createElement("li"); li.textContent = s; ul.appendChild(li); });
+    ((lang === "hi" && o.next_steps_hi) || (lang !== "en" && o.next_steps_local) || o.next_steps || []).forEach(function (s) { var li = document.createElement("li"); li.textContent = s; ul.appendChild(li); });
     $("draft").hidden = false;
   }
   function renderLookup(o) {
@@ -844,7 +864,7 @@
     if (o.demo) h += "<div class='alert warn'>" + esc(t("demo_rec")) + "</div>";
     if (o.stale) h += "<div class='alert warn'>" + esc(t("old")) + "</div>";
     (o.results || []).forEach(function (row) {
-      h += "<div class='card'><dl class='kv'>" + Object.keys(row).map(function (k) { return "<dt>" + esc(k) + "</dt><dd>" + esc(row[k]) + "</dd>"; }).join("") + "</dl></div>";
+      h += "<div class='card'><dl class='kv'>" + Object.keys(row).map(function (k) { return "<dt>" + esc(RKEY[k] ? t(RKEY[k]) : k) + "</dt><dd>" + esc(row[k]) + "</dd>"; }).join("") + "</dl></div>";
     });
     if (o.source) h += "<p class='muted' style='font-size:.82rem'>" + esc(t("m_source")) + ": " + esc(o.source) + "</p>";
     $("lookup").innerHTML = h; $("lookup").hidden = false;
@@ -900,7 +920,7 @@
     if (recog) { recog.stop(); return; }
     try { speechSynthesis.cancel(); } catch (e) {}
     recog = new SR();
-    recog.lang = lang === "en" ? "en-IN" : lang + "-IN";
+    recog.lang = (PACKS[lang] && PACKS[lang].speech) || locale();
     recog.interimResults = true; recog.maxAlternatives = 1; recog.continuous = false;
     var finalText = "";
     recog.onresult = function (ev) {
@@ -908,7 +928,10 @@
       for (var k = ev.resultIndex; k < ev.results.length; k++) { txt += ev.results[k][0].transcript; if (ev.results[k].isFinal) finalText += ev.results[k][0].transcript; }
       $("heard").textContent = "🗣 " + (finalText || txt);
     };
-    recog.onerror = function (ev) { $("status").textContent = ev.error === "not-allowed" || ev.error === "service-not-allowed" ? t("mic_denied") : ev.error; };
+    recog.onerror = function (ev) {
+      if (ev.error === "language-not-supported") { noRecog[lang] = true; $("mic").disabled = true; $("mic-label").textContent = t("no_recog"); return; }
+      $("status").textContent = ev.error === "not-allowed" || ev.error === "service-not-allowed" ? t("mic_denied") : ev.error;
+    };
     var cap = setTimeout(function () { if (recog) recog.stop(); }, 15000);   // never keep listening: 15 s at most
     recog.onend = function () {
       clearTimeout(cap);
@@ -974,20 +997,27 @@
   });
 
   // ---------- boot ----------
+  // Screen text for languages beyond Hindi / English comes from the server's language packs (lang/*.json).
+  function loadUI(l) {
+    if (l === "hi" || l === "en" || UI[l] || !PACKS[l]) return Promise.resolve();
+    return api("/ui/" + l).then(function (r) { UI[l] = r.ui || {}; }).catch(function () {});
+  }
   $("lang").addEventListener("change", function () {
     lang = this.value; try { localStorage.setItem("dwaniforms:lang", lang); } catch (e) {}
-    applyUI(); if (cur && !cur.done) goHome(); else renderHome();
+    loadUI(lang).then(function () { applyUI(); if (cur && !cur.done) goHome(); else renderHome(); });
   });
   try { var saved = localStorage.getItem("dwaniforms:lang"); if (saved) { lang = saved; $("lang").value = saved; } } catch (e) {}
   applyUI();
   window.addEventListener("pagehide", endSession);
   Promise.all([api("/forms"), api("/capabilities")]).then(function (res) {
     forms = res[0]; caps = res[1];
-    if (!caps.translation) {                       // no translator (online version): only hand-written Hindi / English
-      [].forEach.call($("lang").options, function (o) { o.disabled = o.value !== "hi" && o.value !== "en"; });
-      if (lang !== "hi" && lang !== "en") { lang = "hi"; $("lang").value = "hi"; applyUI(); }
+    (caps.lang_packs || []).forEach(function (p) { PACKS[p.lang] = p; });
+    if (!caps.translation) {                       // no translator (online version): only languages written by hand
+      var ok = caps.langs || ["hi", "en"];
+      [].forEach.call($("lang").options, function (o) { o.disabled = ok.indexOf(o.value) < 0; });
+      if (ok.indexOf(lang) < 0) { lang = "hi"; $("lang").value = "hi"; }
     }
-    renderHome();
+    return loadUI(lang).then(function () { applyUI(); renderHome(); });
   }).catch(function () { $("top-list").textContent = t("offline"); });
 })();
 </script>
