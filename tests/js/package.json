@@ -2,7 +2,7 @@
   "name": "dwanilive-attendee-tests",
   "private": true,
   "scripts": {
-    "test": "node attendee_reconnect.test.js && node attendee_a11y.test.js && node presenter_dashboard.test.js && node help_page.test.js && node home_nav.test.js && node site_release.test.js && node notes_tab.test.js && node i18n.test.js && node lost_me.test.js && node slides_tab.test.js && node presenter_lang.test.js && node read_aloud.test.js && node dwaniforms_site.test.js && node dwaniforms_voice.test.js",
+    "test": "node attendee_reconnect.test.js && node attendee_a11y.test.js && node presenter_dashboard.test.js && node help_page.test.js && node home_nav.test.js && node site_release.test.js && node notes_tab.test.js && node i18n.test.js && node lost_me.test.js && node slides_tab.test.js && node presenter_lang.test.js && node read_aloud.test.js && node dwaniforms_site.test.js && node dwaniforms_legal.test.js && node dwaniforms_voice.test.js",
     "test:reconnect": "node attendee_reconnect.test.js",
     "test:a11y": "node attendee_a11y.test.js",
     "test:dashboard": "node presenter_dashboard.test.js",
@@ -14,7 +14,8 @@
     "test:lost": "node lost_me.test.js",
     "test:slides": "node slides_tab.test.js",
     "test:speak": "node presenter_lang.test.js",
-    "test:speak-aloud": "node read_aloud.test.js"
+    "test:speak-aloud": "node read_aloud.test.js",
+    "test:legal": "node dwaniforms_legal.test.js"
   },
   "devDependencies": {
     "jsdom": "^24.0.0",
