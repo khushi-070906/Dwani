@@ -143,9 +143,9 @@ def test_name_in_other_language_flagged_for_review_not_translated():
     assert not any(c[0] == "ரமேஷ்" for c in mt.calls)                    # names are never machine-translated
 
 def test_non_hindi_messages_translated_and_cached():
-    # Kannada: no hand-written language pack (yet), so the kiosk's translator is used
-    mt = FakeMT(); s = make("pm_kisan", "kn", mt); r = run(s.start())
-    assert r.text.startswith("[kn]") and r.machine_translated
+    # Odia: no hand-written language pack (yet), so the kiosk's translator is used
+    mt = FakeMT(); s = make("pm_kisan", "or", mt); r = run(s.start())
+    assert r.text.startswith("[or]") and r.machine_translated
     n = len(mt.calls); run(s._prompt(s.current)); assert len(mt.calls) == n   # cached
 
 def test_free_text_translated_to_form_language_and_flagged():
@@ -249,12 +249,12 @@ def test_operator_set_validates_every_kind_and_unknown_field():
 def test_translated_welcome_survives_a_translator_that_mangles_braces():
     class Mangler(FakeMT):
         async def translate(self, text, lang): self.calls.append((text, lang)); return text.replace("{", "{ ").replace("}", " }")
-    mt = Mangler(); s = make("pm_kisan", "kn", mt); r = run(s.start())           # used to raise KeyError
+    mt = Mangler(); s = make("pm_kisan", "or", mt); r = run(s.start())           # used to raise KeyError
     assert "PM-Kisan" in r.text and "{" not in mt.calls[0][0]
 
 
 def test_english_fallback_flag_without_translator():
-    s = make("pm_kisan", "kn", None); r = run(s.start())
+    s = make("pm_kisan", "or", None); r = run(s.start())
     assert s.english_fallback and "PM-Kisan" in r.text
     assert not make("pm_kisan", "en", None).english_fallback
 
@@ -275,7 +275,7 @@ def test_date_readback_is_spoken_not_iso():
     f = TEMPLATES["pm_kisan"].field_by_id("dob")
     assert FormSession.readback(f, "1990-08-15") == "15 August 1990"
     assert FormSession.readback(f, "1990-08-15", "hi") == "15 अगस्त 1990"
-    assert FormSession.readback(f, "1990-08-15", "kn") == "15 8 1990"            # no month names for this language
+    assert FormSession.readback(f, "1990-08-15", "or") == "15 8 1990"            # no month names for this language
     assert FormSession.readback(f, "1990-08-15", "ta") == "15 ஆகஸ்ட் 1990"       # Tamil language pack
 
 
