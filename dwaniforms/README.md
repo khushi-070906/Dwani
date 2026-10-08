@@ -46,6 +46,14 @@ If the page reloads -- the phone slept, the signal dropped, the app was reopened
 answer stays on the server and is still dropped there after 30 idle minutes. An answer that had been read back but not
 yet confirmed is asked once more rather than quietly kept.
 
+## Pilot numbers
+
+`/form/metrics/view` shows, on any phone, how many forms were started and finished, where people stopped, and which
+questions had to be repeated -- the one list that tells you which question to rewrite first. It is behind
+`DWANIFORMS_METRICS_TOKEN`: without that variable set, neither the page nor the JSON exists. The token is typed into the
+page and sent as a header, so it never reaches a URL, a browser history or a server log. The counters hold form ids,
+question ids and numbers; never anything anyone said.
+
 ## Privacy
 
 Nothing leaves the machine. Aadhaar / account / PAN are masked in responses and the default PDF; sessions are dropped

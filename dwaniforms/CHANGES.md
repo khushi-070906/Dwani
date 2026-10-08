@@ -112,3 +112,25 @@ kiosk UI (`static/app.html`, bundled Rozha One + Mukta fonts) and the website (`
 - The machine-translation tests moved from Kannada to Odia, which still has no pack.
 - Still not offered: Odia, Urdu, Assamese. Odia and Assamese have no browser speech recognition to fall back on, so a
   pack there would be typing-only; worth doing, but it buys less.
+
+## Reading the pilot numbers, and keeping every commit green
+
+- **`/form/metrics/view`**: the anonymous counters as a page you can open on a phone -- forms started and finished, the
+  completion rate, **where people stopped**, and **which questions had to be repeated**. Until now the numbers existed
+  but needed `curl` with a header to read, which is no use at a centre. The token is typed into the page and sent as a
+  header, so it never reaches a URL, a browser history or a server log; without `DWANIFORMS_METRICS_TOKEN` set, neither
+  the page nor the JSON exists. The JSON now also carries a `labels` map, so a report reads "PM-Kisan · Father /
+  husband name" instead of `pm_kisan:father_name`.
+- **Fixed: "where people stopped" was only counting people who timed out.** Pressing "stop and go back", or closing the
+  page, deletes the session, and that path counted nothing -- so the one number that tells you which question is too
+  hard was missing most of its data. `service.delete()` now counts it, exactly like an expiry.
+- **Fixed: tests could fail because of the tests before them.** The per-address cap on new conversations lives in a
+  module-level counter, so the twenty-first session in a run was refused and an unrelated test went red. `tests/conftest.py`
+  clears it around every test.
+- **`check_commits.py`**: runs pytest and the language-pack check over *every* commit you are about to push, each in a
+  throwaway worktree. Splitting work into many small commits is good, but when the code lands in one commit and its test
+  in the next, GitHub marks the one in between with a red X and e-mails about it even though the branch tip is fine.
+  `python check_commits.py` says which commits would be red, before they are pushed.
+- Tests: `tests/test_dwaniforms_metrics_page.py` (6: the page and the numbers both need the token, the page carries no
+  numbers of its own, the counters a pilot report needs, readable names for every key, and that nothing anyone said --
+  no name, no Aadhaar, no long digit string -- can appear in the counters).
