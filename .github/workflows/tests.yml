@@ -63,6 +63,9 @@ jobs:
         run: |
           npm install --no-audit --no-fund
           DWANIFORMS_URL=http://127.0.0.1:8130 node dwaniforms_kiosk.test.js
+      - name: Phone app test (installable, survives a reload)
+        working-directory: tests/js
+        run: DWANIFORMS_URL=http://127.0.0.1:8130 node dwaniforms_pwa.test.js
       - name: Language packs complete
         run: python -m dwaniforms.langpacks check
       - name: No server errors
