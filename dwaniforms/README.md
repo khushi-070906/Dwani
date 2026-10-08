@@ -48,7 +48,10 @@ running server: `DWANIFORMS_URL=http://127.0.0.1:8100 node tests/js/dwaniforms_k
 
 ## Known limits
 
-Hand-written prompts are English and Hindi; other languages are machine-translated (flagged on screen) and need native
-review. Spoken number words cover English and Hindi. Names are not transliterated (flagged for the operator). No Odia ASR.
+Hand-written questions: Hindi and English (in the code) plus Bengali, Marathi, Gujarati, Punjabi, Tamil and Telugu
+(language packs in `lang/`, written by an AI assistant, **marked "draft" until a native speaker reviews them**; see
+`lang/README.md`). The online version offers exactly these 8. On a kiosk with NLLB, other languages are machine-translated
+(flagged on screen). Spoken number words: English and Hindi 0-99; the six pack languages 0-10 plus hundred / thousand /
+lakh / crore and their "two and a half" words (speech recognisers mostly return bigger numbers as numerals). Names are not transliterated (flagged for the operator). No Odia ASR.
 PDFs print form-language text; Hindi letters are printed from the screen (the browser shapes Devanagari correctly).
 Real Whisper/NLLB, the microphone path and text-to-speech must still be tried on the target hardware.

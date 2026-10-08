@@ -19,7 +19,7 @@
 - [ ] **Uptime monitor** (e.g. UptimeRobot, free) on `https://<app>/form/health`, alerting your e-mail.
 - [ ] **Legal review**: DPDP Act 2023 and the DPDP Rules; whether a private service may take Aadhaar numbers to prepare forms (Aadhaar Act); Terms of Use. Then name a **grievance officer** in the privacy policy.
 - [ ] **Pilot** with a CSC / NGO / panchayat: 20-50 real people, older and less literate users included. Read `/form/metrics` weekly.
-- [ ] **Native-speaker review** of the Hindi questions; then decide other languages (hand-written, Bhashini, or NLLB on a bigger server).
+- [ ] **Native-speaker review** of Hindi and of the six language packs in `lang/` (Bengali, Marathi, Gujarati, Punjabi, Tamil, Telugu). Each pack says `"status": "draft"` and the app shows a small "not yet checked by a native speaker" note until a reviewer sets it to `"reviewed"`. See `lang/README.md`. Kannada, Malayalam, Odia, Urdu, Assamese: add a pack (`python -m dwaniforms.langpacks skeleton`) or use NLLB / Bhashini on a bigger server.
 - [ ] **Real records** only with the data owner's permission; until then the online app shows clearly-marked demo records.
 - [ ] Re-check scheme rules every 6 months (`python -m dwaniforms.eligibility` lists any that are due).
 

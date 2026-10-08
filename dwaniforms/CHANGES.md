@@ -41,3 +41,26 @@
 look-ups (`records.py`, kinds `khasra` / `ration_card`), the scheme advisor (`eligibility.py`, `schemes/`,
 `templates/scheme_advisor.json`), suggestions / `when` / final read-back in `session.py`, prefill between flows, the
 kiosk UI (`static/app.html`, bundled Rozha One + Mukta fonts) and the website (`../dwaniforms_site`).
+
+# Round 3 (DwaniForms): more languages online, no translation model needed
+
+- **Language packs** (`lang/*.json`, loaded by `langpacks.py`): Bengali, Marathi, Gujarati, Punjabi, Tamil, Telugu. Each has
+  every question, label, form title, system message, screen text, scheme name / benefit / rule, next step, option name
+  (with the words people actually say), yes / no / skip words, digit words 0-10, hundred / thousand / lakh / crore,
+  "two and a half" words, month names, the khasra "by" word, land units to refuse (bigha, guntha, kanal, cent...),
+  ration-card category names and the area format. Keyed by the English sentence, so a changed English line shows up as
+  missing. `python -m dwaniforms.langpacks check` (run in CI) lists anything missing or any lost `{placeholder}`.
+  **Draft quality**: written by an AI assistant; each pack is `"status": "draft"` until a native speaker reviews it.
+- The online app now offers the 8 hand-written languages (was Hindi / English only); the language list comes from
+  `/form/capabilities` (`langs`, `lang_packs`), screen text from `/form/ui/<lang>`. On a kiosk, packs are used first and
+  NLLB only for the rest.
+- Speech: recogniser tag per pack (Punjabi `pa-Guru-IN`); if a browser refuses a language, the mic is turned off with a
+  "please type" note instead of a raw error. Khasra "145/2" is spoken with the language's "by" word.
+- Fixes found on the way: the "record not found" sentence put English ("khasra 145/2", "this ration card") inside the
+  Hindi message; land / ration result labels were always English (now translated, Hindi too); advisor "Fill this form"
+  titles were English; read-back ended with "." in Hindi / Bengali / Punjabi (now "।"); Bengali য়/ড় spelled two ways
+  didn't match; day numbers with an ordinal ending ("15th", "১৫ই", "15ஆம்", "15వ") weren't understood; letter-spaced
+  kickers broke Indic conjuncts; complaint text in a pack language now also suggests the department.
+- Tests: `tests/test_dwaniforms_langpacks.py` (81: completeness, placeholders, yes/no and option collisions, digits,
+  dates, fractions, khasra, full flows in each language with no translator, endpoints) + a Bengali run of the real
+  app in `tests/js/dwaniforms_kiosk.test.js`.
