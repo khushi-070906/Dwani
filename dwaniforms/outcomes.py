@@ -16,6 +16,29 @@ DRAFT_FOOTER_EN = "This draft was prepared with DwaniForms from what the applica
 DRAFT_FOOTER_HI = "यह मसौदा आवेदक की कही बातों से DwaniForms ने तैयार किया है। हस्ताक्षर से पहले पढ़ लें।"
 
 
+GRIEVANCE_NEXT_EN = (
+    "Print, sign and submit it at the office, or file it on your state's public grievance portal.",
+    "For central government departments you can file it on CPGRAMS (pgportal.gov.in).",
+    "Keep the acknowledgement / registration number you are given.",
+)
+RTI_NEXT_EN = (
+    "Send it to the Public Information Officer of the department by post or by hand, with the fee (unless BPL).",
+    "For central ministries and departments you can also file online at rtionline.gov.in; many states have "
+    "their own RTI portals.",
+    "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can "
+    "file a first appeal.",
+)
+NEXT_STEPS_EN = (*GRIEVANCE_NEXT_EN, *RTI_NEXT_EN)
+
+
+def _local_steps(session, steps_en) -> dict:
+    """Next steps in the citizen's language when a language pack has them (the letter itself stays English / Hindi:
+    it goes to an office)."""
+    from . import langpacks
+    local = [langpacks.text(session.lang, s) for s in steps_en]
+    return {"next_steps_local": local} if all(local) else {}
+
+
 def _v(session, fid: str, native: bool = False) -> str:
     a = session.answers.get(fid)
     if not a:
@@ -80,11 +103,7 @@ def grievance_draft(session, today: dt.date | None = None, **_) -> dict:
         drafts["hi"] = "\n".join(hi)
     return {
         "type": "draft", "title": "Complaint letter", "drafts": drafts,
-        "next_steps": [
-            "Print, sign and submit it at the office, or file it on your state's public grievance portal.",
-            "For central government departments you can file it on CPGRAMS (pgportal.gov.in).",
-            "Keep the acknowledgement / registration number you are given.",
-        ],
+        "next_steps": list(GRIEVANCE_NEXT_EN), **_local_steps(session, GRIEVANCE_NEXT_EN),
         "next_steps_hi": [
             "प्रिंट करके हस्ताक्षर कीजिए और दफ़्तर में जमा कीजिए, या अपने राज्य के शिकायत पोर्टल पर दर्ज कीजिए।",
             "केंद्र सरकार के विभागों के लिए आप इसे CPGRAMS (pgportal.gov.in) पर भी दर्ज कर सकते हैं।",
@@ -149,13 +168,7 @@ def rti_draft(session, today: dt.date | None = None, **_) -> dict:
         drafts["hi"] = "\n".join(hi)
     return {
         "type": "draft", "title": "RTI application", "drafts": drafts,
-        "next_steps": [
-            "Send it to the Public Information Officer of the department by post or by hand, with the fee (unless BPL).",
-            "For central ministries and departments you can also file online at rtionline.gov.in; many states have "
-            "their own RTI portals.",
-            "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can "
-            "file a first appeal.",
-        ],
+        "next_steps": list(RTI_NEXT_EN), **_local_steps(session, RTI_NEXT_EN),
         "next_steps_hi": [
             "इसे विभाग के जन सूचना अधिकारी को डाक से या हाथ से, फ़ीस के साथ भेजिए (बीपीएल हों तो फ़ीस नहीं)।",
             "केंद्रीय मंत्रालयों और विभागों के लिए rtionline.gov.in पर ऑनलाइन भी भर सकते हैं; कई राज्यों के अपने आरटीआई पोर्टल हैं।",

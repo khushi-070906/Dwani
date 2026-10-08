@@ -153,9 +153,24 @@ def _stale_note(meta: Meta | None) -> dict:
     return {"as_of": meta.as_of, "source": meta.source, "demo": meta.demo, "stale": age is not None and age > STALE_DAYS}
 
 
+_WHAT = {"en": {"what_khasra": "khasra {k}", "what_card": "this ration card"},
+         "hi": {"what_khasra": "खसरा {k}", "what_card": "यह राशन कार्ड"}}
+
+
+def _what(lang: str, key: str, **kw) -> str:
+    """The thing that wasn't found, in the citizen's language ("खसरा 145/2")."""
+    from . import langpacks
+    fmt = (langpacks.packs().get(lang) or {}).get("formats", {}).get(key) or _WHAT.get(lang, _WHAT["en"])[key]
+    return fmt.format(**kw)
+
+
 def _area(ha: float, lang: str) -> str:
     acres = f"{ha * 2.4711:.2f}".rstrip("0").rstrip(".")
-    return f"{ha:g} हेक्टेयर (लगभग {acres} एकड़)" if lang == "hi" else f"{ha:g} hectare (about {acres} acres)"
+    if lang == "hi":
+        return f"{ha:g} हेक्टेयर (लगभग {acres} एकड़)"
+    from . import langpacks
+    fmt = (langpacks.packs().get(lang) or {}).get("formats", {}).get("area")
+    return fmt.format(ha=f"{ha:g}", acres=acres) if fmt else f"{ha:g} hectare (about {acres} acres)"
 
 
 def land_outcome(session, service=None, **_) -> dict:
@@ -167,7 +182,7 @@ def land_outcome(session, service=None, **_) -> dict:
     meta = _stale_note(store.meta.get("land"))
     if not rows:
         return {"type": "lookup", "title": "Land record", "found": False, "say_key": "lookup_not_found",
-                "say_kw": {"what": f"khasra {k}"}, **meta}
+                "say_kw": {"what": _what(session.lang, "what_khasra", k=k)}, **meta}
     hi = session.lang == "hi"
     results = []
     for r in rows:
@@ -196,9 +211,11 @@ def ration_outcome(session, service=None, **_) -> dict:
     meta = _stale_note(store.meta.get("ration"))
     if not r:
         return {"type": "lookup", "title": "Ration card", "found": False, "say_key": "lookup_not_found",
-                "say_kw": {"what": "this ration card"}, **meta}
+                "say_kw": {"what": _what(session.lang, "what_card")}, **meta}
     hi = session.lang == "hi"
     cat = CATEGORY_NAMES.get(r["category"].upper(), (r["category"], r["category"]))[1 if hi else 0]
+    from . import langpacks
+    cat = (langpacks.packs().get(session.lang) or {}).get("categories", {}).get(r["category"].upper()) or cat
     shop = r.get("fps_shop_hi") if hi and r.get("fps_shop_hi") else r["fps_shop"]
     results = [{"Card no.": "•" * max(len(r["card_no"]) - 4, 0) + r["card_no"][-4:],
                 "Head of family": mask_name(r["head_name"]), "Category": cat, "Members": r["members"],
