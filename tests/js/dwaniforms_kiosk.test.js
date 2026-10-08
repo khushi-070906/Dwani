@@ -42,7 +42,12 @@ async function open(w, id) {
   ok($(w, "top-list").querySelectorAll(".row").length === 4 && q(w, '#top-list [data-form="scheme_advisor"]'), "home: the four most-used services, incl. the scheme advisor");
   ok($(w, "all-groups").querySelectorAll(".group").length === 4, "home: everything else, grouped");
   ok(!$(w, "demo-note").hidden, "demo records -> the amber 'demo version' card is shown");
-  ok([...$(w, "lang").options].filter((o) => !o.disabled).map((o) => o.value).join() === "hi,en", "no translator on this server: only hand-written Hindi / English offered");
+  // Which languages this server can really do is its own answer (Hindi, English + every lang/*.json pack): the page must
+  // offer exactly those, no more. Asked of the server rather than hard-coded, so adding a pack does not break the test.
+  const offered = (await (await fetch(BASE + "/form/capabilities")).json()).langs.slice().sort().join();
+  ok([...$(w, "lang").options].filter((o) => !o.disabled).map((o) => o.value).sort().join() === offered,
+     "no translator on this server: only languages with hand-written questions offered (" + offered + ")");
+  ok($(w, "lang").querySelector('option[value="kn"]').disabled, "Kannada (no language pack yet) stays disabled online");
 
   // 1. complaint
   await open(w, "grievance");
@@ -111,5 +116,24 @@ async function open(w, id) {
     }
   }
   ok(gotPrefill, "advisor answers carried over: 'I noted Gender: Male'");
+  w.close();
+
+  // 4. a language pack (Bengali) online: screen text, questions, answers and results all in Bengali, no translator
+  if (!offered.split(",").includes("bn")) { console.log("SKIP Bengali: this server has no bn language pack"); return; }
+  w = boot("bn");
+  await until(() => q(w, '[data-form="ration_lookup"]') && q(w, ".welcome h1").textContent === "নমস্কার");
+  ok(q(w, ".welcome h1").textContent === "নমস্কার" && /বলে বা লিখে/.test($(w, "hello-sub") ? $(w, "hello-sub").textContent : q(w, ".lead").textContent),
+     "Bengali: home screen text comes from the language pack");
+  ok(/রেশন কার্ড দেখা/.test(q(w, '[data-form="ration_lookup"]').textContent), "Bengali: service names from the pack");
+  await open(w, "ration_lookup");
+  ok(/রেশন কার্ড নম্বর কত/.test($(w, "question").textContent) && /নমস্কার/.test($(w, "question").textContent), "Bengali: hand-written question, not machine-translated");
+  ok(!$(w, "draft-note").hidden && $(w, "mt-note").hidden, "Bengali: 'not yet checked by a native speaker' note, no machine-translation note");
+  await say(w, "১২৩৪ ৫৬৭৮ ৯০১২");
+  ok(/আপনি বললেন/.test($(w, "question").textContent), "Bengali: read-back in Bengali");
+  $(w, "btn-yes").click();
+  await until(() => !$(w, "result").hidden);
+  const keys = [...$(w, "lookup").querySelectorAll("dt")].map((d) => d.textContent);
+  ok(keys.includes("রেশন দোকান") && keys.includes("শ্রেণি"), "Bengali: record labels translated: " + keys.join(", "));
+  ok(/অগ্রাধিকার|অন্ত্যোদয়/.test($(w, "res-say").textContent), "Bengali: result spoken with the category in Bengali: " + $(w, "res-say").textContent.slice(0, 80));
   w.close();
 })();
