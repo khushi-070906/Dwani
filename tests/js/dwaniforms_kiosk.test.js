@@ -47,7 +47,7 @@ async function open(w, id) {
   const offered = (await (await fetch(BASE + "/form/capabilities")).json()).langs.slice().sort().join();
   ok([...$(w, "lang").options].filter((o) => !o.disabled).map((o) => o.value).sort().join() === offered,
      "no translator on this server: only languages with hand-written questions offered (" + offered + ")");
-  ok($(w, "lang").querySelector('option[value="kn"]').disabled, "Kannada (no language pack yet) stays disabled online");
+  ok($(w, "lang").querySelector('option[value="or"]').disabled, "Odia (no language pack yet) stays disabled online");
 
   // 1. complaint
   await open(w, "grievance");
