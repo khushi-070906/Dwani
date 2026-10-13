@@ -51,7 +51,15 @@
   "fix_which": "எதை மாற்ற வேண்டும்? இவற்றில் ஒன்றைச் சொல்லுங்கள்:",
   "khasra_invalid": "சர்வே எண் புரியவில்லை. இப்படிச் சொல்லுங்கள்: நூற்று நாற்பத்தைந்து பை இரண்டு.",
   "ration_invalid": "குடும்ப அட்டை எண் புரியவில்லை. மெதுவாக மீண்டும் சொல்லுங்கள்.",
-  "unit_acres": "நிலத்தை ஏக்கரில் சொல்லுங்கள். சென்ட், காணி போன்ற அளவுகள் இடத்துக்கு இடம் மாறும்."
+  "unit_acres": "நிலத்தை ஏக்கரில் சொல்லுங்கள். சென்ட், காணி போன்ற அளவுகள் இடத்துக்கு இடம் மாறும்.",
+  "outcome_rti_appeal": "உங்கள் முதல் மேல்முறையீடு திரையில் தயாராக உள்ளது. அதை அச்சிட்டு, கையெழுத்திட்டு, உங்கள் ஆவணங்களின் நகல்களுடன் அனுப்புங்கள்.",
+  "rti_appeal_early": "அலுவலகத்துக்கு {date} வரை பதில் தர நேரம் உள்ளது. அதற்குள் பதில் வராவிட்டால், அந்தத் தேதிக்குப் பிறகு இந்த மேல்முறையீட்டை அனுப்புங்கள்.",
+  "rti_appeal_late": "30 நாட்களுக்கு மேல் ஆகிவிட்டது, எனவே மேல்முறையீடு தாமதமாகிறது. காலியிடத்தில் தாமதத்தின் காரணத்தை எழுதுங்கள்; அலுவலர் அதை இன்னும் ஏற்கலாம்.",
+  "outcome_explain": "இந்தக் காகிதத்தின் பொருள் இதுதான். எல்லாம் திரையிலும் எழுதப்பட்டுள்ளது.",
+  "explain_ahead": "காகிதத்தில் எழுதப்பட்ட தேதி {date}, இன்றிலிருந்து {days} நாட்களில்.",
+  "explain_today": "காகிதத்தில் எழுதப்பட்ட தேதி இன்றுதான்.",
+  "explain_passed": "காகிதத்தில் எழுதப்பட்ட தேதி, {date}, ஏற்கனவே கடந்துவிட்டது. இன்றே அலுவலகத்துக்குச் சென்று இப்போது என்ன செய்ய வேண்டும் என்று கேளுங்கள்.",
+  "explain_disclaimer": "இது பொதுவான தகவல், சட்ட ஆலோசனை அல்ல. எதையும் செய்வதற்கு முன் காகிதத்தை நீங்களே படியுங்கள், அல்லது அலுவலகத்தில் கேளுங்கள்."
  },
  "ui": {
   "a11y_bigger": "எழுத்துகளைப் பெரிதாக்கு",
@@ -172,7 +180,21 @@
   "why_maybe": "ஏன் 'சரிபார்ப்பு தேவை'",
   "working": "புரிந்துகொள்கிறேன்…",
   "yes": "✓ ஆம், சரி",
-  "yes_word": "ஆம்"
+  "yes_word": "ஆம்",
+  "ex_amount": "தொகை",
+  "ex_beware": "மோசடியில் கவனம்",
+  "ex_date": "காகிதத்திலுள்ள தேதி",
+  "ex_do": "என்ன செய்வது",
+  "ex_help": "மோசடி நடந்திருந்தால்",
+  "ex_left": "நாட்கள் உள்ளன",
+  "ex_note": "பொதுவான தகவல், சட்ட ஆலோசனை அல்ல. சரிபார்த்தது:",
+  "ex_passed": "இந்தத் தேதி கடந்துவிட்டது",
+  "ex_today": "இந்தத் தேதி இன்று",
+  "ex_what": "இது என்ன",
+  "ex_wrong": "இதில் ஏதாவது தவறு இருந்தால்",
+  "g_explain": "காகிதத்தைப் புரிந்துகொள்ளுங்கள்",
+  "k_explain": "காகிதத்தின் பொருள்",
+  "next_explain": "காகிதத்தைப் பத்திரமாக வைத்திருங்கள். ஏதாவது அலுவலகம் உங்களுக்கு அநீதி செய்திருந்தால், முகப்புப் பக்கத்திலிருந்து புகார் எழுதலாம்."
  },
  "text": {
   "Bank KYC": "வங்கி கேஒய்சி",
@@ -400,7 +422,74 @@
   "Keep the acknowledgement / registration number you are given.": "உங்களுக்குக் கிடைக்கும் ஒப்புகை / பதிவு எண்ணைப் பத்திரமாக வைத்துக்கொள்ளுங்கள்.",
   "Send it to the Public Information Officer of the department by post or by hand, with the fee (unless BPL).": "இதைத் துறையின் பொதுத் தகவல் அலுவலருக்குத் தபாலில் அல்லது நேரில், கட்டணத்துடன் அனுப்புங்கள் (பிபிஎல் என்றால் கட்டணம் இல்லை).",
   "For central ministries and departments you can also file online at rtionline.gov.in; many states have their own RTI portals.": "மத்திய அமைச்சகங்கள், துறைகளுக்கு rtionline.gov.in-இல் இணையவழியாகவும் விண்ணப்பிக்கலாம்; பல மாநிலங்களுக்குத் தனி ஆர்டிஐ இணையதளங்கள் உள்ளன.",
-  "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can file a first appeal.": "பொதுத் தகவல் அலுவலர் 30 நாட்களுக்குள் பதில் தர வேண்டும் (ஒருவரின் உயிர் அல்லது சுதந்திரம் தொடர்பானதென்றால் 48 மணி நேரத்தில்). கிடைக்காவிட்டால் முதல் மேல்முறையீடு செய்யலாம்."
+  "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can file a first appeal.": "பொதுத் தகவல் அலுவலர் 30 நாட்களுக்குள் பதில் தர வேண்டும் (ஒருவரின் உயிர் அல்லது சுதந்திரம் தொடர்பானதென்றால் 48 மணி நேரத்தில்). கிடைக்காவிட்டால் முதல் மேல்முறையீடு செய்யலாம்.",
+  "RTI first appeal": "ஆர்டிஐ முதல் மேல்முறையீடு",
+  "No reply to your RTI in 30 days, or an incomplete one? The first appeal is drafted for you.": "30 நாட்களில் உங்கள் ஆர்டிஐக்கு பதில் வரவில்லையா, அல்லது முழுமையில்லாமல் வந்ததா? முதல் மேல்முறையீடு உங்களுக்காகத் தயாரிக்கப்படும்.",
+  "Which department did you send your RTI application to?": "நீங்கள் ஆர்டிஐ விண்ணப்பத்தை எந்தத் துறைக்கு அனுப்பினீர்கள்?",
+  "On which date did you send the RTI application?": "ஆர்டிஐ விண்ணப்பத்தை எந்தத் தேதியில் அனுப்பினீர்கள்?",
+  "Date of RTI application": "ஆர்டிஐ விண்ணப்பத் தேதி",
+  "In short, what information had you asked for?": "சுருக்கமாக, நீங்கள் என்ன தகவல் கேட்டிருந்தீர்கள்?",
+  "Information asked for": "கேட்ட தகவல்",
+  "Did you get a reply from the office? Say: no reply, or reply received.": "அலுவலகத்திலிருந்து பதில் வந்ததா? சொல்லுங்கள்: பதில் வரவில்லை, அல்லது பதில் வந்தது.",
+  "Reply from the PIO": "பொதுத் தகவல் அலுவலரின் பதில்",
+  "On which date did you get the reply?": "பதில் எந்தத் தேதியில் கிடைத்தது?",
+  "Date of reply": "பதிலின் தேதி",
+  "What is wrong with the reply? For example: information is missing, or it was refused without a reason.": "பதிலில் என்ன குறை? உதாரணமாக: தகவல் முழுமையில்லை, அல்லது காரணம் இல்லாமல் மறுத்தனர்.",
+  "Why the reply is not acceptable": "பதில் ஏன் ஏற்கத்தக்கதல்ல",
+  "Send it to the First Appellate Authority: the officer senior to the Public Information Officer in the same department. Attach copies of your RTI application and of the reply, if any.": "இதை முதல் மேல்முறையீட்டு அலுவலருக்கு அனுப்புங்கள்: அதே துறையில் பொதுத் தகவல் அலுவலரை விட மூத்த அலுவலர். உங்கள் ஆர்டிஐ விண்ணப்பம் மற்றும் பதிலின் (வந்திருந்தால்) நகல்களை இணையுங்கள்.",
+  "Central government departments charge no fee for a first appeal; some states do, so check your state's rules.": "மத்திய அரசுத் துறைகள் முதல் மேல்முறையீட்டுக்குக் கட்டணம் வாங்குவதில்லை; சில மாநிலங்கள் வாங்குகின்றன, எனவே உங்கள் மாநில விதிகளைப் பாருங்கள்.",
+  "The appeal must be decided within 30 days, 45 at most. If you are still not satisfied, you can make a second appeal to the Information Commission within 90 days.": "மேல்முறையீட்டில் 30 நாட்களுக்குள், அதிகபட்சம் 45 நாட்களுக்குள் முடிவு எடுக்க வேண்டும். அப்போதும் திருப்தி இல்லையென்றால் 90 நாட்களுக்குள் தகவல் ஆணையத்தில் இரண்டாம் மேல்முறையீடு செய்யலாம்.",
+  "A message or call saying your power will be cut tonight unless you call a number or pay through a link is a common fraud. The electricity company does not do this.": "\"இன்று இரவு மின்சாரம் துண்டிக்கப்படும், இந்த எண்ணை அழையுங்கள் அல்லது இணைப்பு மூலம் பணம் கட்டுங்கள்\" என்ற செய்தி அல்லது அழைப்பு பொதுவான மோசடி. மின்சார நிறுவனம் இப்படிச் செய்யாது.",
+  "Amount (Rs.)": "தொகை (ரூ.)",
+  "Banks never ask for your OTP, PIN, password or CVV. Anyone who asks is a fraud.": "வங்கி ஒருபோதும் உங்கள் ஓடிபி, பின், கடவுச்சொல் அல்லது சிவிவியைக் கேட்காது. கேட்பவர் மோசடிக்காரர்.",
+  "Check the challan on the official site echallan.parivahan.gov.in with the challan number or your vehicle number, and pay there or at the traffic police office.": "சலானை அதிகாரப்பூர்வ தளமான echallan.parivahan.gov.in இல் சலான் எண் அல்லது வாகன எண் கொண்டு பாருங்கள், அங்கேயோ போக்குவரத்துக் காவல் அலுவலகத்திலோ கட்டுங்கள்.",
+  "Date on the paper": "காகிதத்திலுள்ள தேதி",
+  "Do not click the link or call the number in the message. Go to your branch, or call the number printed in your passbook or on the back of your card, and ask whether anything is really needed.": "செய்தியிலுள்ள இணைப்பைத் தொடாதீர்கள், அதிலுள்ள எண்ணை அழைக்காதீர்கள். உங்கள் கிளைக்குச் செல்லுங்கள், அல்லது பாஸ்புக்கில் அல்லது கார்டின் பின்புறம் அச்சிட்ட எண்ணை அழைத்து உண்மையில் ஏதாவது செய்ய வேண்டுமா என்று கேளுங்கள்.",
+  "Do not ignore it. Note the court, the case number and the date written on it, and go on that date or send a lawyer.": "இதைப் புறக்கணிக்காதீர்கள். நீதிமன்றத்தின் பெயர், வழக்கு எண், எழுதப்பட்ட தேதி ஆகியவற்றைக் குறித்துக்கொள்ளுங்கள், அந்த நாளில் செல்லுங்கள் அல்லது வழக்கறிஞரை அனுப்புங்கள்.",
+  "Do not pay cash to an agent without an official receipt.": "அதிகாரப்பூர்வ ரசீது இல்லாமல் எந்த முகவருக்கும் ரொக்கம் தராதீர்கள்.",
+  "Do not pay through a link in a message.": "எந்தச் செய்தியிலுள்ள இணைப்பு மூலமும் பணம் கட்டாதீர்கள்.",
+  "Every genuine notice has a Document Identification Number (DIN). You can check it on incometax.gov.in under 'Authenticate notice/order issued by ITD'.": "ஒவ்வொரு உண்மையான அறிவிப்பிலும் ஆவண அடையாள எண் (டிஐஎன்) இருக்கும். அதை incometax.gov.in இல் 'Authenticate notice/order issued by ITD' பகுதியில் சரிபார்க்கலாம்.",
+  "Fake challan messages with a link to pay are common. Do not pay through a link in an SMS or WhatsApp; check on the official site first.": "பணம் கட்டும் இணைப்புடன் போலி சலான் செய்திகள் அடிக்கடி வருகின்றன. எஸ்எம்எஸ் அல்லது வாட்ஸ்அப் இணைப்பு மூலம் பணம் கட்டாதீர்கள்; முதலில் அதிகாரப்பூர்வ தளத்தில் சரிபாருங்கள்.",
+  "Free legal help is available from the District Legal Services Authority at your district court, or by calling 15100.": "மாவட்ட நீதிமன்றத்திலுள்ள மாவட்ட சட்டப் பணிகள் ஆணைக்குழுவிடமிருந்து, அல்லது 15100 ஐ அழைத்து, இலவச சட்ட உதவி பெறலாம்.",
+  "Give a written complaint at the electricity office and keep a copy with their stamp. If it is not fixed, every electricity company has a Consumer Grievance Redressal Forum.": "மின்சார அலுவலகத்தில் எழுத்துப்பூர்வ புகார் கொடுங்கள், முத்திரையிட்ட நகலை உங்களிடம் வைத்திருங்கள். அப்போதும் சரியாகாவிட்டால், ஒவ்வொரு மின்சார நிறுவனத்திலும் நுகர்வோர் குறைதீர்ப்பு மன்றம் உள்ளது.",
+  "Go to the branch with your loan papers and ask for a written statement of what is due. If you cannot pay, ask in writing for more time or smaller instalments.": "கடன் ஆவணங்களுடன் கிளைக்குச் சென்று நிலுவைத் தொகையின் எழுத்துப்பூர்வ விவரத்தைக் கேளுங்கள். இப்போது கட்ட முடியாவிட்டால், எழுத்துப்பூர்வமாக கூடுதல் நேரம் அல்லது சிறிய தவணைகளைக் கேளுங்கள்.",
+  "How much money does it ask for, in rupees? Or say skip.": "இதில் எவ்வளவு ரூபாய் கேட்கப்பட்டுள்ளது? அல்லது அடுத்தது என்று சொல்லுங்கள்.",
+  "I do not know this kind of paper yet.": "இந்த வகைக் காகிதம் பற்றி எனக்கு இன்னும் தெரியாது.",
+  "If it is about a problem with a government office, you can write a complaint here with 'Public grievance (complaint)'.": "ஏதாவது அரசு அலுவலகம் தொடர்பான பிரச்சனை என்றால், இங்கேயே 'பொதுக் குறைதீர்ப்பு (புகார்)' மூலம் புகார் எழுதலாம்.",
+  "If money has been taken from you by fraud, call 1930 at once or report it at cybercrime.gov.in. Reporting quickly can stop the money.": "மோசடியால் பணம் போயிருந்தால், உடனே 1930 ஐ அழையுங்கள் அல்லது cybercrime.gov.in இல் புகார் செய்யுங்கள். விரைவாகத் தெரிவித்தால் பணத்தைத் தடுக்கலாம்.",
+  "If money has been taken, call 1930 at once and tell your bank. Reporting quickly can stop the money.": "பணம் எடுக்கப்பட்டிருந்தால், உடனே 1930 ஐ அழைத்து உங்கள் வங்கிக்குத் தெரிவியுங்கள். விரைவாகத் தெரிவித்தால் பணத்தைத் தடுக்கலாம்.",
+  "If the amount is wrong or you have already paid, complain to the bank in writing. If the bank does not reply in 30 days, or you are not satisfied, complain to the RBI Ombudsman for free: cms.rbi.org.in or 14448.": "தொகை தவறாக இருந்தாலோ நீங்கள் ஏற்கனவே கட்டியிருந்தாலோ, வங்கிக்கு எழுத்துப்பூர்வ புகார் கொடுங்கள். வங்கி 30 நாட்களில் பதில் தராவிட்டால், அல்லது உங்களுக்குத் திருப்தி இல்லையென்றால், ஆர்பிஐ குறைதீர்ப்பாளரிடம் இலவசமாகப் புகார் செய்யுங்கள்: cms.rbi.org.in அல்லது 14448.",
+  "If the amount looks wrong, or you were charged when there was no supply, give a written complaint at the office and keep a copy with their stamp.": "தொகை தவறாகத் தோன்றினால், அல்லது தண்ணீர் வராதபோதும் கட்டணம் விதிக்கப்பட்டிருந்தால், அலுவலகத்தில் எழுத்துப்பூர்வ புகார் கொடுத்து முத்திரையிட்ட நகலை வைத்திருங்கள்.",
+  "If the area or the type of building written on the notice is wrong, you can file an objection at the municipal office. The notice usually says by when; do it before that date.": "அறிவிப்பில் எழுதப்பட்ட பரப்பளவு அல்லது கட்டட வகை தவறாக இருந்தால், நகராட்சி அலுவலகத்தில் ஆட்சேபனை தெரிவிக்கலாம். எப்போது வரை என்று அறிவிப்பில் பொதுவாக எழுதியிருக்கும்; அதற்கு முன் செய்யுங்கள்.",
+  "If the bill is much higher than usual, compare the meter reading printed on it with your meter.": "பில் வழக்கத்தைவிட மிக அதிகமாக இருந்தால், அதில் அச்சிட்ட மீட்டர் அளவீட்டை உங்கள் மீட்டருடன் ஒப்பிட்டுப் பாருங்கள்.",
+  "If you think it is wrong, you can dispute it as written on the challan, or at the traffic police office; some cases go to a court or a Lok Adalat.": "சலான் தவறு என்று நினைத்தால், சலானில் எழுதிய முறையில் அல்லது போக்குவரத்துக் காவல் அலுவலகத்தில் ஆட்சேபிக்கலாம்; சில வழக்குகள் நீதிமன்றம் அல்லது லோக் அதாலத்துக்குச் செல்லும்.",
+  "Is there a last date, or a date to appear, written on it? Say the date, or say skip.": "இதில் கடைசித் தேதி, அல்லது ஆஜராக வேண்டிய தேதி எழுதப்பட்டுள்ளதா? தேதியைச் சொல்லுங்கள், அல்லது அடுத்தது என்று சொல்லுங்கள்.",
+  "Keep the receipt or the payment message.": "ரசீதையோ பணம் கட்டிய செய்தியையோ பத்திரமாக வைத்திருங்கள்.",
+  "Keep the receipt. You may need it later, for example when selling the property.": "ரசீதைப் பத்திரமாக வைத்திருங்கள். பின்னர் தேவைப்படலாம், உதாரணமாகச் சொத்தை விற்கும்போது.",
+  "Kind of paper": "காகித வகை",
+  "Log in at incometax.gov.in, or ask a tax helper, to see the notice and reply by the date given.": "incometax.gov.in இல் உள்நுழைந்து, அல்லது வரி தெரிந்த ஒருவரின் உதவியுடன், அறிவிப்பைப் பார்த்து கொடுக்கப்பட்ட தேதிக்குள் பதில் அளியுங்கள்.",
+  "Never tell anyone your OTP, PIN or password, not even someone who says they are from the bank or the office.": "உங்கள் ஓடிபி, பின் அல்லது கடவுச்சொல்லை யாரிடமும் சொல்லாதீர்கள், வங்கியிலிருந்தோ அலுவலகத்திலிருந்தோ பேசுவதாகச் சொல்பவரிடமும் கூட.",
+  "No court, police or CBI officer arrests anyone on a video call, and no one can ask you to pay to avoid arrest. A so-called digital arrest is fraud: cut the call and dial 1930.": "எந்த நீதிமன்றமோ, காவல்துறையோ, சிபிஐ அதிகாரியோ வீடியோ அழைப்பில் யாரையும் கைது செய்வதில்லை, கைதைத் தவிர்க்க யாரும் பணம் கேட்க முடியாது. \"டிஜிட்டல் கைது\" என்பது மோசடி: அழைப்பைத் துண்டித்து 1930 ஐ அழையுங்கள்.",
+  "Pay by the last date at the electricity office, a bank or post office counter, or the company's official app or website.": "கடைசித் தேதிக்குள் மின்சார அலுவலகத்தில், வங்கி அல்லது தபால் நிலைய கவுண்டரில், அல்லது நிறுவனத்தின் அதிகாரப்பூர்வ செயலி அல்லது இணையதளத்தில் கட்டுங்கள்.",
+  "Pay by the last date at the municipal office or on its official website. Paying late usually adds a penalty or interest.": "கடைசித் தேதிக்குள் நகராட்சி அலுவலகத்தில் அல்லது அதன் அதிகாரப்பூர்வ இணையதளத்தில் கட்டுங்கள். தாமதமாகக் கட்டினால் பொதுவாக அபராதம் அல்லது வட்டி சேரும்.",
+  "Pay by the last date at the water board or municipal office, or on its official website or app.": "கடைசித் தேதிக்குள் குடிநீர் வாரியம் அல்லது நகராட்சி அலுவலகத்தில், அல்லது அதன் அதிகாரப்பூர்வ இணையதளம் அல்லது செயலியில் கட்டுங்கள்.",
+  "Pay only at the office or through its official website or app, not through a link someone sends you.": "பணத்தை அலுவலகத்தில் அல்லது அதன் அதிகாரப்பூர்வ இணையதளம் அல்லது செயலியில் மட்டுமே கட்டுங்கள், யாரோ அனுப்பிய இணைப்பு மூலம் அல்ல.",
+  "Pay only into the loan account, at the branch or through the official app, and keep the receipt.": "பணத்தைக் கடன் கணக்கில் மட்டும், கிளையில் அல்லது அதிகாரப்பூர்வ செயலி மூலம் கட்டுங்கள், ரசீதை வைத்திருங்கள்.",
+  "Pay only to the municipality. Do not give cash to someone who comes to your door without an official receipt.": "பணத்தை நகராட்சிக்கு மட்டுமே கொடுங்கள். அதிகாரப்பூர்வ ரசீது இல்லாமல் வீட்டுக்கு வரும் யாருக்கும் ரொக்கம் தராதீர்கள்.",
+  "Recovery agents must not threaten you or use abusive words, and must not call before 8 in the morning or after 7 in the evening. If they do, complain to the bank and, if you are threatened, to the police.": "வசூல் முகவர்கள் உங்களை மிரட்டவோ தகாத வார்த்தைகள் பேசவோ கூடாது, காலை 8 மணிக்கு முன்போ மாலை 7 மணிக்குப் பின்போ அழைக்கவும் கூடாது. அப்படி நடந்தால் வங்கியிடம் புகார் செய்யுங்கள், மிரட்டல் வந்தால் காவல்துறையிடமும்.",
+  "Show it to someone you trust, at the CSC, the panchayat, or the office that sent it, and ask what it asks you to do and by when.": "இதை நம்பகமான ஒருவரிடம், சிஎஸ்சியில், ஊராட்சியில், அல்லது அனுப்பிய அலுவலகத்தில் காட்டி, இதில் என்ன செய்யச் சொல்லியிருக்கிறது, எப்போது வரை என்று கேளுங்கள்.",
+  "Tell me what kind of paper you got. I will explain what it means, what to do and by when.": "உங்களுக்கு எந்தக் காகிதம் வந்தது என்று சொல்லுங்கள். அதன் பொருள் என்ன, என்ன செய்ய வேண்டும், எப்போது வரை என்று நான் விளக்குகிறேன்.",
+  "The department does not ask for payment through links in SMS or phone calls. Pay only through the official portal.": "வருமான வரித் துறை எஸ்எம்எஸ் அல்லது அழைப்பிலுள்ள இணைப்பு மூலம் பணம் கேட்பதில்லை. அதிகாரப்பூர்வ இணையதளம் மூலம் மட்டுமே கட்டுங்கள்.",
+  "This is a fine for breaking a traffic rule, such as riding without a helmet or crossing a red light.": "இது போக்குவரத்து விதி மீறலுக்கான அபராதம், உதாரணமாக ஹெல்மெட் இல்லாமல் ஓட்டுவது அல்லது சிவப்பு விளக்கைக் கடப்பது.",
+  "This is a letter from a bank or loan company saying a loan payment (EMI) is overdue.": "இது வங்கி அல்லது கடன் நிறுவனத்தின் கடிதம், கடன் தவணை (இஎம்ஐ) நிலுவையில் உள்ளது என்று கூறுகிறது.",
+  "This is a message saying your bank account, card or KYC will be blocked unless you do something now.": "இப்போதே ஏதாவது செய்யாவிட்டால் உங்கள் வங்கிக் கணக்கு, கார்டு அல்லது கேஒய்சி முடக்கப்படும் என்று சொல்லும் செய்தி இது.",
+  "This is a notice from the Income Tax Department, usually asking you to file a return, explain a difference in your income details, or pay tax that is due.": "இது வருமான வரித் துறையின் அறிவிப்பு, பொதுவாக ரிட்டர்ன் தாக்கல் செய்ய, வருமான விவரங்களிலுள்ள வேறுபாட்டை விளக்க, அல்லது நிலுவை வரியைக் கட்டச் சொல்கிறது.",
+  "This is a notice from the municipality or panchayat about tax on your house, shop or land: how much is due and by when.": "இது நகராட்சி அல்லது ஊராட்சியின் அறிவிப்பு, உங்கள் வீடு, கடை அல்லது நிலத்தின் வரி பற்றி: எவ்வளவு கட்ட வேண்டும், எப்போது வரை.",
+  "This is a paper from a court or a lawyer. A court summons gives the date you must appear; a lawyer's notice asks you to do something or reply within a time.": "இது நீதிமன்றம் அல்லது வழக்கறிஞரின் காகிதம். நீதிமன்ற அழைப்பாணையில் நீங்கள் ஆஜராக வேண்டிய தேதி இருக்கும்; வழக்கறிஞர் அறிவிப்பு ஏதாவது செய்யவோ குறிப்பிட்ட நேரத்துக்குள் பதில் அளிக்கவோ சொல்கிறது.",
+  "This is your electricity bill: how much you owe for the power you used, and the last date to pay it.": "இது உங்கள் மின்சாரக் கட்டண பில்: நீங்கள் பயன்படுத்திய மின்சாரத்துக்கான பணம், கட்ட வேண்டிய கடைசித் தேதி.",
+  "This is your water bill from the water board or the municipality: the amount you owe and the last date to pay.": "இது குடிநீர் வாரியம் அல்லது நகராட்சியின் தண்ணீர்க் கட்டண பில்: எவ்வளவு பணம் கட்ட வேண்டும், கட்ட வேண்டிய கடைசித் தேதி.",
+  "Understand a paper (bill, notice, summons)": "காகிதத்தைப் புரிந்துகொள்ளுங்கள் (பில், அறிவிப்பு, அழைப்பாணை)",
+  "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.": "இது எந்தக் காகிதம்? உதாரணமாக: மின்சாரக் கட்டணம், தண்ணீர்க் கட்டணம், சொத்து வரி, வங்கிக் கடன், வங்கி கேஒய்சி செய்தி, நீதிமன்ற அழைப்பாணை, வருமான வரி அறிவிப்பு, போக்குவரத்து சலான், அல்லது வேறு ஏதாவது."
  },
  "options": {
   "Male": [
@@ -677,6 +766,75 @@
    "சொந்த வீடு இல்லை",
    "வாடகை வீடு",
    "வாடகை"
+  ],
+  "No reply received": [
+   "பதில் வரவில்லை",
+   "வரவில்லை",
+   "பதில் இல்லை",
+   "கிடைக்கவில்லை",
+   "இல்லை"
+  ],
+  "Reply received, not satisfied": [
+   "பதில் வந்தது, திருப்தி இல்லை",
+   "பதில் வந்தது",
+   "வந்தது",
+   "கிடைத்தது",
+   "முழுமையில்லை",
+   "ஆம்"
+  ],
+  "Bank KYC or account block message": [
+   "வங்கி கேஒய்சி செய்தி",
+   "கேஒய்சி",
+   "கணக்கு முடக்கம்",
+   "கார்டு முடக்கம்"
+  ],
+  "Bank loan or EMI notice": [
+   "வங்கிக் கடன் அறிவிப்பு",
+   "வங்கிக் கடன்",
+   "கடன்",
+   "லோன்",
+   "இஎம்ஐ",
+   "தவணை"
+  ],
+  "Court summons or legal notice": [
+   "நீதிமன்ற அழைப்பாணை அல்லது சட்ட அறிவிப்பு",
+   "நீதிமன்ற அழைப்பாணை",
+   "நீதிமன்றம்",
+   "கோர்ட்",
+   "சம்மன்",
+   "வக்கீல் நோட்டீஸ்"
+  ],
+  "Electricity bill": [
+   "மின்சாரக் கட்டணம்",
+   "மின்சாரம்",
+   "கரண்ட் பில்",
+   "மின் கட்டணம்"
+  ],
+  "Income tax notice": [
+   "வருமான வரி அறிவிப்பு",
+   "வருமான வரி",
+   "இன்கம் டாக்ஸ்"
+  ],
+  "Property tax notice": [
+   "சொத்து வரி அறிவிப்பு",
+   "சொத்து வரி",
+   "வீட்டு வரி",
+   "பிராப்பர்ட்டி டாக்ஸ்"
+  ],
+  "Something else": [
+   "வேறு ஏதாவது",
+   "வேறு",
+   "தெரியாது"
+  ],
+  "Traffic challan": [
+   "போக்குவரத்து சலான்",
+   "சலான்",
+   "அபராதம்"
+  ],
+  "Water bill": [
+   "தண்ணீர்க் கட்டணம்",
+   "தண்ணீர்",
+   "குடிநீர் வரி"
   ]
  },
  "words": {
