@@ -74,16 +74,34 @@ def ifsc(text: str, **_) -> Result:
     return (True, c, "") if re.fullmatch(r"[A-Z]{4}0[A-Z0-9]{6}", c) else (False, None, "ifsc_invalid")
 
 
-def date(text: str, min_age: int | None = None, max_age: int | None = None, today: dt.date | None = None, **_) -> Result:
+def date(text: str, min_age: int | None = None, max_age: int | None = None, today: dt.date | None = None,
+         future: bool = False, **_) -> Result:
+    """future=True is for dates printed on a paper -- a bill's last date, a hearing date -- which may be ahead of
+    today and are often said without a year ("15 November"): the year is then taken as this year, or next year if
+    that day is more than six months behind us. Birth dates and incident dates keep refusing the future."""
     today = today or dt.date.today()
     parsed = spoken_to_date(text, today)
+    if not parsed and future:
+        parsed = spoken_to_date(f"{text} {today.year}", today)
+        if parsed:
+            try:
+                if (today - dt.date(parsed[2], parsed[1], parsed[0])).days > 183:
+                    parsed = (parsed[0], parsed[1], parsed[2] + 1)
+            except ValueError:
+                return False, None, "date_invalid"
     if not parsed:
         return False, None, "date_invalid"
     d, m, y = parsed
+    if future and y < today.year - 50:             # "15/11/27" was read as 1927; on a bill it means 2027
+        y += 100
     try:
         value = dt.date(y, m, d)
     except ValueError:
         return False, None, "date_invalid"
+    if future:
+        if not (today.year - 5 <= value.year <= today.year + 5):   # a misheard year, not a real last date
+            return False, None, "date_invalid"
+        return True, value.isoformat(), ""
     if value > today:
         return False, None, "date_future"
     age = today.year - value.year - ((today.month, today.day) < (value.month, value.day))
