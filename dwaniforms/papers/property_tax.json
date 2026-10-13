@@ -1,0 +1,37 @@
+{
+ "id": "property_tax",
+ "option": "Property tax notice",
+ "date_role": "pay",
+ "amount": true,
+ "what": {
+  "en": "This is a notice from the municipality or panchayat about tax on your house, shop or land: how much is due and by when.",
+  "hi": "यह नगर निकाय या पंचायत का नोटिस है, आपके घर, दुकान या ज़मीन के टैक्स के बारे में: कितना देना है और कब तक।"
+ },
+ "do": [
+  {
+   "en": "Pay by the last date at the municipal office or on its official website. Paying late usually adds a penalty or interest.",
+   "hi": "आख़िरी तारीख तक नगर निकाय के दफ़्तर में या उसकी अपनी वेबसाइट पर भरिए। देर से भरने पर आमतौर पर जुर्माना या ब्याज लगता है।"
+  },
+  {
+   "en": "Keep the receipt. You may need it later, for example when selling the property.",
+   "hi": "रसीद संभालकर रखिए। बाद में काम आ सकती है, जैसे संपत्ति बेचते समय।"
+  }
+ ],
+ "if_wrong": [
+  {
+   "en": "If the area or the type of building written on the notice is wrong, you can file an objection at the municipal office. The notice usually says by when; do it before that date.",
+   "hi": "अगर नोटिस पर लिखा क्षेत्रफल या मकान का प्रकार ग़लत है, तो नगर निकाय दफ़्तर में आपत्ति दे सकते हैं। नोटिस में आमतौर पर लिखा होता है कि कब तक; उससे पहले दीजिए।"
+  }
+ ],
+ "beware": [
+  {
+   "en": "Pay only to the municipality. Do not give cash to someone who comes to your door without an official receipt.",
+   "hi": "पैसे सिर्फ़ नगर निकाय को दीजिए। घर आए किसी व्यक्ति को बिना सरकारी रसीद के नकद मत दीजिए।"
+  }
+ ],
+ "help": [],
+ "sources": [
+  "State municipal acts (objection to assessment)"
+ ],
+ "last_reviewed": "2026-10-13"
+}

@@ -1,0 +1,33 @@
+{
+ "id": "court_summons",
+ "option": "Court summons or legal notice",
+ "date_role": "appear",
+ "amount": false,
+ "what": {
+  "en": "This is a paper from a court or a lawyer. A court summons gives the date you must appear; a lawyer's notice asks you to do something or reply within a time.",
+  "hi": "यह कोर्ट या वकील का कागज़ है। कोर्ट के समन में वह तारीख होती है जिस दिन आपको हाज़िर होना है; वकील के नोटिस में कुछ करने या तय समय में जवाब देने को कहा जाता है।"
+ },
+ "do": [
+  {
+   "en": "Do not ignore it. Note the court, the case number and the date written on it, and go on that date or send a lawyer.",
+   "hi": "इसे अनदेखा मत कीजिए। कोर्ट का नाम, केस नंबर और लिखी तारीख नोट कीजिए, और उस दिन जाइए या वकील भेजिए।"
+  },
+  {
+   "en": "Free legal help is available from the District Legal Services Authority at your district court, or by calling 15100.",
+   "hi": "ज़िला न्यायालय में ज़िला विधिक सेवा प्राधिकरण से, या 15100 पर फ़ोन करके, मुफ़्त क़ानूनी मदद मिलती है।"
+  }
+ ],
+ "if_wrong": [],
+ "beware": [
+  {
+   "en": "No court, police or CBI officer arrests anyone on a video call, and no one can ask you to pay to avoid arrest. A so-called digital arrest is fraud: cut the call and dial 1930.",
+   "hi": "कोई कोर्ट, पुलिस या सीबीआई अधिकारी वीडियो कॉल पर गिरफ़्तार नहीं करता, और गिरफ़्तारी से बचने के लिए कोई पैसे नहीं माँग सकता। तथाकथित \"डिजिटल अरेस्ट\" धोखा है: फ़ोन काटिए और 1930 पर फ़ोन कीजिए।"
+  }
+ ],
+ "help": [],
+ "sources": [
+  "NALSA free legal aid helpline 15100 (DoT short code)",
+  "I4C advisory on 'digital arrest'"
+ ],
+ "last_reviewed": "2026-10-13"
+}

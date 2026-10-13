@@ -1,0 +1,42 @@
+{
+ "id": "bank_loan",
+ "option": "Bank loan or EMI notice",
+ "date_role": "pay",
+ "amount": true,
+ "what": {
+  "en": "This is a letter from a bank or loan company saying a loan payment (EMI) is overdue.",
+  "hi": "यह बैंक या लोन कंपनी की चिट्ठी है, जिसमें लिखा है कि लोन की किस्त (ईएमआई) बकाया है।"
+ },
+ "do": [
+  {
+   "en": "Go to the branch with your loan papers and ask for a written statement of what is due. If you cannot pay, ask in writing for more time or smaller instalments.",
+   "hi": "लोन के कागज़ लेकर शाखा जाइए और बकाया का लिखित ब्यौरा माँगिए। अगर अभी नहीं भर सकते, तो लिखकर और समय या छोटी किस्तें माँगिए।"
+  },
+  {
+   "en": "Pay only into the loan account, at the branch or through the official app, and keep the receipt.",
+   "hi": "पैसे सिर्फ़ लोन खाते में, शाखा में या कंपनी के अपने ऐप से भरिए, और रसीद रखिए।"
+  }
+ ],
+ "if_wrong": [
+  {
+   "en": "If the amount is wrong or you have already paid, complain to the bank in writing. If the bank does not reply in 30 days, or you are not satisfied, complain to the RBI Ombudsman for free: cms.rbi.org.in or 14448.",
+   "hi": "अगर रकम ग़लत है या आप भर चुके हैं, तो बैंक को लिखित शिकायत दीजिए। बैंक 30 दिन में जवाब न दे, या आप संतुष्ट न हों, तो आरबीआई लोकपाल को मुफ़्त शिकायत कीजिए: cms.rbi.org.in या 14448।"
+  }
+ ],
+ "beware": [
+  {
+   "en": "Recovery agents must not threaten you or use abusive words, and must not call before 8 in the morning or after 7 in the evening. If they do, complain to the bank and, if you are threatened, to the police.",
+   "hi": "वसूली एजेंट आपको धमका नहीं सकते, गाली नहीं दे सकते, और सुबह 8 बजे से पहले या शाम 7 बजे के बाद फ़ोन नहीं कर सकते। ऐसा हो तो बैंक से शिकायत कीजिए, और धमकी मिले तो पुलिस से।"
+  },
+  {
+   "en": "Do not pay cash to an agent without an official receipt.",
+   "hi": "बिना सरकारी रसीद के किसी एजेंट को नकद मत दीजिए।"
+  }
+ ],
+ "help": [],
+ "sources": [
+  "RBI directive on recovery agents, 12 Aug 2022 (no calls before 8 am / after 7 pm)",
+  "RBI Integrated Ombudsman Scheme (cms.rbi.org.in, 14448, free)"
+ ],
+ "last_reviewed": "2026-10-13"
+}

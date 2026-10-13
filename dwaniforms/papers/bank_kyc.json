@@ -1,0 +1,33 @@
+{
+ "id": "bank_kyc",
+ "option": "Bank KYC or account block message",
+ "date_role": null,
+ "amount": false,
+ "what": {
+  "en": "This is a message saying your bank account, card or KYC will be blocked unless you do something now.",
+  "hi": "यह ऐसा मैसेज है जिसमें लिखा है कि अभी कुछ नहीं किया तो आपका बैंक खाता, कार्ड या केवाईसी बंद हो जाएगा।"
+ },
+ "do": [
+  {
+   "en": "Do not click the link or call the number in the message. Go to your branch, or call the number printed in your passbook or on the back of your card, and ask whether anything is really needed.",
+   "hi": "मैसेज का लिंक मत दबाइए और उसमें दिए नंबर पर फ़ोन मत कीजिए। अपनी शाखा जाइए, या पासबुक या कार्ड के पीछे छपे नंबर पर फ़ोन करके पूछिए कि सच में कुछ करना है या नहीं।"
+  }
+ ],
+ "if_wrong": [],
+ "beware": [
+  {
+   "en": "Banks never ask for your OTP, PIN, password or CVV. Anyone who asks is a fraud.",
+   "hi": "बैंक कभी आपका ओटीपी, पिन, पासवर्ड या सीवीवी नहीं माँगता। जो माँगे, वह धोखेबाज़ है।"
+  }
+ ],
+ "help": [
+  {
+   "en": "If money has been taken, call 1930 at once and tell your bank. Reporting quickly can stop the money.",
+   "hi": "अगर पैसे कट गए हैं, तो तुरंत 1930 पर फ़ोन कीजिए और अपने बैंक को बताइए। जल्दी बताने से पैसा रुक सकता है।"
+  }
+ ],
+ "sources": [
+  "I4C / cybercrime.gov.in (1930)"
+ ],
+ "last_reviewed": "2026-10-13"
+}

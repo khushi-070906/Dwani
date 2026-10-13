@@ -1,0 +1,51 @@
+{
+ "id": "electricity_bill",
+ "option": "Electricity bill",
+ "date_role": "pay",
+ "amount": true,
+ "what": {
+  "en": "This is your electricity bill: how much you owe for the power you used, and the last date to pay it.",
+  "hi": "यह आपका बिजली का बिल है: आपने जितनी बिजली इस्तेमाल की उसका पैसा, और भरने की आख़िरी तारीख।"
+ },
+ "do": [
+  {
+   "en": "Pay by the last date at the electricity office, a bank or post office counter, or the company's official app or website.",
+   "hi": "आख़िरी तारीख तक बिजली दफ़्तर, बैंक या डाकघर के काउंटर पर, या कंपनी के अपने ऐप या वेबसाइट से भरिए।"
+  },
+  {
+   "en": "Keep the receipt or the payment message.",
+   "hi": "रसीद या भुगतान का मैसेज संभालकर रखिए।"
+  }
+ ],
+ "if_wrong": [
+  {
+   "en": "If the bill is much higher than usual, compare the meter reading printed on it with your meter.",
+   "hi": "अगर बिल रोज़ से बहुत ज़्यादा है, तो उस पर छपी मीटर रीडिंग को अपने मीटर से मिलाइए।"
+  },
+  {
+   "en": "Give a written complaint at the electricity office and keep a copy with their stamp. If it is not fixed, every electricity company has a Consumer Grievance Redressal Forum.",
+   "hi": "बिजली दफ़्तर में लिखित शिकायत दीजिए और मुहर लगी प्रति अपने पास रखिए। फिर भी ठीक न हो, तो हर बिजली कंपनी में उपभोक्ता शिकायत निवारण फ़ोरम होता है।"
+  }
+ ],
+ "beware": [
+  {
+   "en": "A message or call saying your power will be cut tonight unless you call a number or pay through a link is a common fraud. The electricity company does not do this.",
+   "hi": "\"आज रात बिजली कट जाएगी, इस नंबर पर फ़ोन करो या लिंक से पैसे भरो\" ऐसा मैसेज या फ़ोन आम धोखा है। बिजली कंपनी ऐसा नहीं करती।"
+  },
+  {
+   "en": "Never tell anyone your OTP, PIN or password, not even someone who says they are from the bank or the office.",
+   "hi": "अपना ओटीपी, पिन या पासवर्ड किसी को मत बताइए, उसे भी नहीं जो ख़ुद को बैंक या दफ़्तर का बताए।"
+  }
+ ],
+ "help": [
+  {
+   "en": "If money has been taken from you by fraud, call 1930 at once or report it at cybercrime.gov.in. Reporting quickly can stop the money.",
+   "hi": "अगर धोखे से पैसे कट गए हैं, तो तुरंत 1930 पर फ़ोन कीजिए या cybercrime.gov.in पर शिकायत कीजिए। जल्दी बताने से पैसा रुक सकता है।"
+  }
+ ],
+ "sources": [
+  "Electricity Act 2003, s.42(5) (consumer grievance forums)",
+  "I4C / cybercrime.gov.in (1930)"
+ ],
+ "last_reviewed": "2026-10-13"
+}

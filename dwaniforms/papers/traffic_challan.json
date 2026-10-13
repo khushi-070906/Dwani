@@ -1,0 +1,39 @@
+{
+ "id": "traffic_challan",
+ "option": "Traffic challan",
+ "date_role": "pay",
+ "amount": true,
+ "what": {
+  "en": "This is a fine for breaking a traffic rule, such as riding without a helmet or crossing a red light.",
+  "hi": "यह ट्रैफ़िक नियम तोड़ने का जुर्माना है, जैसे बिना हेलमेट चलाना या लाल बत्ती पार करना।"
+ },
+ "do": [
+  {
+   "en": "Check the challan on the official site echallan.parivahan.gov.in with the challan number or your vehicle number, and pay there or at the traffic police office.",
+   "hi": "चालान को सरकारी साइट echallan.parivahan.gov.in पर चालान नंबर या गाड़ी के नंबर से देखिए, और वहीं या ट्रैफ़िक पुलिस दफ़्तर में भरिए।"
+  }
+ ],
+ "if_wrong": [
+  {
+   "en": "If you think it is wrong, you can dispute it as written on the challan, or at the traffic police office; some cases go to a court or a Lok Adalat.",
+   "hi": "अगर आपको लगता है कि चालान ग़लत है, तो चालान पर लिखे तरीक़े से या ट्रैफ़िक पुलिस दफ़्तर में आपत्ति कर सकते हैं; कुछ मामले कोर्ट या लोक अदालत में जाते हैं।"
+  }
+ ],
+ "beware": [
+  {
+   "en": "Fake challan messages with a link to pay are common. Do not pay through a link in an SMS or WhatsApp; check on the official site first.",
+   "hi": "पैसे भरने के लिंक वाले नक़ली चालान के मैसेज आम हैं। एसएमएस या व्हाट्सऐप के लिंक से पैसे मत भरिए; पहले सरकारी साइट पर जाँचिए।"
+  }
+ ],
+ "help": [
+  {
+   "en": "If money has been taken from you by fraud, call 1930 at once or report it at cybercrime.gov.in. Reporting quickly can stop the money.",
+   "hi": "अगर धोखे से पैसे कट गए हैं, तो तुरंत 1930 पर फ़ोन कीजिए या cybercrime.gov.in पर शिकायत कीजिए। जल्दी बताने से पैसा रुक सकता है।"
+  }
+ ],
+ "sources": [
+  "PIB fact check on fake e-challan messages",
+  "echallan.parivahan.gov.in"
+ ],
+ "last_reviewed": "2026-10-13"
+}

@@ -1,0 +1,39 @@
+{
+ "id": "other",
+ "option": "Something else",
+ "date_role": null,
+ "amount": false,
+ "what": {
+  "en": "I do not know this kind of paper yet.",
+  "hi": "इस तरह के कागज़ के बारे में अभी मुझे जानकारी नहीं है।"
+ },
+ "do": [
+  {
+   "en": "Show it to someone you trust, at the CSC, the panchayat, or the office that sent it, and ask what it asks you to do and by when.",
+   "hi": "इसे किसी भरोसेमंद व्यक्ति को, सीएससी पर, पंचायत में, या भेजने वाले दफ़्तर में दिखाइए, और पूछिए कि इसमें क्या करने को कहा है और कब तक।"
+  },
+  {
+   "en": "If it is about a problem with a government office, you can write a complaint here with 'Public grievance (complaint)'.",
+   "hi": "अगर बात किसी सरकारी दफ़्तर की परेशानी की है, तो यहीं 'शिकायत' वाले फ़ॉर्म से शिकायत लिख सकते हैं।"
+  }
+ ],
+ "if_wrong": [],
+ "beware": [
+  {
+   "en": "Never tell anyone your OTP, PIN or password, not even someone who says they are from the bank or the office.",
+   "hi": "अपना ओटीपी, पिन या पासवर्ड किसी को मत बताइए, उसे भी नहीं जो ख़ुद को बैंक या दफ़्तर का बताए।"
+  },
+  {
+   "en": "Do not pay through a link in a message.",
+   "hi": "किसी मैसेज के लिंक से पैसे मत भरिए।"
+  }
+ ],
+ "help": [
+  {
+   "en": "If money has been taken from you by fraud, call 1930 at once or report it at cybercrime.gov.in. Reporting quickly can stop the money.",
+   "hi": "अगर धोखे से पैसे कट गए हैं, तो तुरंत 1930 पर फ़ोन कीजिए या cybercrime.gov.in पर शिकायत कीजिए। जल्दी बताने से पैसा रुक सकता है।"
+  }
+ ],
+ "sources": [],
+ "last_reviewed": "2026-10-13"
+}

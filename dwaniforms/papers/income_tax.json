@@ -1,0 +1,36 @@
+{
+ "id": "income_tax",
+ "option": "Income tax notice",
+ "date_role": "reply",
+ "amount": true,
+ "what": {
+  "en": "This is a notice from the Income Tax Department, usually asking you to file a return, explain a difference in your income details, or pay tax that is due.",
+  "hi": "यह आयकर विभाग का नोटिस है, जो आमतौर पर रिटर्न भरने, आय के ब्यौरे में अंतर समझाने, या बकाया टैक्स भरने को कहता है।"
+ },
+ "do": [
+  {
+   "en": "Log in at incometax.gov.in, or ask a tax helper, to see the notice and reply by the date given.",
+   "hi": "incometax.gov.in पर लॉग इन करके, या किसी टैक्स जानकार की मदद से, नोटिस देखिए और दी गई तारीख तक जवाब दीजिए।"
+  },
+  {
+   "en": "Every genuine notice has a Document Identification Number (DIN). You can check it on incometax.gov.in under 'Authenticate notice/order issued by ITD'.",
+   "hi": "हर असली नोटिस पर दस्तावेज़ पहचान संख्या (डीआईएन) होती है। उसे incometax.gov.in पर 'Authenticate notice/order issued by ITD' में जाँच सकते हैं।"
+  }
+ ],
+ "if_wrong": [],
+ "beware": [
+  {
+   "en": "The department does not ask for payment through links in SMS or phone calls. Pay only through the official portal.",
+   "hi": "विभाग एसएमएस या फ़ोन के लिंक से पैसे नहीं माँगता। सिर्फ़ सरकारी पोर्टल से भरिए।"
+  },
+  {
+   "en": "Never tell anyone your OTP, PIN or password, not even someone who says they are from the bank or the office.",
+   "hi": "अपना ओटीपी, पिन या पासवर्ड किसी को मत बताइए, उसे भी नहीं जो ख़ुद को बैंक या दफ़्तर का बताए।"
+  }
+ ],
+ "help": [],
+ "sources": [
+  "CBDT circular 19/2019 (DIN on every communication); e-filing portal 'Authenticate notice'"
+ ],
+ "last_reviewed": "2026-10-13"
+}

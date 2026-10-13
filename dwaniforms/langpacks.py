@@ -11,7 +11,8 @@ A pack is plain data so that a reviewer who doesn't code can correct it. Shape (
     lang, name, speech (BCP-47 tag for speech recognition / voices), status (draft | reviewed), reviewed_by
     messages   {key: text}            same keys and {placeholders} as messages.MESSAGES["en"]
     ui         {key: text}            screen text, same keys as the English UI table in static/app.html
-    text       {English: text}        every question, label, title, description, scheme line and next step,
+    text       {English: text}        every question, label, title, description, scheme line, paper explanation
+                                      (papers/*.json) and next step,
                                       keyed by the English original (so a changed English sentence shows up as missing)
     options    {value: [spoken forms]} the first is the name shown and read back for that option
     words      yes, no, skip, skip_phrases, benign_negations, digits {word: 0-10}, scales {word: 100|1000|...},
@@ -145,7 +146,7 @@ def required_text() -> set[str]:
         elif isinstance(x, list):
             for v in x:
                 walk(v)
-    for p in base.glob("schemes/*.json"):
+    for p in [*base.glob("schemes/*.json"), *base.glob("papers/*.json")]:
         walk(json.loads(p.read_text(encoding="utf-8")))
     from . import outcomes
     need.update(outcomes.NEXT_STEPS_EN)

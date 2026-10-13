@@ -1,0 +1,46 @@
+{
+ "id": "water_bill",
+ "option": "Water bill",
+ "date_role": "pay",
+ "amount": true,
+ "what": {
+  "en": "This is your water bill from the water board or the municipality: the amount you owe and the last date to pay.",
+  "hi": "यह जल बोर्ड या नगर निकाय का पानी का बिल है: कितना पैसा देना है और भरने की आख़िरी तारीख।"
+ },
+ "do": [
+  {
+   "en": "Pay by the last date at the water board or municipal office, or on its official website or app.",
+   "hi": "आख़िरी तारीख तक जल बोर्ड या नगर निकाय के दफ़्तर में, या उसकी अपनी वेबसाइट या ऐप से भरिए।"
+  },
+  {
+   "en": "Keep the receipt or the payment message.",
+   "hi": "रसीद या भुगतान का मैसेज संभालकर रखिए।"
+  }
+ ],
+ "if_wrong": [
+  {
+   "en": "If the amount looks wrong, or you were charged when there was no supply, give a written complaint at the office and keep a copy with their stamp.",
+   "hi": "अगर रकम ग़लत लगे, या पानी आया ही नहीं फिर भी पैसा लगा, तो दफ़्तर में लिखित शिकायत दीजिए और मुहर लगी प्रति अपने पास रखिए।"
+  }
+ ],
+ "beware": [
+  {
+   "en": "Pay only at the office or through its official website or app, not through a link someone sends you.",
+   "hi": "पैसे सिर्फ़ दफ़्तर में या उसकी अपनी वेबसाइट या ऐप से भरिए, किसी के भेजे लिंक से नहीं।"
+  },
+  {
+   "en": "Never tell anyone your OTP, PIN or password, not even someone who says they are from the bank or the office.",
+   "hi": "अपना ओटीपी, पिन या पासवर्ड किसी को मत बताइए, उसे भी नहीं जो ख़ुद को बैंक या दफ़्तर का बताए।"
+  }
+ ],
+ "help": [
+  {
+   "en": "If money has been taken from you by fraud, call 1930 at once or report it at cybercrime.gov.in. Reporting quickly can stop the money.",
+   "hi": "अगर धोखे से पैसे कट गए हैं, तो तुरंत 1930 पर फ़ोन कीजिए या cybercrime.gov.in पर शिकायत कीजिए। जल्दी बताने से पैसा रुक सकता है।"
+  }
+ ],
+ "sources": [
+  "I4C / cybercrime.gov.in (1930)"
+ ],
+ "last_reviewed": "2026-10-13"
+}
