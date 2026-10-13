@@ -21,7 +21,10 @@
   :root {
     --forest: #1F5E4D; --forest-2: #2B7562; --forest-soft: #E3EEE8; --navy: #1E2A44; --navy-2: #2C3B5C;
     --sage: #EEF0EA; --sage-2: #E5E8E0; --card: #FFFFFF; --line: #DCDFD6; --line-2: #C9CEC2;
-    --ink: #1E2A44; --ink-2: #4A5468; --ink-3: #6B7385;
+    /* --ink-3 is the small grey text (question counts, step names, breadcrumb). At 13px #6B7385 was 4.14:1 on the
+       page background -- below the 4.5:1 a reader with ageing eyes needs. #60687A clears 4.5 on every background
+       this page uses (page, card, tinted card, amber note). */
+    --ink: #1E2A44; --ink-2: #4A5468; --ink-3: #60687A;
     --amber: #FBF1DC; --amber-line: #E9CF95; --amber-ink: #7A5410;
     --ok: #E3EFE7; --ok-ink: #1F5E4D; --bad: #F8E3E1; --bad-ink: #9B2C2C; --spark: #D9772B; --pen: #2449A6;
     --serif: "Source Serif 4", "Noto Serif Devanagari", "Mukta", Georgia, serif;
@@ -38,6 +41,8 @@
   [hidden] { display: none !important; }
   .wrap { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
   .muted { color: var(--ink-3); }
+  /* The privacy link sits in running text; the words stay the size they are, the tappable box around them grows. */
+  .sagecard a, footer.foot a { display: inline-block; padding: .55rem 0; min-height: 44px; }
   .kicker { font: 700 .72rem var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--forest); }
   /* Spacing letters apart breaks Indic conjuncts (விண்ணப்பம் -> வி ண் ண ப்...): only Latin text gets it */
   html:not([lang="en"]) .kicker, html:not([lang="en"]) .assist .who b { letter-spacing: 0; font-size: .8rem; }
@@ -58,7 +63,10 @@
   .word b span { font: 600 1.3rem var(--serif); color: var(--navy); margin-left: .1rem; }
   .word small { font-size: .72rem; color: var(--ink-3); }
   .tools { display: flex; align-items: center; gap: .5rem; }
-  .tools select, .tbtn { font: 700 .88rem var(--sans); border: 1px solid var(--line-2); background: var(--card); color: var(--navy); border-radius: 8px; padding: .4rem .65rem; }
+  /* Every control a shaky hand has to hit is at least 44px tall -- the size a finger can land on reliably. */
+  .tools select, .tbtn { font: 700 .88rem var(--sans); border: 1px solid var(--line-2); background: var(--card); color: var(--navy); border-radius: 8px; padding: .4rem .65rem; min-height: 44px; }
+  .tbtn { min-width: 44px; }
+  .brand { min-height: 44px; }
   .tbtn[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
 
   /* ---------- cards / rows / buttons ---------- */
@@ -87,15 +95,17 @@
   .row[disabled] { opacity: .5; cursor: default; }
   .row .ri { width: 42px; height: 42px; border-radius: 50%; background: var(--forest-soft); color: var(--forest); display: grid; place-items: center; font-size: 1.15rem; flex: none; }
   .groups { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem 2.2rem; }
-  .group h4 { margin: 1rem 0 .2rem; font: 700 .82rem var(--sans); color: var(--ink-3); }
+  .group h3 { margin: 1rem 0 .2rem; font: 700 .82rem var(--sans); color: var(--ink-3); }
   .mini { display: block; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: .55rem 0; }
   .mini b { display: block; font-size: .95rem; color: var(--navy); }
   .mini span { font-size: .8rem; color: var(--ink-3); }
   .mini:hover:not([disabled]) b { color: var(--forest); text-decoration: underline; }
   .mini[disabled] { opacity: .5; cursor: default; }
   .layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 1.6rem; align-items: start; padding: 1.8rem 0 3rem; }
-  .crumbs { font-size: .82rem; color: var(--ink-3); margin-bottom: .4rem; }
-  .crumbs button { background: none; border: 0; padding: 0; color: var(--forest); font-weight: 700; }
+  .crumbs { font-size: .82rem; color: var(--ink-3); margin-bottom: .4rem; display: flex; align-items: center; gap: .3rem; }
+  /* "Home" is how people go back. It was 17x21: too small to hit, so they pressed the browser's back button and
+     lost the form. The text stays small; the target around it does not. */
+  .crumbs button { background: none; border: 0; color: var(--forest); font-weight: 700; padding: .55rem .5rem; margin-left: -.5rem; min-height: 44px; }
   ol.how { margin: .2rem 0 0; padding-left: 1.1rem; color: var(--ink-2); font-size: .9rem; }
   ol.how li { margin: .25rem 0; }
   .pill { display: inline-block; border-radius: 999px; padding: .08rem .6rem; font-size: .74rem; font-weight: 700; }
@@ -266,17 +276,17 @@
 <body>
 <header class="top">
   <div class="wrap">
-    <button class="brand" id="home-link" type="button" aria-label="DwaniForms home">
+    <button class="brand" id="home-link" type="button" data-ta="a11y_home" aria-label="DwaniForms home">
       <span class="seal" aria-hidden="true">ध</span>
       <span class="word"><b lang="hi">ध्वनि<span lang="en">Forms</span></b><small data-t="tagline">बोलकर फ़ॉर्म भरें</small></span>
     </button>
     <div class="tools">
-      <select id="lang" aria-label="Language / भाषा">
+      <select id="lang" data-ta="a11y_lang" aria-label="Language / भाषा">
         <option value="hi">हिन्दी</option><option value="en">English</option><option value="bn">বাংলা</option><option value="ta">தமிழ்</option>
         <option value="te">తెలుగు</option><option value="mr">मराठी</option><option value="gu">ગુજરાતી</option><option value="kn">ಕನ್ನಡ</option>
         <option value="ml">മലയാളം</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option>
       </select>
-      <button class="tbtn no-print" id="big-btn" type="button" aria-pressed="false" aria-label="Bigger text">A+</button>
+      <button class="tbtn no-print" id="big-btn" type="button" aria-pressed="false" data-ta="a11y_bigger" aria-label="Bigger text">A+</button>
     </div>
   </div>
 </header>
@@ -353,14 +363,14 @@
           <button class="no" type="button" id="btn-no" data-t="no">No</button>
         </div>
         <div class="micwrap">
-          <button class="mic" id="mic" type="button" aria-label="Speak" disabled>🎤</button>
+          <button class="mic" id="mic" type="button" aria-pressed="false" data-ta="tap" aria-label="Speak" disabled>🎤</button>
           <div style="flex:1;min-width:0">
             <div class="wave" id="wave" aria-hidden="true"></div>
             <div class="mic-label" id="mic-label" data-t="tap">Tap the mic and speak; tap again when done</div>
           </div>
         </div>
         <form class="type" id="type-form">
-          <input id="type-input" autocomplete="off" aria-label="Type the answer" data-tp="type_ph" placeholder="Or type your answer">
+          <input id="type-input" autocomplete="off" data-ta="type_ph" aria-label="Type the answer" data-tp="type_ph" placeholder="Or type your answer">
           <button class="btn" type="submit" data-t="send">Send</button>
         </form>
         <div id="status" role="status"></div>
@@ -448,7 +458,7 @@
   var B = location.pathname.replace(/\/$/, "");
   var $ = function (id) { return document.getElementById(id); };
   var UI = {
-    hi: { install: "फ़ोन में लगाएँ", tagline: "बोलकर फ़ॉर्म भरें", hello: "नमस्ते", welcome_kicker: "सरकारी फ़ॉर्म, बोलकर", chip1: "बोलकर या लिखकर", chip2: "हर जवाब की जाँच", chip3: "30 मिनट बाद मिट जाता है", hello_sub: "आज क्या करना है? नीचे से चुनिए, फिर बोलकर या लिखकर जवाब दीजिए। हर जवाब फ़ॉर्म पर जाने से पहले आपको पढ़कर सुनाया जाएगा।",
+    hi: { a11y_home: "ध्वनिForms होम", a11y_bigger: "अक्षर बड़े करें", a11y_lang: "भाषा चुनें", install: "फ़ोन में लगाएँ", tagline: "बोलकर फ़ॉर्म भरें", hello: "नमस्ते", welcome_kicker: "सरकारी फ़ॉर्म, बोलकर", chip1: "बोलकर या लिखकर", chip2: "हर जवाब की जाँच", chip3: "30 मिनट बाद मिट जाता है", hello_sub: "आज क्या करना है? नीचे से चुनिए, फिर बोलकर या लिखकर जवाब दीजिए। हर जवाब फ़ॉर्म पर जाने से पहले आपको पढ़कर सुनाया जाएगा।",
       most: "सबसे ज़्यादा किए जाने वाले काम", everything: "बाकी सब", how_title: "कैसे काम करता है", how1: "फ़ॉर्म चुनिए। सवाल एक-एक करके आएँगे।",
       how2: "माइक दबाकर बोलिए, या लिखिए। हर जवाब पढ़कर सुनाया जाएगा: \"क्या यह सही है?\"", how3: "आख़िर में भरा हुआ फ़ॉर्म या पत्र डाउनलोड या प्रिंट कीजिए।",
       data_title: "आपकी जानकारी", data_body: "जवाब सिर्फ़ इस सेशन तक रहते हैं और 30 मिनट बाद मिट जाते हैं। आधार और खाता नंबर छिपे हुए दिखते हैं।", privacy_link: "निजता नीति",
@@ -486,7 +496,7 @@
   };
   var EN = { next_advisor: "Tap 'Fill this form' next to a scheme: some of your answers will already be filled in. The department makes the final decision.",
     next_lookup: "This comes from a saved copy of the records. For anything important, also check the official portal.",
-    install: "Add to phone", tagline: "Fill forms by speaking", hello: "Namaste", unavailable: "Not available yet", questions: "questions", g_forms: "Government forms",
+    a11y_home: "DwaniForms home", a11y_bigger: "Bigger text", a11y_lang: "Choose a language", install: "Add to phone", tagline: "Fill forms by speaking", hello: "Namaste", unavailable: "Not available yet", questions: "questions", g_forms: "Government forms",
     g_voice: "Complaints and RTI", g_records: "Look up records", g_schemes: "Schemes", advisor_title: "Which schemes can I get?",
     advisor_desc: "A few questions, then the schemes and forms for you", step: "Question", of: "of", redo: "Change", review: "check",
     pencil: "In pencil: say 'yes' to confirm", inked: "confirmed", listening: "Listening… tap again when you're done", working: "Understanding…",
@@ -531,6 +541,18 @@
       if (!el.dataset.enp) el.dataset.enp = el.placeholder;
       el.placeholder = (UI[lang] && UI[lang][el.dataset.tp]) || el.dataset.enp;
     });
+    // What a screen reader announces for a control with no visible words of its own. Without this a blind Tamil
+    // speaker hears the questions in Tamil and the buttons in English.
+    document.querySelectorAll("[data-ta]").forEach(function (el) {
+      if (!el.dataset.ena) el.dataset.ena = el.getAttribute("aria-label") || "";
+      el.setAttribute("aria-label", (UI[lang] && UI[lang][el.dataset.ta]) || el.dataset.ena);
+    });
+  }
+  // The mic is a toggle: say so, and say which way it is turned, not just paint it orange.
+  function micState(on) {
+    var m = $("mic");
+    m.setAttribute("aria-pressed", String(!!on));
+    m.setAttribute("aria-label", t(on ? "listening" : "tap"));
   }
   function api(path, opt) {
     opt = opt || {};
@@ -643,7 +665,8 @@
     groups.forEach(function (g) {
       var items = all.filter(g[1]); if (!items.length) return;
       var d = document.createElement("div"); d.className = "group";
-      var h = document.createElement("h4"); h.textContent = t(g[0]); d.appendChild(h);
+      // h3, not h4: these sit under the "Everything else" h2, and a screen reader reads a skipped level as a gap
+      var h = document.createElement("h3"); h.textContent = t(g[0]); d.appendChild(h);
       items.forEach(function (f) { d.appendChild(rowBtn(f, "mini")); });
       ag.appendChild(d);
     });
@@ -707,6 +730,8 @@
       var n = +s.dataset.step;
       s.className = "s" + (n < step ? " done" : n === step ? " on" : "");
       s.querySelector("i").textContent = n < step ? "✓" : n;
+      // which of the three steps we are on, for a reader that cannot see the dark circle
+      if (n === step) s.setAttribute("aria-current", "step"); else s.removeAttribute("aria-current");
     });
   }
   function render(r) {
@@ -952,13 +977,13 @@
     var cap = setTimeout(function () { if (recog) recog.stop(); }, 15000);   // never keep listening: 15 s at most
     recog.onend = function () {
       clearTimeout(cap);
-      recog = null; $("mic").classList.remove("rec"); waveOn(false); $("mic-label").textContent = t("tap");
+      recog = null; $("mic").classList.remove("rec"); waveOn(false); $("mic-label").textContent = t("tap"); micState(false);
       if (finalText.trim()) send(finalText.trim());
     };
     recog.start();
-    $("mic").classList.add("rec"); waveOn(true); $("mic-label").textContent = t("listening");
+    $("mic").classList.add("rec"); waveOn(true); $("mic-label").textContent = t("listening"); micState(true);
   }
-  function stopListening() { if (recog) { try { recog.abort(); } catch (e) {} recog = null; } if (rec) stopRec(true); $("mic").classList.remove("rec"); waveOn(false); }
+  function stopListening() { if (recog) { try { recog.abort(); } catch (e) {} recog = null; } if (rec) stopRec(true); $("mic").classList.remove("rec"); waveOn(false); micState(false); }
 
   var WORKLET = "class R extends AudioWorkletProcessor{process(i){const c=i[0]&&i[0][0];if(c)this.port.postMessage(c.slice(0));return true}}registerProcessor('dwani-rec',R)";
   var rec = null, want = false;
@@ -987,7 +1012,7 @@
             node.onaudioprocess = function (ev) { chunks.push(new Float32Array(ev.inputBuffer.getChannelData(0))); }; return node; })());
       return setup.then(function (node) {
         src.connect(node); node.connect(sink); rec = { ctx: ctx, stream: stream, node: node, chunks: chunks };
-        $("mic").classList.add("rec"); waveOn(true); $("mic-label").textContent = t("listening");
+        $("mic").classList.add("rec"); waveOn(true); $("mic-label").textContent = t("listening"); micState(true);
         if (!want) stopRec();
       });
     }).catch(function (err) { want = false; $("status").textContent = t("mic_denied") + ": " + err.message; });
@@ -997,7 +1022,7 @@
     var r = rec; rec = null;
     r.node.disconnect(); r.stream.getTracks().forEach(function (tr) { tr.stop(); });
     var rate = r.ctx.sampleRate; r.ctx.close();
-    $("mic").classList.remove("rec"); waveOn(false); $("mic-label").textContent = t("tap");
+    $("mic").classList.remove("rec"); waveOn(false); $("mic-label").textContent = t("tap"); micState(false);
     if (discard) return;
     var pcm = toPCM16(r.chunks, rate); if (pcm.length < 4800) return;
     $("mic").disabled = true; $("status").textContent = t("working");
