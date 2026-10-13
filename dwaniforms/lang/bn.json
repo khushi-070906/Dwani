@@ -51,7 +51,15 @@
   "fix_which": "কোনটা বদলাতে হবে? এগুলোর মধ্যে একটা বলুন:",
   "khasra_invalid": "খসরা নম্বর বুঝতে পারিনি। এভাবে বলুন: একশো পঁয়তাল্লিশ বাই দুই।",
   "ration_invalid": "রেশন কার্ড নম্বর বুঝতে পারিনি। ধীরে ধীরে আবার বলুন।",
-  "unit_acres": "জমির পরিমাণ একরে বলুন। বিঘা, কাঠা রাজ্য ভেদে আলাদা হয়।"
+  "unit_acres": "জমির পরিমাণ একরে বলুন। বিঘা, কাঠা রাজ্য ভেদে আলাদা হয়।",
+  "outcome_rti_appeal": "আপনার প্রথম আপিল স্ক্রিনে তৈরি। এটি প্রিন্ট করে সই করুন এবং আপনার কাগজপত্রের কপি সহ পাঠান।",
+  "rti_appeal_early": "অফিসের কাছে {date} পর্যন্ত উত্তর দেওয়ার সময় আছে। তার মধ্যে উত্তর না এলে, সেই তারিখের পরে এই আপিল পাঠান।",
+  "rti_appeal_late": "৩০ দিনের বেশি পেরিয়ে গেছে, তাই আপিল দেরিতে হচ্ছে। ফাঁকা জায়গায় দেরির কারণ লিখুন; আধিকারিক তবুও এটি গ্রহণ করতে পারেন।",
+  "outcome_explain": "এই কাগজের মানে এটা। সব কিছু স্ক্রিনেও লেখা আছে।",
+  "explain_ahead": "কাগজে লেখা তারিখ {date}, আজ থেকে {days} দিন পরে।",
+  "explain_today": "কাগজে লেখা তারিখ আজকের।",
+  "explain_passed": "কাগজে লেখা তারিখ, {date}, পেরিয়ে গেছে। আজই অফিসে গিয়ে জিজ্ঞেস করুন এখন কী করতে হবে।",
+  "explain_disclaimer": "এটি সাধারণ তথ্য, আইনি পরামর্শ নয়। কিছু করার আগে কাগজটি নিজে পড়ুন, বা অফিসে জিজ্ঞেস করুন।"
  },
  "ui": {
   "a11y_bigger": "বড় অক্ষর",
@@ -172,7 +180,21 @@
   "why_maybe": "কেন 'যাচাই দরকার'",
   "working": "বুঝছি…",
   "yes": "✓ হ্যাঁ, ঠিক",
-  "yes_word": "হ্যাঁ"
+  "yes_word": "হ্যাঁ",
+  "ex_amount": "টাকার পরিমাণ",
+  "ex_beware": "প্রতারণা থেকে সাবধান",
+  "ex_date": "কাগজে লেখা তারিখ",
+  "ex_do": "কী করবেন",
+  "ex_help": "যদি প্রতারণা হয়ে থাকে",
+  "ex_left": "দিন বাকি",
+  "ex_note": "সাধারণ তথ্য, আইনি পরামর্শ নয়। যাচাই করা হয়েছে:",
+  "ex_passed": "এই তারিখ পেরিয়ে গেছে",
+  "ex_today": "এই তারিখ আজ",
+  "ex_what": "এটা কী",
+  "ex_wrong": "যদি এতে কিছু ভুল থাকে",
+  "g_explain": "কাগজ বুঝুন",
+  "k_explain": "কাগজের মানে",
+  "next_explain": "কাগজটি যত্ন করে রাখুন। কোনো অফিস আপনার সঙ্গে অন্যায় করে থাকলে, হোম পেজ থেকে অভিযোগ লিখতে পারেন।"
  },
  "text": {
   "Bank KYC": "ব্যাঙ্ক কেওয়াইসি",
@@ -400,7 +422,74 @@
   "Keep the acknowledgement / registration number you are given.": "যে প্রাপ্তিস্বীকার / নথিভুক্তি নম্বর পাবেন সেটা যত্ন করে রাখুন।",
   "Send it to the Public Information Officer of the department by post or by hand, with the fee (unless BPL).": "এটা দপ্তরের জন তথ্য আধিকারিকের কাছে ডাকে বা হাতে, ফি সহ পাঠান (বিপিএল হলে ফি লাগবে না)।",
   "For central ministries and departments you can also file online at rtionline.gov.in; many states have their own RTI portals.": "কেন্দ্রীয় মন্ত্রক ও দপ্তরের জন্য rtionline.gov.in-এ অনলাইনেও আবেদন করা যায়; অনেক রাজ্যের নিজস্ব আরটিআই পোর্টাল আছে।",
-  "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can file a first appeal.": "জন তথ্য আধিকারিককে ৩০ দিনের মধ্যে উত্তর দিতে হয় (কারও জীবন বা স্বাধীনতার প্রশ্ন হলে ৪৮ ঘণ্টায়)। না পেলে প্রথম আপিল করতে পারেন।"
+  "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can file a first appeal.": "জন তথ্য আধিকারিককে ৩০ দিনের মধ্যে উত্তর দিতে হয় (কারও জীবন বা স্বাধীনতার প্রশ্ন হলে ৪৮ ঘণ্টায়)। না পেলে প্রথম আপিল করতে পারেন।",
+  "RTI first appeal": "আরটিআই প্রথম আপিল",
+  "No reply to your RTI in 30 days, or an incomplete one? The first appeal is drafted for you.": "৩০ দিনে আপনার আরটিআই-এর উত্তর আসেনি, বা অসম্পূর্ণ এসেছে? প্রথম আপিল আপনার জন্য তৈরি হবে।",
+  "Which department did you send your RTI application to?": "আপনি আরটিআই আবেদন কোন বিভাগে পাঠিয়েছিলেন?",
+  "On which date did you send the RTI application?": "আরটিআই আবেদন কোন তারিখে পাঠিয়েছিলেন?",
+  "Date of RTI application": "আরটিআই আবেদনের তারিখ",
+  "In short, what information had you asked for?": "সংক্ষেপে, আপনি কী তথ্য চেয়েছিলেন?",
+  "Information asked for": "চাওয়া তথ্য",
+  "Did you get a reply from the office? Say: no reply, or reply received.": "অফিস থেকে কি উত্তর এসেছে? বলুন: উত্তর আসেনি, অথবা উত্তর এসেছে।",
+  "Reply from the PIO": "জন তথ্য আধিকারিকের উত্তর",
+  "On which date did you get the reply?": "উত্তর কোন তারিখে পেয়েছিলেন?",
+  "Date of reply": "উত্তরের তারিখ",
+  "What is wrong with the reply? For example: information is missing, or it was refused without a reason.": "উত্তরে কী সমস্যা? যেমন: তথ্য অসম্পূর্ণ, বা কোনো কারণ ছাড়াই না বলা হয়েছে।",
+  "Why the reply is not acceptable": "উত্তর কেন গ্রহণযোগ্য নয়",
+  "Send it to the First Appellate Authority: the officer senior to the Public Information Officer in the same department. Attach copies of your RTI application and of the reply, if any.": "এটি প্রথম আপিল কর্তৃপক্ষকে পাঠান: একই বিভাগে জন তথ্য আধিকারিকের ঊর্ধ্বতন আধিকারিক। আরটিআই আবেদন এবং উত্তরের (যদি এসে থাকে) কপি সঙ্গে দিন।",
+  "Central government departments charge no fee for a first appeal; some states do, so check your state's rules.": "কেন্দ্রীয় সরকারের বিভাগ প্রথম আপিলের জন্য কোনো ফি নেয় না; কিছু রাজ্য নেয়, তাই আপনার রাজ্যের নিয়ম দেখে নিন।",
+  "The appeal must be decided within 30 days, 45 at most. If you are still not satisfied, you can make a second appeal to the Information Commission within 90 days.": "আপিলের সিদ্ধান্ত ৩০ দিনের মধ্যে, বড়জোর ৪৫ দিনে হতে হবে। তবুও সন্তুষ্ট না হলে ৯০ দিনের মধ্যে তথ্য কমিশনে দ্বিতীয় আপিল করতে পারেন।",
+  "A message or call saying your power will be cut tonight unless you call a number or pay through a link is a common fraud. The electricity company does not do this.": "\"আজ রাতে বিদ্যুৎ কেটে যাবে, এই নম্বরে ফোন করুন বা লিঙ্কে টাকা দিন\" এমন মেসেজ বা ফোন সাধারণ প্রতারণা। বিদ্যুৎ সংস্থা এমন করে না।",
+  "Amount (Rs.)": "টাকার পরিমাণ (টাকা)",
+  "Banks never ask for your OTP, PIN, password or CVV. Anyone who asks is a fraud.": "ব্যাংক কখনও আপনার ওটিপি, পিন, পাসওয়ার্ড বা সিভিভি চায় না। যে চায়, সে প্রতারক।",
+  "Check the challan on the official site echallan.parivahan.gov.in with the challan number or your vehicle number, and pay there or at the traffic police office.": "সরকারি সাইট echallan.parivahan.gov.in-এ চালান নম্বর বা গাড়ির নম্বর দিয়ে চালান দেখুন, এবং সেখানে বা ট্রাফিক পুলিশ অফিসে জমা দিন।",
+  "Date on the paper": "কাগজে লেখা তারিখ",
+  "Do not click the link or call the number in the message. Go to your branch, or call the number printed in your passbook or on the back of your card, and ask whether anything is really needed.": "মেসেজের লিঙ্কে চাপ দেবেন না এবং তার নম্বরে ফোন করবেন না। নিজের শাখায় যান, বা পাসবই বা কার্ডের পিছনে ছাপা নম্বরে ফোন করে জিজ্ঞেস করুন সত্যিই কিছু করতে হবে কি না।",
+  "Do not ignore it. Note the court, the case number and the date written on it, and go on that date or send a lawyer.": "এটি উপেক্ষা করবেন না। আদালতের নাম, মামলার নম্বর আর লেখা তারিখ লিখে রাখুন, এবং সেদিন যান বা উকিল পাঠান।",
+  "Do not pay cash to an agent without an official receipt.": "সরকারি রসিদ ছাড়া কোনো এজেন্টকে নগদ টাকা দেবেন না।",
+  "Do not pay through a link in a message.": "কোনো মেসেজের লিঙ্ক থেকে টাকা দেবেন না।",
+  "Every genuine notice has a Document Identification Number (DIN). You can check it on incometax.gov.in under 'Authenticate notice/order issued by ITD'.": "প্রতিটি আসল নোটিসে একটি ডকুমেন্ট আইডেন্টিফিকেশন নম্বর (ডিআইএন) থাকে। incometax.gov.in-এ 'Authenticate notice/order issued by ITD'-এ গিয়ে এটি যাচাই করতে পারেন।",
+  "Fake challan messages with a link to pay are common. Do not pay through a link in an SMS or WhatsApp; check on the official site first.": "টাকা দেওয়ার লিঙ্ক সহ নকল চালানের মেসেজ প্রায়ই আসে। এসএমএস বা হোয়াটসঅ্যাপের লিঙ্ক থেকে টাকা দেবেন না; আগে সরকারি সাইটে দেখে নিন।",
+  "Free legal help is available from the District Legal Services Authority at your district court, or by calling 15100.": "জেলা আদালতে জেলা আইনি পরিষেবা কর্তৃপক্ষে, বা 15100 নম্বরে ফোন করে, বিনামূল্যে আইনি সাহায্য পাওয়া যায়।",
+  "Give a written complaint at the electricity office and keep a copy with their stamp. If it is not fixed, every electricity company has a Consumer Grievance Redressal Forum.": "বিদ্যুৎ অফিসে লিখিত অভিযোগ দিন এবং সিলমোহর দেওয়া কপি নিজের কাছে রাখুন। তবুও ঠিক না হলে, প্রতিটি বিদ্যুৎ সংস্থায় গ্রাহক অভিযোগ নিষ্পত্তি ফোরাম আছে।",
+  "Go to the branch with your loan papers and ask for a written statement of what is due. If you cannot pay, ask in writing for more time or smaller instalments.": "ঋণের কাগজপত্র নিয়ে শাখায় যান এবং বকেয়ার লিখিত হিসাব চান। এখন দিতে না পারলে, লিখিতভাবে আরও সময় বা ছোট কিস্তি চান।",
+  "How much money does it ask for, in rupees? Or say skip.": "এতে কত টাকা চাওয়া হয়েছে? অথবা বলুন বাদ দিন।",
+  "I do not know this kind of paper yet.": "এই ধরনের কাগজ সম্পর্কে এখনও আমার জানা নেই।",
+  "If it is about a problem with a government office, you can write a complaint here with 'Public grievance (complaint)'.": "যদি কোনো সরকারি অফিসের সমস্যা নিয়ে হয়, তাহলে এখানেই 'জন অভিযোগ (নালিশ)' দিয়ে অভিযোগ লিখতে পারেন।",
+  "If money has been taken from you by fraud, call 1930 at once or report it at cybercrime.gov.in. Reporting quickly can stop the money.": "প্রতারণা করে টাকা নেওয়া হলে, এখনই 1930-এ ফোন করুন বা cybercrime.gov.in-এ অভিযোগ করুন। তাড়াতাড়ি জানালে টাকা আটকানো যেতে পারে।",
+  "If money has been taken, call 1930 at once and tell your bank. Reporting quickly can stop the money.": "টাকা কেটে নেওয়া হলে, এখনই 1930-এ ফোন করুন এবং আপনার ব্যাংককে জানান। তাড়াতাড়ি জানালে টাকা আটকানো যেতে পারে।",
+  "If the amount is wrong or you have already paid, complain to the bank in writing. If the bank does not reply in 30 days, or you are not satisfied, complain to the RBI Ombudsman for free: cms.rbi.org.in or 14448.": "টাকার পরিমাণ ভুল হলে বা আপনি আগেই দিয়ে থাকলে, ব্যাংককে লিখিত অভিযোগ দিন। ব্যাংক 30 দিনে উত্তর না দিলে, বা আপনি সন্তুষ্ট না হলে, আরবিআই ওমবাডসম্যানের কাছে বিনামূল্যে অভিযোগ করুন: cms.rbi.org.in বা 14448।",
+  "If the amount looks wrong, or you were charged when there was no supply, give a written complaint at the office and keep a copy with their stamp.": "টাকার পরিমাণ ভুল মনে হলে, বা জল না এলেও টাকা ধরা হলে, অফিসে লিখিত অভিযোগ দিন এবং সিলমোহর দেওয়া কপি নিজের কাছে রাখুন।",
+  "If the area or the type of building written on the notice is wrong, you can file an objection at the municipal office. The notice usually says by when; do it before that date.": "নোটিসে লেখা জমির মাপ বা বাড়ির ধরন ভুল হলে, পুরসভা অফিসে আপত্তি জানাতে পারেন। নোটিসে সাধারণত লেখা থাকে কবে পর্যন্ত; তার আগেই করুন।",
+  "If the bill is much higher than usual, compare the meter reading printed on it with your meter.": "বিল যদি স্বাভাবিকের চেয়ে অনেক বেশি হয়, তাতে ছাপা মিটার রিডিং আপনার মিটারের সঙ্গে মিলিয়ে দেখুন।",
+  "If you think it is wrong, you can dispute it as written on the challan, or at the traffic police office; some cases go to a court or a Lok Adalat.": "চালান ভুল মনে হলে, চালানে লেখা নিয়মে বা ট্রাফিক পুলিশ অফিসে আপত্তি জানাতে পারেন; কিছু মামলা আদালত বা লোক আদালতে যায়।",
+  "Is there a last date, or a date to appear, written on it? Say the date, or say skip.": "এতে কি শেষ তারিখ, বা হাজির হওয়ার তারিখ লেখা আছে? তারিখ বলুন, অথবা বলুন বাদ দিন।",
+  "Keep the receipt or the payment message.": "রসিদ বা টাকা দেওয়ার মেসেজ যত্ন করে রাখুন।",
+  "Keep the receipt. You may need it later, for example when selling the property.": "রসিদ যত্ন করে রাখুন। পরে কাজে লাগতে পারে, যেমন সম্পত্তি বিক্রির সময়।",
+  "Kind of paper": "কাগজের ধরন",
+  "Log in at incometax.gov.in, or ask a tax helper, to see the notice and reply by the date given.": "incometax.gov.in-এ লগ ইন করে, বা কোনো কর বিশেষজ্ঞের সাহায্যে, নোটিসটি দেখুন এবং দেওয়া তারিখের মধ্যে উত্তর দিন।",
+  "Never tell anyone your OTP, PIN or password, not even someone who says they are from the bank or the office.": "আপনার ওটিপি, পিন বা পাসওয়ার্ড কাউকে বলবেন না, এমনকি যে নিজেকে ব্যাংক বা অফিসের লোক বলে তাকেও না।",
+  "No court, police or CBI officer arrests anyone on a video call, and no one can ask you to pay to avoid arrest. A so-called digital arrest is fraud: cut the call and dial 1930.": "কোনো আদালত, পুলিশ বা সিবিআই আধিকারিক ভিডিও কলে গ্রেপ্তার করে না, আর গ্রেপ্তার এড়াতে কেউ টাকা চাইতে পারে না। তথাকথিত \"ডিজিটাল অ্যারেস্ট\" প্রতারণা: ফোন কেটে 1930-এ ফোন করুন।",
+  "Pay by the last date at the electricity office, a bank or post office counter, or the company's official app or website.": "শেষ তারিখের মধ্যে বিদ্যুৎ অফিসে, ব্যাংক বা ডাকঘরের কাউন্টারে, বা সংস্থার নিজস্ব অ্যাপ বা ওয়েবসাইটে জমা দিন।",
+  "Pay by the last date at the municipal office or on its official website. Paying late usually adds a penalty or interest.": "শেষ তারিখের মধ্যে পুরসভা অফিসে বা তার নিজস্ব ওয়েবসাইটে জমা দিন। দেরিতে দিলে সাধারণত জরিমানা বা সুদ লাগে।",
+  "Pay by the last date at the water board or municipal office, or on its official website or app.": "শেষ তারিখের মধ্যে জল বোর্ড বা পুরসভা অফিসে, বা তার নিজস্ব ওয়েবসাইট বা অ্যাপে জমা দিন।",
+  "Pay only at the office or through its official website or app, not through a link someone sends you.": "টাকা শুধু অফিসে বা তার নিজস্ব ওয়েবসাইট বা অ্যাপে দিন, কারও পাঠানো লিঙ্কে নয়।",
+  "Pay only into the loan account, at the branch or through the official app, and keep the receipt.": "টাকা শুধু ঋণের অ্যাকাউন্টে, শাখায় বা সংস্থার নিজস্ব অ্যাপে দিন, এবং রসিদ রাখুন।",
+  "Pay only to the municipality. Do not give cash to someone who comes to your door without an official receipt.": "টাকা শুধু পুরসভাকে দিন। সরকারি রসিদ ছাড়া বাড়িতে আসা কাউকে নগদ দেবেন না।",
+  "Recovery agents must not threaten you or use abusive words, and must not call before 8 in the morning or after 7 in the evening. If they do, complain to the bank and, if you are threatened, to the police.": "আদায়কারী এজেন্ট আপনাকে ভয় দেখাতে বা গালি দিতে পারে না, এবং সকাল 8টার আগে বা সন্ধ্যা 7টার পরে ফোন করতে পারে না। এমন হলে ব্যাংকে অভিযোগ করুন, আর হুমকি পেলে পুলিশে।",
+  "Show it to someone you trust, at the CSC, the panchayat, or the office that sent it, and ask what it asks you to do and by when.": "এটি কোনো বিশ্বস্ত লোককে, সিএসসি-তে, পঞ্চায়েতে, বা যে অফিস পাঠিয়েছে সেখানে দেখান, এবং জিজ্ঞেস করুন এতে কী করতে বলা হয়েছে আর কবে পর্যন্ত।",
+  "Tell me what kind of paper you got. I will explain what it means, what to do and by when.": "বলুন আপনি কোন কাগজ পেয়েছেন। আমি বুঝিয়ে দেব এর মানে কী, কী করতে হবে আর কবে পর্যন্ত।",
+  "The department does not ask for payment through links in SMS or phone calls. Pay only through the official portal.": "আয়কর বিভাগ এসএমএস বা ফোনের লিঙ্কে টাকা চায় না। শুধু সরকারি পোর্টালে জমা দিন।",
+  "This is a fine for breaking a traffic rule, such as riding without a helmet or crossing a red light.": "এটি ট্রাফিক নিয়ম ভাঙার জরিমানা, যেমন হেলমেট ছাড়া চালানো বা লাল আলো পার হওয়া।",
+  "This is a letter from a bank or loan company saying a loan payment (EMI) is overdue.": "এটি ব্যাংক বা ঋণ সংস্থার চিঠি, যাতে লেখা আছে ঋণের কিস্তি (ইএমআই) বকেয়া।",
+  "This is a message saying your bank account, card or KYC will be blocked unless you do something now.": "এটি এমন মেসেজ যাতে লেখা আছে এখনই কিছু না করলে আপনার ব্যাংক অ্যাকাউন্ট, কার্ড বা কেওয়াইসি বন্ধ হয়ে যাবে।",
+  "This is a notice from the Income Tax Department, usually asking you to file a return, explain a difference in your income details, or pay tax that is due.": "এটি আয়কর বিভাগের নোটিস, যা সাধারণত রিটার্ন জমা দিতে, আয়ের হিসাবে পার্থক্য ব্যাখ্যা করতে, বা বকেয়া কর দিতে বলে।",
+  "This is a notice from the municipality or panchayat about tax on your house, shop or land: how much is due and by when.": "এটি পুরসভা বা পঞ্চায়েতের নোটিস, আপনার বাড়ি, দোকান বা জমির করের বিষয়ে: কত দিতে হবে আর কবে পর্যন্ত।",
+  "This is a paper from a court or a lawyer. A court summons gives the date you must appear; a lawyer's notice asks you to do something or reply within a time.": "এটি আদালত বা উকিলের কাগজ। আদালতের সমনে থাকে কোন দিন আপনাকে হাজির হতে হবে; উকিলের নোটিসে কিছু করতে বা নির্দিষ্ট সময়ে উত্তর দিতে বলা হয়।",
+  "This is your electricity bill: how much you owe for the power you used, and the last date to pay it.": "এটি আপনার বিদ্যুতের বিল: যত বিদ্যুৎ ব্যবহার করেছেন তার টাকা, আর জমা দেওয়ার শেষ তারিখ।",
+  "This is your water bill from the water board or the municipality: the amount you owe and the last date to pay.": "এটি জল বোর্ড বা পুরসভার জলের বিল: কত টাকা দিতে হবে আর জমা দেওয়ার শেষ তারিখ।",
+  "Understand a paper (bill, notice, summons)": "কাগজ বুঝুন (বিল, নোটিস, সমন)",
+  "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.": "এটা কোন কাগজ? যেমন: বিদ্যুতের বিল, জলের বিল, সম্পত্তি কর, ব্যাংক ঋণ, ব্যাংক কেওয়াইসি মেসেজ, আদালতের সমন, আয়করের নোটিস, ট্রাফিক চালান, বা অন্য কিছু।"
  },
  "options": {
   "Male": [
@@ -677,6 +766,76 @@
    "ভাড়া",
    "ভাড়াবাড়ি",
    "গৃহহীন"
+  ],
+  "No reply received": [
+   "উত্তর আসেনি",
+   "আসেনি",
+   "কোনো উত্তর নেই",
+   "পাইনি",
+   "না"
+  ],
+  "Reply received, not satisfied": [
+   "উত্তর এসেছে, সন্তুষ্ট নই",
+   "উত্তর এসেছে",
+   "এসেছে",
+   "পেয়েছি",
+   "অসম্পূর্ণ",
+   "হ্যাঁ"
+  ],
+  "Bank KYC or account block message": [
+   "ব্যাংক কেওয়াইসি মেসেজ",
+   "কেওয়াইসি",
+   "অ্যাকাউন্ট বন্ধ",
+   "কার্ড বন্ধ"
+  ],
+  "Bank loan or EMI notice": [
+   "ব্যাংক ঋণের নোটিস",
+   "ব্যাংক ঋণ",
+   "ঋণ",
+   "লোন",
+   "ইএমআই",
+   "কিস্তি"
+  ],
+  "Court summons or legal notice": [
+   "আদালতের সমন বা আইনি নোটিস",
+   "আদালতের সমন",
+   "আদালত",
+   "সমন",
+   "কোর্ট",
+   "উকিলের নোটিস"
+  ],
+  "Electricity bill": [
+   "বিদ্যুতের বিল",
+   "বিদ্যুৎ",
+   "কারেন্টের বিল",
+   "ইলেকট্রিক বিল"
+  ],
+  "Income tax notice": [
+   "আয়করের নোটিস",
+   "আয়কর",
+   "ইনকাম ট্যাক্স"
+  ],
+  "Property tax notice": [
+   "সম্পত্তি করের নোটিস",
+   "সম্পত্তি কর",
+   "বাড়ির কর",
+   "প্রপার্টি ট্যাক্স",
+   "পুরসভার কর"
+  ],
+  "Something else": [
+   "অন্য কিছু",
+   "অন্য",
+   "জানি না"
+  ],
+  "Traffic challan": [
+   "ট্রাফিক চালান",
+   "চালান",
+   "জরিমানা"
+  ],
+  "Water bill": [
+   "জলের বিল",
+   "জল",
+   "পানির বিল"
   ]
  },
  "words": {
