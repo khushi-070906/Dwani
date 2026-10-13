@@ -39,6 +39,12 @@
   a { color: var(--forest); }
   :focus-visible { outline: 3px solid var(--spark); outline-offset: 2px; }
   [hidden] { display: none !important; }
+  .explain h3 { margin: 1rem 0 .3rem; font: 700 .95rem var(--sans); color: var(--forest); }
+  .explain .ex-sec:first-of-type h3 { margin-top: .2rem; }
+  .explain ul { margin: .2rem 0 0; padding-left: 1.1rem; color: var(--ink-2); }
+  .explain li { margin: .25rem 0; }
+  .explain .alert h3 { color: inherit; margin-top: 0; }
+  .explain .ex-note { font-size: .8rem; margin: 1rem 0 0; }
   .wrap { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
   .muted { color: var(--ink-3); }
   /* The privacy link sits in running text; the words stay the size they are, the tappable box around them grows. */
@@ -413,6 +419,7 @@
         </div>
         <div id="lookup" hidden></div>
         <div id="advice" hidden></div>
+        <div id="explain" hidden></div>
         <div id="formdone" hidden></div>
       </div>
       <aside>
@@ -458,7 +465,8 @@
   var B = location.pathname.replace(/\/$/, "");
   var $ = function (id) { return document.getElementById(id); };
   var UI = {
-    hi: { a11y_home: "ध्वनिForms होम", a11y_bigger: "अक्षर बड़े करें", a11y_lang: "भाषा चुनें", install: "फ़ोन में लगाएँ", tagline: "बोलकर फ़ॉर्म भरें", hello: "नमस्ते", welcome_kicker: "सरकारी फ़ॉर्म, बोलकर", chip1: "बोलकर या लिखकर", chip2: "हर जवाब की जाँच", chip3: "30 मिनट बाद मिट जाता है", hello_sub: "आज क्या करना है? नीचे से चुनिए, फिर बोलकर या लिखकर जवाब दीजिए। हर जवाब फ़ॉर्म पर जाने से पहले आपको पढ़कर सुनाया जाएगा।",
+    hi: { g_explain: "कागज़ समझिए", k_explain: "कागज़ का मतलब", ex_what: "यह क्या है", ex_do: "क्या करें", ex_wrong: "अगर इसमें कुछ ग़लत है", ex_beware: "धोखे से बचिए", ex_help: "अगर धोखा हो गया", ex_date: "कागज़ पर लिखी तारीख", ex_amount: "रकम", ex_left: "दिन बाकी", ex_passed: "यह तारीख निकल चुकी है", ex_today: "यह तारीख आज है", ex_note: "सामान्य जानकारी, क़ानूनी सलाह नहीं। जाँची गई:", next_explain: "कागज़ संभालकर रखिए। अगर किसी दफ़्तर ने आपके साथ ग़लत किया है, तो होम पेज से शिकायत लिख सकते हैं।",
+      a11y_home: "ध्वनिForms होम", a11y_bigger: "अक्षर बड़े करें", a11y_lang: "भाषा चुनें", install: "फ़ोन में लगाएँ", tagline: "बोलकर फ़ॉर्म भरें", hello: "नमस्ते", welcome_kicker: "सरकारी फ़ॉर्म, बोलकर", chip1: "बोलकर या लिखकर", chip2: "हर जवाब की जाँच", chip3: "30 मिनट बाद मिट जाता है", hello_sub: "आज क्या करना है? नीचे से चुनिए, फिर बोलकर या लिखकर जवाब दीजिए। हर जवाब फ़ॉर्म पर जाने से पहले आपको पढ़कर सुनाया जाएगा।",
       most: "सबसे ज़्यादा किए जाने वाले काम", everything: "बाकी सब", how_title: "कैसे काम करता है", how1: "फ़ॉर्म चुनिए। सवाल एक-एक करके आएँगे।",
       how2: "माइक दबाकर बोलिए, या लिखिए। हर जवाब पढ़कर सुनाया जाएगा: \"क्या यह सही है?\"", how3: "आख़िर में भरा हुआ फ़ॉर्म या पत्र डाउनलोड या प्रिंट कीजिए।",
       data_title: "आपकी जानकारी", data_body: "जवाब सिर्फ़ इस सेशन तक रहते हैं और 30 मिनट बाद मिट जाते हैं। आधार और खाता नंबर छिपे हुए दिखते हैं।", privacy_link: "निजता नीति",
@@ -494,7 +502,8 @@
       no_recog: "इस ब्राउज़र में इस भाषा में बोलकर जवाब नहीं हो पा रहा। लिखकर जवाब दीजिए।", by_word: "बटा" },
     en: {}
   };
-  var EN = { next_advisor: "Tap 'Fill this form' next to a scheme: some of your answers will already be filled in. The department makes the final decision.",
+  var EN = { g_explain: "Understand a paper", k_explain: "Paper explained", ex_what: "What it is", ex_do: "What to do", ex_wrong: "If something on it is wrong", ex_beware: "Watch out for fraud", ex_help: "If you were cheated", ex_date: "Date on the paper", ex_amount: "Amount", ex_left: "days left", ex_passed: "This date has passed", ex_today: "This date is today", ex_note: "General guidance, not legal advice. Checked on", next_explain: "Keep the paper safe. If an office has treated you unfairly, you can write a complaint from the home page.",
+    next_advisor: "Tap 'Fill this form' next to a scheme: some of your answers will already be filled in. The department makes the final decision.",
     next_lookup: "This comes from a saved copy of the records. For anything important, also check the official portal.",
     a11y_home: "DwaniForms home", a11y_bigger: "Bigger text", a11y_lang: "Choose a language", install: "Add to phone", tagline: "Fill forms by speaking", hello: "Namaste", unavailable: "Not available yet", questions: "questions", g_forms: "Government forms",
     g_voice: "Complaints and RTI", g_records: "Look up records", g_schemes: "Schemes", advisor_title: "Which schemes can I get?",
@@ -526,7 +535,7 @@
   var PACKS = {};        // lang -> {speech, status} for hand-written language packs (from /capabilities)
   var LANG_NAMES = { hi: "हिन्दी", en: "English", bn: "বাংলা", ta: "தமிழ்", te: "తెలుగు", mr: "मराठी", gu: "ગુજરાતી", kn: "ಕನ್ನಡ",
                      ml: "മലയാളം", pa: "ਪੰਜਾਬੀ", ur: "اردو", or: "ଓଡ଼ିଆ", as: "অসমীয়া" };
-  var ICON = { form: "📝", grievance: "📢", rti: "📄", lookup_land: "🗺", lookup_ration: "🍚", advisor: "💡" };
+  var ICON = { form: "📝", grievance: "📢", rti: "📄", rti_appeal: "⚖", explain: "🧾", lookup_land: "🗺", lookup_ration: "🍚", advisor: "💡" };
   var lang = "hi", sid = null, cur = null, forms = [], caps = {}, reveal = false, inkedBefore = {};
 
   function t(k) { return (UI[lang] && UI[lang][k]) || EN[k] || k; }
@@ -656,10 +665,11 @@
     var advisor = { id: "scheme_advisor", flow: "advisor", title: t("advisor_title"), titles: {}, description: { en: t("advisor_desc"), hi: t("advisor_desc") }, available: true };
     var all = forms.concat([advisor]);
     var byId = {}; all.forEach(function (f) { byId[f.id] = f; });
-    var top = ["pm_kisan", "grievance", "scheme_advisor", "land_record"].map(function (id) { return byId[id]; }).filter(Boolean);
+    var top = ["pm_kisan", "samjhao", "grievance", "scheme_advisor", "land_record"].map(function (id) { return byId[id]; }).filter(Boolean);
     var tl = $("top-list"); tl.innerHTML = "";
     top.forEach(function (f) { tl.appendChild(rowBtn(f, "row")); });
-    var groups = [["g_forms", function (f) { return f.flow === "form"; }], ["g_voice", function (f) { return f.flow === "grievance" || f.flow === "rti"; }],
+    var groups = [["g_forms", function (f) { return f.flow === "form"; }], ["g_voice", function (f) { return f.flow === "grievance" || f.flow === "rti" || f.flow === "rti_appeal"; }],
+                  ["g_explain", function (f) { return f.flow === "explain"; }],
                   ["g_records", function (f) { return f.flow === "lookup_land" || f.flow === "lookup_ration"; }], ["g_schemes", function (f) { return f.flow === "advisor"; }]];
     var ag = $("all-groups"); ag.innerHTML = "";
     groups.forEach(function (g) {
@@ -834,9 +844,10 @@
     stopListening();
     var o = r.outcome || {};
     var fields = r.fields || [];
-    var kicker = o.type === "draft" ? t("k_draft") : o.type === "lookup" ? (o.found ? t("k_found") : t("k_notfound")) : o.type === "advisor" ? t("k_advice") : t("k_form");
+    var kicker = o.type === "draft" ? t("k_draft") : o.type === "lookup" ? (o.found ? t("k_found") : t("k_notfound")) : o.type === "advisor" ? t("k_advice") : o.type === "explain" ? t("k_explain") : t("k_form");
     $("cert-kicker").textContent = kicker;
-    $("what-next-body").textContent = o.type === "advisor" ? t("next_advisor") : o.type === "lookup" ? t("next_lookup") : t("what_next_body");
+    $("what-next-body").textContent = o.type === "advisor" ? t("next_advisor") : o.type === "lookup" ? t("next_lookup") :
+      o.type === "explain" ? t("next_explain") : t("what_next_body");
     $("res-title").textContent = r.title || ""; $("res-crumb").textContent = r.title || "";
     var meta = [[t("m_ref"), "<span class='mono'>DF-" + esc(String(sid || "").slice(0, 8).toUpperCase()) + "</span>"],
                 [t("m_date"), esc(new Date().toLocaleString(locale(), { dateStyle: "medium", timeStyle: "short" }))],
@@ -847,13 +858,14 @@
     $("res-say").textContent = o.say || r.text;
     $("res-say").className = "alert" + (o.type === "lookup" && !o.found ? " warn" : "");
     speak(o.say || r.text);
-    ["draft", "lookup", "advice", "formdone"].forEach(function (id) { $(id).hidden = true; });
-    $("pdf").hidden = o.type === "advisor" || o.type === "lookup";
+    ["draft", "lookup", "advice", "explain", "formdone"].forEach(function (id) { $(id).hidden = true; });
+    $("pdf").hidden = o.type === "advisor" || o.type === "lookup" || o.type === "explain";
     $("json").hidden = !!o.type;
     $("print-letter").hidden = false;
     if (o.type === "draft") renderDraft(o);
     else if (o.type === "lookup") renderLookup(o);
     else if (o.type === "advisor") renderAdvice(o);
+    else if (o.type === "explain") renderExplain(o);
     else renderFormDone(fields);
     setSteps("done", true);
     show("result");
@@ -938,6 +950,42 @@
     }
     add(o.likely || [], "likely"); add(o.maybe || [], "maybe");
     if (o.not_matched) { var p = document.createElement("p"); p.className = "muted"; p.style.fontSize = ".85rem"; p.textContent = o.not_matched + " " + t("not_matched"); box.appendChild(p); }
+    box.hidden = false;
+  }
+  // Samjhao: what a paper means. Everything is set with textContent: the sentences come from data files.
+  function renderExplain(o) {
+    var box = $("explain"); box.innerHTML = "";
+    var card = document.createElement("div"); card.className = "card explain"; box.appendChild(card);
+    function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+    if (o.date || o.amount) {
+      var dl = el("dl", "kv"); card.appendChild(dl);
+      if (o.date) {
+        var dd = el("dd"), m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(o.date), when = o.date;
+        try { if (m) when = new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(locale(), { day: "numeric", month: "long", year: "numeric" }); } catch (e) {}
+        dd.appendChild(document.createTextNode(when + " "));
+        var pill = el("span", "pill " + (o.days > 0 ? "ok" : "warn"), o.days > 0 ? o.days + " " + t("ex_left") : o.days === 0 ? t("ex_today") : t("ex_passed"));
+        dd.appendChild(pill);
+        dl.appendChild(el("dt", null, t("ex_date"))); dl.appendChild(dd);
+      }
+      if (o.amount) {
+        var amt = Number(o.amount);
+        dl.appendChild(el("dt", null, t("ex_amount")));
+        dl.appendChild(el("dd", "mono", "₹ " + (isFinite(amt) ? amt.toLocaleString("en-IN") : o.amount)));
+      }
+    }
+    function section(key, items, cls) {
+      if (!items || !items.length) return;
+      var wrap = el("div", cls || "ex-sec"); wrap.appendChild(el("h3", null, t(key)));
+      if (items.length === 1) wrap.appendChild(el("p", null, items[0]));
+      else { var ul = el("ul"); items.forEach(function (x) { ul.appendChild(el("li", null, x)); }); wrap.appendChild(ul); }
+      card.appendChild(wrap);
+    }
+    section("ex_what", [o.what]);
+    section("ex_do", o["do"]);
+    section("ex_wrong", o.if_wrong);
+    section("ex_beware", o.beware, "ex-sec alert warn");
+    section("ex_help", o.help);
+    if (o.last_reviewed) card.appendChild(el("p", "muted ex-note", t("ex_note") + " " + o.last_reviewed));
     box.hidden = false;
   }
   $("print-letter").addEventListener("click", function () {
