@@ -66,6 +66,9 @@ jobs:
       - name: Phone app test (installable, survives a reload)
         working-directory: tests/js
         run: DWANIFORMS_URL=http://127.0.0.1:8130 node dwaniforms_pwa.test.js
+      - name: Accessibility test (contrast, targets, screen-reader names)
+        working-directory: tests/js
+        run: DWANIFORMS_URL=http://127.0.0.1:8130 node dwaniforms_a11y.test.js
       - name: Language packs complete
         run: python -m dwaniforms.langpacks check
       - name: No server errors
