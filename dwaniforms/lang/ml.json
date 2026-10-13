@@ -51,7 +51,15 @@
   "fix_which": "ഏത് ഭാഗമാണ് മാറ്റേണ്ടത്? ഇവയിൽ ഒന്ന് പറയുക:",
   "khasra_invalid": "ഖസ്ര നമ്പർ കിട്ടിയില്ല. നൂറ്റി നാല്പത്തഞ്ച് ബട്ടാ രണ്ട് എന്ന മട്ടിൽ പറയുക.",
   "ration_invalid": "റേഷൻ കാർഡ് നമ്പർ കിട്ടിയില്ല. പതുക്കെ ഒന്നുകൂടി പറയുക.",
-  "unit_acres": "ദയവായി ഭൂമി ഏക്കറിൽ പറയുക. സെന്റ്, ബിഘ, കനാൽ എന്നിവ സംസ്ഥാനം തോറും വ്യത്യാസപ്പെടും."
+  "unit_acres": "ദയവായി ഭൂമി ഏക്കറിൽ പറയുക. സെന്റ്, ബിഘ, കനാൽ എന്നിവ സംസ്ഥാനം തോറും വ്യത്യാസപ്പെടും.",
+  "outcome_rti_appeal": "നിങ്ങളുടെ ഒന്നാം അപ്പീൽ സ്ക്രീനിൽ തയ്യാറാണ്. ഇത് പ്രിന്റ് ചെയ്ത് ഒപ്പിട്ട്, നിങ്ങളുടെ രേഖകളുടെ പകർപ്പുകൾക്കൊപ്പം അയയ്ക്കുക.",
+  "rti_appeal_early": "ഓഫീസിന് {date} വരെ മറുപടി നൽകാൻ സമയമുണ്ട്. അതിനകം മറുപടി വന്നില്ലെങ്കിൽ, ആ തീയതിക്ക് ശേഷം ഈ അപ്പീൽ അയയ്ക്കുക.",
+  "rti_appeal_late": "30 ദിവസത്തിലധികം കഴിഞ്ഞു, അതിനാൽ അപ്പീൽ വൈകിയാണ്. ഒഴിഞ്ഞ സ്ഥലത്ത് വൈകാനുള്ള കാരണം എഴുതുക; ഉദ്യോഗസ്ഥൻ എന്നിട്ടും അത് സ്വീകരിച്ചേക്കാം.",
+  "outcome_explain": "ഈ കടലാസിന്റെ അർഥം ഇതാണ്. എല്ലാം സ്ക്രീനിലും എഴുതിയിട്ടുണ്ട്.",
+  "explain_ahead": "കടലാസിൽ എഴുതിയ തീയതി {date} ആണ്, ഇന്നു മുതൽ {days} ദിവസം കഴിഞ്ഞ്.",
+  "explain_today": "കടലാസിൽ എഴുതിയ തീയതി ഇന്നാണ്.",
+  "explain_passed": "കടലാസിൽ എഴുതിയ തീയതി, {date}, കഴിഞ്ഞുപോയി. ഇന്നുതന്നെ ഓഫീസിൽ പോയി ഇനി എന്തു ചെയ്യണമെന്ന് ചോദിക്കുക.",
+  "explain_disclaimer": "ഇത് പൊതുവായ വിവരമാണ്, നിയമോപദേശമല്ല. എന്തെങ്കിലും ചെയ്യുന്നതിനു മുമ്പ് കടലാസ് സ്വയം വായിക്കുക, അല്ലെങ്കിൽ ഓഫീസിൽ ചോദിക്കുക."
  },
  "ui": {
   "a11y_bigger": "അക്ഷരം വലുതാക്കുക",
@@ -172,7 +180,21 @@
   "why_maybe": "'പരിശോധിക്കണം' എന്തുകൊണ്ട്",
   "working": "മനസ്സിലാക്കുന്നു…",
   "yes": "അതെ, ശരിയാണ്",
-  "yes_word": "അതെ"
+  "yes_word": "അതെ",
+  "ex_amount": "തുക",
+  "ex_beware": "തട്ടിപ്പ് സൂക്ഷിക്കുക",
+  "ex_date": "കടലാസിലെ തീയതി",
+  "ex_do": "എന്തു ചെയ്യണം",
+  "ex_help": "തട്ടിപ്പ് നടന്നെങ്കിൽ",
+  "ex_left": "ദിവസം ബാക്കി",
+  "ex_note": "പൊതുവായ വിവരം, നിയമോപദേശമല്ല. പരിശോധിച്ചത്:",
+  "ex_passed": "ഈ തീയതി കഴിഞ്ഞു",
+  "ex_today": "ഈ തീയതി ഇന്നാണ്",
+  "ex_what": "ഇത് എന്താണ്",
+  "ex_wrong": "ഇതിൽ എന്തെങ്കിലും തെറ്റുണ്ടെങ്കിൽ",
+  "g_explain": "കടലാസ് മനസ്സിലാക്കുക",
+  "k_explain": "കടലാസിന്റെ അർഥം",
+  "next_explain": "കടലാസ് സൂക്ഷിച്ചുവയ്ക്കുക. ഏതെങ്കിലും ഓഫീസ് നിങ്ങളോട് അനീതി കാണിച്ചെങ്കിൽ, ഹോം പേജിൽ നിന്ന് പരാതി എഴുതാം."
  },
  "text": {
   "Bank KYC": "ബാങ്ക് കെവൈസി",
@@ -400,7 +422,74 @@
   "Keep the acknowledgement / registration number you are given.": "നിങ്ങൾക്ക് കിട്ടുന്ന രസീത് / രജിസ്ട്രേഷൻ നമ്പർ സൂക്ഷിച്ചുവെക്കുക.",
   "Send it to the Public Information Officer of the department by post or by hand, with the fee (unless BPL).": "ഫീസോടുകൂടി (ബിപിഎൽ ഒഴികെ) വകുപ്പിന്റെ പബ്ലിക് ഇൻഫർമേഷൻ ഓഫീസർക്ക് തപാലിലോ നേരിട്ടോ അയയ്ക്കുക.",
   "For central ministries and departments you can also file online at rtionline.gov.in; many states have their own RTI portals.": "കേന്ദ്ര മന്ത്രാലയങ്ങൾക്കും വകുപ്പുകൾക്കും rtionline.gov.in ൽ ഓൺലൈനായും നൽകാം; പല സംസ്ഥാനങ്ങൾക്കും സ്വന്തം ആർടിഐ പോർട്ടലുണ്ട്.",
-  "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can file a first appeal.": "പിഐഒ 30 ദിവസത്തിനകം മറുപടി നൽകണം (ജീവനോ സ്വാതന്ത്ര്യത്തിനോ സംബന്ധിച്ചാണെങ്കിൽ 48 മണിക്കൂറിനകം). ഇല്ലെങ്കിൽ ഒന്നാം അപ്പീൽ നൽകാം."
+  "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can file a first appeal.": "പിഐഒ 30 ദിവസത്തിനകം മറുപടി നൽകണം (ജീവനോ സ്വാതന്ത്ര്യത്തിനോ സംബന്ധിച്ചാണെങ്കിൽ 48 മണിക്കൂറിനകം). ഇല്ലെങ്കിൽ ഒന്നാം അപ്പീൽ നൽകാം.",
+  "RTI first appeal": "ആർടിഐ ഒന്നാം അപ്പീൽ",
+  "No reply to your RTI in 30 days, or an incomplete one? The first appeal is drafted for you.": "30 ദിവസത്തിനകം നിങ്ങളുടെ ആർടിഐക്ക് മറുപടി വന്നില്ലേ, അല്ലെങ്കിൽ അപൂർണ്ണമായി വന്നോ? ഒന്നാം അപ്പീൽ നിങ്ങൾക്കായി തയ്യാറാക്കും.",
+  "Which department did you send your RTI application to?": "നിങ്ങൾ ആർടിഐ അപേക്ഷ ഏത് വകുപ്പിലേക്കാണ് അയച്ചത്?",
+  "On which date did you send the RTI application?": "ആർടിഐ അപേക്ഷ ഏത് തീയതിയിലാണ് അയച്ചത്?",
+  "Date of RTI application": "ആർടിഐ അപേക്ഷയുടെ തീയതി",
+  "In short, what information had you asked for?": "ചുരുക്കത്തിൽ, നിങ്ങൾ എന്ത് വിവരമാണ് ചോദിച്ചത്?",
+  "Information asked for": "ചോദിച്ച വിവരം",
+  "Did you get a reply from the office? Say: no reply, or reply received.": "ഓഫീസിൽ നിന്ന് മറുപടി വന്നോ? പറയുക: മറുപടി വന്നില്ല, അല്ലെങ്കിൽ മറുപടി വന്നു.",
+  "Reply from the PIO": "പിഐഒയുടെ മറുപടി",
+  "On which date did you get the reply?": "ഏത് തീയതിയിലാണ് മറുപടി കിട്ടിയത്?",
+  "Date of reply": "മറുപടിയുടെ തീയതി",
+  "What is wrong with the reply? For example: information is missing, or it was refused without a reason.": "മറുപടിയിൽ എന്താണ് കുറവ്? ഉദാഹരണത്തിന്: വിവരം അപൂർണ്ണമാണ്, അല്ലെങ്കിൽ കാരണമില്ലാതെ നിരസിച്ചു.",
+  "Why the reply is not acceptable": "മറുപടി എന്തുകൊണ്ട് സ്വീകാര്യമല്ല",
+  "Send it to the First Appellate Authority: the officer senior to the Public Information Officer in the same department. Attach copies of your RTI application and of the reply, if any.": "ഇത് ഒന്നാം അപ്പീൽ അധികാരിക്ക് അയയ്ക്കുക: അതേ വകുപ്പിൽ പിഐഒയെക്കാൾ മുതിർന്ന ഉദ്യോഗസ്ഥൻ. നിങ്ങളുടെ ആർടിഐ അപേക്ഷയുടെയും മറുപടിയുടെയും (വന്നിട്ടുണ്ടെങ്കിൽ) പകർപ്പുകൾ ചേർക്കുക.",
+  "Central government departments charge no fee for a first appeal; some states do, so check your state's rules.": "കേന്ദ്ര സർക്കാർ വകുപ്പുകൾ ഒന്നാം അപ്പീലിന് ഫീസ് വാങ്ങുന്നില്ല; ചില സംസ്ഥാനങ്ങൾ വാങ്ങുന്നുണ്ട്, അതിനാൽ നിങ്ങളുടെ സംസ്ഥാനത്തെ ചട്ടങ്ങൾ നോക്കുക.",
+  "The appeal must be decided within 30 days, 45 at most. If you are still not satisfied, you can make a second appeal to the Information Commission within 90 days.": "അപ്പീലിൽ 30 ദിവസത്തിനകം, പരമാവധി 45 ദിവസത്തിനകം തീരുമാനമെടുക്കണം. എന്നിട്ടും തൃപ്തിയില്ലെങ്കിൽ 90 ദിവസത്തിനകം വിവരാവകാശ കമ്മീഷനിൽ രണ്ടാം അപ്പീൽ നൽകാം.",
+  "A message or call saying your power will be cut tonight unless you call a number or pay through a link is a common fraud. The electricity company does not do this.": "\"ഇന്ന് രാത്രി വൈദ്യുതി വിച്ഛേദിക്കും, ഈ നമ്പറിൽ വിളിക്കുക അല്ലെങ്കിൽ ലിങ്കിലൂടെ പണം അടയ്ക്കുക\" എന്ന സന്ദേശമോ കോളോ സാധാരണ തട്ടിപ്പാണ്. വൈദ്യുതി കമ്പനി ഇങ്ങനെ ചെയ്യില്ല.",
+  "Amount (Rs.)": "തുക (രൂ.)",
+  "Banks never ask for your OTP, PIN, password or CVV. Anyone who asks is a fraud.": "ബാങ്ക് ഒരിക്കലും നിങ്ങളുടെ ഒടിപി, പിൻ, പാസ്‌വേഡ് അല്ലെങ്കിൽ സിവിവി ചോദിക്കില്ല. ചോദിക്കുന്നവർ തട്ടിപ്പുകാരാണ്.",
+  "Check the challan on the official site echallan.parivahan.gov.in with the challan number or your vehicle number, and pay there or at the traffic police office.": "ചലാൻ ഔദ്യോഗിക സൈറ്റായ echallan.parivahan.gov.in ൽ ചലാൻ നമ്പറോ വാഹന നമ്പറോ ഉപയോഗിച്ച് നോക്കുക, അവിടെയോ ട്രാഫിക് പോലീസ് ഓഫീസിലോ അടയ്ക്കുക.",
+  "Date on the paper": "കടലാസിലെ തീയതി",
+  "Do not click the link or call the number in the message. Go to your branch, or call the number printed in your passbook or on the back of your card, and ask whether anything is really needed.": "സന്ദേശത്തിലെ ലിങ്കിൽ അമർത്തരുത്, അതിലെ നമ്പറിൽ വിളിക്കരുത്. നിങ്ങളുടെ ശാഖയിൽ പോകുക, അല്ലെങ്കിൽ പാസ്‌ബുക്കിലോ കാർഡിന്റെ പിന്നിലോ അച്ചടിച്ച നമ്പറിൽ വിളിച്ച് ശരിക്കും എന്തെങ്കിലും ചെയ്യണോ എന്ന് ചോദിക്കുക.",
+  "Do not ignore it. Note the court, the case number and the date written on it, and go on that date or send a lawyer.": "ഇത് അവഗണിക്കരുത്. കോടതിയുടെ പേര്, കേസ് നമ്പർ, എഴുതിയ തീയതി എന്നിവ കുറിച്ചുവയ്ക്കുക, ആ ദിവസം പോകുക അല്ലെങ്കിൽ ഒരു അഭിഭാഷകനെ അയയ്ക്കുക.",
+  "Do not pay cash to an agent without an official receipt.": "ഔദ്യോഗിക രസീതില്ലാതെ ഒരു ഏജന്റിനും പണമായി കൊടുക്കരുത്.",
+  "Do not pay through a link in a message.": "ഒരു സന്ദേശത്തിലെ ലിങ്കിലൂടെയും പണം അടയ്ക്കരുത്.",
+  "Every genuine notice has a Document Identification Number (DIN). You can check it on incometax.gov.in under 'Authenticate notice/order issued by ITD'.": "എല്ലാ യഥാർഥ നോട്ടീസിലും ഡോക്യുമെന്റ് ഐഡന്റിഫിക്കേഷൻ നമ്പർ (ഡിഐഎൻ) ഉണ്ടാകും. ഇത് incometax.gov.in ൽ 'Authenticate notice/order issued by ITD' ൽ പരിശോധിക്കാം.",
+  "Fake challan messages with a link to pay are common. Do not pay through a link in an SMS or WhatsApp; check on the official site first.": "പണം അടയ്ക്കാനുള്ള ലിങ്കുള്ള വ്യാജ ചലാൻ സന്ദേശങ്ങൾ സാധാരണമാണ്. എസ്എംഎസിലെയോ വാട്ട്‌സ്ആപ്പിലെയോ ലിങ്കിലൂടെ പണം അടയ്ക്കരുത്; ആദ്യം ഔദ്യോഗിക സൈറ്റിൽ പരിശോധിക്കുക.",
+  "Free legal help is available from the District Legal Services Authority at your district court, or by calling 15100.": "ജില്ലാ കോടതിയിലെ ജില്ലാ നിയമ സേവന അതോറിറ്റിയിൽ നിന്നോ, 15100 ൽ വിളിച്ചോ, സൗജന്യ നിയമസഹായം ലഭിക്കും.",
+  "Give a written complaint at the electricity office and keep a copy with their stamp. If it is not fixed, every electricity company has a Consumer Grievance Redressal Forum.": "വൈദ്യുതി ഓഫീസിൽ രേഖാമൂലം പരാതി നൽകുക, മുദ്രയുള്ള പകർപ്പ് സൂക്ഷിക്കുക. എന്നിട്ടും ശരിയായില്ലെങ്കിൽ, ഓരോ വൈദ്യുതി കമ്പനിക്കും ഉപഭോക്തൃ പരാതി പരിഹാര ഫോറം ഉണ്ട്.",
+  "Go to the branch with your loan papers and ask for a written statement of what is due. If you cannot pay, ask in writing for more time or smaller instalments.": "വായ്പാ രേഖകളുമായി ശാഖയിൽ പോയി കുടിശ്ശികയുടെ രേഖാമൂലമുള്ള വിവരം ചോദിക്കുക. ഇപ്പോൾ അടയ്ക്കാൻ കഴിയില്ലെങ്കിൽ, രേഖാമൂലം കൂടുതൽ സമയമോ ചെറിയ തവണകളോ ചോദിക്കുക.",
+  "How much money does it ask for, in rupees? Or say skip.": "ഇതിൽ എത്ര രൂപയാണ് ചോദിച്ചിരിക്കുന്നത്? അല്ലെങ്കിൽ ഒഴിവാക്കുക എന്ന് പറയുക.",
+  "I do not know this kind of paper yet.": "ഇത്തരം കടലാസിനെക്കുറിച്ച് എനിക്ക് ഇതുവരെ അറിയില്ല.",
+  "If it is about a problem with a government office, you can write a complaint here with 'Public grievance (complaint)'.": "ഏതെങ്കിലും സർക്കാർ ഓഫീസിലെ പ്രശ്നത്തെക്കുറിച്ചാണെങ്കിൽ, ഇവിടെത്തന്നെ 'പൊതു പരാതി' വഴി പരാതി എഴുതാം.",
+  "If money has been taken from you by fraud, call 1930 at once or report it at cybercrime.gov.in. Reporting quickly can stop the money.": "തട്ടിപ്പിലൂടെ പണം നഷ്ടപ്പെട്ടെങ്കിൽ, ഉടൻ 1930 ൽ വിളിക്കുക അല്ലെങ്കിൽ cybercrime.gov.in ൽ പരാതിപ്പെടുക. വേഗം അറിയിച്ചാൽ പണം തടയാനായേക്കും.",
+  "If money has been taken, call 1930 at once and tell your bank. Reporting quickly can stop the money.": "പണം നഷ്ടപ്പെട്ടെങ്കിൽ, ഉടൻ 1930 ൽ വിളിച്ച് നിങ്ങളുടെ ബാങ്കിനെ അറിയിക്കുക. വേഗം അറിയിച്ചാൽ പണം തടയാനായേക്കും.",
+  "If the amount is wrong or you have already paid, complain to the bank in writing. If the bank does not reply in 30 days, or you are not satisfied, complain to the RBI Ombudsman for free: cms.rbi.org.in or 14448.": "തുക തെറ്റാണെങ്കിലോ നിങ്ങൾ ഇതിനകം അടച്ചിട്ടുണ്ടെങ്കിലോ, ബാങ്കിന് രേഖാമൂലം പരാതി നൽകുക. ബാങ്ക് 30 ദിവസത്തിനകം മറുപടി നൽകിയില്ലെങ്കിൽ, അല്ലെങ്കിൽ നിങ്ങൾക്ക് തൃപ്തിയില്ലെങ്കിൽ, ആർബിഐ ഓംബുഡ്‌സ്മാനെ സൗജന്യമായി സമീപിക്കുക: cms.rbi.org.in അല്ലെങ്കിൽ 14448.",
+  "If the amount looks wrong, or you were charged when there was no supply, give a written complaint at the office and keep a copy with their stamp.": "തുക തെറ്റാണെന്ന് തോന്നിയാൽ, അല്ലെങ്കിൽ വെള്ളം വരാതിരുന്നിട്ടും പണം ഈടാക്കിയെങ്കിൽ, ഓഫീസിൽ രേഖാമൂലം പരാതി നൽകി മുദ്രയുള്ള പകർപ്പ് സൂക്ഷിക്കുക.",
+  "If the area or the type of building written on the notice is wrong, you can file an objection at the municipal office. The notice usually says by when; do it before that date.": "നോട്ടീസിൽ എഴുതിയ വിസ്തീർണമോ കെട്ടിടത്തിന്റെ തരമോ തെറ്റാണെങ്കിൽ, മുനിസിപ്പൽ ഓഫീസിൽ ആക്ഷേപം നൽകാം. എപ്പോൾ വരെ എന്ന് നോട്ടീസിൽ സാധാരണ എഴുതിയിരിക്കും; അതിനു മുമ്പ് ചെയ്യുക.",
+  "If the bill is much higher than usual, compare the meter reading printed on it with your meter.": "ബിൽ പതിവിലും വളരെ കൂടുതലാണെങ്കിൽ, അതിൽ അച്ചടിച്ച മീറ്റർ റീഡിങ് നിങ്ങളുടെ മീറ്ററുമായി ഒത്തുനോക്കുക.",
+  "If you think it is wrong, you can dispute it as written on the challan, or at the traffic police office; some cases go to a court or a Lok Adalat.": "ചലാൻ തെറ്റാണെന്ന് തോന്നിയാൽ, ചലാനിൽ എഴുതിയ രീതിയിലോ ട്രാഫിക് പോലീസ് ഓഫീസിലോ എതിർപ്പ് അറിയിക്കാം; ചില കേസുകൾ കോടതിയിലോ ലോക് അദാലത്തിലോ പോകും.",
+  "Is there a last date, or a date to appear, written on it? Say the date, or say skip.": "ഇതിൽ അവസാന തീയതിയോ, ഹാജരാകേണ്ട തീയതിയോ എഴുതിയിട്ടുണ്ടോ? തീയതി പറയുക, അല്ലെങ്കിൽ ഒഴിവാക്കുക എന്ന് പറയുക.",
+  "Keep the receipt or the payment message.": "രസീതോ പണമടച്ചതിന്റെ സന്ദേശമോ സൂക്ഷിച്ചുവയ്ക്കുക.",
+  "Keep the receipt. You may need it later, for example when selling the property.": "രസീത് സൂക്ഷിച്ചുവയ്ക്കുക. പിന്നീട് ആവശ്യം വന്നേക്കാം, ഉദാഹരണത്തിന് വസ്തു വിൽക്കുമ്പോൾ.",
+  "Kind of paper": "കടലാസിന്റെ തരം",
+  "Log in at incometax.gov.in, or ask a tax helper, to see the notice and reply by the date given.": "incometax.gov.in ൽ ലോഗ് ഇൻ ചെയ്തോ, നികുതി അറിയുന്ന ഒരാളുടെ സഹായത്തോടെയോ, നോട്ടീസ് കാണുക, നൽകിയ തീയതിക്കകം മറുപടി നൽകുക.",
+  "Never tell anyone your OTP, PIN or password, not even someone who says they are from the bank or the office.": "നിങ്ങളുടെ ഒടിപി, പിൻ അല്ലെങ്കിൽ പാസ്‌വേഡ് ആരോടും പറയരുത്, ബാങ്കിൽ നിന്നോ ഓഫീസിൽ നിന്നോ ആണെന്ന് പറയുന്നവരോടുപോലും.",
+  "No court, police or CBI officer arrests anyone on a video call, and no one can ask you to pay to avoid arrest. A so-called digital arrest is fraud: cut the call and dial 1930.": "ഒരു കോടതിയോ പോലീസോ സിബിഐ ഉദ്യോഗസ്ഥനോ വീഡിയോ കോളിൽ ആരെയും അറസ്റ്റ് ചെയ്യില്ല, അറസ്റ്റ് ഒഴിവാക്കാൻ ആർക്കും പണം ചോദിക്കാനാവില്ല. \"ഡിജിറ്റൽ അറസ്റ്റ്\" എന്നത് തട്ടിപ്പാണ്: കോൾ കട്ട് ചെയ്ത് 1930 ൽ വിളിക്കുക.",
+  "Pay by the last date at the electricity office, a bank or post office counter, or the company's official app or website.": "അവസാന തീയതിക്കകം വൈദ്യുതി ഓഫീസിലോ, ബാങ്കിന്റെയോ പോസ്റ്റ് ഓഫീസിന്റെയോ കൗണ്ടറിലോ, കമ്പനിയുടെ ഔദ്യോഗിക ആപ്പിലോ വെബ്‌സൈറ്റിലോ അടയ്ക്കുക.",
+  "Pay by the last date at the municipal office or on its official website. Paying late usually adds a penalty or interest.": "അവസാന തീയതിക്കകം മുനിസിപ്പൽ ഓഫീസിലോ അതിന്റെ ഔദ്യോഗിക വെബ്‌സൈറ്റിലോ അടയ്ക്കുക. വൈകി അടച്ചാൽ സാധാരണ പിഴയോ പലിശയോ ചേരും.",
+  "Pay by the last date at the water board or municipal office, or on its official website or app.": "അവസാന തീയതിക്കകം ജല അതോറിറ്റിയുടെയോ മുനിസിപ്പാലിറ്റിയുടെയോ ഓഫീസിലോ, അതിന്റെ ഔദ്യോഗിക വെബ്‌സൈറ്റിലോ ആപ്പിലോ അടയ്ക്കുക.",
+  "Pay only at the office or through its official website or app, not through a link someone sends you.": "പണം ഓഫീസിലോ അതിന്റെ ഔദ്യോഗിക വെബ്‌സൈറ്റിലോ ആപ്പിലോ മാത്രം അടയ്ക്കുക, ആരെങ്കിലും അയച്ച ലിങ്കിലൂടെ അല്ല.",
+  "Pay only into the loan account, at the branch or through the official app, and keep the receipt.": "പണം വായ്പാ അക്കൗണ്ടിലേക്ക് മാത്രം, ശാഖയിലോ ഔദ്യോഗിക ആപ്പിലോ അടയ്ക്കുക, രസീത് സൂക്ഷിക്കുക.",
+  "Pay only to the municipality. Do not give cash to someone who comes to your door without an official receipt.": "പണം മുനിസിപ്പാലിറ്റിക്ക് മാത്രം നൽകുക. ഔദ്യോഗിക രസീതില്ലാതെ വീട്ടിൽ വരുന്ന ആർക്കും പണമായി കൊടുക്കരുത്.",
+  "Recovery agents must not threaten you or use abusive words, and must not call before 8 in the morning or after 7 in the evening. If they do, complain to the bank and, if you are threatened, to the police.": "റിക്കവറി ഏജന്റുമാർ നിങ്ങളെ ഭീഷണിപ്പെടുത്താനോ അസഭ്യം പറയാനോ പാടില്ല, രാവിലെ 8 ന് മുമ്പോ വൈകിട്ട് 7 ന് ശേഷമോ വിളിക്കാനും പാടില്ല. അങ്ങനെയുണ്ടായാൽ ബാങ്കിൽ പരാതിപ്പെടുക, ഭീഷണിയുണ്ടെങ്കിൽ പോലീസിലും.",
+  "Show it to someone you trust, at the CSC, the panchayat, or the office that sent it, and ask what it asks you to do and by when.": "ഇത് വിശ്വസിക്കാവുന്ന ഒരാളെ, സിഎസ്‌സിയിൽ, പഞ്ചായത്തിൽ, അല്ലെങ്കിൽ അയച്ച ഓഫീസിൽ കാണിക്കുക, ഇതിൽ എന്തു ചെയ്യാനാണ് പറയുന്നതെന്നും എപ്പോൾ വരെയാണെന്നും ചോദിക്കുക.",
+  "Tell me what kind of paper you got. I will explain what it means, what to do and by when.": "നിങ്ങൾക്ക് ഏത് കടലാസാണ് കിട്ടിയതെന്ന് പറയുക. അതിന്റെ അർഥം എന്താണ്, എന്തു ചെയ്യണം, എപ്പോൾ വരെ എന്ന് ഞാൻ വിശദീകരിക്കാം.",
+  "The department does not ask for payment through links in SMS or phone calls. Pay only through the official portal.": "ആദായനികുതി വകുപ്പ് എസ്എംഎസിലെയോ ഫോൺ കോളിലെയോ ലിങ്കിലൂടെ പണം ചോദിക്കില്ല. ഔദ്യോഗിക പോർട്ടലിലൂടെ മാത്രം അടയ്ക്കുക.",
+  "This is a fine for breaking a traffic rule, such as riding without a helmet or crossing a red light.": "ഇത് ഗതാഗത നിയമം ലംഘിച്ചതിനുള്ള പിഴയാണ്, ഉദാഹരണത്തിന് ഹെൽമെറ്റില്ലാതെ ഓടിക്കുക അല്ലെങ്കിൽ ചുവപ്പ് സിഗ്നൽ കടക്കുക.",
+  "This is a letter from a bank or loan company saying a loan payment (EMI) is overdue.": "ഇത് ബാങ്കിന്റെയോ വായ്പാ കമ്പനിയുടെയോ കത്താണ്, വായ്പാ തവണ (ഇഎംഐ) കുടിശ്ശികയാണെന്ന് പറയുന്നു.",
+  "This is a message saying your bank account, card or KYC will be blocked unless you do something now.": "ഇപ്പോൾ എന്തെങ്കിലും ചെയ്തില്ലെങ്കിൽ നിങ്ങളുടെ ബാങ്ക് അക്കൗണ്ട്, കാർഡ് അല്ലെങ്കിൽ കെവൈസി ബ്ലോക്ക് ആകുമെന്ന് പറയുന്ന സന്ദേശമാണിത്.",
+  "This is a notice from the Income Tax Department, usually asking you to file a return, explain a difference in your income details, or pay tax that is due.": "ഇത് ആദായനികുതി വകുപ്പിന്റെ നോട്ടീസാണ്, സാധാരണയായി റിട്ടേൺ ഫയൽ ചെയ്യാനോ, വരുമാന വിവരങ്ങളിലെ വ്യത്യാസം വിശദീകരിക്കാനോ, കുടിശ്ശിക നികുതി അടയ്ക്കാനോ ആവശ്യപ്പെടുന്നു.",
+  "This is a notice from the municipality or panchayat about tax on your house, shop or land: how much is due and by when.": "ഇത് മുനിസിപ്പാലിറ്റിയുടെയോ പഞ്ചായത്തിന്റെയോ നോട്ടീസാണ്, നിങ്ങളുടെ വീട്, കട അല്ലെങ്കിൽ ഭൂമിയുടെ നികുതിയെക്കുറിച്ച്: എത്ര അടയ്ക്കണം, എപ്പോൾ വരെ.",
+  "This is a paper from a court or a lawyer. A court summons gives the date you must appear; a lawyer's notice asks you to do something or reply within a time.": "ഇത് കോടതിയുടെയോ അഭിഭാഷകന്റെയോ കടലാസാണ്. കോടതി സമൻസിൽ നിങ്ങൾ ഹാജരാകേണ്ട തീയതി ഉണ്ടാകും; അഭിഭാഷകന്റെ നോട്ടീസ് എന്തെങ്കിലും ചെയ്യാനോ നിശ്ചിത സമയത്തിനകം മറുപടി നൽകാനോ ആവശ്യപ്പെടുന്നു.",
+  "This is your electricity bill: how much you owe for the power you used, and the last date to pay it.": "ഇത് നിങ്ങളുടെ വൈദ്യുതി ബില്ലാണ്: നിങ്ങൾ ഉപയോഗിച്ച വൈദ്യുതിയുടെ പണം, അടയ്ക്കാനുള്ള അവസാന തീയതി.",
+  "This is your water bill from the water board or the municipality: the amount you owe and the last date to pay.": "ഇത് ജല അതോറിറ്റിയുടെയോ മുനിസിപ്പാലിറ്റിയുടെയോ വെള്ളക്കരം ബില്ലാണ്: എത്ര പണം അടയ്ക്കണം, അടയ്ക്കാനുള്ള അവസാന തീയതി.",
+  "Understand a paper (bill, notice, summons)": "കടലാസ് മനസ്സിലാക്കുക (ബിൽ, നോട്ടീസ്, സമൻസ്)",
+  "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.": "ഇത് ഏത് കടലാസാണ്? ഉദാഹരണത്തിന്: വൈദ്യുതി ബിൽ, വെള്ളക്കരം ബിൽ, വസ്തു നികുതി, ബാങ്ക് വായ്പ, ബാങ്ക് കെവൈസി സന്ദേശം, കോടതി സമൻസ്, ആദായനികുതി നോട്ടീസ്, ട്രാഫിക് ചലാൻ, അല്ലെങ്കിൽ മറ്റെന്തെങ്കിലും."
  },
  "options": {
   "Male": [
@@ -664,6 +753,75 @@
    "സ്വന്തമായി വീടില്ല",
    "വീടില്ല",
    "വാടക വീട്"
+  ],
+  "No reply received": [
+   "മറുപടി വന്നില്ല",
+   "വന്നില്ല",
+   "മറുപടി ഇല്ല",
+   "കിട്ടിയില്ല",
+   "ഇല്ല"
+  ],
+  "Reply received, not satisfied": [
+   "മറുപടി വന്നു, തൃപ്തിയില്ല",
+   "മറുപടി വന്നു",
+   "വന്നു",
+   "കിട്ടി",
+   "അപൂർണ്ണം",
+   "അതെ"
+  ],
+  "Bank KYC or account block message": [
+   "ബാങ്ക് കെവൈസി സന്ദേശം",
+   "കെവൈസി",
+   "അക്കൗണ്ട് ബ്ലോക്ക്",
+   "കാർഡ് ബ്ലോക്ക്"
+  ],
+  "Bank loan or EMI notice": [
+   "ബാങ്ക് വായ്പാ നോട്ടീസ്",
+   "ബാങ്ക് വായ്പ",
+   "വായ്പ",
+   "ലോൺ",
+   "ഇഎംഐ",
+   "തവണ"
+  ],
+  "Court summons or legal notice": [
+   "കോടതി സമൻസ് അല്ലെങ്കിൽ നിയമ നോട്ടീസ്",
+   "കോടതി സമൻസ്",
+   "കോടതി",
+   "കോർട്ട്",
+   "സമൻസ്",
+   "വക്കീൽ നോട്ടീസ്"
+  ],
+  "Electricity bill": [
+   "വൈദ്യുതി ബിൽ",
+   "വൈദ്യുതി",
+   "കറന്റ് ബിൽ",
+   "കെഎസ്ഇബി ബിൽ"
+  ],
+  "Income tax notice": [
+   "ആദായനികുതി നോട്ടീസ്",
+   "ആദായനികുതി",
+   "ഇൻകം ടാക്സ്"
+  ],
+  "Property tax notice": [
+   "വസ്തു നികുതി നോട്ടീസ്",
+   "വസ്തു നികുതി",
+   "കെട്ടിട നികുതി",
+   "പ്രോപ്പർട്ടി ടാക്സ്"
+  ],
+  "Something else": [
+   "മറ്റെന്തെങ്കിലും",
+   "മറ്റൊന്ന്",
+   "അറിയില്ല"
+  ],
+  "Traffic challan": [
+   "ട്രാഫിക് ചലാൻ",
+   "ചലാൻ",
+   "പിഴ"
+  ],
+  "Water bill": [
+   "വെള്ളക്കരം ബിൽ",
+   "വെള്ളം",
+   "വാട്ടർ ബിൽ"
   ]
  },
  "words": {
