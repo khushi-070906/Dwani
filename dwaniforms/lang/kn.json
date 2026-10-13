@@ -51,7 +51,15 @@
   "fix_which": "ಯಾವ ಭಾಗವನ್ನು ಬದಲಾಯಿಸಬೇಕು? ಇವುಗಳಲ್ಲಿ ಒಂದನ್ನು ಹೇಳಿ:",
   "khasra_invalid": "ಖಸ್ರಾ ಸಂಖ್ಯೆ ಸಿಗಲಿಲ್ಲ. ನೂರ ನಲವತ್ತೈದು ಬಟಾ ಎರಡು ಎಂಬಂತೆ ಹೇಳಿ.",
   "ration_invalid": "ಪಡಿತರ ಚೀಟಿ ಸಂಖ್ಯೆ ಸಿಗಲಿಲ್ಲ. ನಿಧಾನವಾಗಿ ಇನ್ನೊಮ್ಮೆ ಹೇಳಿ.",
-  "unit_acres": "ದಯವಿಟ್ಟು ಜಮೀನನ್ನು ಎಕರೆಯಲ್ಲಿ ಹೇಳಿ. ಗುಂಟೆ, ಬಿಘಾ, ಕನಾಲ್ ರಾಜ್ಯದಿಂದ ರಾಜ್ಯಕ್ಕೆ ಬೇರೆಯಾಗುತ್ತವೆ."
+  "unit_acres": "ದಯವಿಟ್ಟು ಜಮೀನನ್ನು ಎಕರೆಯಲ್ಲಿ ಹೇಳಿ. ಗುಂಟೆ, ಬಿಘಾ, ಕನಾಲ್ ರಾಜ್ಯದಿಂದ ರಾಜ್ಯಕ್ಕೆ ಬೇರೆಯಾಗುತ್ತವೆ.",
+  "outcome_rti_appeal": "ನಿಮ್ಮ ಮೊದಲ ಮೇಲ್ಮನವಿ ಪರದೆಯ ಮೇಲೆ ಸಿದ್ಧವಾಗಿದೆ. ಅದನ್ನು ಮುದ್ರಿಸಿ, ಸಹಿ ಮಾಡಿ, ನಿಮ್ಮ ದಾಖಲೆಗಳ ಪ್ರತಿಗಳೊಂದಿಗೆ ಕಳುಹಿಸಿ.",
+  "rti_appeal_early": "ಕಚೇರಿಗೆ {date} ರವರೆಗೆ ಉತ್ತರಿಸಲು ಸಮಯವಿದೆ. ಅಷ್ಟರೊಳಗೆ ಉತ್ತರ ಬರದಿದ್ದರೆ, ಆ ದಿನಾಂಕದ ನಂತರ ಈ ಮೇಲ್ಮನವಿ ಕಳುಹಿಸಿ.",
+  "rti_appeal_late": "30 ದಿನಗಳಿಗಿಂತ ಹೆಚ್ಚು ಕಳೆದಿವೆ, ಆದ್ದರಿಂದ ಮೇಲ್ಮನವಿ ತಡವಾಗಿದೆ. ಖಾಲಿ ಜಾಗದಲ್ಲಿ ತಡವಾದ ಕಾರಣ ಬರೆಯಿರಿ; ಅಧಿಕಾರಿ ಆದರೂ ಅದನ್ನು ಸ್ವೀಕರಿಸಬಹುದು.",
+  "outcome_explain": "ಈ ಕಾಗದದ ಅರ್ಥ ಇದು. ಎಲ್ಲವೂ ಪರದೆಯ ಮೇಲೂ ಬರೆದಿದೆ.",
+  "explain_ahead": "ಕಾಗದದ ಮೇಲೆ ಬರೆದ ದಿನಾಂಕ {date}, ಇಂದಿನಿಂದ {days} ದಿನಗಳ ನಂತರ.",
+  "explain_today": "ಕಾಗದದ ಮೇಲೆ ಬರೆದ ದಿನಾಂಕ ಇಂದೇ.",
+  "explain_passed": "ಕಾಗದದ ಮೇಲೆ ಬರೆದ ದಿನಾಂಕ, {date}, ಈಗಾಗಲೇ ಕಳೆದಿದೆ. ಇಂದೇ ಕಚೇರಿಗೆ ಹೋಗಿ ಈಗ ಏನು ಮಾಡಬೇಕು ಎಂದು ಕೇಳಿ.",
+  "explain_disclaimer": "ಇದು ಸಾಮಾನ್ಯ ಮಾಹಿತಿ, ಕಾನೂನು ಸಲಹೆ ಅಲ್ಲ. ಏನಾದರೂ ಮಾಡುವ ಮೊದಲು ಕಾಗದವನ್ನು ನೀವೇ ಓದಿ, ಅಥವಾ ಕಚೇರಿಯಲ್ಲಿ ಕೇಳಿ."
  },
  "ui": {
   "a11y_bigger": "ಅಕ್ಷರ ದೊಡ್ಡದು ಮಾಡಿ",
@@ -172,7 +180,21 @@
   "why_maybe": "'ಪರಿಶೀಲಿಸಬೇಕು' ಏಕೆ",
   "working": "ಅರ್ಥ ಮಾಡಿಕೊಳ್ಳುತ್ತಿದ್ದೇನೆ…",
   "yes": "ಹೌದು, ಸರಿ",
-  "yes_word": "ಹೌದು"
+  "yes_word": "ಹೌದು",
+  "ex_amount": "ಮೊತ್ತ",
+  "ex_beware": "ವಂಚನೆಯ ಬಗ್ಗೆ ಎಚ್ಚರ",
+  "ex_date": "ಕಾಗದದ ಮೇಲಿನ ದಿನಾಂಕ",
+  "ex_do": "ಏನು ಮಾಡಬೇಕು",
+  "ex_help": "ವಂಚನೆಯಾಗಿದ್ದರೆ",
+  "ex_left": "ದಿನ ಬಾಕಿ",
+  "ex_note": "ಸಾಮಾನ್ಯ ಮಾಹಿತಿ, ಕಾನೂನು ಸಲಹೆ ಅಲ್ಲ. ಪರಿಶೀಲಿಸಿದ್ದು:",
+  "ex_passed": "ಈ ದಿನಾಂಕ ಕಳೆದಿದೆ",
+  "ex_today": "ಈ ದಿನಾಂಕ ಇಂದು",
+  "ex_what": "ಇದು ಏನು",
+  "ex_wrong": "ಇದರಲ್ಲಿ ಏನಾದರೂ ತಪ್ಪಿದ್ದರೆ",
+  "g_explain": "ಕಾಗದ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ",
+  "k_explain": "ಕಾಗದದ ಅರ್ಥ",
+  "next_explain": "ಕಾಗದವನ್ನು ಜೋಪಾನವಾಗಿಡಿ. ಯಾವುದಾದರೂ ಕಚೇರಿ ನಿಮಗೆ ಅನ್ಯಾಯ ಮಾಡಿದ್ದರೆ, ಮುಖಪುಟದಿಂದ ದೂರು ಬರೆಯಬಹುದು."
  },
  "text": {
   "Bank KYC": "ಬ್ಯಾಂಕ್ ಕೆವೈಸಿ",
@@ -400,7 +422,74 @@
   "Keep the acknowledgement / registration number you are given.": "ನಿಮಗೆ ಸಿಗುವ ಸ್ವೀಕೃತಿ / ನೋಂದಣಿ ಸಂಖ್ಯೆಯನ್ನು ಜೋಪಾನವಾಗಿ ಇಟ್ಟುಕೊಳ್ಳಿ.",
   "Send it to the Public Information Officer of the department by post or by hand, with the fee (unless BPL).": "ಶುಲ್ಕದೊಂದಿಗೆ (ಬಿಪಿಎಲ್ ಹೊರತು) ಇಲಾಖೆಯ ಸಾರ್ವಜನಿಕ ಮಾಹಿತಿ ಅಧಿಕಾರಿಗೆ ಅಂಚೆಯಲ್ಲಿ ಅಥವಾ ಖುದ್ದಾಗಿ ಕಳುಹಿಸಿ.",
   "For central ministries and departments you can also file online at rtionline.gov.in; many states have their own RTI portals.": "ಕೇಂದ್ರ ಸಚಿವಾಲಯ ಮತ್ತು ಇಲಾಖೆಗಳಿಗೆ rtionline.gov.in ನಲ್ಲಿಯೂ ಆನ್‌ಲೈನ್ ಸಲ್ಲಿಸಬಹುದು; ಹಲವು ರಾಜ್ಯಗಳಿಗೆ ತಮ್ಮದೇ ಆರ್‌ಟಿಐ ಪೋರ್ಟಲ್ ಇದೆ.",
-  "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can file a first appeal.": "ಪಿಐಒ 30 ದಿನಗಳಲ್ಲಿ ಉತ್ತರಿಸಬೇಕು (ಜೀವ ಅಥವಾ ಸ್ವಾತಂತ್ರ್ಯಕ್ಕೆ ಸಂಬಂಧಿಸಿದ್ದರೆ 48 ಗಂಟೆಗಳಲ್ಲಿ). ಇಲ್ಲದಿದ್ದರೆ ಮೊದಲ ಮೇಲ್ಮನವಿ ಸಲ್ಲಿಸಬಹುದು."
+  "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can file a first appeal.": "ಪಿಐಒ 30 ದಿನಗಳಲ್ಲಿ ಉತ್ತರಿಸಬೇಕು (ಜೀವ ಅಥವಾ ಸ್ವಾತಂತ್ರ್ಯಕ್ಕೆ ಸಂಬಂಧಿಸಿದ್ದರೆ 48 ಗಂಟೆಗಳಲ್ಲಿ). ಇಲ್ಲದಿದ್ದರೆ ಮೊದಲ ಮೇಲ್ಮನವಿ ಸಲ್ಲಿಸಬಹುದು.",
+  "RTI first appeal": "ಆರ್‌ಟಿಐ ಮೊದಲ ಮೇಲ್ಮನವಿ",
+  "No reply to your RTI in 30 days, or an incomplete one? The first appeal is drafted for you.": "30 ದಿನಗಳಲ್ಲಿ ನಿಮ್ಮ ಆರ್‌ಟಿಐಗೆ ಉತ್ತರ ಬರಲಿಲ್ಲವೇ, ಅಥವಾ ಅಪೂರ್ಣವಾಗಿ ಬಂತೇ? ಮೊದಲ ಮೇಲ್ಮನವಿ ನಿಮಗಾಗಿ ಸಿದ್ಧವಾಗುತ್ತದೆ.",
+  "Which department did you send your RTI application to?": "ನೀವು ಆರ್‌ಟಿಐ ಅರ್ಜಿಯನ್ನು ಯಾವ ಇಲಾಖೆಗೆ ಕಳುಹಿಸಿದ್ದಿರಿ?",
+  "On which date did you send the RTI application?": "ಆರ್‌ಟಿಐ ಅರ್ಜಿಯನ್ನು ಯಾವ ದಿನಾಂಕದಂದು ಕಳುಹಿಸಿದ್ದಿರಿ?",
+  "Date of RTI application": "ಆರ್‌ಟಿಐ ಅರ್ಜಿಯ ದಿನಾಂಕ",
+  "In short, what information had you asked for?": "ಸಂಕ್ಷಿಪ್ತವಾಗಿ, ನೀವು ಯಾವ ಮಾಹಿತಿ ಕೇಳಿದ್ದಿರಿ?",
+  "Information asked for": "ಕೇಳಿದ ಮಾಹಿತಿ",
+  "Did you get a reply from the office? Say: no reply, or reply received.": "ಕಚೇರಿಯಿಂದ ಉತ್ತರ ಬಂತೇ? ಹೇಳಿ: ಉತ್ತರ ಬಂದಿಲ್ಲ, ಅಥವಾ ಉತ್ತರ ಬಂದಿದೆ.",
+  "Reply from the PIO": "ಪಿಐಒ ಅವರ ಉತ್ತರ",
+  "On which date did you get the reply?": "ಉತ್ತರ ಯಾವ ದಿನಾಂಕದಂದು ಸಿಕ್ಕಿತು?",
+  "Date of reply": "ಉತ್ತರದ ದಿನಾಂಕ",
+  "What is wrong with the reply? For example: information is missing, or it was refused without a reason.": "ಉತ್ತರದಲ್ಲಿ ಏನು ತಪ್ಪಿದೆ? ಉದಾಹರಣೆಗೆ: ಮಾಹಿತಿ ಅಪೂರ್ಣವಾಗಿದೆ, ಅಥವಾ ಕಾರಣವಿಲ್ಲದೆ ನಿರಾಕರಿಸಲಾಗಿದೆ.",
+  "Why the reply is not acceptable": "ಉತ್ತರ ಏಕೆ ಒಪ್ಪಲಾಗದು",
+  "Send it to the First Appellate Authority: the officer senior to the Public Information Officer in the same department. Attach copies of your RTI application and of the reply, if any.": "ಇದನ್ನು ಮೊದಲ ಮೇಲ್ಮನವಿ ಪ್ರಾಧಿಕಾರಕ್ಕೆ ಕಳುಹಿಸಿ: ಅದೇ ಇಲಾಖೆಯಲ್ಲಿ ಪಿಐಒಗಿಂತ ಹಿರಿಯ ಅಧಿಕಾರಿ. ನಿಮ್ಮ ಆರ್‌ಟಿಐ ಅರ್ಜಿ ಮತ್ತು ಉತ್ತರದ (ಬಂದಿದ್ದರೆ) ಪ್ರತಿಗಳನ್ನು ಲಗತ್ತಿಸಿ.",
+  "Central government departments charge no fee for a first appeal; some states do, so check your state's rules.": "ಕೇಂದ್ರ ಸರ್ಕಾರದ ಇಲಾಖೆಗಳು ಮೊದಲ ಮೇಲ್ಮನವಿಗೆ ಶುಲ್ಕ ತೆಗೆದುಕೊಳ್ಳುವುದಿಲ್ಲ; ಕೆಲವು ರಾಜ್ಯಗಳು ತೆಗೆದುಕೊಳ್ಳುತ್ತವೆ, ಆದ್ದರಿಂದ ನಿಮ್ಮ ರಾಜ್ಯದ ನಿಯಮಗಳನ್ನು ನೋಡಿ.",
+  "The appeal must be decided within 30 days, 45 at most. If you are still not satisfied, you can make a second appeal to the Information Commission within 90 days.": "ಮೇಲ್ಮನವಿಯ ತೀರ್ಮಾನ 30 ದಿನಗಳಲ್ಲಿ, ಹೆಚ್ಚೆಂದರೆ 45 ದಿನಗಳಲ್ಲಿ ಆಗಬೇಕು. ಆಗಲೂ ತೃಪ್ತಿಯಾಗದಿದ್ದರೆ 90 ದಿನಗಳಲ್ಲಿ ಮಾಹಿತಿ ಆಯೋಗಕ್ಕೆ ಎರಡನೇ ಮೇಲ್ಮನವಿ ಸಲ್ಲಿಸಬಹುದು.",
+  "A message or call saying your power will be cut tonight unless you call a number or pay through a link is a common fraud. The electricity company does not do this.": "\"ಇಂದು ರಾತ್ರಿ ವಿದ್ಯುತ್ ಕಡಿತವಾಗುತ್ತದೆ, ಈ ಸಂಖ್ಯೆಗೆ ಕರೆ ಮಾಡಿ ಅಥವಾ ಲಿಂಕ್ ಮೂಲಕ ಹಣ ಕಟ್ಟಿ\" ಎಂಬ ಸಂದೇಶ ಅಥವಾ ಕರೆ ಸಾಮಾನ್ಯ ವಂಚನೆ. ವಿದ್ಯುತ್ ಕಂಪನಿ ಹೀಗೆ ಮಾಡುವುದಿಲ್ಲ.",
+  "Amount (Rs.)": "ಮೊತ್ತ (ರೂ.)",
+  "Banks never ask for your OTP, PIN, password or CVV. Anyone who asks is a fraud.": "ಬ್ಯಾಂಕ್ ಎಂದಿಗೂ ನಿಮ್ಮ ಒಟಿಪಿ, ಪಿನ್, ಪಾಸ್‌ವರ್ಡ್ ಅಥವಾ ಸಿವಿವಿ ಕೇಳುವುದಿಲ್ಲ. ಕೇಳುವವರು ವಂಚಕರು.",
+  "Check the challan on the official site echallan.parivahan.gov.in with the challan number or your vehicle number, and pay there or at the traffic police office.": "ಚಲನ್ ಅನ್ನು ಅಧಿಕೃತ ತಾಣ echallan.parivahan.gov.in ನಲ್ಲಿ ಚಲನ್ ಸಂಖ್ಯೆ ಅಥವಾ ವಾಹನ ಸಂಖ್ಯೆಯಿಂದ ನೋಡಿ, ಮತ್ತು ಅಲ್ಲಿ ಅಥವಾ ಸಂಚಾರ ಪೊಲೀಸ್ ಕಚೇರಿಯಲ್ಲಿ ಪಾವತಿಸಿ.",
+  "Date on the paper": "ಕಾಗದದ ಮೇಲಿನ ದಿನಾಂಕ",
+  "Do not click the link or call the number in the message. Go to your branch, or call the number printed in your passbook or on the back of your card, and ask whether anything is really needed.": "ಸಂದೇಶದ ಲಿಂಕ್ ಒತ್ತಬೇಡಿ ಮತ್ತು ಅದರಲ್ಲಿನ ಸಂಖ್ಯೆಗೆ ಕರೆ ಮಾಡಬೇಡಿ. ನಿಮ್ಮ ಶಾಖೆಗೆ ಹೋಗಿ, ಅಥವಾ ಪಾಸ್‌ಬುಕ್ ಅಥವಾ ಕಾರ್ಡ್‌ನ ಹಿಂದೆ ಮುದ್ರಿಸಿದ ಸಂಖ್ಯೆಗೆ ಕರೆ ಮಾಡಿ ನಿಜವಾಗಿ ಏನಾದರೂ ಮಾಡಬೇಕೇ ಎಂದು ಕೇಳಿ.",
+  "Do not ignore it. Note the court, the case number and the date written on it, and go on that date or send a lawyer.": "ಇದನ್ನು ಕಡೆಗಣಿಸಬೇಡಿ. ನ್ಯಾಯಾಲಯದ ಹೆಸರು, ಪ್ರಕರಣ ಸಂಖ್ಯೆ ಮತ್ತು ಬರೆದ ದಿನಾಂಕವನ್ನು ಬರೆದಿಟ್ಟುಕೊಳ್ಳಿ, ಮತ್ತು ಆ ದಿನ ಹೋಗಿ ಅಥವಾ ವಕೀಲರನ್ನು ಕಳುಹಿಸಿ.",
+  "Do not pay cash to an agent without an official receipt.": "ಅಧಿಕೃತ ರಸೀದಿ ಇಲ್ಲದೆ ಯಾವುದೇ ಏಜೆಂಟ್‌ಗೆ ನಗದು ಕೊಡಬೇಡಿ.",
+  "Do not pay through a link in a message.": "ಯಾವುದೇ ಸಂದೇಶದ ಲಿಂಕ್ ಮೂಲಕ ಹಣ ಕಟ್ಟಬೇಡಿ.",
+  "Every genuine notice has a Document Identification Number (DIN). You can check it on incometax.gov.in under 'Authenticate notice/order issued by ITD'.": "ಪ್ರತಿ ನಿಜವಾದ ನೋಟಿಸ್‌ನಲ್ಲಿ ಡಾಕ್ಯುಮೆಂಟ್ ಐಡೆಂಟಿಫಿಕೇಶನ್ ನಂಬರ್ (ಡಿಐಎನ್) ಇರುತ್ತದೆ. ಅದನ್ನು incometax.gov.in ನಲ್ಲಿ 'Authenticate notice/order issued by ITD' ಎಂಬಲ್ಲಿ ಪರಿಶೀಲಿಸಬಹುದು.",
+  "Fake challan messages with a link to pay are common. Do not pay through a link in an SMS or WhatsApp; check on the official site first.": "ಹಣ ಕಟ್ಟುವ ಲಿಂಕ್ ಇರುವ ನಕಲಿ ಚಲನ್ ಸಂದೇಶಗಳು ಸಾಮಾನ್ಯ. ಎಸ್‌ಎಂಎಸ್ ಅಥವಾ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಲಿಂಕ್ ಮೂಲಕ ಹಣ ಕಟ್ಟಬೇಡಿ; ಮೊದಲು ಅಧಿಕೃತ ತಾಣದಲ್ಲಿ ಪರಿಶೀಲಿಸಿ.",
+  "Free legal help is available from the District Legal Services Authority at your district court, or by calling 15100.": "ಜಿಲ್ಲಾ ನ್ಯಾಯಾಲಯದಲ್ಲಿರುವ ಜಿಲ್ಲಾ ಕಾನೂನು ಸೇವೆಗಳ ಪ್ರಾಧಿಕಾರದಿಂದ, ಅಥವಾ 15100 ಗೆ ಕರೆ ಮಾಡಿ, ಉಚಿತ ಕಾನೂನು ನೆರವು ಸಿಗುತ್ತದೆ.",
+  "Give a written complaint at the electricity office and keep a copy with their stamp. If it is not fixed, every electricity company has a Consumer Grievance Redressal Forum.": "ವಿದ್ಯುತ್ ಕಚೇರಿಯಲ್ಲಿ ಲಿಖಿತ ದೂರು ಕೊಡಿ ಮತ್ತು ಮುದ್ರೆಯಿರುವ ಪ್ರತಿಯನ್ನು ನಿಮ್ಮ ಬಳಿ ಇಟ್ಟುಕೊಳ್ಳಿ. ಆದರೂ ಸರಿಯಾಗದಿದ್ದರೆ, ಪ್ರತಿ ವಿದ್ಯುತ್ ಕಂಪನಿಯಲ್ಲಿ ಗ್ರಾಹಕ ಕುಂದುಕೊರತೆ ಪರಿಹಾರ ವೇದಿಕೆ ಇರುತ್ತದೆ.",
+  "Go to the branch with your loan papers and ask for a written statement of what is due. If you cannot pay, ask in writing for more time or smaller instalments.": "ಸಾಲದ ದಾಖಲೆಗಳೊಂದಿಗೆ ಶಾಖೆಗೆ ಹೋಗಿ ಬಾಕಿ ಮೊತ್ತದ ಲಿಖಿತ ವಿವರ ಕೇಳಿ. ಈಗ ಕಟ್ಟಲು ಆಗದಿದ್ದರೆ, ಲಿಖಿತವಾಗಿ ಹೆಚ್ಚು ಸಮಯ ಅಥವಾ ಸಣ್ಣ ಕಂತುಗಳನ್ನು ಕೇಳಿ.",
+  "How much money does it ask for, in rupees? Or say skip.": "ಇದರಲ್ಲಿ ಎಷ್ಟು ರೂಪಾಯಿ ಕೇಳಲಾಗಿದೆ? ಅಥವಾ ಬಿಟ್ಟುಬಿಡಿ ಎನ್ನಿ.",
+  "I do not know this kind of paper yet.": "ಈ ರೀತಿಯ ಕಾಗದದ ಬಗ್ಗೆ ನನಗೆ ಇನ್ನೂ ಮಾಹಿತಿ ಇಲ್ಲ.",
+  "If it is about a problem with a government office, you can write a complaint here with 'Public grievance (complaint)'.": "ಯಾವುದಾದರೂ ಸರ್ಕಾರಿ ಕಚೇರಿಯ ಸಮಸ್ಯೆಯ ಬಗ್ಗೆ ಇದ್ದರೆ, ಇಲ್ಲೇ 'ಸಾರ್ವಜನಿಕ ದೂರು' ಮೂಲಕ ದೂರು ಬರೆಯಬಹುದು.",
+  "If money has been taken from you by fraud, call 1930 at once or report it at cybercrime.gov.in. Reporting quickly can stop the money.": "ವಂಚನೆಯಿಂದ ಹಣ ಹೋಗಿದ್ದರೆ, ತಕ್ಷಣ 1930 ಗೆ ಕರೆ ಮಾಡಿ ಅಥವಾ cybercrime.gov.in ನಲ್ಲಿ ದೂರು ನೀಡಿ. ಬೇಗ ತಿಳಿಸಿದರೆ ಹಣವನ್ನು ತಡೆಯಬಹುದು.",
+  "If money has been taken, call 1930 at once and tell your bank. Reporting quickly can stop the money.": "ಹಣ ಕಡಿತವಾಗಿದ್ದರೆ, ತಕ್ಷಣ 1930 ಗೆ ಕರೆ ಮಾಡಿ ಮತ್ತು ನಿಮ್ಮ ಬ್ಯಾಂಕಿಗೆ ತಿಳಿಸಿ. ಬೇಗ ತಿಳಿಸಿದರೆ ಹಣವನ್ನು ತಡೆಯಬಹುದು.",
+  "If the amount is wrong or you have already paid, complain to the bank in writing. If the bank does not reply in 30 days, or you are not satisfied, complain to the RBI Ombudsman for free: cms.rbi.org.in or 14448.": "ಮೊತ್ತ ತಪ್ಪಾಗಿದ್ದರೆ ಅಥವಾ ನೀವು ಈಗಾಗಲೇ ಕಟ್ಟಿದ್ದರೆ, ಬ್ಯಾಂಕಿಗೆ ಲಿಖಿತ ದೂರು ಕೊಡಿ. ಬ್ಯಾಂಕ್ 30 ದಿನಗಳಲ್ಲಿ ಉತ್ತರಿಸದಿದ್ದರೆ, ಅಥವಾ ನಿಮಗೆ ತೃಪ್ತಿಯಾಗದಿದ್ದರೆ, ಆರ್‌ಬಿಐ ಒಂಬುಡ್ಸ್‌ಮನ್‌ಗೆ ಉಚಿತವಾಗಿ ದೂರು ನೀಡಿ: cms.rbi.org.in ಅಥವಾ 14448.",
+  "If the amount looks wrong, or you were charged when there was no supply, give a written complaint at the office and keep a copy with their stamp.": "ಮೊತ್ತ ತಪ್ಪೆನಿಸಿದರೆ, ಅಥವಾ ನೀರು ಬರದಿದ್ದರೂ ಹಣ ವಿಧಿಸಿದ್ದರೆ, ಕಚೇರಿಯಲ್ಲಿ ಲಿಖಿತ ದೂರು ಕೊಡಿ ಮತ್ತು ಮುದ್ರೆಯಿರುವ ಪ್ರತಿಯನ್ನು ನಿಮ್ಮ ಬಳಿ ಇಟ್ಟುಕೊಳ್ಳಿ.",
+  "If the area or the type of building written on the notice is wrong, you can file an objection at the municipal office. The notice usually says by when; do it before that date.": "ನೋಟಿಸ್‌ನಲ್ಲಿ ಬರೆದ ವಿಸ್ತೀರ್ಣ ಅಥವಾ ಕಟ್ಟಡದ ಬಗೆ ತಪ್ಪಾಗಿದ್ದರೆ, ನಗರಸಭೆ ಕಚೇರಿಯಲ್ಲಿ ಆಕ್ಷೇಪಣೆ ಸಲ್ಲಿಸಬಹುದು. ಯಾವಾಗದವರೆಗೆ ಎಂದು ನೋಟಿಸ್‌ನಲ್ಲಿ ಸಾಮಾನ್ಯವಾಗಿ ಬರೆದಿರುತ್ತದೆ; ಅದಕ್ಕಿಂತ ಮೊದಲು ಮಾಡಿ.",
+  "If the bill is much higher than usual, compare the meter reading printed on it with your meter.": "ಬಿಲ್ ಎಂದಿಗಿಂತ ತುಂಬಾ ಹೆಚ್ಚಿದ್ದರೆ, ಅದರ ಮೇಲೆ ಮುದ್ರಿಸಿದ ಮೀಟರ್ ರೀಡಿಂಗ್ ಅನ್ನು ನಿಮ್ಮ ಮೀಟರ್‌ನೊಂದಿಗೆ ಹೋಲಿಸಿ.",
+  "If you think it is wrong, you can dispute it as written on the challan, or at the traffic police office; some cases go to a court or a Lok Adalat.": "ಚಲನ್ ತಪ್ಪೆನಿಸಿದರೆ, ಚಲನ್‌ನಲ್ಲಿ ಬರೆದ ರೀತಿಯಲ್ಲಿ ಅಥವಾ ಸಂಚಾರ ಪೊಲೀಸ್ ಕಚೇರಿಯಲ್ಲಿ ಆಕ್ಷೇಪಿಸಬಹುದು; ಕೆಲವು ಪ್ರಕರಣಗಳು ನ್ಯಾಯಾಲಯ ಅಥವಾ ಲೋಕ ಅದಾಲತ್‌ಗೆ ಹೋಗುತ್ತವೆ.",
+  "Is there a last date, or a date to appear, written on it? Say the date, or say skip.": "ಇದರ ಮೇಲೆ ಕೊನೆಯ ದಿನಾಂಕ, ಅಥವಾ ಹಾಜರಾಗುವ ದಿನಾಂಕ ಬರೆದಿದೆಯೇ? ದಿನಾಂಕ ಹೇಳಿ, ಅಥವಾ ಬಿಟ್ಟುಬಿಡಿ ಎನ್ನಿ.",
+  "Keep the receipt or the payment message.": "ರಸೀದಿ ಅಥವಾ ಪಾವತಿಯ ಸಂದೇಶವನ್ನು ಜೋಪಾನವಾಗಿಡಿ.",
+  "Keep the receipt. You may need it later, for example when selling the property.": "ರಸೀದಿಯನ್ನು ಜೋಪಾನವಾಗಿಡಿ. ನಂತರ ಉಪಯೋಗಕ್ಕೆ ಬರಬಹುದು, ಉದಾಹರಣೆಗೆ ಆಸ್ತಿ ಮಾರುವಾಗ.",
+  "Kind of paper": "ಕಾಗದದ ಬಗೆ",
+  "Log in at incometax.gov.in, or ask a tax helper, to see the notice and reply by the date given.": "incometax.gov.in ನಲ್ಲಿ ಲಾಗ್ ಇನ್ ಮಾಡಿ, ಅಥವಾ ತೆರಿಗೆ ತಿಳಿದವರ ಸಹಾಯದಿಂದ, ನೋಟಿಸ್ ನೋಡಿ ಮತ್ತು ಕೊಟ್ಟ ದಿನಾಂಕದೊಳಗೆ ಉತ್ತರಿಸಿ.",
+  "Never tell anyone your OTP, PIN or password, not even someone who says they are from the bank or the office.": "ನಿಮ್ಮ ಒಟಿಪಿ, ಪಿನ್ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ಅನ್ನು ಯಾರಿಗೂ ಹೇಳಬೇಡಿ, ತಾವು ಬ್ಯಾಂಕ್ ಅಥವಾ ಕಚೇರಿಯವರು ಎಂದು ಹೇಳುವವರಿಗೂ ಬೇಡ.",
+  "No court, police or CBI officer arrests anyone on a video call, and no one can ask you to pay to avoid arrest. A so-called digital arrest is fraud: cut the call and dial 1930.": "ಯಾವುದೇ ನ್ಯಾಯಾಲಯ, ಪೊಲೀಸ್ ಅಥವಾ ಸಿಬಿಐ ಅಧಿಕಾರಿ ವಿಡಿಯೋ ಕರೆಯಲ್ಲಿ ಬಂಧಿಸುವುದಿಲ್ಲ, ಮತ್ತು ಬಂಧನ ತಪ್ಪಿಸಲು ಯಾರೂ ಹಣ ಕೇಳುವಂತಿಲ್ಲ. \"ಡಿಜಿಟಲ್ ಅರೆಸ್ಟ್\" ಎನ್ನುವುದು ವಂಚನೆ: ಕರೆ ಕಡಿತಗೊಳಿಸಿ 1930 ಗೆ ಕರೆ ಮಾಡಿ.",
+  "Pay by the last date at the electricity office, a bank or post office counter, or the company's official app or website.": "ಕೊನೆಯ ದಿನಾಂಕದೊಳಗೆ ವಿದ್ಯುತ್ ಕಚೇರಿಯಲ್ಲಿ, ಬ್ಯಾಂಕ್ ಅಥವಾ ಅಂಚೆ ಕಚೇರಿಯ ಕೌಂಟರ್‌ನಲ್ಲಿ, ಅಥವಾ ಕಂಪನಿಯ ಅಧಿಕೃತ ಆ್ಯಪ್ ಅಥವಾ ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ ಪಾವತಿಸಿ.",
+  "Pay by the last date at the municipal office or on its official website. Paying late usually adds a penalty or interest.": "ಕೊನೆಯ ದಿನಾಂಕದೊಳಗೆ ನಗರಸಭೆ ಕಚೇರಿಯಲ್ಲಿ ಅಥವಾ ಅದರ ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ ಪಾವತಿಸಿ. ತಡವಾಗಿ ಕಟ್ಟಿದರೆ ಸಾಮಾನ್ಯವಾಗಿ ದಂಡ ಅಥವಾ ಬಡ್ಡಿ ಸೇರುತ್ತದೆ.",
+  "Pay by the last date at the water board or municipal office, or on its official website or app.": "ಕೊನೆಯ ದಿನಾಂಕದೊಳಗೆ ಜಲಮಂಡಳಿ ಅಥವಾ ನಗರಸಭೆ ಕಚೇರಿಯಲ್ಲಿ, ಅಥವಾ ಅದರ ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್ ಅಥವಾ ಆ್ಯಪ್‌ನಲ್ಲಿ ಪಾವತಿಸಿ.",
+  "Pay only at the office or through its official website or app, not through a link someone sends you.": "ಹಣವನ್ನು ಕಚೇರಿಯಲ್ಲಿ ಅಥವಾ ಅದರ ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್ ಅಥವಾ ಆ್ಯಪ್‌ನಲ್ಲಿ ಮಾತ್ರ ಕಟ್ಟಿ, ಯಾರೋ ಕಳುಹಿಸಿದ ಲಿಂಕ್ ಮೂಲಕ ಅಲ್ಲ.",
+  "Pay only into the loan account, at the branch or through the official app, and keep the receipt.": "ಹಣವನ್ನು ಸಾಲದ ಖಾತೆಗೆ ಮಾತ್ರ, ಶಾಖೆಯಲ್ಲಿ ಅಥವಾ ಅಧಿಕೃತ ಆ್ಯಪ್ ಮೂಲಕ ಕಟ್ಟಿ, ಮತ್ತು ರಸೀದಿ ಇಟ್ಟುಕೊಳ್ಳಿ.",
+  "Pay only to the municipality. Do not give cash to someone who comes to your door without an official receipt.": "ಹಣವನ್ನು ನಗರಸಭೆಗೆ ಮಾತ್ರ ಕೊಡಿ. ಅಧಿಕೃತ ರಸೀದಿ ಇಲ್ಲದೆ ಮನೆಗೆ ಬಂದ ಯಾರಿಗೂ ನಗದು ಕೊಡಬೇಡಿ.",
+  "Recovery agents must not threaten you or use abusive words, and must not call before 8 in the morning or after 7 in the evening. If they do, complain to the bank and, if you are threatened, to the police.": "ವಸೂಲಿ ಏಜೆಂಟರು ನಿಮಗೆ ಬೆದರಿಕೆ ಹಾಕುವಂತಿಲ್ಲ ಅಥವಾ ಬೈಯುವಂತಿಲ್ಲ, ಮತ್ತು ಬೆಳಿಗ್ಗೆ 8 ಕ್ಕಿಂತ ಮೊದಲು ಅಥವಾ ಸಂಜೆ 7 ರ ನಂತರ ಕರೆ ಮಾಡುವಂತಿಲ್ಲ. ಹಾಗಾದರೆ ಬ್ಯಾಂಕಿಗೆ ದೂರು ನೀಡಿ, ಬೆದರಿಕೆ ಬಂದರೆ ಪೊಲೀಸರಿಗೆ.",
+  "Show it to someone you trust, at the CSC, the panchayat, or the office that sent it, and ask what it asks you to do and by when.": "ಇದನ್ನು ನಂಬಿಕಸ್ಥ ವ್ಯಕ್ತಿಗೆ, ಸಿಎಸ್‌ಸಿಯಲ್ಲಿ, ಪಂಚಾಯತ್‌ನಲ್ಲಿ, ಅಥವಾ ಕಳುಹಿಸಿದ ಕಚೇರಿಯಲ್ಲಿ ತೋರಿಸಿ, ಮತ್ತು ಇದರಲ್ಲಿ ಏನು ಮಾಡಲು ಹೇಳಿದೆ ಮತ್ತು ಯಾವಾಗದವರೆಗೆ ಎಂದು ಕೇಳಿ.",
+  "Tell me what kind of paper you got. I will explain what it means, what to do and by when.": "ನಿಮಗೆ ಯಾವ ಕಾಗದ ಬಂದಿದೆ ಎಂದು ಹೇಳಿ. ಅದರ ಅರ್ಥ ಏನು, ಏನು ಮಾಡಬೇಕು ಮತ್ತು ಯಾವಾಗದವರೆಗೆ ಎಂದು ನಾನು ವಿವರಿಸುತ್ತೇನೆ.",
+  "The department does not ask for payment through links in SMS or phone calls. Pay only through the official portal.": "ಆದಾಯ ತೆರಿಗೆ ಇಲಾಖೆ ಎಸ್‌ಎಂಎಸ್ ಅಥವಾ ಕರೆಯ ಲಿಂಕ್ ಮೂಲಕ ಹಣ ಕೇಳುವುದಿಲ್ಲ. ಅಧಿಕೃತ ಪೋರ್ಟಲ್ ಮೂಲಕ ಮಾತ್ರ ಪಾವತಿಸಿ.",
+  "This is a fine for breaking a traffic rule, such as riding without a helmet or crossing a red light.": "ಇದು ಸಂಚಾರ ನಿಯಮ ಉಲ್ಲಂಘನೆಯ ದಂಡ, ಉದಾಹರಣೆಗೆ ಹೆಲ್ಮೆಟ್ ಇಲ್ಲದೆ ಚಲಾಯಿಸುವುದು ಅಥವಾ ಕೆಂಪು ದೀಪ ದಾಟುವುದು.",
+  "This is a letter from a bank or loan company saying a loan payment (EMI) is overdue.": "ಇದು ಬ್ಯಾಂಕ್ ಅಥವಾ ಸಾಲ ಕಂಪನಿಯ ಪತ್ರ, ಸಾಲದ ಕಂತು (ಇಎಂಐ) ಬಾಕಿ ಇದೆ ಎಂದು ಹೇಳುತ್ತದೆ.",
+  "This is a message saying your bank account, card or KYC will be blocked unless you do something now.": "ಇದು ಈಗಲೇ ಏನಾದರೂ ಮಾಡದಿದ್ದರೆ ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆ, ಕಾರ್ಡ್ ಅಥವಾ ಕೆವೈಸಿ ಬಂದ್ ಆಗುತ್ತದೆ ಎನ್ನುವ ಸಂದೇಶ.",
+  "This is a notice from the Income Tax Department, usually asking you to file a return, explain a difference in your income details, or pay tax that is due.": "ಇದು ಆದಾಯ ತೆರಿಗೆ ಇಲಾಖೆಯ ನೋಟಿಸ್, ಸಾಮಾನ್ಯವಾಗಿ ರಿಟರ್ನ್ ಸಲ್ಲಿಸಲು, ಆದಾಯದ ವಿವರಗಳಲ್ಲಿನ ವ್ಯತ್ಯಾಸ ವಿವರಿಸಲು, ಅಥವಾ ಬಾಕಿ ತೆರಿಗೆ ಕಟ್ಟಲು ಹೇಳುತ್ತದೆ.",
+  "This is a notice from the municipality or panchayat about tax on your house, shop or land: how much is due and by when.": "ಇದು ನಗರಸಭೆ ಅಥವಾ ಪಂಚಾಯತ್‌ನ ನೋಟಿಸ್, ನಿಮ್ಮ ಮನೆ, ಅಂಗಡಿ ಅಥವಾ ಜಮೀನಿನ ತೆರಿಗೆಯ ಬಗ್ಗೆ: ಎಷ್ಟು ಕಟ್ಟಬೇಕು ಮತ್ತು ಯಾವಾಗದವರೆಗೆ.",
+  "This is a paper from a court or a lawyer. A court summons gives the date you must appear; a lawyer's notice asks you to do something or reply within a time.": "ಇದು ನ್ಯಾಯಾಲಯ ಅಥವಾ ವಕೀಲರ ಕಾಗದ. ನ್ಯಾಯಾಲಯದ ಸಮನ್ಸ್‌ನಲ್ಲಿ ನೀವು ಹಾಜರಾಗಬೇಕಾದ ದಿನಾಂಕ ಇರುತ್ತದೆ; ವಕೀಲರ ನೋಟಿಸ್ ಏನಾದರೂ ಮಾಡಲು ಅಥವಾ ನಿಗದಿತ ಸಮಯದಲ್ಲಿ ಉತ್ತರಿಸಲು ಹೇಳುತ್ತದೆ.",
+  "This is your electricity bill: how much you owe for the power you used, and the last date to pay it.": "ಇದು ನಿಮ್ಮ ವಿದ್ಯುತ್ ಬಿಲ್: ನೀವು ಬಳಸಿದ ವಿದ್ಯುತ್‌ನ ಹಣ, ಮತ್ತು ಪಾವತಿಸುವ ಕೊನೆಯ ದಿನಾಂಕ.",
+  "This is your water bill from the water board or the municipality: the amount you owe and the last date to pay.": "ಇದು ಜಲಮಂಡಳಿ ಅಥವಾ ನಗರಸಭೆಯ ನೀರಿನ ಬಿಲ್: ಎಷ್ಟು ಹಣ ಕಟ್ಟಬೇಕು ಮತ್ತು ಪಾವತಿಸುವ ಕೊನೆಯ ದಿನಾಂಕ.",
+  "Understand a paper (bill, notice, summons)": "ಕಾಗದ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ (ಬಿಲ್, ನೋಟಿಸ್, ಸಮನ್ಸ್)",
+  "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.": "ಇದು ಯಾವ ಕಾಗದ? ಉದಾಹರಣೆಗೆ: ವಿದ್ಯುತ್ ಬಿಲ್, ನೀರಿನ ಬಿಲ್, ಆಸ್ತಿ ತೆರಿಗೆ, ಬ್ಯಾಂಕ್ ಸಾಲ, ಬ್ಯಾಂಕ್ ಕೆವೈಸಿ ಸಂದೇಶ, ನ್ಯಾಯಾಲಯದ ಸಮನ್ಸ್, ಆದಾಯ ತೆರಿಗೆ ನೋಟಿಸ್, ಸಂಚಾರ ಚಲನ್, ಅಥವಾ ಬೇರೆ ಏನಾದರೂ."
  },
  "options": {
   "Male": [
@@ -668,6 +757,74 @@
    "ಸ್ವಂತ ಮನೆ ಇಲ್ಲ",
    "ಮನೆ ಇಲ್ಲ",
    "ಬಾಡಿಗೆ ಮನೆ"
+  ],
+  "No reply received": [
+   "ಉತ್ತರ ಬಂದಿಲ್ಲ",
+   "ಬಂದಿಲ್ಲ",
+   "ಯಾವುದೇ ಉತ್ತರ ಇಲ್ಲ",
+   "ಸಿಕ್ಕಿಲ್ಲ",
+   "ಇಲ್ಲ"
+  ],
+  "Reply received, not satisfied": [
+   "ಉತ್ತರ ಬಂದಿದೆ, ತೃಪ್ತಿಯಿಲ್ಲ",
+   "ಉತ್ತರ ಬಂದಿದೆ",
+   "ಬಂದಿದೆ",
+   "ಸಿಕ್ಕಿದೆ",
+   "ಅಪೂರ್ಣ",
+   "ಹೌದು"
+  ],
+  "Bank KYC or account block message": [
+   "ಬ್ಯಾಂಕ್ ಕೆವೈಸಿ ಸಂದೇಶ",
+   "ಕೆವೈಸಿ",
+   "ಖಾತೆ ಬಂದ್",
+   "ಕಾರ್ಡ್ ಬಂದ್"
+  ],
+  "Bank loan or EMI notice": [
+   "ಬ್ಯಾಂಕ್ ಸಾಲದ ನೋಟಿಸ್",
+   "ಬ್ಯಾಂಕ್ ಸಾಲ",
+   "ಸಾಲ",
+   "ಲೋನ್",
+   "ಇಎಂಐ",
+   "ಕಂತು"
+  ],
+  "Court summons or legal notice": [
+   "ನ್ಯಾಯಾಲಯದ ಸಮನ್ಸ್ ಅಥವಾ ಕಾನೂನು ನೋಟಿಸ್",
+   "ನ್ಯಾಯಾಲಯದ ಸಮನ್ಸ್",
+   "ನ್ಯಾಯಾಲಯ",
+   "ಕೋರ್ಟ್",
+   "ಸಮನ್ಸ್",
+   "ವಕೀಲರ ನೋಟಿಸ್"
+  ],
+  "Electricity bill": [
+   "ವಿದ್ಯುತ್ ಬಿಲ್",
+   "ವಿದ್ಯುತ್",
+   "ಕರೆಂಟ್ ಬಿಲ್"
+  ],
+  "Income tax notice": [
+   "ಆದಾಯ ತೆರಿಗೆ ನೋಟಿಸ್",
+   "ಆದಾಯ ತೆರಿಗೆ",
+   "ಇನ್‌ಕಂ ಟ್ಯಾಕ್ಸ್"
+  ],
+  "Property tax notice": [
+   "ಆಸ್ತಿ ತೆರಿಗೆ ನೋಟಿಸ್",
+   "ಆಸ್ತಿ ತೆರಿಗೆ",
+   "ಮನೆ ತೆರಿಗೆ",
+   "ಪ್ರಾಪರ್ಟಿ ಟ್ಯಾಕ್ಸ್"
+  ],
+  "Something else": [
+   "ಬೇರೆ ಏನಾದರೂ",
+   "ಬೇರೆ",
+   "ಗೊತ್ತಿಲ್ಲ"
+  ],
+  "Traffic challan": [
+   "ಸಂಚಾರ ಚಲನ್",
+   "ಚಲನ್",
+   "ದಂಡ"
+  ],
+  "Water bill": [
+   "ನೀರಿನ ಬಿಲ್",
+   "ನೀರು",
+   "ನೀರಿನ ಕರ"
   ]
  },
  "words": {
