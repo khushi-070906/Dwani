@@ -10,6 +10,7 @@
 | Monitoring | `/form/health` (no personal data) for Render and uptime monitors; `/form/metrics` anonymous counts (started / finished / where people stopped / which questions needed repeating) behind `DWANIFORMS_METRICS_TOKEN`, and `/form/metrics/view` to read them on a phone | `hardening.py`, `static/metrics.html` |
 | Reliability | Friendly offline / busy messages with retry; numbers said in pieces are joined; 15 s mic cap | `static/app.html`, `session.py` |
 | On the phone | Installable from the browser ("Add to phone"), then opens full screen; a service worker keeps the page, icons and fonts (never `/sessions`); a reload or a sleeping phone no longer loses a half-filled form | `static/manifest.webmanifest`, `static/sw.js`, `api.py` |
+| Reachable | WCAG AA checked: 4.5:1 contrast everywhere, 44px targets, live regions, screen-reader names translated into all eight languages, heading order, reduced motion | `static/app.html`, `tests/test_dwaniforms_a11y.py`, `tests/js/dwaniforms_a11y.test.js` |
 | Supply chain | `pip-audit` on the online app's dependencies in CI | `.github/workflows/tests.yml` |
 | Capacity | Load test: 50 people at once p95 ≈ 120 ms, 150 at once p95 ≈ 380 ms, 0 errors (1 CPU) | `tests/load/dwaniforms_load.py` |
 
@@ -21,6 +22,7 @@
 - [ ] **Legal review by a lawyer**: DPDP Act 2023 and the DPDP Rules; whether a private service may take Aadhaar numbers to prepare forms (Aadhaar Act). Written and live, but **not yet read by a lawyer**: `dwaniforms_site/terms.html` (what the service does and does not do, fair use, no e-KYC, limits of responsibility, Indian law / Delhi courts) and the privacy policy, which now names a **grievance officer** (Khushi Mittal) with a 30-day reply promise — change the name if someone else should answer complaints.
 - [ ] **Pilot** with a CSC / NGO / panchayat: 20-50 real people, older and less literate users included. Open `/form/metrics/view` weekly: the top of "where people stopped" is the question to rewrite first.
 - [ ] **Native-speaker review** of Hindi and of the eight language packs in `lang/` (Bengali, Marathi, Gujarati, Punjabi, Tamil, Telugu, Kannada, Malayalam). Each pack says `"status": "draft"` and the app shows a small "not yet checked by a native speaker" note until a reviewer sets it to `"reviewed"`. See `lang/README.md`. Odia, Urdu, Assamese: add a pack (`python -m dwaniforms.langpacks skeleton`) or use NLLB / Bhashini on a bigger server.
+- [ ] **Try a screen reader on a real phone** (TalkBack on Android, VoiceOver on iPhone): the markup is right, but nobody has listened to a whole form being filled.
 - [ ] **Try the install on a real phone** (Android Chrome and an iPhone): "Add to phone" needs HTTPS, which Render gives; on an iPhone there is no prompt, the person uses Share › Add to Home Screen. Check the icon, the full-screen opening, and that a half-filled form survives locking the phone.
 - [ ] **Real records** only with the data owner's permission; until then the online app shows clearly-marked demo records.
 - [ ] Re-check scheme rules every 6 months (`python -m dwaniforms.eligibility` lists any that are due).
