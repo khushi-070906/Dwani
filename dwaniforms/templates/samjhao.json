@@ -1,0 +1,263 @@
+{
+ "id": "samjhao",
+ "title": "Understand a paper (bill, notice, summons)",
+ "flow": "explain",
+ "description": {
+  "en": "Tell me what kind of paper you got. I will explain what it means, what to do and by when.",
+  "hi": "बताइए आपको कौन सा कागज़ मिला है। मैं समझाऊँगा कि उसका मतलब क्या है, क्या करना है और कब तक।"
+ },
+ "glossary": [
+  "KYC",
+  "EMI",
+  "OTP",
+  "PIN",
+  "challan",
+  "DIN",
+  "RBI",
+  "CSC"
+ ],
+ "fields": [
+  {
+   "id": "paper",
+   "kind": "choice",
+   "label": "Kind of paper",
+   "prompt": {
+    "en": "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.",
+    "hi": "यह कौन सा कागज़ है? जैसे: बिजली का बिल, पानी का बिल, प्रॉपर्टी टैक्स, बैंक लोन का नोटिस, बैंक केवाईसी का मैसेज, कोर्ट का समन, इनकम टैक्स का नोटिस, ट्रैफ़िक चालान, या कुछ और।"
+   },
+   "labels": {
+    "hi": "कागज़ का प्रकार"
+   },
+   "options": [
+    {
+     "value": "Electricity bill",
+     "synonyms": {
+      "en": [
+       "electricity bill",
+       "electricity",
+       "bijli",
+       "bijli ka bill",
+       "power bill",
+       "light bill"
+      ],
+      "hi": [
+       "बिजली का बिल",
+       "बिजली",
+       "बिजली बिल",
+       "लाइट का बिल"
+      ]
+     }
+    },
+    {
+     "value": "Water bill",
+     "synonyms": {
+      "en": [
+       "water bill",
+       "water",
+       "paani",
+       "pani ka bill"
+      ],
+      "hi": [
+       "पानी का बिल",
+       "पानी",
+       "पानी बिल",
+       "जल बोर्ड"
+      ]
+     }
+    },
+    {
+     "value": "Property tax notice",
+     "synonyms": {
+      "en": [
+       "property tax",
+       "house tax",
+       "house tax notice",
+       "municipal tax"
+      ],
+      "hi": [
+       "प्रॉपर्टी टैक्स",
+       "हाउस टैक्स",
+       "गृह कर",
+       "मकान का टैक्स",
+       "संपत्ति कर"
+      ]
+     }
+    },
+    {
+     "value": "Bank loan or EMI notice",
+     "synonyms": {
+      "en": [
+       "bank loan",
+       "loan",
+       "emi",
+       "loan notice",
+       "recovery"
+      ],
+      "hi": [
+       "बैंक लोन का नोटिस",
+       "लोन",
+       "ईएमआई",
+       "किस्त",
+       "कर्ज़",
+       "क़र्ज़",
+       "वसूली"
+      ]
+     }
+    },
+    {
+     "value": "Bank KYC or account block message",
+     "synonyms": {
+      "en": [
+       "kyc",
+       "bank kyc",
+       "account block",
+       "account blocked",
+       "kyc message",
+       "card block"
+      ],
+      "hi": [
+       "बैंक केवाईसी का मैसेज",
+       "केवाईसी",
+       "खाता बंद",
+       "अकाउंट बंद",
+       "कार्ड बंद"
+      ]
+     }
+    },
+    {
+     "value": "Court summons or legal notice",
+     "synonyms": {
+      "en": [
+       "court",
+       "summons",
+       "court summons",
+       "legal notice",
+       "lawyer notice",
+       "warrant"
+      ],
+      "hi": [
+       "कोर्ट का समन",
+       "कोर्ट",
+       "समन",
+       "अदालत",
+       "वकील का नोटिस",
+       "कानूनी नोटिस",
+       "क़ानूनी नोटिस"
+      ]
+     }
+    },
+    {
+     "value": "Income tax notice",
+     "synonyms": {
+      "en": [
+       "income tax",
+       "income tax notice",
+       "itr",
+       "aaykar"
+      ],
+      "hi": [
+       "इनकम टैक्स का नोटिस",
+       "इनकम टैक्स",
+       "आयकर",
+       "आयकर नोटिस"
+      ]
+     }
+    },
+    {
+     "value": "Traffic challan",
+     "synonyms": {
+      "en": [
+       "challan",
+       "traffic challan",
+       "e-challan",
+       "traffic fine",
+       "fine"
+      ],
+      "hi": [
+       "ट्रैफ़िक चालान",
+       "चालान",
+       "ट्रैफिक चालान",
+       "जुर्माना"
+      ]
+     }
+    },
+    {
+     "value": "Something else",
+     "synonyms": {
+      "en": [
+       "something else",
+       "other",
+       "don't know",
+       "not sure"
+      ],
+      "hi": [
+       "कुछ और",
+       "अन्य",
+       "पता नहीं",
+       "दूसरा"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "due_date",
+   "kind": "date",
+   "label": "Date on the paper",
+   "required": false,
+   "params": {
+    "future": true
+   },
+   "when": {
+    "field": "paper",
+    "in": [
+     "Electricity bill",
+     "Water bill",
+     "Property tax notice",
+     "Bank loan or EMI notice",
+     "Court summons or legal notice",
+     "Income tax notice",
+     "Traffic challan"
+    ]
+   },
+   "prompt": {
+    "en": "Is there a last date, or a date to appear, written on it? Say the date, or say skip.",
+    "hi": "क्या इस पर कोई आख़िरी तारीख, या हाज़िर होने की तारीख लिखी है? तारीख बताइए, या 'छोड़ो' कहिए।"
+   },
+   "labels": {
+    "hi": "कागज़ पर लिखी तारीख"
+   }
+  },
+  {
+   "id": "amount",
+   "kind": "number",
+   "label": "Amount (Rs.)",
+   "required": false,
+   "params": {
+    "minimum": 1,
+    "maximum": 100000000
+   },
+   "when": {
+    "field": "paper",
+    "in": [
+     "Electricity bill",
+     "Water bill",
+     "Property tax notice",
+     "Bank loan or EMI notice",
+     "Income tax notice",
+     "Traffic challan"
+    ]
+   },
+   "prompt": {
+    "en": "How much money does it ask for, in rupees? Or say skip.",
+    "hi": "इसमें कितने रुपये माँगे गए हैं? या 'छोड़ो' कहिए।"
+   },
+   "labels": {
+    "hi": "रकम (रु.)"
+   }
+  }
+ ],
+ "titles": {
+  "hi": "कागज़ समझिए (बिल, नोटिस, समन)"
+ }
+}
