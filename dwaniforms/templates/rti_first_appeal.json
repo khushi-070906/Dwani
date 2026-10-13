@@ -1,0 +1,423 @@
+{
+ "id": "rti_first_appeal",
+ "title": "RTI first appeal",
+ "flow": "rti_appeal",
+ "final_readback": true,
+ "description": {
+  "en": "No reply to your RTI in 30 days, or an incomplete one? The first appeal is drafted for you.",
+  "hi": "आरटीआई का 30 दिन में जवाब नहीं आया, या अधूरा आया? प्रथम अपील आपके लिए तैयार होगी।"
+ },
+ "glossary": [
+  "RTI",
+  "Public Information Officer",
+  "khasra",
+  "khatauni",
+  "ration card",
+  "BPL",
+  "MGNREGA",
+  "PM Awas",
+  "Aadhaar",
+  "First Appellate Authority",
+  "Section 19"
+ ],
+ "fields": [
+  {
+   "id": "full_name",
+   "kind": "name",
+   "label": "Name of applicant",
+   "prompt": {
+    "en": "What is your full name?",
+    "hi": "अपना पूरा नाम बताइए।"
+   },
+   "labels": {
+    "hi": "आवेदक का नाम"
+   }
+  },
+  {
+   "id": "address",
+   "kind": "place",
+   "label": "Address for reply",
+   "prompt": {
+    "en": "What is your postal address? The reply will be sent here.",
+    "hi": "आपका डाक पता क्या है? जवाब इसी पते पर आएगा।"
+   },
+   "labels": {
+    "hi": "डाक पता"
+   }
+  },
+  {
+   "id": "pincode",
+   "kind": "pincode",
+   "label": "PIN code",
+   "prompt": {
+    "en": "What is the PIN code?",
+    "hi": "पिन कोड क्या है?"
+   },
+   "labels": {
+    "hi": "पिन कोड"
+   }
+  },
+  {
+   "id": "mobile",
+   "kind": "mobile",
+   "label": "Mobile number",
+   "prompt": {
+    "en": "What is your mobile number? Or say skip.",
+    "hi": "आपका मोबाइल नंबर क्या है? या 'छोड़ो' कहिए।"
+   },
+   "labels": {
+    "hi": "मोबाइल नंबर"
+   },
+   "required": false
+  },
+  {
+   "id": "department",
+   "kind": "choice",
+   "label": "Public authority (department)",
+   "prompt": {
+    "en": "Which department did you send your RTI application to?",
+    "hi": "आपने आरटीआई आवेदन किस विभाग को भेजा था?"
+   },
+   "labels": {
+    "hi": "विभाग"
+   },
+   "options": [
+    {
+     "value": "Revenue (land records)",
+     "synonyms": {
+      "en": [
+       "revenue",
+       "khasra",
+       "khatauni",
+       "khata"
+      ],
+      "hi": [
+       "राजस्व (भूमि अभिलेख)",
+       "खसरा",
+       "खतौनी",
+       "खाता",
+       "पटवारी"
+      ]
+     }
+    },
+    {
+     "value": "Food & civil supplies (ration)",
+     "synonyms": {
+      "en": [
+       "food & civil supplies",
+       "ration",
+       "ration card",
+       "kotedar"
+      ],
+      "hi": [
+       "खाद्य एवं रसद (राशन)",
+       "राशन",
+       "राशन कार्ड",
+       "कोटेदार",
+       "डीलर"
+      ]
+     }
+    },
+    {
+     "value": "Electricity",
+     "synonyms": {
+      "en": [
+       "electricity",
+       "bijli",
+       "electricity",
+       "meter"
+      ],
+      "hi": [
+       "बिजली विभाग",
+       "बिजली",
+       "मीटर",
+       "ट्रांसफार्मर",
+       "ट्रांसफॉर्मर"
+      ]
+     }
+    },
+    {
+     "value": "Water supply",
+     "synonyms": {
+      "en": [
+       "water supply",
+       "paani",
+       "pani",
+       "water"
+      ],
+      "hi": [
+       "जल आपूर्ति",
+       "पानी",
+       "नल",
+       "हैंडपंप",
+       "हैंड पंप"
+      ]
+     }
+    },
+    {
+     "value": "Rural development & panchayat",
+     "synonyms": {
+      "en": [
+       "rural development & panchayat",
+       "pradhan",
+       "sarpanch",
+       "panchayat"
+      ],
+      "hi": [
+       "ग्राम्य विकास एवं पंचायत",
+       "प्रधान",
+       "सरपंच",
+       "पंचायत",
+       "मनरेगा"
+      ]
+     }
+    },
+    {
+     "value": "Roads (PWD)",
+     "synonyms": {
+      "en": [
+       "roads",
+       "sadak",
+       "road",
+       "pothole"
+      ],
+      "hi": [
+       "सड़क (लोक निर्माण विभाग)",
+       "सड़क",
+       "सडक",
+       "रोड",
+       "गड्ढा"
+      ]
+     }
+    },
+    {
+     "value": "Health",
+     "synonyms": {
+      "en": [
+       "health",
+       "hospital",
+       "doctor",
+       "dawai"
+      ],
+      "hi": [
+       "स्वास्थ्य विभाग",
+       "अस्पताल",
+       "डॉक्टर",
+       "डाक्टर",
+       "दवाई"
+      ]
+     }
+    },
+    {
+     "value": "Education",
+     "synonyms": {
+      "en": [
+       "education",
+       "school",
+       "teacher",
+       "master ji"
+      ],
+      "hi": [
+       "शिक्षा विभाग",
+       "स्कूल",
+       "विद्यालय",
+       "शिक्षक",
+       "अध्यापक"
+      ]
+     }
+    },
+    {
+     "value": "Police",
+     "synonyms": {
+      "en": [
+       "police",
+       "police",
+       "thana",
+       "fir"
+      ],
+      "hi": [
+       "पुलिस",
+       "पुलिस",
+       "थाना",
+       "थाने",
+       "एफआईआर"
+      ]
+     }
+    },
+    {
+     "value": "Social welfare (pension)",
+     "synonyms": {
+      "en": [
+       "social welfare",
+       "pension",
+       "old age pension",
+       "vridha"
+      ],
+      "hi": [
+       "समाज कल्याण (पेंशन)",
+       "पेंशन",
+       "वृद्धा",
+       "वृद्धावस्था",
+       "विधवा"
+      ]
+     }
+    },
+    {
+     "value": "Municipal (sanitation)",
+     "synonyms": {
+      "en": [
+       "municipal",
+       "safai",
+       "kooda",
+       "garbage"
+      ],
+      "hi": [
+       "नगर निकाय (सफाई)",
+       "सफाई",
+       "कूड़ा",
+       "कूडा",
+       "नाली"
+      ]
+     }
+    },
+    {
+     "value": "Other",
+     "synonyms": {
+      "en": [
+       "other",
+       "something else"
+      ],
+      "hi": [
+       "अन्य",
+       "कोई और",
+       "दूसरा"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "rti_date",
+   "kind": "date",
+   "label": "Date of RTI application",
+   "prompt": {
+    "en": "On which date did you send the RTI application?",
+    "hi": "आरटीआई आवेदन किस तारीख को भेजा था?"
+   },
+   "labels": {
+    "hi": "आरटीआई आवेदन की तारीख"
+   }
+  },
+  {
+   "id": "information",
+   "kind": "text",
+   "label": "Information asked for",
+   "prompt": {
+    "en": "In short, what information had you asked for?",
+    "hi": "संक्षेप में, आपने कौन सी जानकारी माँगी थी?"
+   },
+   "labels": {
+    "hi": "माँगी गई सूचना"
+   },
+   "params": {
+    "min_length": 10
+   }
+  },
+  {
+   "id": "reply_status",
+   "kind": "choice",
+   "label": "Reply from the PIO",
+   "prompt": {
+    "en": "Did you get a reply from the office? Say: no reply, or reply received.",
+    "hi": "क्या दफ़्तर से जवाब आया? कहिए: जवाब नहीं आया, या जवाब आया।"
+   },
+   "labels": {
+    "hi": "जन सूचना अधिकारी का जवाब"
+   },
+   "options": [
+    {
+     "value": "No reply received",
+     "synonyms": {
+      "en": [
+       "no reply",
+       "no",
+       "nothing",
+       "not received",
+       "no answer"
+      ],
+      "hi": [
+       "जवाब नहीं आया",
+       "नहीं आया",
+       "नहीं",
+       "कोई जवाब नहीं",
+       "कुछ नहीं"
+      ]
+     }
+    },
+    {
+     "value": "Reply received, not satisfied",
+     "synonyms": {
+      "en": [
+       "reply received",
+       "received",
+       "got a reply",
+       "yes",
+       "not satisfied",
+       "incomplete"
+      ],
+      "hi": [
+       "जवाब आया",
+       "आया",
+       "हाँ",
+       "मिला",
+       "अधूरा",
+       "संतुष्ट नहीं"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "reply_date",
+   "kind": "date",
+   "label": "Date of reply",
+   "prompt": {
+    "en": "On which date did you get the reply?",
+    "hi": "जवाब किस तारीख को मिला?"
+   },
+   "labels": {
+    "hi": "जवाब की तारीख"
+   },
+   "when": {
+    "field": "reply_status",
+    "in": [
+     "Reply received, not satisfied"
+    ]
+   }
+  },
+  {
+   "id": "grounds",
+   "kind": "text",
+   "label": "Why the reply is not acceptable",
+   "prompt": {
+    "en": "What is wrong with the reply? For example: information is missing, or it was refused without a reason.",
+    "hi": "जवाब में क्या कमी है? जैसे: जानकारी अधूरी है, या बिना कारण मना कर दिया।"
+   },
+   "labels": {
+    "hi": "जवाब में कमी"
+   },
+   "when": {
+    "field": "reply_status",
+    "in": [
+     "Reply received, not satisfied"
+    ]
+   },
+   "params": {
+    "min_length": 10
+   }
+  }
+ ],
+ "titles": {
+  "hi": "आरटीआई प्रथम अपील"
+ }
+}

@@ -44,7 +44,7 @@ class FormTemplate:
     form_language: str                           # language the portal/bank expects (usually "en")
     fields: list[FormField]
     glossary: list[str] = field(default_factory=list)   # terms protected from mistranslation
-    flow: str = "form"                           # form | grievance | rti | lookup | advisor  (what happens at the end)
+    flow: str = "form"                           # form | grievance | rti | rti_appeal | lookup | advisor | explain
     description: dict[str, str] = field(default_factory=dict)
     extract: dict | None = None                  # {"from": "complaint", "fields": {"department": "department", ...}}
     final_readback: bool = False                 # read the whole draft back and confirm before finishing

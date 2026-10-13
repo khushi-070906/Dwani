@@ -2,6 +2,7 @@
 
   grievance -> a complaint letter        (English: the translated complaint; Hindi: the citizen's own words)
   rti       -> an RTI application under Section 6(1) of the RTI Act, 2005
+  rti_appeal -> a first appeal under Section 19(1), with the 30-day window worked out from the dates given
   lookup    -> the record found in the locally cached dataset (records.py)
   advisor   -> schemes the person likely qualifies for (eligibility.py)
 
@@ -28,7 +29,14 @@ RTI_NEXT_EN = (
     "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can "
     "file a first appeal.",
 )
-NEXT_STEPS_EN = (*GRIEVANCE_NEXT_EN, *RTI_NEXT_EN)
+RTI_APPEAL_NEXT_EN = (
+    "Send it to the First Appellate Authority: the officer senior to the Public Information Officer in the same "
+    "department. Attach copies of your RTI application and of the reply, if any.",
+    "Central government departments charge no fee for a first appeal; some states do, so check your state's rules.",
+    "The appeal must be decided within 30 days, 45 at most. If you are still not satisfied, you can make a second "
+    "appeal to the Information Commission within 90 days.",
+)
+NEXT_STEPS_EN = (*GRIEVANCE_NEXT_EN, *RTI_NEXT_EN, *RTI_APPEAL_NEXT_EN)
 
 
 def _local_steps(session, steps_en) -> dict:
@@ -178,4 +186,107 @@ def rti_draft(session, today: dt.date | None = None, **_) -> dict:
     }
 
 
-OUTCOMES = {"grievance": grievance_draft, "rti": rti_draft}   # lookup/advisor register themselves (records.py, eligibility.py)
+def appeal_timing(rti_date: str, reply_date: str, today: dt.date) -> dict:
+    """RTI Act s.7(1)/19(1): the PIO has 30 days; the appeal is due within 30 days of that period running out, or of
+    the reply. Returns {"early": date the PIO's time ends} | {"late": True} | {} (on time), plus "last" (ISO)."""
+    try:
+        sent = dt.date.fromisoformat(rti_date)
+    except ValueError:
+        return {}
+    pio_until = sent + dt.timedelta(days=30)
+    if reply_date:
+        try:
+            last = dt.date.fromisoformat(reply_date) + dt.timedelta(days=30)
+        except ValueError:
+            return {}
+        return {"last": last.isoformat(), **({"late": True} if today > last else {})}
+    last = pio_until + dt.timedelta(days=30)
+    if today <= pio_until:
+        return {"early": pio_until.isoformat(), "last": last.isoformat()}
+    return {"last": last.isoformat(), **({"late": True} if today > last else {})}
+
+
+def rti_appeal_draft(session, today: dt.date | None = None, **_) -> dict:
+    today = today or dt.date.today()
+    dep, sent, replied = _v(session, "department"), _v(session, "rti_date"), _v(session, "reply_date")
+    got_reply = _v(session, "reply_status").startswith("Reply")
+    timing = appeal_timing(sent, replied if got_reply else "", today)
+    n = 6
+    en = [
+        "To,",
+        "The First Appellate Authority",
+        f"(Officer senior to the Public Information Officer), {dep}",
+        "",
+        "Subject: First appeal under Section 19(1) of the Right to Information Act, 2005",
+        "",
+        f"1. Name of the appellant: {_v(session, 'full_name')}",
+        f"2. Address for correspondence: {_v(session, 'address')}, PIN {_v(session, 'pincode')}",
+        f"3. RTI application dated {_date_en(sent)}, sent to the Public Information Officer, {dep}.",
+        f"4. Information asked for: {_v(session, 'information')}",
+    ]
+    if got_reply:
+        en += [f"5. Grounds of appeal: A reply dated {_date_en(replied)} was received. It is not satisfactory: "
+               f"{_v(session, 'grounds')}",
+               "6. Relief sought: Direct the Public Information Officer to provide the complete information asked for."]
+    else:
+        en += ["5. Grounds of appeal: No information and no reply was received within the 30 days allowed by Section "
+               "7(1) of the Act. Under Section 7(2) this is deemed a refusal.",
+               "6. Relief sought: Direct the Public Information Officer to provide the complete information asked for, "
+               "free of charge as required by Section 7(6), within a fixed time."]
+    if timing.get("late"):
+        n += 1
+        en.append(f"{n}. This appeal is filed after the 30 days allowed. I request that the delay be condoned, as "
+                  "permitted by the proviso to Section 19(1), because: ______________________________")
+    en += ["", "Enclosures: copy of the RTI application; proof of sending and of the fee paid"
+           + ("; copy of the reply" if got_reply else "") + ".",
+           "", "I state that the facts above are true to the best of my knowledge.", "",
+           f"Place: ____________     Date: {today.strftime('%d %B %Y')}", "",
+           f"Signature: ____________     ({_v(session, 'full_name')})"]
+    if _v(session, "mobile"):
+        en.append(f"Mobile: {_v(session, 'mobile')}")
+    en += ["", DRAFT_FOOTER_EN]
+    drafts = {"en": "\n".join(en)}
+    if session.lang == "hi":
+        dep_hi = _dept_hi(dep)
+        hi = ["सेवा में,", "प्रथम अपीलीय अधिकारी", f"(जन सूचना अधिकारी से वरिष्ठ अधिकारी), {dep_hi}", "",
+              "विषय: सूचना का अधिकार अधिनियम, 2005 की धारा 19(1) के अंतर्गत प्रथम अपील", "",
+              f"1. अपीलकर्ता का नाम: {_v(session, 'full_name', True)}",
+              f"2. पत्राचार का पता: {_v(session, 'address', True)}, पिन {_v(session, 'pincode')}",
+              f"3. दिनांक {_hi_date(sent)} का आरटीआई आवेदन, जन सूचना अधिकारी, {dep_hi} को भेजा गया।",
+              f"4. माँगी गई सूचना: {_v(session, 'information', True)}"]
+        if got_reply:
+            hi += [f"5. अपील का आधार: दिनांक {_hi_date(replied)} का जवाब मिला, जो संतोषजनक नहीं है: "
+                   f"{_v(session, 'grounds', True)}",
+                   "6. माँगी गई राहत: जन सूचना अधिकारी को माँगी गई पूरी सूचना देने का निर्देश दिया जाए।"]
+        else:
+            hi += ["5. अपील का आधार: अधिनियम की धारा 7(1) में दिए 30 दिनों में न सूचना मिली, न कोई जवाब। धारा 7(2) के अनुसार "
+                   "इसे सूचना देने से इनकार माना जाता है।",
+                   "6. माँगी गई राहत: जन सूचना अधिकारी को माँगी गई पूरी सूचना, धारा 7(6) के अनुसार निःशुल्क, तय समय में देने का "
+                   "निर्देश दिया जाए।"]
+        if timing.get("late"):
+            hi.append("7. यह अपील 30 दिन बीतने के बाद की जा रही है। धारा 19(1) के परंतुक के अनुसार देरी माफ़ करने का अनुरोध है, "
+                      "क्योंकि: ______________________________")
+        hi += ["", "संलग्न: आरटीआई आवेदन की प्रति; भेजने और शुल्क की रसीद" + ("; जवाब की प्रति" if got_reply else "") + "।",
+               "", "मैं घोषित करता/करती हूँ कि ऊपर दी गई बातें मेरी जानकारी में सही हैं।", "",
+               f"स्थान: ________     दिनांक: {_hi_date(today.isoformat())}", "",
+               f"हस्ताक्षर: ________     ({_v(session, 'full_name', True)})", "", DRAFT_FOOTER_HI]
+        drafts["hi"] = "\n".join(hi)
+    say_more = []
+    if timing.get("early"):
+        say_more.append(["rti_appeal_early", {"date": timing["early"]}])
+    elif timing.get("late"):
+        say_more.append(["rti_appeal_late", {}])
+    return {
+        "type": "draft", "title": "RTI first appeal", "drafts": drafts, "timing": timing,
+        "next_steps": list(RTI_APPEAL_NEXT_EN), **_local_steps(session, RTI_APPEAL_NEXT_EN),
+        "next_steps_hi": [
+            "इसे प्रथम अपीलीय अधिकारी को भेजिए: उसी विभाग में जन सूचना अधिकारी से वरिष्ठ अधिकारी। आरटीआई आवेदन और जवाब (अगर आया हो) की प्रति साथ लगाइए।",
+            "केंद्र सरकार के विभाग प्रथम अपील की कोई फ़ीस नहीं लेते; कुछ राज्य लेते हैं, इसलिए अपने राज्य के नियम देख लीजिए।",
+            "अपील का फ़ैसला 30 दिन में, ज़्यादा से ज़्यादा 45 दिन में होना चाहिए। फिर भी संतुष्ट न हों तो 90 दिन में सूचना आयोग में दूसरी अपील कर सकते हैं।",
+        ],
+        "say_key": "outcome_rti_appeal", "say_more": say_more,
+    }
+
+
+OUTCOMES = {"grievance": grievance_draft, "rti": rti_draft, "rti_appeal": rti_appeal_draft}
+# lookup/advisor register themselves (records.py, eligibility.py)
