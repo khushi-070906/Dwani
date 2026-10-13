@@ -46,6 +46,23 @@ If the page reloads -- the phone slept, the signal dropped, the app was reopened
 answer stays on the server and is still dropped there after 30 idle minutes. An answer that had been read back but not
 yet confirmed is asked once more rather than quietly kept.
 
+## Reachable by people who can't see it well
+
+The app is checked against WCAG AA, because the people it is for are often old, often cannot read much, and often
+cannot see small grey text:
+
+- every text colour clears 4.5:1 on every background the page uses (`tests/test_dwaniforms_a11y.py` computes the
+  ratios from the CSS, so one careless tweak fails the build);
+- every control is at least 44px, the size a fingertip lands on without aiming;
+- the questions sit in a live region, so a screen reader reads each new one; a dropped connection is an `alert`;
+- the mic is a toggle that says which way it is turned, and every control with no visible words of its own is named
+  **in the citizen's language** (`data-ta`, translated in all eight packs) -- a blind Tamil speaker should not hear
+  the questions in Tamil and the buttons in English;
+- headings step down one level at a time, the current step carries `aria-current`, and the mic's pulse stops for
+  anyone who asked their phone for less motion.
+
+Not yet checked: a real screen reader (TalkBack, VoiceOver) on a real phone.
+
 ## Pilot numbers
 
 `/form/metrics/view` shows, on any phone, how many forms were started and finished, where people stopped, and which
