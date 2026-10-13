@@ -63,6 +63,30 @@ cannot see small grey text:
 
 Not yet checked: a real screen reader (TalkBack, VoiceOver) on a real phone.
 
+## Understand a paper (Samjhao)
+
+Someone got an electricity bill, a property tax notice, a bank loan letter, a "your KYC will be blocked" message, a
+court summons, an income tax notice or a traffic challan. They say which, and (if it has them) the date and the amount
+printed on it. The app says what the paper is, what to do, what to do if something on it is wrong, how to spot the fraud
+that is commonly dressed up as that paper, and where free help is (1930 for cyber fraud, 15100 for free legal aid, the
+RBI Ombudsman at cms.rbi.org.in / 14448). The date is counted: "12 days left", "today", or "already passed -- go today".
+
+Nothing reads the paper and nothing guesses: each kind of paper is a plain file in `papers/*.json`, English and Hindi
+written by hand and every other language in its pack, with the public source of each rule and a `last_reviewed` date. A
+reviewer can fix a sentence without touching code; `python -m dwaniforms.langpacks check` then lists what each language
+still needs. The fraud warning is read aloud, not only shown, because it is the one thing worth hearing.
+
+Dates on a paper may lie ahead and are often said without a year ("15 November"): fields with `"future": true` accept
+both (the year is this year, or next if that day is more than six months behind us). Birth dates still refuse the future.
+
+## RTI first appeal
+
+No reply to an RTI in 30 days, or an incomplete one: the first appeal under Section 19(1) is drafted (English, and
+Hindi alongside for Hindi speakers), addressed to the officer senior to the PIO. The dates given decide what it says:
+if the office still has time, it says until when; if 30 days have run out since the reply or since the PIO's 30 days,
+the draft asks for the delay to be condoned and leaves a blank for the reason; with no reply it cites deemed refusal
+(s.7(2)) and asks for the information free of charge (s.7(6)).
+
 ## Pilot numbers
 
 `/form/metrics/view` shows, on any phone, how many forms were started and finished, where people stopped, and which
