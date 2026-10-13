@@ -664,11 +664,15 @@ class LauncherApp:
             def do_POST(self):
                 from urllib.parse import urlparse
 
+                # Read the body BEFORE deciding whether to answer. Replying 403 and closing while the caller's bytes are
+                # still unread makes Windows reset the connection (WinError 10053/10054), so the caller never sees the
+                # 403 -- it sees a crash. Capped, so a huge Content-Length cannot make the launcher buffer it all.
+                length = max(0, min(int(self.headers.get("Content-Length") or 0), 1_000_000))
+                raw = self.rfile.read(length) if length else b""
                 if not self._authed():
                     return self._send(403, b"Forbidden", "text/plain")
-                length = int(self.headers.get("Content-Length") or 0)
                 try:
-                    body = json.loads(self.rfile.read(length) or b"{}") if length else {}
+                    body = json.loads(raw or b"{}") if length else {}
                 except ValueError:
                     body = {}
                 route = urlparse(self.path).path
