@@ -51,7 +51,15 @@
   "fix_which": "ਕੀ ਬਦਲਣਾ ਹੈ? ਇਨ੍ਹਾਂ ਵਿੱਚੋਂ ਇੱਕ ਕਹੋ:",
   "khasra_invalid": "ਮੈਨੂੰ ਖਸਰਾ ਨੰਬਰ ਸਮਝ ਨਹੀਂ ਆਇਆ। ਇਸ ਤਰ੍ਹਾਂ ਕਹੋ: ਇੱਕ ਸੌ ਪੰਤਾਲੀ ਬਟਾ ਦੋ।",
   "ration_invalid": "ਮੈਨੂੰ ਰਾਸ਼ਨ ਕਾਰਡ ਨੰਬਰ ਸਮਝ ਨਹੀਂ ਆਇਆ। ਕਿਰਪਾ ਕਰਕੇ ਹੌਲੀ-ਹੌਲੀ ਦੁਬਾਰਾ ਦੱਸੋ।",
-  "unit_acres": "ਕਿਰਪਾ ਕਰਕੇ ਜ਼ਮੀਨ ਏਕੜਾਂ (ਕਿੱਲਿਆਂ) ਵਿੱਚ ਦੱਸੋ। ਕਨਾਲ, ਮਰਲਾ ਅਤੇ ਬਿੱਘਾ ਹਰ ਰਾਜ ਵਿੱਚ ਵੱਖਰੇ ਹੁੰਦੇ ਹਨ।"
+  "unit_acres": "ਕਿਰਪਾ ਕਰਕੇ ਜ਼ਮੀਨ ਏਕੜਾਂ (ਕਿੱਲਿਆਂ) ਵਿੱਚ ਦੱਸੋ। ਕਨਾਲ, ਮਰਲਾ ਅਤੇ ਬਿੱਘਾ ਹਰ ਰਾਜ ਵਿੱਚ ਵੱਖਰੇ ਹੁੰਦੇ ਹਨ।",
+  "outcome_rti_appeal": "ਤੁਹਾਡੀ ਪਹਿਲੀ ਅਪੀਲ ਸਕ੍ਰੀਨ 'ਤੇ ਤਿਆਰ ਹੈ। ਇਸਨੂੰ ਪ੍ਰਿੰਟ ਕਰਕੇ ਦਸਤਖ਼ਤ ਕਰੋ ਅਤੇ ਆਪਣੇ ਕਾਗਜ਼ਾਂ ਦੀਆਂ ਕਾਪੀਆਂ ਨਾਲ ਭੇਜੋ।",
+  "rti_appeal_early": "ਦਫ਼ਤਰ ਕੋਲ {date} ਤੱਕ ਜਵਾਬ ਦੇਣ ਦਾ ਸਮਾਂ ਹੈ। ਤਦ ਤੱਕ ਜਵਾਬ ਨਾ ਆਵੇ, ਤਾਂ ਉਸ ਤਾਰੀਖ ਤੋਂ ਬਾਅਦ ਇਹ ਅਪੀਲ ਭੇਜੋ।",
+  "rti_appeal_late": "30 ਦਿਨਾਂ ਤੋਂ ਵੱਧ ਲੰਘ ਚੁੱਕੇ ਹਨ, ਇਸ ਲਈ ਅਪੀਲ ਦੇਰ ਨਾਲ ਹੈ। ਖਾਲੀ ਥਾਂ ਵਿੱਚ ਦੇਰੀ ਦਾ ਕਾਰਨ ਲਿਖੋ; ਅਧਿਕਾਰੀ ਫਿਰ ਵੀ ਇਸਨੂੰ ਮੰਨ ਸਕਦੇ ਹਨ।",
+  "outcome_explain": "ਇਸ ਕਾਗਜ਼ ਦਾ ਮਤਲਬ ਇਹ ਹੈ। ਸਭ ਕੁਝ ਸਕ੍ਰੀਨ 'ਤੇ ਵੀ ਲਿਖਿਆ ਹੈ।",
+  "explain_ahead": "ਕਾਗਜ਼ 'ਤੇ ਲਿਖੀ ਤਾਰੀਖ {date} ਹੈ, ਅੱਜ ਤੋਂ {days} ਦਿਨ ਬਾਅਦ।",
+  "explain_today": "ਕਾਗਜ਼ 'ਤੇ ਲਿਖੀ ਤਾਰੀਖ ਅੱਜ ਦੀ ਹੈ।",
+  "explain_passed": "ਕਾਗਜ਼ 'ਤੇ ਲਿਖੀ ਤਾਰੀਖ, {date}, ਲੰਘ ਚੁੱਕੀ ਹੈ। ਅੱਜ ਹੀ ਦਫ਼ਤਰ ਜਾ ਕੇ ਪੁੱਛੋ ਕਿ ਹੁਣ ਕੀ ਕਰਨਾ ਹੈ।",
+  "explain_disclaimer": "ਇਹ ਆਮ ਜਾਣਕਾਰੀ ਹੈ, ਕਾਨੂੰਨੀ ਸਲਾਹ ਨਹੀਂ। ਕੁਝ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਕਾਗਜ਼ ਆਪ ਪੜ੍ਹੋ, ਜਾਂ ਦਫ਼ਤਰ ਤੋਂ ਪੁੱਛੋ।"
  },
  "ui": {
   "a11y_bigger": "ਅੱਖਰ ਵੱਡੇ ਕਰੋ",
@@ -172,7 +180,21 @@
   "why_maybe": "'ਜਾਂਚ ਜ਼ਰੂਰੀ' ਕਿਉਂ",
   "working": "ਸਮਝ ਰਹੇ ਹਾਂ…",
   "yes": "✓ ਹਾਂ, ਸਹੀ ਹੈ",
-  "yes_word": "ਹਾਂ"
+  "yes_word": "ਹਾਂ",
+  "ex_amount": "ਰਕਮ",
+  "ex_beware": "ਧੋਖੇ ਤੋਂ ਬਚੋ",
+  "ex_date": "ਕਾਗਜ਼ 'ਤੇ ਲਿਖੀ ਤਾਰੀਖ",
+  "ex_do": "ਕੀ ਕਰੀਏ",
+  "ex_help": "ਜੇ ਧੋਖਾ ਹੋ ਗਿਆ",
+  "ex_left": "ਦਿਨ ਬਾਕੀ",
+  "ex_note": "ਆਮ ਜਾਣਕਾਰੀ, ਕਾਨੂੰਨੀ ਸਲਾਹ ਨਹੀਂ। ਜਾਂਚੀ ਗਈ:",
+  "ex_passed": "ਇਹ ਤਾਰੀਖ ਲੰਘ ਚੁੱਕੀ ਹੈ",
+  "ex_today": "ਇਹ ਤਾਰੀਖ ਅੱਜ ਹੈ",
+  "ex_what": "ਇਹ ਕੀ ਹੈ",
+  "ex_wrong": "ਜੇ ਇਸ ਵਿੱਚ ਕੁਝ ਗਲਤ ਹੈ",
+  "g_explain": "ਕਾਗਜ਼ ਸਮਝੋ",
+  "k_explain": "ਕਾਗਜ਼ ਦਾ ਮਤਲਬ",
+  "next_explain": "ਕਾਗਜ਼ ਸੰਭਾਲ ਕੇ ਰੱਖੋ। ਜੇ ਕਿਸੇ ਦਫ਼ਤਰ ਨੇ ਤੁਹਾਡੇ ਨਾਲ ਗਲਤ ਕੀਤਾ ਹੈ, ਤਾਂ ਹੋਮ ਪੇਜ ਤੋਂ ਸ਼ਿਕਾਇਤ ਲਿਖ ਸਕਦੇ ਹੋ।"
  },
  "text": {
   "Bank KYC": "ਬੈਂਕ ਕੇਵਾਈਸੀ",
@@ -400,7 +422,74 @@
   "Keep the acknowledgement / registration number you are given.": "ਜੋ ਰਸੀਦ / ਰਜਿਸਟ੍ਰੇਸ਼ਨ ਨੰਬਰ ਮਿਲੇ ਉਸਨੂੰ ਸੰਭਾਲ ਕੇ ਰੱਖੋ।",
   "Send it to the Public Information Officer of the department by post or by hand, with the fee (unless BPL).": "ਇਸਨੂੰ ਵਿਭਾਗ ਦੇ ਲੋਕ ਸੂਚਨਾ ਅਧਿਕਾਰੀ ਨੂੰ ਡਾਕ ਰਾਹੀਂ ਜਾਂ ਹੱਥੀਂ, ਫ਼ੀਸ ਸਮੇਤ ਭੇਜੋ (ਬੀਪੀਐਲ ਹੋਵੋ ਤਾਂ ਫ਼ੀਸ ਨਹੀਂ)।",
   "For central ministries and departments you can also file online at rtionline.gov.in; many states have their own RTI portals.": "ਕੇਂਦਰੀ ਮੰਤਰਾਲਿਆਂ ਅਤੇ ਵਿਭਾਗਾਂ ਲਈ rtionline.gov.in 'ਤੇ ਔਨਲਾਈਨ ਵੀ ਅਰਜ਼ੀ ਦੇ ਸਕਦੇ ਹੋ; ਕਈ ਰਾਜਾਂ ਦੇ ਆਪਣੇ ਆਰਟੀਆਈ ਪੋਰਟਲ ਹਨ।",
-  "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can file a first appeal.": "ਲੋਕ ਸੂਚਨਾ ਅਧਿਕਾਰੀ ਨੂੰ 30 ਦਿਨਾਂ ਵਿੱਚ ਜਵਾਬ ਦੇਣਾ ਪੈਂਦਾ ਹੈ (ਕਿਸੇ ਦੀ ਜਾਨ ਜਾਂ ਆਜ਼ਾਦੀ ਦਾ ਮਾਮਲਾ ਹੋਵੇ ਤਾਂ 48 ਘੰਟਿਆਂ ਵਿੱਚ)। ਜਵਾਬ ਨਾ ਮਿਲੇ ਤਾਂ ਪਹਿਲੀ ਅਪੀਲ ਕਰ ਸਕਦੇ ਹੋ।"
+  "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can file a first appeal.": "ਲੋਕ ਸੂਚਨਾ ਅਧਿਕਾਰੀ ਨੂੰ 30 ਦਿਨਾਂ ਵਿੱਚ ਜਵਾਬ ਦੇਣਾ ਪੈਂਦਾ ਹੈ (ਕਿਸੇ ਦੀ ਜਾਨ ਜਾਂ ਆਜ਼ਾਦੀ ਦਾ ਮਾਮਲਾ ਹੋਵੇ ਤਾਂ 48 ਘੰਟਿਆਂ ਵਿੱਚ)। ਜਵਾਬ ਨਾ ਮਿਲੇ ਤਾਂ ਪਹਿਲੀ ਅਪੀਲ ਕਰ ਸਕਦੇ ਹੋ।",
+  "RTI first appeal": "ਆਰਟੀਆਈ ਪਹਿਲੀ ਅਪੀਲ",
+  "No reply to your RTI in 30 days, or an incomplete one? The first appeal is drafted for you.": "30 ਦਿਨਾਂ ਵਿੱਚ ਤੁਹਾਡੀ ਆਰਟੀਆਈ ਦਾ ਜਵਾਬ ਨਹੀਂ ਆਇਆ, ਜਾਂ ਅਧੂਰਾ ਆਇਆ? ਪਹਿਲੀ ਅਪੀਲ ਤੁਹਾਡੇ ਲਈ ਤਿਆਰ ਹੋਵੇਗੀ।",
+  "Which department did you send your RTI application to?": "ਤੁਸੀਂ ਆਰਟੀਆਈ ਅਰਜ਼ੀ ਕਿਸ ਵਿਭਾਗ ਨੂੰ ਭੇਜੀ ਸੀ?",
+  "On which date did you send the RTI application?": "ਆਰਟੀਆਈ ਅਰਜ਼ੀ ਕਿਸ ਤਾਰੀਖ ਨੂੰ ਭੇਜੀ ਸੀ?",
+  "Date of RTI application": "ਆਰਟੀਆਈ ਅਰਜ਼ੀ ਦੀ ਤਾਰੀਖ",
+  "In short, what information had you asked for?": "ਸੰਖੇਪ ਵਿੱਚ, ਤੁਸੀਂ ਕਿਹੜੀ ਜਾਣਕਾਰੀ ਮੰਗੀ ਸੀ?",
+  "Information asked for": "ਮੰਗੀ ਗਈ ਜਾਣਕਾਰੀ",
+  "Did you get a reply from the office? Say: no reply, or reply received.": "ਕੀ ਦਫ਼ਤਰ ਤੋਂ ਜਵਾਬ ਆਇਆ? ਕਹੋ: ਜਵਾਬ ਨਹੀਂ ਆਇਆ, ਜਾਂ ਜਵਾਬ ਆਇਆ।",
+  "Reply from the PIO": "ਲੋਕ ਸੂਚਨਾ ਅਧਿਕਾਰੀ ਦਾ ਜਵਾਬ",
+  "On which date did you get the reply?": "ਜਵਾਬ ਕਿਸ ਤਾਰੀਖ ਨੂੰ ਮਿਲਿਆ?",
+  "Date of reply": "ਜਵਾਬ ਦੀ ਤਾਰੀਖ",
+  "What is wrong with the reply? For example: information is missing, or it was refused without a reason.": "ਜਵਾਬ ਵਿੱਚ ਕੀ ਕਮੀ ਹੈ? ਜਿਵੇਂ: ਜਾਣਕਾਰੀ ਅਧੂਰੀ ਹੈ, ਜਾਂ ਬਿਨਾਂ ਕਾਰਨ ਇਨਕਾਰ ਕਰ ਦਿੱਤਾ।",
+  "Why the reply is not acceptable": "ਜਵਾਬ ਕਿਉਂ ਮਨਜ਼ੂਰ ਨਹੀਂ",
+  "Send it to the First Appellate Authority: the officer senior to the Public Information Officer in the same department. Attach copies of your RTI application and of the reply, if any.": "ਇਸਨੂੰ ਪਹਿਲੀ ਅਪੀਲ ਅਥਾਰਟੀ ਨੂੰ ਭੇਜੋ: ਉਸੇ ਵਿਭਾਗ ਵਿੱਚ ਲੋਕ ਸੂਚਨਾ ਅਧਿਕਾਰੀ ਤੋਂ ਸੀਨੀਅਰ ਅਧਿਕਾਰੀ। ਆਰਟੀਆਈ ਅਰਜ਼ੀ ਅਤੇ ਜਵਾਬ (ਜੇ ਆਇਆ ਹੋਵੇ) ਦੀਆਂ ਕਾਪੀਆਂ ਨਾਲ ਲਗਾਓ।",
+  "Central government departments charge no fee for a first appeal; some states do, so check your state's rules.": "ਕੇਂਦਰ ਸਰਕਾਰ ਦੇ ਵਿਭਾਗ ਪਹਿਲੀ ਅਪੀਲ ਦੀ ਕੋਈ ਫ਼ੀਸ ਨਹੀਂ ਲੈਂਦੇ; ਕੁਝ ਰਾਜ ਲੈਂਦੇ ਹਨ, ਇਸ ਲਈ ਆਪਣੇ ਰਾਜ ਦੇ ਨਿਯਮ ਦੇਖ ਲਓ।",
+  "The appeal must be decided within 30 days, 45 at most. If you are still not satisfied, you can make a second appeal to the Information Commission within 90 days.": "ਅਪੀਲ ਦਾ ਫ਼ੈਸਲਾ 30 ਦਿਨਾਂ ਵਿੱਚ, ਵੱਧ ਤੋਂ ਵੱਧ 45 ਦਿਨਾਂ ਵਿੱਚ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ। ਫਿਰ ਵੀ ਤਸੱਲੀ ਨਾ ਹੋਵੇ ਤਾਂ 90 ਦਿਨਾਂ ਵਿੱਚ ਸੂਚਨਾ ਕਮਿਸ਼ਨ ਕੋਲ ਦੂਜੀ ਅਪੀਲ ਕਰ ਸਕਦੇ ਹੋ।",
+  "A message or call saying your power will be cut tonight unless you call a number or pay through a link is a common fraud. The electricity company does not do this.": "\"ਅੱਜ ਰਾਤ ਬਿਜਲੀ ਕੱਟ ਜਾਵੇਗੀ, ਇਸ ਨੰਬਰ 'ਤੇ ਫ਼ੋਨ ਕਰੋ ਜਾਂ ਲਿੰਕ ਤੋਂ ਪੈਸੇ ਭਰੋ\" ਅਜਿਹਾ ਮੈਸੇਜ ਜਾਂ ਫ਼ੋਨ ਆਮ ਧੋਖਾ ਹੈ। ਬਿਜਲੀ ਕੰਪਨੀ ਇਹ ਨਹੀਂ ਕਰਦੀ।",
+  "Amount (Rs.)": "ਰਕਮ (ਰੁ.)",
+  "Banks never ask for your OTP, PIN, password or CVV. Anyone who asks is a fraud.": "ਬੈਂਕ ਕਦੇ ਵੀ ਤੁਹਾਡਾ ਓਟੀਪੀ, ਪਿੰਨ, ਪਾਸਵਰਡ ਜਾਂ ਸੀਵੀਵੀ ਨਹੀਂ ਮੰਗਦਾ। ਜੋ ਮੰਗੇ, ਉਹ ਧੋਖੇਬਾਜ਼ ਹੈ।",
+  "Check the challan on the official site echallan.parivahan.gov.in with the challan number or your vehicle number, and pay there or at the traffic police office.": "ਚਲਾਨ ਨੂੰ ਸਰਕਾਰੀ ਸਾਈਟ echallan.parivahan.gov.in 'ਤੇ ਚਲਾਨ ਨੰਬਰ ਜਾਂ ਗੱਡੀ ਦੇ ਨੰਬਰ ਨਾਲ ਦੇਖੋ, ਅਤੇ ਉੱਥੇ ਜਾਂ ਟ੍ਰੈਫ਼ਿਕ ਪੁਲਿਸ ਦਫ਼ਤਰ ਵਿੱਚ ਭਰੋ।",
+  "Date on the paper": "ਕਾਗਜ਼ 'ਤੇ ਲਿਖੀ ਤਾਰੀਖ",
+  "Do not click the link or call the number in the message. Go to your branch, or call the number printed in your passbook or on the back of your card, and ask whether anything is really needed.": "ਮੈਸੇਜ ਦੇ ਲਿੰਕ 'ਤੇ ਨਾ ਦਬਾਓ ਅਤੇ ਉਸ ਵਿੱਚ ਦਿੱਤੇ ਨੰਬਰ 'ਤੇ ਫ਼ੋਨ ਨਾ ਕਰੋ। ਆਪਣੀ ਸ਼ਾਖਾ ਜਾਓ, ਜਾਂ ਪਾਸਬੁੱਕ ਜਾਂ ਕਾਰਡ ਦੇ ਪਿੱਛੇ ਛਪੇ ਨੰਬਰ 'ਤੇ ਫ਼ੋਨ ਕਰਕੇ ਪੁੱਛੋ ਕਿ ਸੱਚਮੁੱਚ ਕੁਝ ਕਰਨਾ ਹੈ ਜਾਂ ਨਹੀਂ।",
+  "Do not ignore it. Note the court, the case number and the date written on it, and go on that date or send a lawyer.": "ਇਸਨੂੰ ਅਣਡਿੱਠਾ ਨਾ ਕਰੋ। ਅਦਾਲਤ ਦਾ ਨਾਮ, ਕੇਸ ਨੰਬਰ ਅਤੇ ਲਿਖੀ ਤਾਰੀਖ ਨੋਟ ਕਰੋ, ਅਤੇ ਉਸ ਦਿਨ ਜਾਓ ਜਾਂ ਵਕੀਲ ਭੇਜੋ।",
+  "Do not pay cash to an agent without an official receipt.": "ਸਰਕਾਰੀ ਰਸੀਦ ਤੋਂ ਬਿਨਾਂ ਕਿਸੇ ਏਜੰਟ ਨੂੰ ਨਕਦ ਨਾ ਦਿਓ।",
+  "Do not pay through a link in a message.": "ਕਿਸੇ ਮੈਸੇਜ ਦੇ ਲਿੰਕ ਤੋਂ ਪੈਸੇ ਨਾ ਭਰੋ।",
+  "Every genuine notice has a Document Identification Number (DIN). You can check it on incometax.gov.in under 'Authenticate notice/order issued by ITD'.": "ਹਰ ਅਸਲੀ ਨੋਟਿਸ 'ਤੇ ਡਾਕੂਮੈਂਟ ਆਈਡੈਂਟੀਫ਼ਿਕੇਸ਼ਨ ਨੰਬਰ (ਡੀਆਈਐੱਨ) ਹੁੰਦਾ ਹੈ। ਇਸਨੂੰ incometax.gov.in 'ਤੇ 'Authenticate notice/order issued by ITD' ਵਿੱਚ ਜਾਂਚ ਸਕਦੇ ਹੋ।",
+  "Fake challan messages with a link to pay are common. Do not pay through a link in an SMS or WhatsApp; check on the official site first.": "ਪੈਸੇ ਭਰਨ ਦੇ ਲਿੰਕ ਵਾਲੇ ਨਕਲੀ ਚਲਾਨ ਦੇ ਮੈਸੇਜ ਆਮ ਹਨ। ਐੱਸਐੱਮਐੱਸ ਜਾਂ ਵਟਸਐਪ ਦੇ ਲਿੰਕ ਤੋਂ ਪੈਸੇ ਨਾ ਭਰੋ; ਪਹਿਲਾਂ ਸਰਕਾਰੀ ਸਾਈਟ 'ਤੇ ਜਾਂਚੋ।",
+  "Free legal help is available from the District Legal Services Authority at your district court, or by calling 15100.": "ਜ਼ਿਲ੍ਹਾ ਅਦਾਲਤ ਵਿੱਚ ਜ਼ਿਲ੍ਹਾ ਕਾਨੂੰਨੀ ਸੇਵਾਵਾਂ ਅਥਾਰਟੀ ਤੋਂ, ਜਾਂ 15100 'ਤੇ ਫ਼ੋਨ ਕਰਕੇ, ਮੁਫ਼ਤ ਕਾਨੂੰਨੀ ਮਦਦ ਮਿਲਦੀ ਹੈ।",
+  "Give a written complaint at the electricity office and keep a copy with their stamp. If it is not fixed, every electricity company has a Consumer Grievance Redressal Forum.": "ਬਿਜਲੀ ਦਫ਼ਤਰ ਵਿੱਚ ਲਿਖਤੀ ਸ਼ਿਕਾਇਤ ਦਿਓ ਅਤੇ ਮੋਹਰ ਵਾਲੀ ਕਾਪੀ ਆਪਣੇ ਕੋਲ ਰੱਖੋ। ਫਿਰ ਵੀ ਠੀਕ ਨਾ ਹੋਵੇ, ਤਾਂ ਹਰ ਬਿਜਲੀ ਕੰਪਨੀ ਵਿੱਚ ਖਪਤਕਾਰ ਸ਼ਿਕਾਇਤ ਨਿਵਾਰਨ ਫੋਰਮ ਹੁੰਦਾ ਹੈ।",
+  "Go to the branch with your loan papers and ask for a written statement of what is due. If you cannot pay, ask in writing for more time or smaller instalments.": "ਕਰਜ਼ੇ ਦੇ ਕਾਗਜ਼ ਲੈ ਕੇ ਸ਼ਾਖਾ ਜਾਓ ਅਤੇ ਬਕਾਏ ਦਾ ਲਿਖਤੀ ਵੇਰਵਾ ਮੰਗੋ। ਜੇ ਹੁਣ ਨਹੀਂ ਭਰ ਸਕਦੇ, ਤਾਂ ਲਿਖ ਕੇ ਹੋਰ ਸਮਾਂ ਜਾਂ ਛੋਟੀਆਂ ਕਿਸ਼ਤਾਂ ਮੰਗੋ।",
+  "How much money does it ask for, in rupees? Or say skip.": "ਇਸ ਵਿੱਚ ਕਿੰਨੇ ਰੁਪਏ ਮੰਗੇ ਗਏ ਹਨ? ਜਾਂ ਅੱਗੇ ਕਹੋ।",
+  "I do not know this kind of paper yet.": "ਇਸ ਤਰ੍ਹਾਂ ਦੇ ਕਾਗਜ਼ ਬਾਰੇ ਮੈਨੂੰ ਅਜੇ ਜਾਣਕਾਰੀ ਨਹੀਂ ਹੈ।",
+  "If it is about a problem with a government office, you can write a complaint here with 'Public grievance (complaint)'.": "ਜੇ ਗੱਲ ਕਿਸੇ ਸਰਕਾਰੀ ਦਫ਼ਤਰ ਦੀ ਪਰੇਸ਼ਾਨੀ ਦੀ ਹੈ, ਤਾਂ ਇੱਥੇ ਹੀ 'ਜਨਤਕ ਸ਼ਿਕਾਇਤ' ਨਾਲ ਸ਼ਿਕਾਇਤ ਲਿਖ ਸਕਦੇ ਹੋ।",
+  "If money has been taken from you by fraud, call 1930 at once or report it at cybercrime.gov.in. Reporting quickly can stop the money.": "ਜੇ ਧੋਖੇ ਨਾਲ ਪੈਸੇ ਕੱਟੇ ਗਏ ਹਨ, ਤਾਂ ਤੁਰੰਤ 1930 'ਤੇ ਫ਼ੋਨ ਕਰੋ ਜਾਂ cybercrime.gov.in 'ਤੇ ਸ਼ਿਕਾਇਤ ਕਰੋ। ਜਲਦੀ ਦੱਸਣ ਨਾਲ ਪੈਸਾ ਰੁਕ ਸਕਦਾ ਹੈ।",
+  "If money has been taken, call 1930 at once and tell your bank. Reporting quickly can stop the money.": "ਜੇ ਪੈਸੇ ਕੱਟੇ ਗਏ ਹਨ, ਤਾਂ ਤੁਰੰਤ 1930 'ਤੇ ਫ਼ੋਨ ਕਰੋ ਅਤੇ ਆਪਣੇ ਬੈਂਕ ਨੂੰ ਦੱਸੋ। ਜਲਦੀ ਦੱਸਣ ਨਾਲ ਪੈਸਾ ਰੁਕ ਸਕਦਾ ਹੈ।",
+  "If the amount is wrong or you have already paid, complain to the bank in writing. If the bank does not reply in 30 days, or you are not satisfied, complain to the RBI Ombudsman for free: cms.rbi.org.in or 14448.": "ਜੇ ਰਕਮ ਗਲਤ ਹੈ ਜਾਂ ਤੁਸੀਂ ਭਰ ਚੁੱਕੇ ਹੋ, ਤਾਂ ਬੈਂਕ ਨੂੰ ਲਿਖਤੀ ਸ਼ਿਕਾਇਤ ਦਿਓ। ਬੈਂਕ 30 ਦਿਨਾਂ ਵਿੱਚ ਜਵਾਬ ਨਾ ਦੇਵੇ, ਜਾਂ ਤੁਹਾਡੀ ਤਸੱਲੀ ਨਾ ਹੋਵੇ, ਤਾਂ ਆਰਬੀਆਈ ਲੋਕਪਾਲ ਨੂੰ ਮੁਫ਼ਤ ਸ਼ਿਕਾਇਤ ਕਰੋ: cms.rbi.org.in ਜਾਂ 14448।",
+  "If the amount looks wrong, or you were charged when there was no supply, give a written complaint at the office and keep a copy with their stamp.": "ਜੇ ਰਕਮ ਗਲਤ ਲੱਗੇ, ਜਾਂ ਪਾਣੀ ਆਇਆ ਹੀ ਨਹੀਂ ਫਿਰ ਵੀ ਪੈਸੇ ਲੱਗੇ, ਤਾਂ ਦਫ਼ਤਰ ਵਿੱਚ ਲਿਖਤੀ ਸ਼ਿਕਾਇਤ ਦਿਓ ਅਤੇ ਮੋਹਰ ਵਾਲੀ ਕਾਪੀ ਆਪਣੇ ਕੋਲ ਰੱਖੋ।",
+  "If the area or the type of building written on the notice is wrong, you can file an objection at the municipal office. The notice usually says by when; do it before that date.": "ਜੇ ਨੋਟਿਸ 'ਤੇ ਲਿਖਿਆ ਰਕਬਾ ਜਾਂ ਮਕਾਨ ਦੀ ਕਿਸਮ ਗਲਤ ਹੈ, ਤਾਂ ਨਗਰ ਨਿਗਮ ਦਫ਼ਤਰ ਵਿੱਚ ਇਤਰਾਜ਼ ਦੇ ਸਕਦੇ ਹੋ। ਨੋਟਿਸ ਵਿੱਚ ਆਮ ਤੌਰ 'ਤੇ ਲਿਖਿਆ ਹੁੰਦਾ ਹੈ ਕਿ ਕਦੋਂ ਤੱਕ; ਉਸ ਤੋਂ ਪਹਿਲਾਂ ਦਿਓ।",
+  "If the bill is much higher than usual, compare the meter reading printed on it with your meter.": "ਜੇ ਬਿੱਲ ਆਮ ਨਾਲੋਂ ਬਹੁਤ ਜ਼ਿਆਦਾ ਹੈ, ਤਾਂ ਉਸ 'ਤੇ ਛਪੀ ਮੀਟਰ ਰੀਡਿੰਗ ਆਪਣੇ ਮੀਟਰ ਨਾਲ ਮਿਲਾਓ।",
+  "If you think it is wrong, you can dispute it as written on the challan, or at the traffic police office; some cases go to a court or a Lok Adalat.": "ਜੇ ਚਲਾਨ ਗਲਤ ਲੱਗੇ, ਤਾਂ ਚਲਾਨ 'ਤੇ ਲਿਖੇ ਤਰੀਕੇ ਨਾਲ ਜਾਂ ਟ੍ਰੈਫ਼ਿਕ ਪੁਲਿਸ ਦਫ਼ਤਰ ਵਿੱਚ ਇਤਰਾਜ਼ ਕਰ ਸਕਦੇ ਹੋ; ਕੁਝ ਕੇਸ ਅਦਾਲਤ ਜਾਂ ਲੋਕ ਅਦਾਲਤ ਵਿੱਚ ਜਾਂਦੇ ਹਨ।",
+  "Is there a last date, or a date to appear, written on it? Say the date, or say skip.": "ਕੀ ਇਸ 'ਤੇ ਕੋਈ ਆਖ਼ਰੀ ਤਾਰੀਖ, ਜਾਂ ਹਾਜ਼ਰ ਹੋਣ ਦੀ ਤਾਰੀਖ ਲਿਖੀ ਹੈ? ਤਾਰੀਖ ਦੱਸੋ, ਜਾਂ ਅੱਗੇ ਕਹੋ।",
+  "Keep the receipt or the payment message.": "ਰਸੀਦ ਜਾਂ ਭੁਗਤਾਨ ਦਾ ਮੈਸੇਜ ਸੰਭਾਲ ਕੇ ਰੱਖੋ।",
+  "Keep the receipt. You may need it later, for example when selling the property.": "ਰਸੀਦ ਸੰਭਾਲ ਕੇ ਰੱਖੋ। ਬਾਅਦ ਵਿੱਚ ਕੰਮ ਆ ਸਕਦੀ ਹੈ, ਜਿਵੇਂ ਜਾਇਦਾਦ ਵੇਚਣ ਵੇਲੇ।",
+  "Kind of paper": "ਕਾਗਜ਼ ਦੀ ਕਿਸਮ",
+  "Log in at incometax.gov.in, or ask a tax helper, to see the notice and reply by the date given.": "incometax.gov.in 'ਤੇ ਲੌਗ ਇਨ ਕਰਕੇ, ਜਾਂ ਕਿਸੇ ਟੈਕਸ ਜਾਣਕਾਰ ਦੀ ਮਦਦ ਨਾਲ, ਨੋਟਿਸ ਦੇਖੋ ਅਤੇ ਦਿੱਤੀ ਤਾਰੀਖ ਤੱਕ ਜਵਾਬ ਦਿਓ।",
+  "Never tell anyone your OTP, PIN or password, not even someone who says they are from the bank or the office.": "ਆਪਣਾ ਓਟੀਪੀ, ਪਿੰਨ ਜਾਂ ਪਾਸਵਰਡ ਕਿਸੇ ਨੂੰ ਨਾ ਦੱਸੋ, ਉਸਨੂੰ ਵੀ ਨਹੀਂ ਜੋ ਆਪਣੇ ਆਪ ਨੂੰ ਬੈਂਕ ਜਾਂ ਦਫ਼ਤਰ ਦਾ ਦੱਸੇ।",
+  "No court, police or CBI officer arrests anyone on a video call, and no one can ask you to pay to avoid arrest. A so-called digital arrest is fraud: cut the call and dial 1930.": "ਕੋਈ ਅਦਾਲਤ, ਪੁਲਿਸ ਜਾਂ ਸੀਬੀਆਈ ਅਧਿਕਾਰੀ ਵੀਡੀਓ ਕਾਲ 'ਤੇ ਗ੍ਰਿਫ਼ਤਾਰ ਨਹੀਂ ਕਰਦਾ, ਅਤੇ ਗ੍ਰਿਫ਼ਤਾਰੀ ਤੋਂ ਬਚਣ ਲਈ ਕੋਈ ਪੈਸੇ ਨਹੀਂ ਮੰਗ ਸਕਦਾ। ਅਖੌਤੀ \"ਡਿਜੀਟਲ ਅਰੈਸਟ\" ਧੋਖਾ ਹੈ: ਫ਼ੋਨ ਕੱਟੋ ਅਤੇ 1930 'ਤੇ ਫ਼ੋਨ ਕਰੋ।",
+  "Pay by the last date at the electricity office, a bank or post office counter, or the company's official app or website.": "ਆਖ਼ਰੀ ਤਾਰੀਖ ਤੱਕ ਬਿਜਲੀ ਦਫ਼ਤਰ ਵਿੱਚ, ਬੈਂਕ ਜਾਂ ਡਾਕਘਰ ਦੇ ਕਾਊਂਟਰ 'ਤੇ, ਜਾਂ ਕੰਪਨੀ ਦੀ ਆਪਣੀ ਐਪ ਜਾਂ ਵੈੱਬਸਾਈਟ ਤੋਂ ਭਰੋ।",
+  "Pay by the last date at the municipal office or on its official website. Paying late usually adds a penalty or interest.": "ਆਖ਼ਰੀ ਤਾਰੀਖ ਤੱਕ ਨਗਰ ਨਿਗਮ ਦਫ਼ਤਰ ਵਿੱਚ ਜਾਂ ਉਸਦੀ ਆਪਣੀ ਵੈੱਬਸਾਈਟ 'ਤੇ ਭਰੋ। ਦੇਰ ਨਾਲ ਭਰਨ 'ਤੇ ਆਮ ਤੌਰ 'ਤੇ ਜੁਰਮਾਨਾ ਜਾਂ ਵਿਆਜ ਲੱਗਦਾ ਹੈ।",
+  "Pay by the last date at the water board or municipal office, or on its official website or app.": "ਆਖ਼ਰੀ ਤਾਰੀਖ ਤੱਕ ਜਲ ਬੋਰਡ ਜਾਂ ਨਗਰ ਨਿਗਮ ਦੇ ਦਫ਼ਤਰ ਵਿੱਚ, ਜਾਂ ਉਸਦੀ ਆਪਣੀ ਵੈੱਬਸਾਈਟ ਜਾਂ ਐਪ ਤੋਂ ਭਰੋ।",
+  "Pay only at the office or through its official website or app, not through a link someone sends you.": "ਪੈਸੇ ਸਿਰਫ਼ ਦਫ਼ਤਰ ਵਿੱਚ ਜਾਂ ਉਸਦੀ ਆਪਣੀ ਵੈੱਬਸਾਈਟ ਜਾਂ ਐਪ ਤੋਂ ਭਰੋ, ਕਿਸੇ ਦੇ ਭੇਜੇ ਲਿੰਕ ਤੋਂ ਨਹੀਂ।",
+  "Pay only into the loan account, at the branch or through the official app, and keep the receipt.": "ਪੈਸੇ ਸਿਰਫ਼ ਕਰਜ਼ਾ ਖਾਤੇ ਵਿੱਚ, ਸ਼ਾਖਾ ਵਿੱਚ ਜਾਂ ਕੰਪਨੀ ਦੀ ਆਪਣੀ ਐਪ ਤੋਂ ਭਰੋ, ਅਤੇ ਰਸੀਦ ਰੱਖੋ।",
+  "Pay only to the municipality. Do not give cash to someone who comes to your door without an official receipt.": "ਪੈਸੇ ਸਿਰਫ਼ ਨਗਰ ਨਿਗਮ ਨੂੰ ਦਿਓ। ਸਰਕਾਰੀ ਰਸੀਦ ਤੋਂ ਬਿਨਾਂ ਘਰ ਆਏ ਕਿਸੇ ਨੂੰ ਨਕਦ ਨਾ ਦਿਓ।",
+  "Recovery agents must not threaten you or use abusive words, and must not call before 8 in the morning or after 7 in the evening. If they do, complain to the bank and, if you are threatened, to the police.": "ਵਸੂਲੀ ਏਜੰਟ ਤੁਹਾਨੂੰ ਧਮਕਾ ਨਹੀਂ ਸਕਦੇ, ਗਾਲ੍ਹਾਂ ਨਹੀਂ ਕੱਢ ਸਕਦੇ, ਅਤੇ ਸਵੇਰੇ 8 ਵਜੇ ਤੋਂ ਪਹਿਲਾਂ ਜਾਂ ਸ਼ਾਮ 7 ਵਜੇ ਤੋਂ ਬਾਅਦ ਫ਼ੋਨ ਨਹੀਂ ਕਰ ਸਕਦੇ। ਅਜਿਹਾ ਹੋਵੇ ਤਾਂ ਬੈਂਕ ਨੂੰ ਸ਼ਿਕਾਇਤ ਕਰੋ, ਅਤੇ ਧਮਕੀ ਮਿਲੇ ਤਾਂ ਪੁਲਿਸ ਨੂੰ।",
+  "Show it to someone you trust, at the CSC, the panchayat, or the office that sent it, and ask what it asks you to do and by when.": "ਇਸਨੂੰ ਕਿਸੇ ਭਰੋਸੇਮੰਦ ਵਿਅਕਤੀ ਨੂੰ, ਸੀਐੱਸਸੀ 'ਤੇ, ਪੰਚਾਇਤ ਵਿੱਚ, ਜਾਂ ਭੇਜਣ ਵਾਲੇ ਦਫ਼ਤਰ ਵਿੱਚ ਦਿਖਾਓ, ਅਤੇ ਪੁੱਛੋ ਕਿ ਇਸ ਵਿੱਚ ਕੀ ਕਰਨ ਨੂੰ ਕਿਹਾ ਹੈ ਅਤੇ ਕਦੋਂ ਤੱਕ।",
+  "Tell me what kind of paper you got. I will explain what it means, what to do and by when.": "ਦੱਸੋ ਤੁਹਾਨੂੰ ਕਿਹੜਾ ਕਾਗਜ਼ ਮਿਲਿਆ ਹੈ। ਮੈਂ ਸਮਝਾਵਾਂਗਾ ਕਿ ਇਸਦਾ ਮਤਲਬ ਕੀ ਹੈ, ਕੀ ਕਰਨਾ ਹੈ ਅਤੇ ਕਦੋਂ ਤੱਕ।",
+  "The department does not ask for payment through links in SMS or phone calls. Pay only through the official portal.": "ਆਮਦਨ ਕਰ ਵਿਭਾਗ ਐੱਸਐੱਮਐੱਸ ਜਾਂ ਫ਼ੋਨ ਦੇ ਲਿੰਕ ਤੋਂ ਪੈਸੇ ਨਹੀਂ ਮੰਗਦਾ। ਸਿਰਫ਼ ਸਰਕਾਰੀ ਪੋਰਟਲ ਤੋਂ ਭਰੋ।",
+  "This is a fine for breaking a traffic rule, such as riding without a helmet or crossing a red light.": "ਇਹ ਟ੍ਰੈਫ਼ਿਕ ਨਿਯਮ ਤੋੜਨ ਦਾ ਜੁਰਮਾਨਾ ਹੈ, ਜਿਵੇਂ ਬਿਨਾਂ ਹੈਲਮੇਟ ਚਲਾਉਣਾ ਜਾਂ ਲਾਲ ਬੱਤੀ ਪਾਰ ਕਰਨਾ।",
+  "This is a letter from a bank or loan company saying a loan payment (EMI) is overdue.": "ਇਹ ਬੈਂਕ ਜਾਂ ਕਰਜ਼ਾ ਕੰਪਨੀ ਦੀ ਚਿੱਠੀ ਹੈ, ਜਿਸ ਵਿੱਚ ਲਿਖਿਆ ਹੈ ਕਿ ਕਰਜ਼ੇ ਦੀ ਕਿਸ਼ਤ (ਈਐੱਮਆਈ) ਬਕਾਇਆ ਹੈ।",
+  "This is a message saying your bank account, card or KYC will be blocked unless you do something now.": "ਇਹ ਅਜਿਹਾ ਮੈਸੇਜ ਹੈ ਜਿਸ ਵਿੱਚ ਲਿਖਿਆ ਹੈ ਕਿ ਹੁਣੇ ਕੁਝ ਨਾ ਕੀਤਾ ਤਾਂ ਤੁਹਾਡਾ ਬੈਂਕ ਖਾਤਾ, ਕਾਰਡ ਜਾਂ ਕੇਵਾਈਸੀ ਬੰਦ ਹੋ ਜਾਵੇਗਾ।",
+  "This is a notice from the Income Tax Department, usually asking you to file a return, explain a difference in your income details, or pay tax that is due.": "ਇਹ ਆਮਦਨ ਕਰ ਵਿਭਾਗ ਦਾ ਨੋਟਿਸ ਹੈ, ਜੋ ਆਮ ਤੌਰ 'ਤੇ ਰਿਟਰਨ ਭਰਨ, ਆਮਦਨ ਦੇ ਵੇਰਵੇ ਵਿੱਚ ਫ਼ਰਕ ਸਮਝਾਉਣ, ਜਾਂ ਬਕਾਇਆ ਟੈਕਸ ਭਰਨ ਲਈ ਕਹਿੰਦਾ ਹੈ।",
+  "This is a notice from the municipality or panchayat about tax on your house, shop or land: how much is due and by when.": "ਇਹ ਨਗਰ ਨਿਗਮ ਜਾਂ ਪੰਚਾਇਤ ਦਾ ਨੋਟਿਸ ਹੈ, ਤੁਹਾਡੇ ਘਰ, ਦੁਕਾਨ ਜਾਂ ਜ਼ਮੀਨ ਦੇ ਟੈਕਸ ਬਾਰੇ: ਕਿੰਨਾ ਦੇਣਾ ਹੈ ਅਤੇ ਕਦੋਂ ਤੱਕ।",
+  "This is a paper from a court or a lawyer. A court summons gives the date you must appear; a lawyer's notice asks you to do something or reply within a time.": "ਇਹ ਅਦਾਲਤ ਜਾਂ ਵਕੀਲ ਦਾ ਕਾਗਜ਼ ਹੈ। ਅਦਾਲਤ ਦੇ ਸੰਮਨ ਵਿੱਚ ਉਹ ਤਾਰੀਖ ਹੁੰਦੀ ਹੈ ਜਿਸ ਦਿਨ ਤੁਹਾਨੂੰ ਹਾਜ਼ਰ ਹੋਣਾ ਹੈ; ਵਕੀਲ ਦੇ ਨੋਟਿਸ ਵਿੱਚ ਕੁਝ ਕਰਨ ਜਾਂ ਤੈਅ ਸਮੇਂ ਵਿੱਚ ਜਵਾਬ ਦੇਣ ਲਈ ਕਿਹਾ ਜਾਂਦਾ ਹੈ।",
+  "This is your electricity bill: how much you owe for the power you used, and the last date to pay it.": "ਇਹ ਤੁਹਾਡਾ ਬਿਜਲੀ ਦਾ ਬਿੱਲ ਹੈ: ਤੁਸੀਂ ਜਿੰਨੀ ਬਿਜਲੀ ਵਰਤੀ ਉਸਦੇ ਪੈਸੇ, ਅਤੇ ਭਰਨ ਦੀ ਆਖ਼ਰੀ ਤਾਰੀਖ।",
+  "This is your water bill from the water board or the municipality: the amount you owe and the last date to pay.": "ਇਹ ਜਲ ਬੋਰਡ ਜਾਂ ਨਗਰ ਨਿਗਮ ਦਾ ਪਾਣੀ ਦਾ ਬਿੱਲ ਹੈ: ਕਿੰਨੇ ਪੈਸੇ ਦੇਣੇ ਹਨ ਅਤੇ ਭਰਨ ਦੀ ਆਖ਼ਰੀ ਤਾਰੀਖ।",
+  "Understand a paper (bill, notice, summons)": "ਕਾਗਜ਼ ਸਮਝੋ (ਬਿੱਲ, ਨੋਟਿਸ, ਸੰਮਨ)",
+  "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.": "ਇਹ ਕਿਹੜਾ ਕਾਗਜ਼ ਹੈ? ਜਿਵੇਂ: ਬਿਜਲੀ ਦਾ ਬਿੱਲ, ਪਾਣੀ ਦਾ ਬਿੱਲ, ਪ੍ਰਾਪਰਟੀ ਟੈਕਸ, ਬੈਂਕ ਕਰਜ਼ਾ, ਬੈਂਕ ਕੇਵਾਈਸੀ ਮੈਸੇਜ, ਅਦਾਲਤ ਦਾ ਸੰਮਨ, ਆਮਦਨ ਕਰ ਦਾ ਨੋਟਿਸ, ਟ੍ਰੈਫ਼ਿਕ ਚਲਾਨ, ਜਾਂ ਕੁਝ ਹੋਰ।"
  },
  "options": {
   "Male": [
@@ -666,6 +755,74 @@
    "ਕਿਰਾਏ",
    "ਕਿਰਾਏ ਦਾ",
    "ਬੇਘਰ"
+  ],
+  "No reply received": [
+   "ਜਵਾਬ ਨਹੀਂ ਆਇਆ",
+   "ਨਹੀਂ ਆਇਆ",
+   "ਕੋਈ ਜਵਾਬ ਨਹੀਂ",
+   "ਨਹੀਂ ਮਿਲਿਆ",
+   "ਨਹੀਂ"
+  ],
+  "Reply received, not satisfied": [
+   "ਜਵਾਬ ਆਇਆ, ਤਸੱਲੀ ਨਹੀਂ",
+   "ਜਵਾਬ ਆਇਆ",
+   "ਆਇਆ",
+   "ਮਿਲਿਆ",
+   "ਅਧੂਰਾ",
+   "ਹਾਂ"
+  ],
+  "Bank KYC or account block message": [
+   "ਬੈਂਕ ਕੇਵਾਈਸੀ ਮੈਸੇਜ",
+   "ਕੇਵਾਈਸੀ",
+   "ਖਾਤਾ ਬੰਦ",
+   "ਕਾਰਡ ਬੰਦ"
+  ],
+  "Bank loan or EMI notice": [
+   "ਬੈਂਕ ਕਰਜ਼ੇ ਦਾ ਨੋਟਿਸ",
+   "ਬੈਂਕ ਕਰਜ਼ਾ",
+   "ਕਰਜ਼ਾ",
+   "ਲੋਨ",
+   "ਈਐੱਮਆਈ",
+   "ਕਿਸ਼ਤ"
+  ],
+  "Court summons or legal notice": [
+   "ਅਦਾਲਤ ਦਾ ਸੰਮਨ ਜਾਂ ਕਾਨੂੰਨੀ ਨੋਟਿਸ",
+   "ਅਦਾਲਤ ਦਾ ਸੰਮਨ",
+   "ਅਦਾਲਤ",
+   "ਕੋਰਟ",
+   "ਸੰਮਨ",
+   "ਵਕੀਲ ਦਾ ਨੋਟਿਸ"
+  ],
+  "Electricity bill": [
+   "ਬਿਜਲੀ ਦਾ ਬਿੱਲ",
+   "ਬਿਜਲੀ",
+   "ਬਿਜਲੀ ਬਿੱਲ"
+  ],
+  "Income tax notice": [
+   "ਆਮਦਨ ਕਰ ਦਾ ਨੋਟਿਸ",
+   "ਆਮਦਨ ਕਰ",
+   "ਇਨਕਮ ਟੈਕਸ"
+  ],
+  "Property tax notice": [
+   "ਪ੍ਰਾਪਰਟੀ ਟੈਕਸ ਦਾ ਨੋਟਿਸ",
+   "ਪ੍ਰਾਪਰਟੀ ਟੈਕਸ",
+   "ਹਾਊਸ ਟੈਕਸ",
+   "ਜਾਇਦਾਦ ਟੈਕਸ"
+  ],
+  "Something else": [
+   "ਕੁਝ ਹੋਰ",
+   "ਹੋਰ",
+   "ਪਤਾ ਨਹੀਂ"
+  ],
+  "Traffic challan": [
+   "ਟ੍ਰੈਫ਼ਿਕ ਚਲਾਨ",
+   "ਚਲਾਨ",
+   "ਜੁਰਮਾਨਾ"
+  ],
+  "Water bill": [
+   "ਪਾਣੀ ਦਾ ਬਿੱਲ",
+   "ਪਾਣੀ",
+   "ਪਾਣੀ ਬਿੱਲ"
   ]
  },
  "words": {
