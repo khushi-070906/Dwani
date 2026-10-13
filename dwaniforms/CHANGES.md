@@ -159,3 +159,36 @@ The app was audited in a real browser at phone width, on the home screen and mid
   real page in two languages -- names, mic toggle, live regions, aria-current, heading order). Both run in CI.
 - Not done: nobody has listened to a whole form with TalkBack or VoiceOver on a real phone. The markup is right; the
   experience is unverified.
+
+## Understand a paper (Samjhao) and the RTI first appeal
+
+- **Samjhao** (`templates/samjhao.json`, `explain.py`, `papers/*.json`): nine kinds of paper -- electricity bill, water
+  bill, property tax notice, bank loan / EMI notice, bank KYC message, court summons or legal notice, income tax notice,
+  traffic challan, something else. For each: what it is, what to do, if something on it is wrong, the fraud to watch for,
+  and free help. The date on the paper is counted (days left / today / passed) and read out, with the fraud warning and
+  a one-line "general guidance, not legal advice". No model, no photo: the same paper always gets the same answer.
+  Each rule was checked against a public source before it was written (RBI directive of 12 Aug 2022 on recovery agents
+  calling before 8 am / after 7 pm; the RBI Integrated Ombudsman Scheme, cms.rbi.org.in, 14448, free; NALSA 15100;
+  I4C on "digital arrest" and 1930 / cybercrime.gov.in; the DIN on every income tax notice; PIB on fake e-challans;
+  consumer grievance forums of electricity companies under s.42(5) of the Electricity Act). Sources and a
+  `last_reviewed` date sit in each file.
+- **RTI first appeal** (`templates/rti_first_appeal.json`, `outcomes.rti_appeal_draft`): the Section 19(1) appeal, with
+  the 30-day window worked out from the dates given -- too early (the PIO still has time: says until when), on time, or
+  late (asks for condonation, blank for the reason). Department choices are the RTI application's own.
+- **Dates ahead** (`validators.date(future=True)`): a bill's last date or a hearing date may be in the future and said
+  without a year. Only fields that ask for it accept this.
+- Spoken result: outcomes can add lines (`say_text`, already in the citizen's language) and messages with a date read
+  out in words (`say_more`).
+- Home page: "Understand a paper" joins the five most-used tasks and gets its own group; the first appeal sits with
+  complaints and RTI.
+- Eight language packs: 21 strings for the appeal and 79 for Samjhao (messages, questions, every paper sentence, the
+  nine paper names, screen text), all AI-drafted, packs still `draft`. A check confirmed every number and web address
+  (1930, 15100, 14448, cms.rbi.org.in, incometax.gov.in, echallan.parivahan.gov.in) survives in every translation.
+- Tests: `test_dwaniforms_samjhao.py` (36: every paper file complete, the questions follow the paper, **saying each
+  paper's name picks that paper in all ten languages**, days counted, the warning spoken, explanations in the pack
+  language), `test_dwaniforms_rti_appeal.py` (19: the window in every case, English and Hindi drafts, condonation,
+  the reply words in all eight packs), `test_dwaniforms_dates_ahead.py` (12), `tests/js/dwaniforms_samjhao.test.js`
+  (16: the real page, in CI).
+- Not done: a lawyer or consumer-rights worker reading the nine explanations; reading the paper from a photo; any
+  state-specific rule (fees, penalties, objection periods differ by state and city, so the text says "usually" and
+  "check your state's rules" rather than a number).
