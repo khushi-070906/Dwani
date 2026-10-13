@@ -88,3 +88,27 @@ def test_launcher_preview_and_send(monkeypatch):
         assert r["ok"] is False and "Copy error report" in r["error"]
     finally:
         httpd.shutdown()
+
+
+def test_refused_post_with_a_body_still_gets_its_403():
+    """A POST with the wrong token must be ANSWERED 403 even when it carries a body.
+
+    The launcher used to reply and close without reading the body; on Windows that resets the connection, so the caller
+    got ConnectionAbortedError (WinError 10053) instead of the 403 -- the test above failed there at random.
+    """
+    import gui
+    app = gui.LauncherApp(setup_firewall_if_needed=lambda: None, server_port=8000, license_server_url="http://unused")
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), app._make_handler())
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    port = httpd.server_address[1]
+    try:
+        for size in (2, 64 * 1024, 900_000):
+            c = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+            c.request("POST", "/api/report/send?t=wrong", body=b"x" * size,
+                      headers={"Content-Type": "application/json"})
+            r = c.getresponse()
+            assert r.status == 403, size
+            r.read()
+            c.close()
+    finally:
+        httpd.shutdown()
