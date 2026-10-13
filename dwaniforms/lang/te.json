@@ -51,7 +51,15 @@
   "fix_which": "ఏది మార్చాలి? వీటిలో ఒకటి చెప్పండి:",
   "khasra_invalid": "సర్వే నంబర్ అర్థం కాలేదు. ఇలా చెప్పండి: నూట నలభై ఐదు బై రెండు.",
   "ration_invalid": "రేషన్ కార్డు నంబర్ అర్థం కాలేదు. నెమ్మదిగా మళ్లీ చెప్పండి.",
-  "unit_acres": "దయచేసి భూమిని ఎకరాల్లో చెప్పండి. గుంటలు, సెంట్లు ప్రాంతాన్ని బట్టి మారతాయి."
+  "unit_acres": "దయచేసి భూమిని ఎకరాల్లో చెప్పండి. గుంటలు, సెంట్లు ప్రాంతాన్ని బట్టి మారతాయి.",
+  "outcome_rti_appeal": "మీ మొదటి అప్పీలు తెరపై సిద్ధంగా ఉంది. దాన్ని ప్రింట్ చేసి, సంతకం చేసి, మీ పత్రాల కాపీలతో పంపండి.",
+  "rti_appeal_early": "కార్యాలయానికి {date} వరకు జవాబు ఇవ్వడానికి సమయం ఉంది. అప్పటికి జవాబు రాకపోతే, ఆ తేదీ తర్వాత ఈ అప్పీలు పంపండి.",
+  "rti_appeal_late": "30 రోజులకు పైగా గడిచిపోయాయి, కాబట్టి అప్పీలు ఆలస్యంగా ఉంది. ఖాళీ స్థలంలో ఆలస్యానికి కారణం రాయండి; అధికారి అయినా దాన్ని స్వీకరించవచ్చు.",
+  "outcome_explain": "ఈ కాగితం అర్థం ఇది. అంతా తెరపై కూడా రాసి ఉంది.",
+  "explain_ahead": "కాగితంపై రాసిన తేదీ {date}, ఈ రోజు నుంచి {days} రోజుల తర్వాత.",
+  "explain_today": "కాగితంపై రాసిన తేదీ ఈ రోజే.",
+  "explain_passed": "కాగితంపై రాసిన తేదీ, {date}, ఇప్పటికే దాటిపోయింది. ఈ రోజే కార్యాలయానికి వెళ్లి ఇప్పుడు ఏం చేయాలో అడగండి.",
+  "explain_disclaimer": "ఇది సాధారణ సమాచారం, న్యాయ సలహా కాదు. ఏదైనా చేసే ముందు కాగితాన్ని మీరే చదవండి, లేదా కార్యాలయంలో అడగండి."
  },
  "ui": {
   "a11y_bigger": "అక్షరాలు పెద్దవి చేయండి",
@@ -172,7 +180,21 @@
   "why_maybe": "'పరిశీలన అవసరం' ఎందుకు",
   "working": "అర్థం చేసుకుంటున్నాం…",
   "yes": "✓ అవును, సరైనదే",
-  "yes_word": "అవును"
+  "yes_word": "అవును",
+  "ex_amount": "మొత్తం",
+  "ex_beware": "మోసం పట్ల జాగ్రత్త",
+  "ex_date": "కాగితంపై తేదీ",
+  "ex_do": "ఏం చేయాలి",
+  "ex_help": "మోసం జరిగితే",
+  "ex_left": "రోజులు ఉన్నాయి",
+  "ex_note": "సాధారణ సమాచారం, న్యాయ సలహా కాదు. తనిఖీ చేసినది:",
+  "ex_passed": "ఈ తేదీ దాటిపోయింది",
+  "ex_today": "ఈ తేదీ ఈ రోజే",
+  "ex_what": "ఇది ఏమిటి",
+  "ex_wrong": "ఇందులో ఏదైనా తప్పు ఉంటే",
+  "g_explain": "కాగితాన్ని అర్థం చేసుకోండి",
+  "k_explain": "కాగితం అర్థం",
+  "next_explain": "కాగితాన్ని జాగ్రత్తగా ఉంచుకోండి. ఏదైనా కార్యాలయం మీకు అన్యాయం చేసి ఉంటే, హోమ్ పేజీ నుంచి ఫిర్యాదు రాయవచ్చు."
  },
  "text": {
   "Bank KYC": "బ్యాంక్ కేవైసీ",
@@ -400,7 +422,74 @@
   "Keep the acknowledgement / registration number you are given.": "మీకు ఇచ్చే రసీదు / నమోదు నంబర్‌ను జాగ్రత్తగా ఉంచుకోండి.",
   "Send it to the Public Information Officer of the department by post or by hand, with the fee (unless BPL).": "దీన్ని శాఖ ప్రజా సమాచార అధికారికి పోస్టులో లేదా స్వయంగా, రుసుముతో పంపండి (బీపీఎల్ అయితే రుసుము లేదు).",
   "For central ministries and departments you can also file online at rtionline.gov.in; many states have their own RTI portals.": "కేంద్ర మంత్రిత్వ శాఖలు, విభాగాల కోసం rtionline.gov.in లో ఆన్‌లైన్‌లో కూడా దరఖాస్తు చేయవచ్చు; చాలా రాష్ట్రాలకు సొంత ఆర్టీఐ పోర్టళ్లు ఉన్నాయి.",
-  "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can file a first appeal.": "ప్రజా సమాచార అధికారి 30 రోజుల్లో జవాబు ఇవ్వాలి (ఎవరిదైనా ప్రాణం లేదా స్వేచ్ఛకు సంబంధించినదైతే 48 గంటల్లో). జవాబు రాకపోతే మొదటి అప్పీలు చేయవచ్చు."
+  "The PIO must reply within 30 days (48 hours if it concerns someone's life or liberty). If not, you can file a first appeal.": "ప్రజా సమాచార అధికారి 30 రోజుల్లో జవాబు ఇవ్వాలి (ఎవరిదైనా ప్రాణం లేదా స్వేచ్ఛకు సంబంధించినదైతే 48 గంటల్లో). జవాబు రాకపోతే మొదటి అప్పీలు చేయవచ్చు.",
+  "RTI first appeal": "ఆర్టీఐ మొదటి అప్పీలు",
+  "No reply to your RTI in 30 days, or an incomplete one? The first appeal is drafted for you.": "30 రోజుల్లో మీ ఆర్టీఐకి జవాబు రాలేదా, లేదా అసంపూర్ణంగా వచ్చిందా? మొదటి అప్పీలు మీ కోసం సిద్ధమవుతుంది.",
+  "Which department did you send your RTI application to?": "మీరు ఆర్టీఐ దరఖాస్తును ఏ శాఖకు పంపారు?",
+  "On which date did you send the RTI application?": "ఆర్టీఐ దరఖాస్తును ఏ తేదీన పంపారు?",
+  "Date of RTI application": "ఆర్టీఐ దరఖాస్తు తేదీ",
+  "In short, what information had you asked for?": "క్లుప్తంగా, మీరు ఏ సమాచారం అడిగారు?",
+  "Information asked for": "అడిగిన సమాచారం",
+  "Did you get a reply from the office? Say: no reply, or reply received.": "కార్యాలయం నుంచి జవాబు వచ్చిందా? చెప్పండి: జవాబు రాలేదు, లేదా జవాబు వచ్చింది.",
+  "Reply from the PIO": "ప్రజా సమాచార అధికారి జవాబు",
+  "On which date did you get the reply?": "జవాబు ఏ తేదీన అందింది?",
+  "Date of reply": "జవాబు తేదీ",
+  "What is wrong with the reply? For example: information is missing, or it was refused without a reason.": "జవాబులో ఏమి లోపం ఉంది? ఉదాహరణకు: సమాచారం అసంపూర్ణం, లేదా కారణం లేకుండా తిరస్కరించారు.",
+  "Why the reply is not acceptable": "జవాబు ఎందుకు ఆమోదయోగ్యం కాదు",
+  "Send it to the First Appellate Authority: the officer senior to the Public Information Officer in the same department. Attach copies of your RTI application and of the reply, if any.": "దీన్ని మొదటి అప్పీలు అధికారికి పంపండి: అదే శాఖలో ప్రజా సమాచార అధికారి కంటే పై అధికారి. మీ ఆర్టీఐ దరఖాస్తు మరియు జవాబు (వచ్చి ఉంటే) కాపీలను జత చేయండి.",
+  "Central government departments charge no fee for a first appeal; some states do, so check your state's rules.": "కేంద్ర ప్రభుత్వ శాఖలు మొదటి అప్పీలుకు రుసుము తీసుకోవు; కొన్ని రాష్ట్రాలు తీసుకుంటాయి, కాబట్టి మీ రాష్ట్ర నియమాలు చూడండి.",
+  "The appeal must be decided within 30 days, 45 at most. If you are still not satisfied, you can make a second appeal to the Information Commission within 90 days.": "అప్పీలుపై 30 రోజుల్లో, గరిష్ఠంగా 45 రోజుల్లో నిర్ణయం రావాలి. అప్పటికీ సంతృప్తి లేకపోతే 90 రోజుల్లో సమాచార కమిషన్‌కు రెండో అప్పీలు చేయవచ్చు.",
+  "A message or call saying your power will be cut tonight unless you call a number or pay through a link is a common fraud. The electricity company does not do this.": "\"ఈ రాత్రి కరెంటు కట్ అవుతుంది, ఈ నంబర్‌కు కాల్ చేయండి లేదా లింక్ ద్వారా డబ్బు కట్టండి\" అనే సందేశం లేదా కాల్ సాధారణ మోసం. విద్యుత్ సంస్థ అలా చేయదు.",
+  "Amount (Rs.)": "మొత్తం (రూ.)",
+  "Banks never ask for your OTP, PIN, password or CVV. Anyone who asks is a fraud.": "బ్యాంకు ఎప్పుడూ మీ ఓటీపీ, పిన్, పాస్‌వర్డ్ లేదా సీవీవీ అడగదు. అడిగేవారు మోసగాళ్లు.",
+  "Check the challan on the official site echallan.parivahan.gov.in with the challan number or your vehicle number, and pay there or at the traffic police office.": "చలాన్‌ను అధికారిక సైట్ echallan.parivahan.gov.in లో చలాన్ నంబర్ లేదా వాహన నంబర్‌తో చూడండి, అక్కడ లేదా ట్రాఫిక్ పోలీస్ కార్యాలయంలో కట్టండి.",
+  "Date on the paper": "కాగితంపై తేదీ",
+  "Do not click the link or call the number in the message. Go to your branch, or call the number printed in your passbook or on the back of your card, and ask whether anything is really needed.": "సందేశంలోని లింక్‌ను నొక్కకండి, అందులోని నంబర్‌కు కాల్ చేయకండి. మీ శాఖకు వెళ్లండి, లేదా పాస్‌బుక్‌లో లేదా కార్డు వెనుక ముద్రించిన నంబర్‌కు కాల్ చేసి నిజంగా ఏదైనా చేయాలా అని అడగండి.",
+  "Do not ignore it. Note the court, the case number and the date written on it, and go on that date or send a lawyer.": "దీన్ని పట్టించుకోకుండా వదలకండి. కోర్టు పేరు, కేసు నంబర్, రాసిన తేదీ రాసుకోండి, ఆ రోజు వెళ్లండి లేదా న్యాయవాదిని పంపండి.",
+  "Do not pay cash to an agent without an official receipt.": "అధికారిక రసీదు లేకుండా ఏ ఏజెంట్‌కూ నగదు ఇవ్వకండి.",
+  "Do not pay through a link in a message.": "ఏ సందేశంలోని లింక్ ద్వారానూ డబ్బు కట్టకండి.",
+  "Every genuine notice has a Document Identification Number (DIN). You can check it on incometax.gov.in under 'Authenticate notice/order issued by ITD'.": "ప్రతి నిజమైన నోటీసుపై డాక్యుమెంట్ ఐడెంటిఫికేషన్ నంబర్ (డీఐఎన్) ఉంటుంది. దాన్ని incometax.gov.in లో 'Authenticate notice/order issued by ITD' లో తనిఖీ చేయవచ్చు.",
+  "Fake challan messages with a link to pay are common. Do not pay through a link in an SMS or WhatsApp; check on the official site first.": "డబ్బు కట్టే లింక్‌తో నకిలీ చలాన్ సందేశాలు తరచుగా వస్తాయి. ఎస్ఎంఎస్ లేదా వాట్సాప్ లింక్ ద్వారా డబ్బు కట్టకండి; ముందు అధికారిక సైట్‌లో తనిఖీ చేయండి.",
+  "Free legal help is available from the District Legal Services Authority at your district court, or by calling 15100.": "జిల్లా కోర్టులోని జిల్లా న్యాయ సేవల ప్రాధికార సంస్థ నుంచి, లేదా 15100 కు కాల్ చేసి, ఉచిత న్యాయ సహాయం పొందవచ్చు.",
+  "Give a written complaint at the electricity office and keep a copy with their stamp. If it is not fixed, every electricity company has a Consumer Grievance Redressal Forum.": "విద్యుత్ కార్యాలయంలో రాతపూర్వక ఫిర్యాదు ఇవ్వండి, ముద్ర ఉన్న ప్రతిని మీ దగ్గర ఉంచుకోండి. అయినా సరి కాకపోతే, ప్రతి విద్యుత్ సంస్థలో వినియోగదారుల ఫిర్యాదుల పరిష్కార వేదిక ఉంటుంది.",
+  "Go to the branch with your loan papers and ask for a written statement of what is due. If you cannot pay, ask in writing for more time or smaller instalments.": "రుణ పత్రాలతో శాఖకు వెళ్లి బకాయి వివరాలు రాతపూర్వకంగా అడగండి. ఇప్పుడు కట్టలేకపోతే, రాతపూర్వకంగా మరింత సమయం లేదా చిన్న వాయిదాలు అడగండి.",
+  "How much money does it ask for, in rupees? Or say skip.": "ఇందులో ఎన్ని రూపాయలు అడిగారు? లేదా తర్వాత అనండి.",
+  "I do not know this kind of paper yet.": "ఈ రకమైన కాగితం గురించి నాకు ఇంకా తెలియదు.",
+  "If it is about a problem with a government office, you can write a complaint here with 'Public grievance (complaint)'.": "ఏదైనా ప్రభుత్వ కార్యాలయం సమస్య గురించి అయితే, ఇక్కడే 'ప్రజా ఫిర్యాదు' ద్వారా ఫిర్యాదు రాయవచ్చు.",
+  "If money has been taken from you by fraud, call 1930 at once or report it at cybercrime.gov.in. Reporting quickly can stop the money.": "మోసంతో డబ్బు పోయి ఉంటే, వెంటనే 1930 కు కాల్ చేయండి లేదా cybercrime.gov.in లో ఫిర్యాదు చేయండి. త్వరగా చెబితే డబ్బును ఆపవచ్చు.",
+  "If money has been taken, call 1930 at once and tell your bank. Reporting quickly can stop the money.": "డబ్బు కట్ అయి ఉంటే, వెంటనే 1930 కు కాల్ చేసి మీ బ్యాంకుకు తెలియజేయండి. త్వరగా చెబితే డబ్బును ఆపవచ్చు.",
+  "If the amount is wrong or you have already paid, complain to the bank in writing. If the bank does not reply in 30 days, or you are not satisfied, complain to the RBI Ombudsman for free: cms.rbi.org.in or 14448.": "మొత్తం తప్పుగా ఉన్నా లేదా మీరు ఇప్పటికే కట్టి ఉన్నా, బ్యాంకుకు రాతపూర్వక ఫిర్యాదు ఇవ్వండి. బ్యాంకు 30 రోజుల్లో జవాబు ఇవ్వకపోతే, లేదా మీకు సంతృప్తి లేకపోతే, ఆర్బీఐ అంబుడ్స్‌మన్‌కు ఉచితంగా ఫిర్యాదు చేయండి: cms.rbi.org.in లేదా 14448.",
+  "If the amount looks wrong, or you were charged when there was no supply, give a written complaint at the office and keep a copy with their stamp.": "మొత్తం తప్పుగా అనిపిస్తే, లేదా నీళ్లు రాకపోయినా డబ్బు వేసి ఉంటే, కార్యాలయంలో రాతపూర్వక ఫిర్యాదు ఇచ్చి ముద్ర ఉన్న ప్రతిని ఉంచుకోండి.",
+  "If the area or the type of building written on the notice is wrong, you can file an objection at the municipal office. The notice usually says by when; do it before that date.": "నోటీసులో రాసిన విస్తీర్ణం లేదా భవనం రకం తప్పుగా ఉంటే, మున్సిపల్ కార్యాలయంలో అభ్యంతరం చెప్పవచ్చు. ఎప్పటి వరకు అనేది సాధారణంగా నోటీసులో రాసి ఉంటుంది; అంతకు ముందే చేయండి.",
+  "If the bill is much higher than usual, compare the meter reading printed on it with your meter.": "బిల్లు ఎప్పటికంటే చాలా ఎక్కువగా ఉంటే, దానిపై ముద్రించిన మీటర్ రీడింగ్‌ను మీ మీటర్‌తో పోల్చి చూడండి.",
+  "If you think it is wrong, you can dispute it as written on the challan, or at the traffic police office; some cases go to a court or a Lok Adalat.": "చలాన్ తప్పు అనిపిస్తే, చలాన్‌పై రాసిన విధంగా లేదా ట్రాఫిక్ పోలీస్ కార్యాలయంలో అభ్యంతరం చెప్పవచ్చు; కొన్ని కేసులు కోర్టుకు లేదా లోక్ అదాలత్‌కు వెళ్తాయి.",
+  "Is there a last date, or a date to appear, written on it? Say the date, or say skip.": "దీనిపై చివరి తేదీ, లేదా హాజరు కావాల్సిన తేదీ రాసి ఉందా? తేదీ చెప్పండి, లేదా తర్వాత అనండి.",
+  "Keep the receipt or the payment message.": "రసీదు లేదా చెల్లింపు సందేశాన్ని జాగ్రత్తగా ఉంచుకోండి.",
+  "Keep the receipt. You may need it later, for example when selling the property.": "రసీదును జాగ్రత్తగా ఉంచుకోండి. తర్వాత అవసరం కావచ్చు, ఉదాహరణకు ఆస్తి అమ్మేటప్పుడు.",
+  "Kind of paper": "కాగితం రకం",
+  "Log in at incometax.gov.in, or ask a tax helper, to see the notice and reply by the date given.": "incometax.gov.in లో లాగిన్ అయి, లేదా పన్ను తెలిసిన వారి సహాయంతో, నోటీసు చూసి ఇచ్చిన తేదీలోపు జవాబు ఇవ్వండి.",
+  "Never tell anyone your OTP, PIN or password, not even someone who says they are from the bank or the office.": "మీ ఓటీపీ, పిన్ లేదా పాస్‌వర్డ్ ఎవరికీ చెప్పకండి, తాము బ్యాంకు నుంచి లేదా కార్యాలయం నుంచి అని చెప్పేవారికి కూడా.",
+  "No court, police or CBI officer arrests anyone on a video call, and no one can ask you to pay to avoid arrest. A so-called digital arrest is fraud: cut the call and dial 1930.": "ఏ కోర్టు, పోలీసు లేదా సీబీఐ అధికారి వీడియో కాల్‌లో ఎవరినీ అరెస్ట్ చేయరు, అరెస్ట్ తప్పించుకోవడానికి ఎవరూ డబ్బు అడగలేరు. \"డిజిటల్ అరెస్ట్\" అనేది మోసం: కాల్ కట్ చేసి 1930 కు కాల్ చేయండి.",
+  "Pay by the last date at the electricity office, a bank or post office counter, or the company's official app or website.": "చివరి తేదీలోపు విద్యుత్ కార్యాలయంలో, బ్యాంకు లేదా పోస్టాఫీసు కౌంటర్‌లో, లేదా సంస్థ అధికారిక యాప్ లేదా వెబ్‌సైట్‌లో కట్టండి.",
+  "Pay by the last date at the municipal office or on its official website. Paying late usually adds a penalty or interest.": "చివరి తేదీలోపు మున్సిపల్ కార్యాలయంలో లేదా దాని అధికారిక వెబ్‌సైట్‌లో కట్టండి. ఆలస్యంగా కడితే సాధారణంగా జరిమానా లేదా వడ్డీ పడుతుంది.",
+  "Pay by the last date at the water board or municipal office, or on its official website or app.": "చివరి తేదీలోపు జల మండలి లేదా మున్సిపల్ కార్యాలయంలో, లేదా దాని అధికారిక వెబ్‌సైట్ లేదా యాప్‌లో కట్టండి.",
+  "Pay only at the office or through its official website or app, not through a link someone sends you.": "డబ్బును కార్యాలయంలో లేదా దాని అధికారిక వెబ్‌సైట్ లేదా యాప్‌లో మాత్రమే కట్టండి, ఎవరో పంపిన లింక్ ద్వారా కాదు.",
+  "Pay only into the loan account, at the branch or through the official app, and keep the receipt.": "డబ్బును రుణ ఖాతాలోకి మాత్రమే, శాఖలో లేదా అధికారిక యాప్ ద్వారా కట్టండి, రసీదు ఉంచుకోండి.",
+  "Pay only to the municipality. Do not give cash to someone who comes to your door without an official receipt.": "డబ్బును మున్సిపాలిటీకి మాత్రమే ఇవ్వండి. అధికారిక రసీదు లేకుండా ఇంటికి వచ్చిన ఎవరికీ నగదు ఇవ్వకండి.",
+  "Recovery agents must not threaten you or use abusive words, and must not call before 8 in the morning or after 7 in the evening. If they do, complain to the bank and, if you are threatened, to the police.": "రికవరీ ఏజెంట్లు మిమ్మల్ని బెదిరించకూడదు లేదా దూషించకూడదు, ఉదయం 8 గంటలకు ముందు లేదా సాయంత్రం 7 గంటల తర్వాత కాల్ చేయకూడదు. అలా జరిగితే బ్యాంకుకు ఫిర్యాదు చేయండి, బెదిరింపు వస్తే పోలీసులకు కూడా.",
+  "Show it to someone you trust, at the CSC, the panchayat, or the office that sent it, and ask what it asks you to do and by when.": "దీన్ని నమ్మకమైన వ్యక్తికి, సీఎస్సీలో, పంచాయతీలో, లేదా పంపిన కార్యాలయంలో చూపించి, ఇందులో ఏం చేయమని చెప్పారో, ఎప్పటి వరకో అడగండి.",
+  "Tell me what kind of paper you got. I will explain what it means, what to do and by when.": "మీకు ఏ కాగితం వచ్చిందో చెప్పండి. దాని అర్థం ఏమిటి, ఏం చేయాలి, ఎప్పటి వరకు అని నేను వివరిస్తాను.",
+  "The department does not ask for payment through links in SMS or phone calls. Pay only through the official portal.": "ఆదాయపు పన్ను శాఖ ఎస్ఎంఎస్ లేదా ఫోన్ కాల్‌లోని లింక్ ద్వారా డబ్బు అడగదు. అధికారిక పోర్టల్ ద్వారా మాత్రమే కట్టండి.",
+  "This is a fine for breaking a traffic rule, such as riding without a helmet or crossing a red light.": "ఇది ట్రాఫిక్ నియమం ఉల్లంఘించినందుకు జరిమానా, ఉదాహరణకు హెల్మెట్ లేకుండా నడపడం లేదా ఎరుపు లైటు దాటడం.",
+  "This is a letter from a bank or loan company saying a loan payment (EMI) is overdue.": "ఇది బ్యాంకు లేదా రుణ సంస్థ నుంచి వచ్చిన ఉత్తరం, రుణ వాయిదా (ఈఎంఐ) బకాయి ఉందని చెబుతుంది.",
+  "This is a message saying your bank account, card or KYC will be blocked unless you do something now.": "ఇప్పుడే ఏదైనా చేయకపోతే మీ బ్యాంకు ఖాతా, కార్డు లేదా కేవైసీ బ్లాక్ అవుతుందని చెప్పే సందేశం ఇది.",
+  "This is a notice from the Income Tax Department, usually asking you to file a return, explain a difference in your income details, or pay tax that is due.": "ఇది ఆదాయపు పన్ను శాఖ నోటీసు, సాధారణంగా రిటర్న్ దాఖలు చేయమని, ఆదాయ వివరాల్లో తేడాను వివరించమని, లేదా బకాయి పన్ను కట్టమని చెబుతుంది.",
+  "This is a notice from the municipality or panchayat about tax on your house, shop or land: how much is due and by when.": "ఇది మున్సిపాలిటీ లేదా పంచాయతీ నోటీసు, మీ ఇల్లు, దుకాణం లేదా భూమి పన్ను గురించి: ఎంత కట్టాలి, ఎప్పటి వరకు.",
+  "This is a paper from a court or a lawyer. A court summons gives the date you must appear; a lawyer's notice asks you to do something or reply within a time.": "ఇది కోర్టు లేదా న్యాయవాది కాగితం. కోర్టు సమన్లలో మీరు హాజరు కావాల్సిన తేదీ ఉంటుంది; న్యాయవాది నోటీసు ఏదైనా చేయమని లేదా నిర్ణీత సమయంలో జవాబు ఇవ్వమని అడుగుతుంది.",
+  "This is your electricity bill: how much you owe for the power you used, and the last date to pay it.": "ఇది మీ కరెంటు బిల్లు: మీరు వాడిన విద్యుత్తుకు డబ్బు, కట్టడానికి చివరి తేదీ.",
+  "This is your water bill from the water board or the municipality: the amount you owe and the last date to pay.": "ఇది జల మండలి లేదా మున్సిపాలిటీ నీటి బిల్లు: ఎంత డబ్బు కట్టాలి, కట్టడానికి చివరి తేదీ.",
+  "Understand a paper (bill, notice, summons)": "కాగితాన్ని అర్థం చేసుకోండి (బిల్లు, నోటీసు, సమన్లు)",
+  "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.": "ఇది ఏ కాగితం? ఉదాహరణకు: కరెంటు బిల్లు, నీటి బిల్లు, ఆస్తి పన్ను, బ్యాంకు రుణం, బ్యాంకు కేవైసీ సందేశం, కోర్టు సమన్లు, ఆదాయపు పన్ను నోటీసు, ట్రాఫిక్ చలాన్, లేదా ఇంకేదైనా."
  },
  "options": {
   "Male": [
@@ -680,6 +769,73 @@
    "సొంత ఇల్లు లేదు",
    "అద్దె ఇల్లు",
    "అద్దెకు"
+  ],
+  "No reply received": [
+   "జవాబు రాలేదు",
+   "రాలేదు",
+   "జవాబు లేదు",
+   "అందలేదు",
+   "లేదు"
+  ],
+  "Reply received, not satisfied": [
+   "జవాబు వచ్చింది, సంతృప్తి లేదు",
+   "జవాబు వచ్చింది",
+   "వచ్చింది",
+   "అందింది",
+   "అసంపూర్ణం",
+   "అవును"
+  ],
+  "Bank KYC or account block message": [
+   "బ్యాంకు కేవైసీ సందేశం",
+   "కేవైసీ",
+   "ఖాతా బ్లాక్",
+   "కార్డు బ్లాక్"
+  ],
+  "Bank loan or EMI notice": [
+   "బ్యాంకు రుణ నోటీసు",
+   "బ్యాంకు రుణం",
+   "రుణం",
+   "లోన్",
+   "ఈఎంఐ",
+   "వాయిదా"
+  ],
+  "Court summons or legal notice": [
+   "కోర్టు సమన్లు లేదా లీగల్ నోటీసు",
+   "కోర్టు సమన్లు",
+   "కోర్టు",
+   "సమన్లు",
+   "న్యాయవాది నోటీసు"
+  ],
+  "Electricity bill": [
+   "కరెంటు బిల్లు",
+   "కరెంటు",
+   "విద్యుత్ బిల్లు"
+  ],
+  "Income tax notice": [
+   "ఆదాయపు పన్ను నోటీసు",
+   "ఆదాయపు పన్ను",
+   "ఇన్‌కమ్ ట్యాక్స్"
+  ],
+  "Property tax notice": [
+   "ఆస్తి పన్ను నోటీసు",
+   "ఆస్తి పన్ను",
+   "ఇంటి పన్ను",
+   "ప్రాపర్టీ ట్యాక్స్"
+  ],
+  "Something else": [
+   "ఇంకేదైనా",
+   "వేరే",
+   "తెలియదు"
+  ],
+  "Traffic challan": [
+   "ట్రాఫిక్ చలాన్",
+   "చలాన్",
+   "జరిమానా"
+  ],
+  "Water bill": [
+   "నీటి బిల్లు",
+   "నీళ్లు",
+   "నీటి పన్ను"
   ]
  },
  "words": {
