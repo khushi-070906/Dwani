@@ -134,3 +134,28 @@ kiosk UI (`static/app.html`, bundled Rozha One + Mukta fonts) and the website (`
 - Tests: `tests/test_dwaniforms_metrics_page.py` (6: the page and the numbers both need the token, the page carries no
   numbers of its own, the counters a pilot report needs, readable names for every key, and that nothing anyone said --
   no name, no Aadhaar, no long digit string -- can appear in the counters).
+
+## Usable by the people it is for (WCAG AA)
+
+The app was audited in a real browser at phone width, on the home screen and mid-form. What it found, and what changed:
+
+- **17 pieces of small grey text failed contrast** (4.14:1 against 4.5:1 needed): the question counts, the step names
+  "check" and "ready", the breadcrumb, the footer. `--ink-3` is now `#60687A`, which clears 4.5:1 on every background
+  the page uses -- page, card, tinted card and the amber note.
+- **Controls too small to hit.** "Home" in the breadcrumb -- the way back out of a form -- was **17x21px**; miss it and
+  people press the browser's back button and lose the form. A+ was 39x38, the language chooser 102x40, the privacy
+  links 53x21. Everything a finger has to find is now at least 44px tall.
+- **Buttons spoke English in every language.** The logo, A+, the language chooser, the type box and the mic had
+  hard-coded English `aria-label`s, so a blind Tamil speaker heard the questions in Tamil and the buttons in English.
+  They are now translated through the packs (`data-ta`), with three new strings added to all eight languages.
+- **The mic did not say whether it was listening.** It is now a proper toggle (`aria-pressed`) whose name changes
+  between "tap and speak" and "listening" as it starts and stops.
+- **Headings skipped a level** (h2 -> h4), which a screen reader reads as a missing section; the service groups are h3.
+  The step you are on carries `aria-current`.
+- Already right, and now held in place by tests: the question is a live region, a lost connection is an `alert`,
+  and every animation stops for `prefers-reduced-motion`.
+- Tests: `tests/test_dwaniforms_a11y.py` (40: contrast computed from the CSS for every text-on-background pair, the
+  44px rules, the translated names in all eight packs, heading levels) and `tests/js/dwaniforms_a11y.test.js` (13: the
+  real page in two languages -- names, mic toggle, live regions, aria-current, heading order). Both run in CI.
+- Not done: nobody has listened to a whole form with TalkBack or VoiceOver on a real phone. The markup is right; the
+  experience is unverified.
