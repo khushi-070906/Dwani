@@ -7,13 +7,13 @@ import inspect
 import time
 from dataclasses import dataclass
 
-from . import eligibility, extract, langpacks, records
+from . import eligibility, explain, extract, langpacks, records
 from .outcomes import OUTCOMES
 from .schema import FormTemplate, load_all
 from .session import FormSession, Reply
 
 FLOW_OUTCOMES = {**OUTCOMES, "lookup_land": records.land_outcome, "lookup_ration": records.ration_outcome,
-                 "advisor": eligibility.advisor_outcome}
+                 "advisor": eligibility.advisor_outcome, "explain": explain.explain_outcome}
 
 # Whisper has no Odia model; others below are supported by Whisper per its language list. Unsupported => text/operator input.
 ASR_LANGS = {"en", "hi", "bn", "ta", "te", "mr", "gu", "kn", "ml", "pa", "ur", "as", "ne", "sa", "sd"}
@@ -143,11 +143,18 @@ class FormService:
                 said.append(await s.msg("records_as_of", date=spoken_date))
             if out.get("stale"):
                 said.append(await s.msg("records_stale"))
+        said.extend(out.get("say_text", []))              # lines already written in the citizen's language
+        from .schema import FormField
+        for key, kw in out.get("say_more", []):          # extra spoken lines; an ISO "date" is read out in words
+            kw = dict(kw)
+            if kw.get("date"):
+                kw["date"] = s.readback(FormField("date", "date", "", {"en": ""}), kw["date"], s.lang)
+            said.append(await s.msg(key, **kw))
         if out.get("disclaimer_key"):
             said.append(await s.msg(out["disclaimer_key"]))
         out["say"] = " ".join(said)
         s.outcome = out
-        reply.text = out["say"] if out.get("type") in ("lookup", "advisor") else reply.text + " " + out["say"]
+        reply.text = out["say"] if out.get("type") in ("lookup", "advisor", "explain") else reply.text + " " + out["say"]
         reply.outcome = out
         return reply
 
