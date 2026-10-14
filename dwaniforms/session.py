@@ -6,6 +6,7 @@ state machine is testable with plain strings. The translator is any object with 
 """
 from __future__ import annotations
 
+import re
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -341,30 +342,49 @@ class FormSession:
         self.touch()
         return await self._ask()
 
+    def _clean(self, f: FormField, value: str) -> tuple[bool, str, str]:
+        """Typed value -> (ok, canonical value, error key). The same checks for an operator's entry and for a suggestion."""
+        value = value.strip()
+        if f.kind == "date" and re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):                 # 2026-10-20 -> 20/10/2026
+            value = f"{value[8:10]}/{value[5:7]}/{value[:4]}"
+        if f.kind in validators.VALIDATORS:
+            ok, v, err = validators.VALIDATORS[f.kind](value, **f.params)
+            return (ok, v, "") if ok else (False, "", err)
+        if f.kind == "choice":
+            hit = next((o.value for o in f.options if o.value.lower() == value.strip().lower()), None)
+            return (True, hit, "") if hit is not None else (False, "", "choice_invalid")
+        if f.kind == "yesno":
+            yn = parse_yes_no(value)
+            return (True, "Yes" if yn else "No", "") if yn is not None else (False, "", "yesno_invalid")
+        ok, v, err = validators.text(value, **f.params)      # name / place / text
+        return (True, v, "") if ok else (False, "", err)
+
+    def suggest(self, values: dict) -> list[str]:
+        """Answers read off a photographed paper. Each one is only a guess: it is checked like any typed value, then
+        read back with "is this correct?" when its question comes up, and a "no" asks the question normally. Fields
+        that already have an answer are left alone. Returns the fields that were taken."""
+        self.touch()
+        taken = []
+        for fid, raw in values.items():
+            try:
+                f = self.template.field_by_id(fid)
+            except KeyError:
+                continue
+            if fid in self.answers or not isinstance(raw, str):
+                continue
+            ok, v, _ = self._clean(f, raw)
+            if ok and v:
+                self.suggestions[fid] = (v, v, False)
+                taken.append(fid)
+        return taken
+
     def operator_set(self, field_id: str, value: str) -> tuple[bool, str]:
         """Operator types a value (escalation path). Same validation, no read-back."""
         self.touch()
         f = self.template.field_by_id(field_id)          # KeyError for an unknown field
-        if f.kind in validators.VALIDATORS:
-            ok, v, err = validators.VALIDATORS[f.kind](value, **f.params)
-            if not ok:
-                return False, err
-            value = v
-        elif f.kind == "choice":
-            hit = next((o.value for o in f.options if o.value.lower() == value.strip().lower()), None)
-            if hit is None:
-                return False, "choice_invalid"
-            value = hit
-        elif f.kind == "yesno":
-            yn = parse_yes_no(value)
-            if yn is None:
-                return False, "yesno_invalid"
-            value = "Yes" if yn else "No"
-        else:                                            # name / place / text
-            ok, v, err = validators.text(value, **f.params)
-            if not ok:
-                return False, err
-            value = v
+        ok, value, err = self._clean(f, value)
+        if not ok:
+            return False, err
         self.answers[field_id] = Answer(value, value, needs_review=False)
         self.outcome = None
         old = self.idx
