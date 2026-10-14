@@ -144,3 +144,12 @@ def test_a_shared_link_has_a_title_a_description_and_a_real_preview_picture(clie
     assert len(data) < 300_000                       # a slow phone should still get the preview
     assert meta["og:url"].endswith("/form/yojana")
 
+
+def test_every_word_on_the_page_exists_in_both_languages():
+    block = re.search(r"var T = \{(.*?)\n  \};", PAGE, re.S).group(1)
+    hi, en = block.split("\n    en:", 1)
+    keys = lambda part: re.findall(r"(?:^|[,{])\s*([a-z][a-z_0-9]*):\s*\"", part, re.M)
+    assert keys(hi) and set(keys(hi)) == set(keys(en)), set(keys(hi)) ^ set(keys(en))
+    for k in re.findall(r'data-t="([a-z_0-9]+)"', PAGE):
+        assert k in keys(hi), k
+
