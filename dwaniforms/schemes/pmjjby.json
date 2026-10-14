@@ -1,0 +1,51 @@
+{
+ "id": "pmjjby",
+ "name": {
+  "en": "PM Jeevan Jyoti Bima Yojana (life insurance)",
+  "hi": "पीएम जीवन ज्योति बीमा योजना (जीवन बीमा)"
+ },
+ "ministry": "Ministry of Finance (Department of Financial Services)",
+ "source": "https://jansuraksha.gov.in",
+ "benefit": {
+  "en": "₹2 lakh to your family if you die, for ₹436 a year",
+  "hi": "मृत्यु होने पर परिवार को ₹2 लाख, साल के ₹436 में"
+ },
+ "form": null,
+ "apply": {
+  "en": "Ask at your bank to join; the yearly ₹436 is taken from your account by itself.",
+  "hi": "अपने बैंक में जुड़ने के लिए पूछें; साल के ₹436 खाते से अपने-आप कट जाते हैं।"
+ },
+ "rules": [
+  {
+   "fact": "age",
+   "gte": 18,
+   "lte": 50,
+   "why": {
+    "en": "you must join between 18 and 50",
+    "hi": "18 से 50 साल के बीच जुड़ना होता है"
+   }
+  },
+  {
+   "fact": "bank_account",
+   "eq": "Yes",
+   "soft": true,
+   "why": {
+    "en": "you need a savings bank account (a Jan Dhan account works)",
+    "hi": "बचत खाता चाहिए (जन धन खाता चलेगा)"
+   }
+  },
+  {
+   "check": {
+    "en": "Your bank account must be linked to Aadhaar.",
+    "hi": "बैंक खाता आधार से जुड़ा होना चाहिए।"
+   }
+  },
+  {
+   "check": {
+    "en": "If you join before 50, cover can go on until 55 as long as you pay. Keep ₹436 in the account each year.",
+    "hi": "50 से पहले जुड़ने पर 55 साल तक कवर चल सकता है, बशर्ते आप प्रीमियम भरते रहें। हर साल खाते में ₹436 रखें।"
+   }
+  }
+ ],
+ "last_reviewed": "2026-10-14"
+}

@@ -557,7 +557,12 @@
   "What is your parent's or guardian's name?": "നിങ്ങളുടെ മാതാപിതാക്കളുടെയോ രക്ഷിതാവിന്റെയോ പേരെന്താണ്?",
   "What percentage did you get in your last exam? For example: 72.5.": "അവസാന പരീക്ഷയിൽ നിങ്ങൾക്ക് എത്ര ശതമാനം മാർക്ക് കിട്ടി? ഉദാഹരണം: 72.5.",
   "Which class or course are you in? For example: class 9, B.A. second year.": "നിങ്ങൾ ഏത് ക്ലാസിലോ കോഴ്സിലോ ആണ്? ഉദാഹരണം: ഒൻപതാം ക്ലാസ്, ബി.എ. രണ്ടാം വർഷം.",
-  "Which pension are you applying for: old age, widow, or disability?": "നിങ്ങൾ ഏത് പെൻഷന് അപേക്ഷിക്കുന്നു: വാർദ്ധക്യം, വിധവ, അല്ലെങ്കിൽ ഭിന്നശേഷി?"
+  "Which pension are you applying for: old age, widow, or disability?": "നിങ്ങൾ ഏത് പെൻഷന് അപേക്ഷിക്കുന്നു: വാർദ്ധക്യം, വിധവ, അല്ലെങ്കിൽ ഭിന്നശേഷി?",
+  "PM Jeevan Jyoti Bima Yojana (life insurance)": "പ്രധാനമന്ത്രി ജീവൻ ജ്യോതി ബീമ യോജന (ജീവൻ ഇൻഷുറൻസ്)",
+  "₹2 lakh to your family if you die, for ₹436 a year": "മരണം സംഭവിച്ചാൽ കുടുംബത്തിന് ₹2 ലക്ഷം, വർഷം വെറും ₹436-ന്",
+  "Ask at your bank to join; the yearly ₹436 is taken from your account by itself.": "ചേരാൻ നിങ്ങളുടെ ബാങ്കിൽ ചോദിക്കുക; വർഷത്തെ ₹436 നിങ്ങളുടെ അക്കൗണ്ടിൽ നിന്ന് തനിയെ പോകും.",
+  "you must join between 18 and 50": "18-നും 50-നും ഇടയിൽ ചേരണം",
+  "If you join before 50, cover can go on until 55 as long as you pay. Keep ₹436 in the account each year.": "50-ന് മുമ്പ് ചേർന്നാൽ പ്രീമിയം അടയ്ക്കുന്നിടത്തോളം 55 വയസ്സ് വരെ പരിരക്ഷ തുടരാം. എല്ലാ വർഷവും അക്കൗണ്ടിൽ ₹436 വയ്ക്കുക."
  },
  "options": {
   "Male": [

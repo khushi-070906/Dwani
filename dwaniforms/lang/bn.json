@@ -557,7 +557,12 @@
   "What is your parent's or guardian's name?": "আপনার বাবা-মা বা অভিভাবকের নাম কী?",
   "What percentage did you get in your last exam? For example: 72.5.": "আপনার শেষ পরীক্ষায় কত শতাংশ নম্বর পেয়েছেন? যেমন: 72.5।",
   "Which class or course are you in? For example: class 9, B.A. second year.": "আপনি কোন শ্রেণি বা কোর্সে পড়েন? যেমন: নবম শ্রেণি, বিএ দ্বিতীয় বর্ষ।",
-  "Which pension are you applying for: old age, widow, or disability?": "আপনি কোন পেনশনের জন্য আবেদন করছেন: বার্ধক্য, বিধবা, নাকি প্রতিবন্ধী?"
+  "Which pension are you applying for: old age, widow, or disability?": "আপনি কোন পেনশনের জন্য আবেদন করছেন: বার্ধক্য, বিধবা, নাকি প্রতিবন্ধী?",
+  "PM Jeevan Jyoti Bima Yojana (life insurance)": "প্রধানমন্ত্রী জীবন জ্যোতি বিমা যোজনা (জীবন বিমা)",
+  "₹2 lakh to your family if you die, for ₹436 a year": "মৃত্যু হলে পরিবার পাবে ₹২ লক্ষ, বছরে মাত্র ₹৪৩৬-এ",
+  "Ask at your bank to join; the yearly ₹436 is taken from your account by itself.": "যোগ দিতে আপনার ব্যাঙ্কে জিজ্ঞেস করুন; বছরের ₹৪৩৬ নিজে থেকেই আপনার অ্যাকাউন্ট থেকে কাটা যায়।",
+  "you must join between 18 and 50": "১৮ থেকে ৫০ বছরের মধ্যে যোগ দিতে হয়",
+  "If you join before 50, cover can go on until 55 as long as you pay. Keep ₹436 in the account each year.": "৫০-এর আগে যোগ দিলে প্রিমিয়াম দিতে থাকলে ৫৫ বছর পর্যন্ত কভার চলতে পারে। প্রতি বছর অ্যাকাউন্টে ₹৪৩৬ রাখুন।"
  },
  "options": {
   "Male": [
