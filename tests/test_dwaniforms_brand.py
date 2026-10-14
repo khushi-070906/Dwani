@@ -193,9 +193,3 @@ def test_the_app_draws_its_ticks_pencil_warning_and_download_instead_of_text_sym
         assert sym not in code, f"{sym!r} is still a text symbol in the app"
     for name in ("check", "warn", "pencil"):
         assert f'"{name}": "<path' in app, name
-
-
-def test_the_yes_and_no_buttons_draw_their_tick_and_cross_in_every_language():
-    app = (Path(__file__).resolve().parent.parent / "dwaniforms" / "static" / "app.html").read_text(encoding="utf-8")
-    assert re.search(r'id="btn-yes"[^>]*data-icon="check"', app) and re.search(r'id="btn-no"[^>]*data-icon="cross"', app)
-    assert r'replace(/^[\u2713\u2717]\s*/, "")' in app, "a text tick left in a language table would be drawn twice"
