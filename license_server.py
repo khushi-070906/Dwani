@@ -1057,7 +1057,10 @@ def _safe_next_path(next_path: str) -> str:
     """Only allow same-site relative paths (e.g. '/pricing.html') as a post-
     login redirect target -- rejects absolute URLs and protocol-relative
     '//evil.com' paths so this can't be turned into an open redirect."""
-    if next_path and next_path.startswith("/") and not next_path.startswith("//"):
+    # A backslash or a control character after the first "/" is read by browsers as another "/" ("/\evil.com" and
+    # "/\t/evil.com" both mean "//evil.com"), so those are refused too.
+    if (next_path and next_path.startswith("/") and not next_path.startswith("//")
+            and "\\" not in next_path and not any(ord(c) < 32 or ord(c) == 127 for c in next_path)):
         return next_path
     return "/dashboard.html"
 
