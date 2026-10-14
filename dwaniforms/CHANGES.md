@@ -271,3 +271,16 @@ The app was audited in a real browser at phone width, on the home screen and mid
 - Tests: `tests/js/dwaniforms_docs.test.js` (parsing), `tests/js/dwaniforms_docs_page.test.js` (real page, real server),
   `tests/test_dwaniforms_docs.py` (server). Checked once in a real Chromium with the real engine on a generated card.
 
+## My applications (what happened to my RTI?)
+
+A list kept **on the phone only** (`localStorage`, key `dwaniforms:apps`), reached from the home page. After an RTI, appeal or any
+form, "Save to my applications" stores the office, the title and the dates the person types (sent, reply received, first appeal
+sent, decision received) and a reference number -- never a name, address, phone number or what was asked. From those dates it
+works out what the RTI Act allows next: the office's 30 days (s.7(1)), the first appeal window, 30 days from the end of that or
+from the reply (s.19(1)), the decision date and the 90-day second-appeal window (s.19(3)). It warns when a limit has passed (an
+appeal is still possible, with a request to excuse the delay), downloads a calendar reminder (`.ics`, two days before), and "Write
+the first appeal" opens that form with the office and the RTI date offered as suggestions (each read back for a yes, like a photo's).
+
+There is **no connection to any government system**: the page cannot know whether an office replied, so the person enters the
+dates. The date rules live in `static/js/tracker.js` and a test runs them against the server's own `outcomes.appeal_timing` on
+the same dates. Tests: `tests/js/dwaniforms_tracker.test.js`, `tests/js/dwaniforms_tracker_page.test.js`, `tests/test_dwaniforms_tracker.py`.
