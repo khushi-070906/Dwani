@@ -9,21 +9,16 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Lato:wght@400;700&family=Mukta:wght@400;600;800&family=Noto+Serif+Devanagari:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="brand.css">
 <style>
-  :root { --green: #0b5d4b; --marigold: #e8a317; --sand: #f6f1e6; --card: #fffdf8; --line: #e6dccb; --ink: #1f2a26; --ink-2: #4a5550; --ink-3: #6f7a75; }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--sand); color: var(--ink); font: 17px/1.65 "Mukta", "Nirmala UI", system-ui, sans-serif; }
-  header { background: #fff; border-bottom: 1px solid #DCDFD6; }
-  .wrap { max-width: 860px; margin: 0 auto; padding: 0 1.3rem; }
-  nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; }
-  .lang { border: 1px solid #C9CEC2; background: #fff; color: #1E2A44; border-radius: 999px; padding: .25rem .85rem; font: 800 .88rem "Mukta", sans-serif; cursor: pointer; }
-  main { background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: 1.6rem 1.8rem 2rem; margin: 2rem auto 3rem; }
-  h1 { margin: 0 0 .3rem; font-size: 2rem; } h2 { font-size: 1.2rem; margin: 1.6rem 0 .3rem; color: var(--green); }
-  h1, h2 { font-family: "Source Serif 4", Georgia, serif; }
+  body { margin: 0; background: var(--sage); font: 17px/1.65 var(--sans); }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 1.25rem; }
+  main { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.6rem 1.8rem 2rem; margin: 2rem auto 3rem; }
+  h1 { margin: 0 0 .3rem; font-size: 2rem; } h2 { font-size: 1.2rem; margin: 1.6rem 0 .3rem; }
   p, li { color: var(--ink-2); } ul { margin: .3rem 0 .6rem; padding-left: 1.2rem; } li { margin: .25rem 0; }
-  .meta { color: var(--ink-3); font-size: .9rem; }
-  .box { background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--green); border-radius: 10px; padding: .9rem 1rem; margin: 1rem 0 1.4rem; }
-  a { color: var(--green); }
-  footer { text-align: center; color: var(--ink-3); font-size: .9rem; padding: 0 0 2.5rem; }
+  .meta { color: var(--ink-3); font-size: .9rem; margin: 0 0 1rem; }
+  .box { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--forest); border-radius: 10px; padding: .9rem 1rem; margin: 1rem 0 1.4rem; }
+  a { color: var(--forest); }
+  footer { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: .3rem .6rem; color: var(--ink-3); font-size: .9rem; padding: 0 1rem 2.5rem; text-align: center; }
   [data-lang="hi"] .en, [data-lang="en"] .hi { display: none !important; }
   .df-brand { display: flex; align-items: center; gap: .7rem; text-decoration: none; }
   .df-seal { width: 40px; height: 40px; border-radius: 50%; background: #1F5E4D; color: #fff; display: grid; place-items: center; position: relative;
