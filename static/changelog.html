@@ -7,6 +7,7 @@
 <meta name="description" content="Release history of the DwaniLive desktop app: new features and fixes in every version.">
 <link rel="icon" type="image/png" href="/static/favicon.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/static/brand.css">
 <style>
   :root { --bg: #fdf6e7; --raised: #fffaf0; --raised-2: #f4e9cf; --ink: #2c1810; --ink-dim: #4a3629; --ink-faint: #69543f;
           --accent-deep: #a8460c; --accent-2: #c81e5e; --indigo: #223367; --live: #2f7a3a; }
@@ -14,9 +15,6 @@
   body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 "Mukta", system-ui, sans-serif; }
   .wrap { max-width: 780px; margin: 0 auto; padding: 1.2rem 1rem 4rem; }
   header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
-  .brand { font-family: "Rozha One", Georgia, serif; font-size: 2rem; text-decoration: none; line-height: 1;
-           background: linear-gradient(120deg, var(--accent-deep), var(--accent-2) 50%, var(--indigo)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .brand small { font-family: "Mukta", sans-serif; font-weight: 800; font-size: 0.36em; letter-spacing: 0.06em; color: var(--ink-dim); -webkit-text-fill-color: var(--ink-dim); }
   nav a { color: var(--ink-dim); font-weight: 700; text-decoration: none; margin-left: 1rem; }
   h1 { font-family: "Rozha One", Georgia, serif; font-weight: 400; font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 1.6rem 0 0.3rem; }
   .lead { color: var(--ink-dim); margin: 0 0 1.4rem; }
@@ -37,7 +35,7 @@
 <body>
 <div class="wrap">
   <header>
-    <a class="brand" href="/" lang="hi">ध्वनि<small> LIVE</small></a>
+    <a href="/" style="text-decoration:none"><span class="brand-name"><span class="dwani" lang="hi">ध्वनि</span><span class="live">Live</span></span></a>
     <nav><a href="/#features">Features</a><a href="/#plans">Pricing</a></nav>
   </header>
   <h1>What's new</h1>
