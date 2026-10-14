@@ -192,3 +192,67 @@ The app was audited in a real browser at phone width, on the home screen and mid
 - Not done: a lawyer or consumer-rights worker reading the nine explanations; reading the paper from a photo; any
   state-specific rule (fees, penalties, objection periods differ by state and city, so the text says "usually" and
   "check your state's rules" rather than a number).
+
+## Samjhao: read the paper from a photo
+
+- **"Read from a photo"** in Samjhao (`static/app.html`, `static/ocr/`): the picture is read on the phone by tesseract.js
+  (English, then Hindi + English when needed) in a web worker served from this server; it is never uploaded. The
+  engine is fetched on first use only (about 7 MB) and kept by the service worker (`CACHE` is now `dwaniforms-v2`).
+- **`POST /sessions/{id}/suggest`** + `Session.suggest()`: up to three values read off the photo are checked like typed
+  answers and read back with "is this correct?"; a "no" asks normally; answers already given are never replaced.
+  `operator_set` and `suggest` share one `_clean()`.
+- `/assets/ocr/...` is served with the right types (`.wasm` as `application/wasm`; `.gz` as raw bytes, not "gzip");
+  the CSP adds `'wasm-unsafe-eval'` and still blocks `eval`.
+- Privacy page (English and Hindi) says plainly that the photo stays on the phone and no camera permission is asked.
+- **Fixed: "days left" was one too many after midnight in India.** The server runs on UTC, which is still yesterday
+  until 5:30 am IST. `clock.today()` (fixed +5:30; India has no daylight saving) is now what every "today" means.
+- Eight packs gain the eight photo strings (drafts, as the rest).
+
+## Samjhao: ask one question (optional AI, off by default)
+
+- `ai.py`, `POST /sessions/{id}/ask`, an "Ask the AI" box under the explanation. Needs `DWANIFORMS_AI_KEY`; without it the
+  box, the endpoint and every outbound call are absent (`capabilities.ai` is false).
+- Consent every time (server refuses without `consent: true`; the page asks again for each question and says what leaves).
+- Only the question (identifying numbers, PAN codes and e-mails blanked) and the kind of paper / days left are sent; the
+  prompt is built from our own written explanation and rules the question cannot override; nothing stored or logged;
+  `hardening.LIMITS["ai"]` = 10 per hour per address. Uses only the standard library (`urllib`), so no new dependency.
+- Privacy page (English and Hindi) has a section for it; `render.yaml` explains how to switch it on; nine strings added to
+  all eight packs.
+
+## Company API: services sold one by one, 30-day trial keys
+
+- `apikeys.py`: signed keys (`dfk_...`), scoped to a group (`rti`, `rti_appeal`, `grievance`, `samjhao`, `advisor`, `forms`), one
+  template or `*`; end date, finished-draft quota and requests a minute inside the key; `issue` / `inspect` / `services` on the
+  command line; revoke by id with `DWANIFORMS_REVOKED_KEYS`. No secret, no API.
+- `b2b.py`, mounted at `/api/v1` by `standalone.py` when `DWANIFORMS_KEY_SECRET` is set: `GET /services`, `GET /usage`,
+  `POST /{service}/draft` (fields in, outcome out, validated by the same code as the voice app). Stateless: nothing stored,
+  bodies never logged, key never echoed, no CORS, one error shape, guessing keys is slowed down. Optional
+  `DWANIFORMS_USAGE_LOG` for invoicing (key id, service, status only).
+- ISO dates (`2026-10-20`) are now accepted by `Session._clean`, so the operator box and photo suggestions take them too.
+- `API.md` for customers, with an RTI / appeal walk-through; `render.yaml` generates `DWANIFORMS_KEY_SECRET`.
+
+## Scheme forms: pension, scholarship, Ayushman card
+
+- Three new forms: `pension_application` (old age, widow or disability; the disability percentage is asked only for a
+  disability pension), `scholarship_application` (level of study, school or college, last marks, parent's name) and
+  `ayushman_card` (family size, "is the family on the list"). Hindi and English written by hand; all eight packs gained the
+  21 questions and 8 options (drafts, as the rest).
+- The schemes link to them: old age, widow and disability pensions -> `pension_application` (they pointed at the income
+  certificate before), Ayushman Bharat -> `ayushman_card`. Scholarship rules are NOT in the scheme advisor yet (they differ
+  by state and year); the form is there for a centre to use.
+- The forms are on sale through the company API under the `forms` group.
+
+## Spoken numbers and dates, names, addresses
+
+- **Dates**: "pandrah march do hazaar do" is 15/03/2002 (a Romanised "do" inside a date or after a thousand is the number 2, not
+  the word "do"); Hindi months written in Latin letters (janvari, agast, sitambar ...), day ordinals (pehli, doosri, teesri,
+  chauthi, paanchvi), and a day that is not 1-31 is refused. "do hazaar do" is 2002 as a quantity too.
+- **Names** (`names.py`): "Mohd Aslam", "Mohammad Aslam" and "मोहम्मद अस्लम" are one person. Words are turned into sound keys (all
+  Indian scripts by sound, schwa dropped the way Hindi is spoken), well-known variants are folded, word order and titles
+  do not matter, an initial matches a full word. Answers `same` / `probably` / `different` with the reasons; a close
+  but different name (Rahul / Rahil, Sunil / Sushil) is `probably`, never `same`.
+- **Addresses** (`address.py`): house, floor, block, street, landmark (with near / opposite / behind), locality, village,
+  post office, tehsil, district, city, state, pincode, care-of; Hindi and English, commas or none; what cannot be placed goes
+  to `unparsed` rather than being guessed.
+- All three are on the company API (`/names/match`, `/address/parse`, `/speech/parse`) with their own key scopes
+  (`names`, `address`, `speech`).
