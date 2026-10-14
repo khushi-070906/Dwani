@@ -110,3 +110,9 @@ def test_the_contact_address_is_the_team_mailbox():
     for rel in ("static/privacy.html", "static/terms.html", "static/help.html", "careers/config.toml"):
         t = (ROOT / rel).read_text(encoding="utf-8")
         assert "dwanilive@gmail.com" in t and "khushimittal070906" not in t, rel
+
+
+def test_the_shared_header_asks_an_endpoint_that_exists_whether_you_are_logged_in():
+    """The careers header once asked /api/me, which does not exist, so a logged-in person was always shown 'Log in'."""
+    asked = re.search(r'fetch\("(/[^"]+)"', text(STATIC / "site-nav.js")).group(1)
+    assert f'@app.get("{asked}")' in text(ROOT / "license_server.py"), f"site-nav.js asks {asked}, which license_server does not serve"
