@@ -1,0 +1,18 @@
+/* DwaniLive brand: the logo (ध्वनि with a gradient, and LIVE) and the fonts, in ONE place for every DwaniLive page.
+   The colours come from each page's own variables (--accent-deep, --accent-2, --indigo, --ink-dim), so the logo follows
+   the dark and high-contrast themes. tests/test_dwanilive_brand.py fails when a page carries its own different copy,
+   skips this file, or asks Google Fonts for something it does not have.
+
+   Rozha One, Source Serif 4 and Mukta ship with the app (SIL OFL, licence texts next to the files): DwaniLive is offline-first, so the
+   logo and the text must not depend on Google Fonts. Google Fonts still supplies the weights not shipped here. */
+@font-face { font-family: "Rozha One"; src: url("/static/fonts/RozhaOne-subset.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Source Serif 4"; src: url("/static/fonts/SourceSerif4-latin.woff2") format("woff2"); font-weight: 500 700; font-display: swap; }
+@font-face { font-family: "Mukta"; src: url("/static/fonts/Mukta-Regular-subset.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Mukta"; src: url("/static/fonts/Mukta-SemiBold-subset.woff2") format("woff2"); font-weight: 600 800; font-display: swap; }
+
+.brand-name { display: inline-flex; align-items: baseline; gap: 0.08em; font-family: var(--font-display, "Rozha One", "Noto Serif Devanagari", Georgia, serif); font-size: var(--brand-size, 1.55rem); font-weight: 400; letter-spacing: -0.01em; text-decoration: none; }
+.brand-name .dwani {
+  background: linear-gradient(120deg, var(--accent-deep), var(--accent-2), var(--indigo));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.brand-name .live { color: var(--ink-dim); font-family: var(--font-body, "Mukta", "Noto Sans", "Segoe UI", system-ui, sans-serif); font-size: 0.88rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
