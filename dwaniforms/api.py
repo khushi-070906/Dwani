@@ -128,9 +128,9 @@ def create_router(service: FormService, prefix: str = "/form") -> APIRouter:
 
     @router.get("/assets/{kind}/{name}")
     async def asset(kind: str, name: str):
-        """Logo, fonts and the photo reader (ocr/), bundled so a kiosk with no internet still works."""
+        """Logo, fonts, the photo reader (ocr/) and the page's own scripts (js/), bundled so a kiosk with no internet still works."""
         import re as _re
-        if kind not in ("fonts", "img", "ocr") or not _re.fullmatch(r"[\w.-]+", name):
+        if kind not in ("fonts", "img", "ocr", "js") or not _re.fullmatch(r"[\w.-]+", name):
             raise HTTPException(404)
         p = (STATIC / kind / name).resolve()
         if STATIC.resolve() not in p.parents or not p.is_file():
