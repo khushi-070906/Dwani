@@ -345,3 +345,12 @@ The first calm pass was nearly all one green. Colour is back, in a small muted s
 ## DwaniYojana can be answered by speaking
 - Where the browser can listen, each question has an "Answer by speaking" button. The words go to `POST /form/yojana/understand`, which reads them for that one question with the spoken forms' own readers: Hindi and English number words ("बासठ", "ढाई एकड़", "डेढ़ लाख"), yes/no and each option's synonyms. "पता नहीं" is never turned into a No. Income spoken as an amount is rounded up to its band. Nothing is stored.
 - The page says plainly that the browser may send the sound to Google; tapping always works. Where the browser cannot listen the button is not shown.
+
+## DwaniYojana: a better shared link, a copyable list, plain dates
+- A link to `/form/yojana` pasted into WhatsApp or another chat app shows a title, a line in both languages and a 1200x630 picture (`static/img/yojana-share.png`), not a bare address.
+- "Copy the list of schemes" puts the scheme names and the link on the clipboard, for people who share by SMS or notes. It carries no answer, like the picture and the WhatsApp text.
+- "Rules checked on" is written as 7 अक्टूबर 2026 / 7 Oct 2026.
+- A browser with JavaScript turned off is told how to turn it on, in both languages, instead of a blank page.
+- The question list is cached for five minutes; the replies to `understand` and `advise` are `no-store`.
+- New `YOJANA.md` documents the endpoints, what is stored (nothing) and how to keep a scheme current. A test now fails if a word on the page exists in only one language.
+
