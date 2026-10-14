@@ -87,3 +87,41 @@ def test_the_endpoints_create_no_session_and_write_nothing():
     part = api[api.index('@router.get("/yojana"'):api.index('@router.post("/sessions")')]
     for forbidden in ("service.create", "sessions", "open(", "write", "logging", "logger"):
         assert forbidden not in part, forbidden
+
+
+@pytest.mark.parametrize("qid,said,lang,expected", [
+    ("age", "बासठ साल", "hi", 62), ("age", "I am sixty two", "en", 62), ("age", "62.5", "en", None),
+    ("gender", "मैं महिला हूँ", "hi", "Female"), ("occupation", "मैं खेती करता हूँ", "hi", "Farmer"),
+    ("occupation", "खेत मज़दूर", "hi", "Farm labourer"), ("occupation", "farm labour", "en", "Farm labourer"),
+    ("land_acres", "ढाई एकड़", "hi", 2.5), ("land_acres", "2.5 acres", "en", 2.5), ("land_acres", "दो एकड़", "hi", 2),
+    ("annual_income", "डेढ़ लाख", "hi", 200000), ("annual_income", "8 lakh", "en", 1000000),
+    ("bank_account", "हाँ जी", "hi", "Yes"), ("bank_account", "nope", "en", "No"),
+    ("bank_account", "पता नहीं", "hi", None), ("bank_account", "I don't know", "en", None), ("ration_card", "अंत्योदय", "hi", "AAY"),
+    ("house", "कच्चा", "hi", "Kutcha house"), ("age", "blah", "en", None), ("age", "", "en", None),
+])
+def test_spoken_words_mean_what_the_spoken_forms_would_take_them_to_mean(qid, said, lang, expected):
+    assert yojana.understand(T, qid, said, lang) == expected
+
+
+def test_a_question_that_is_not_asked_here_cannot_be_answered_by_voice():
+    for bad in ("category", "nope"):
+        with pytest.raises(yojana.BadFacts):
+            yojana.understand(T, bad, "general", "en")
+
+
+def test_the_income_bands_on_the_page_are_the_ones_the_server_rounds_to():
+    tops = [int(x) for x in re.findall(r"\[(\d{6,7}), \"", re.search(r"var INCOME = \[(.*?)\];", PAGE, re.S).group(1))]
+    assert tuple(tops) == yojana.INCOME_BANDS
+
+
+def test_the_voice_endpoint_answers_and_refuses(client):
+    ok = client.post("/form/yojana/understand", json={"question": "age", "text": "बासठ", "lang": "hi"})
+    assert ok.status_code == 200 and ok.json() == {"value": 62}
+    assert client.post("/form/yojana/understand", json={"question": "age", "text": "???", "lang": "hi"}).json() == {"value": None}
+    assert client.post("/form/yojana/understand", json={"question": "category", "text": "x", "lang": "hi"}).status_code == 422
+    assert client.post("/form/yojana/understand", json={"question": "age", "text": "x" * 400, "lang": "hi"}).status_code == 422
+
+
+def test_the_page_tells_people_their_browser_may_send_speech_to_google():
+    assert "Google" in PAGE[PAGE.index("voice_note: \"बोलने"):][:200] and "Google" in PAGE[PAGE.index("voice_note: \"When you speak"):][:200]
+    assert "webkitSpeechRecognition" in PAGE and "$(\"voice\").hidden = false" in PAGE   # shown only where the browser can listen
