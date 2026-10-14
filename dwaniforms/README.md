@@ -79,6 +79,56 @@ still needs. The fraud warning is read aloud, not only shown, because it is the 
 Dates on a paper may lie ahead and are often said without a year ("15 November"): fields with `"future": true` accept
 both (the year is this year, or next if that day is more than six months behind us). Birth dates still refuse the future.
 
+### Photo of the paper
+
+"Read from a photo" in Samjhao fills the three answers from a picture of the paper. The picture is read **on the phone**:
+the engine (tesseract.js 7 with its WebAssembly core, English and Hindi data, all Apache-2.0, in `static/ocr/` with a
+NOTICE and the licence) runs in a web worker loaded from this server the first time the button is used (about 7 MB,
+then the phone keeps it), so the picture is never uploaded and a kiosk with no internet still works. English is read
+first, because it gets digits right where the Hindi model sometimes drops a "1"; Hindi + English runs only when the first
+pass did not find all three.
+
+`static/ocr/dwani-ocr.js` turns the text into three *suggestions* (the kind of paper by weighted keywords, the date
+printed next to a label such as "Due date" / "अंतिम तिथि", the amount next to a label such as "Amount payable" / "देय
+राशि") and says nothing when it is not sure. They go to `POST /sessions/{id}/suggest`, which checks each like a typed
+answer and holds it until its question comes up; it is then read back with "is this correct?", and a "no" asks the
+question the normal way. Needs WebAssembly SIMD (every phone browser since 2021-23); otherwise the person is told to
+speak or type. The CSP gains `'wasm-unsafe-eval'` (WebAssembly only; `eval` stays blocked), and the camera permission is
+still off because the photo comes from the phone's own camera or gallery through a file input.
+
+To try it for real: open the app in Chrome, start Samjhao, tap the button and choose a photo. `tests/js/dwaniforms_ocr.test.js`
+tests the parsing, `tests/test_dwaniforms_photo.py` the server side, and `tests/js/dwaniforms_samjhao.test.js` the page
+with a stand-in engine; the real engine was run in Chromium against a generated English bill, a Hindi bill with
+Devanagari digits and a skewed, noisy challan.
+
+### Ask a question about the paper (optional, off by default)
+
+After the explanation, an "Ask the AI" box can answer one more question ("can I pay in two parts?"). It exists **only
+when the server has `DWANIFORMS_AI_KEY`** (an Anthropic API key, set in Render's environment, never in the repo;
+`DWANIFORMS_AI_MODEL` changes the model, default `claude-haiku-5-5`). Without the key the capabilities say `ai: false`, the
+page shows no box, `/sessions/{id}/ask` answers 404, and DwaniForms makes no outbound call at all.
+
+It is the one place the app talks to anyone else, so `ai.py` keeps it narrow: every question needs a fresh "yes, send it"
+(the endpoint refuses `consent: false`, and the page never remembers a yes); only the question and the kind of paper (and
+days left) go -- not the photo, the amount, the date, a name or any answer -- with Aadhaar-like and other long numbers,
+mobile numbers, PAN codes and e-mails blanked first; the model is told to stay inside our written explanation, never to
+call a paper genuine or fake from a description, never to take an OTP, to point to 1930 / 15100, and to ignore
+instructions inside the question; nothing is stored or logged (a failure logs only its kind); and a per-address limit of 10
+questions an hour (`hardening.LIMITS["ai"]`) stops a bot running up the bill. `tests/test_dwaniforms_ai.py` mocks the
+network call and checks every one of these, including exactly what is in the request.
+
+## Company API (selling a service to a platform)
+
+`/api/v1` lets another company's software call one service at a time: fields in, finished draft out (RTI application, RTI
+first appeal, grievance, Samjhao, scheme advisor, and the form-checking services). Full reference: [API.md](API.md).
+
+Keys are **signed, not stored** (`apikeys.py`): the key itself carries the company, the services it opens, its end date, its
+size and its speed, and an HMAC with `DWANIFORMS_KEY_SECRET` proves it was not edited, so nothing is lost when a free host
+wipes its disk. A 30-day trial is `python -m dwaniforms.apikeys issue --org "RTIwala" --services rti,rti_appeal --days 30`;
+one key per customer per service set. Without the secret the API is not mounted at all. `b2b.py` runs the same validators as
+the voice app on the fields it is given, keeps nothing (no session, no disk, no body in any log) and counts only finished
+drafts against the quota. The quota count lives in memory; see API.md for the durable option.
+
 ## RTI first appeal
 
 No reply to an RTI in 30 days, or an incomplete one: the first appeal under Section 19(1) is drafted (English, and
@@ -116,3 +166,12 @@ Hand-written questions: Hindi and English (in the code) plus Bengali, Marathi, G
 lakh / crore and their "two and a half" words (speech recognisers mostly return bigger numbers as numerals). Names are not transliterated (flagged for the operator). No Odia ASR.
 PDFs print form-language text; Hindi letters are printed from the screen (the browser shapes Devanagari correctly).
 Real Whisper/NLLB, the microphone path and text-to-speech must still be tried on the target hardware.
+
+## Scheme forms, names, addresses, spoken dates
+
+- `pension_application`, `scholarship_application`, `ayushman_card` are ordinary JSON templates (`templates/`); the pension and
+  Ayushman schemes in `schemes/` link to them.
+- `names.match("Mohd Aslam", "मोहम्मद अस्लम")` says whether two spellings are one person (`same` / `probably` / `different`, with reasons);
+  `address.parse("H-24, gali no. 3, near Shiv mandir, Uttam Nagar")` splits an address into house, street, landmark, locality ...;
+  `spoken.spoken_to_date("pandrah march do hazaar do")` is (15, 3, 2002). Tests: `tests/test_dwaniforms_spoken_dates.py`, `test_dwaniforms_names.py`, `test_dwaniforms_address.py`, `test_dwaniforms_tools_api.py`,
+  `tests/test_dwaniforms_scheme_forms.py`. All three helpers are also on the company API (see `API.md`).
