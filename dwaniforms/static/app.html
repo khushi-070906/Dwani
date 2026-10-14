@@ -826,7 +826,7 @@
     document.querySelectorAll("#steps .s").forEach(function (s) {
       var n = +s.dataset.step;
       s.className = "s" + (n < step ? " done" : n === step ? " on" : "");
-      s.querySelector("i").textContent = n < step ? "✓" : n;
+      s.querySelector("i").innerHTML = n < step ? icon("check") : n;
       // which of the three steps we are on, for a reader that cannot see the dark circle
       if (n === step) s.setAttribute("aria-current", "step"); else s.removeAttribute("aria-current");
     });
@@ -845,7 +845,7 @@
     var filled = fields.filter(function (f) { return f.value; }).length;
     $("bar").style.width = (fields.length ? Math.round(100 * filled / fields.length) : 0) + "%";
     var pos = fields.findIndex(function (f) { return f.id === r.field_id; });
-    $("step-count").textContent = pos > -1 ? t("step") + " " + (pos + 1) + " / " + fields.length : "✓ " + filled + " / " + fields.length;
+    $("step-count").innerHTML = pos > -1 ? esc(t("step") + " " + (pos + 1) + " / " + fields.length) : icon("check") + " " + filled + " / " + fields.length;
     $("sheet").classList.toggle("final", r.phase === "final" || r.phase === "fix");
     setSteps(r.phase, false);
     renderSheet(fields, r);
