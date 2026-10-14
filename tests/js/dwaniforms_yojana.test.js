@@ -38,7 +38,7 @@ async function until(fn, ms = 8000) { const end = Date.now() + ms; while (Date.n
   await until(() => /दिव्यांग/.test(heading())); d.querySelector(".opt.skip").click();
   ok(await until(() => !$("out").hidden && d.querySelectorAll(".scheme").length > 0), "the answer screen appears with schemes");
   ok(/PM-KISAN|पीएम-किसान/.test($("result").textContent) && /वृद्धावस्था/.test($("result").textContent), "PM-KISAN and the old-age pension are among them");
-  ok(/नियम जाँचे गए: \d{4}-\d\d-\d\d/.test($("result").textContent) && /फ़ैसला नहीं/.test($("result").textContent), "it says when the rules were checked, and that it is guidance");
+  ok(/नियम जाँचे गए: \d{1,2} (जनवरी|फ़रवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितंबर|अक्टूबर|नवंबर|दिसंबर) \d{4}/.test($("result").textContent) && /फ़ैसला नहीं/.test($("result").textContent), "it says when the rules were checked, and that it is guidance");
 
   const call = sent.filter((s) => /yojana\/advise/.test(s.u))[0], body = JSON.parse(call.body);
   ok(body.facts.age === 62 && body.facts.annual_income === 200000 && !("category" in body.facts), "one request carries the answers (income as the top of its band)");
@@ -52,6 +52,6 @@ async function until(fn, ms = 8000) { const end = Date.now() + ms; while (Date.n
   ok(!w.localStorage.length && !w.sessionStorage.length && !/;/.test(d.cookie), "nothing is stored in the browser");
 
   d.querySelector('.lang button[data-l="en"]').click();
-  ok(await until(() => /You may get/.test($("result").textContent) && /Rules checked on/.test($("result").textContent)), "switching to English redraws the same answer in English");
+  ok(await until(() => /You may get/.test($("result").textContent) && /Rules checked on: \d{1,2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}/.test($("result").textContent)), "switching to English redraws the same answer in English, with the date in words");
   console.log(process.exitCode ? "FAILED" : "all passed");
 })();

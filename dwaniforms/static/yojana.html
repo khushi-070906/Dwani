@@ -306,7 +306,7 @@
     if (m) { var g2 = document.createElement("h2"); g2.className = "group"; g2.textContent = t("maybe"); box.appendChild(g2); d.maybe.forEach(function (s) { box.appendChild(schemeCard(s, true)); }); }
     var meta = document.createElement("p"); var stale = d.likely.concat(d.maybe).some(function (s) { return s.stale; });
     meta.className = "meta" + (stale ? " stale" : "");
-    meta.textContent = (d.reviewed ? t("reviewed") + ": " + d.reviewed + ". " : "") + (stale ? t("stale") + " " : "") + t("disc");
+    meta.textContent = (d.reviewed ? t("reviewed") + ": " + niceDate(d.reviewed) + ". " : "") + (stale ? t("stale") + " " : "") + t("disc");
     box.appendChild(meta);
     if (n + m) {
       var cta = document.createElement("div"); cta.className = "cta"; cta.appendChild(document.createTextNode(t("cta") + " "));
@@ -332,6 +332,15 @@
       document.body.removeChild(ta); done(ok);
     }
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { done(true); }, old); else old();
+  }
+
+  // "2026-10-07" is read by few people; "7 अक्टूबर 2026" is read by everyone.
+  var MONTHS = { hi: ["जनवरी", "फ़रवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"],
+                 en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] };
+  function niceDate(iso) {
+    var m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(iso || "");
+    if (!m || +m[2] < 1 || +m[2] > 12) return iso || "";
+    return +m[3] + " " + MONTHS[lang][+m[2] - 1] + " " + m[1];
   }
 
   function shareUrl() { return location.origin + location.pathname.replace(/\/$/, ""); }
