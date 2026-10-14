@@ -182,3 +182,14 @@ def test_the_dwaniforms_site_writes_to_the_team_mailbox():
     for n in ("index", "privacy", "terms"):
         t = (site / f"{n}.html").read_text(encoding="utf-8")
         assert "dwanilive@gmail.com" in t and "khushimittal070906" not in t, n
+
+
+def test_the_app_draws_its_ticks_pencil_warning_and_download_instead_of_text_symbols():
+    """✓ ✎ ⚠ ⤓ come from whatever font a phone has (often a coloured emoji), so the app draws them. They remain only inside
+    the per-language wording tables ('✓ हाँ, सही है'), which are text."""
+    app = (Path(__file__).resolve().parent.parent / "dwaniforms" / "static" / "app.html").read_text(encoding="utf-8")
+    code = app[:app.index("  var UI = {")] + app[app.index("  var LANG_NAMES"):]
+    for sym in "✓✎⚠⤓":
+        assert sym not in code, f"{sym!r} is still a text symbol in the app"
+    for name in ("check", "warn", "pencil"):
+        assert f'"{name}": "<path' in app, name
