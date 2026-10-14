@@ -390,3 +390,40 @@ def test_the_standalone_app_mounts_it_only_with_a_secret(monkeypatch):
     monkeypatch.delenv("DWANIFORMS_KEY_SECRET")
     c = TestClient(build_app(None, None, "x", True, False, False))
     assert c.get("/api/v1/usage", headers=H(raw)).status_code == 404
+
+
+# ---- any public authority, not only the twelve the voice app lists ---------------------------------------------
+def test_any_office_name_is_accepted_for_rti_appeal_and_grievance_and_printed_as_given():
+    c, _ = make()
+    raw, _k = key("*")
+    office = "Bhopal Municipal Corporation, Ward 12 Office"
+    r = c.post("/api/v1/rti_application/draft", headers=H(raw), json={"lang": "hi", "fields": {**RTI, "department": office}}).json()
+    assert r["complete"] and r["errors"] == {}
+    assert f"(PIO), {office}" in r["outcome"]["drafts"]["en"] and office in r["outcome"]["drafts"]["hi"]
+    appeal = {"full_name": "Asha Verma", "address": "12 Gandhi Road, Bhopal", "pincode": "462001", "department": office,
+              "rti_date": "2026-09-01", "information": "Status of my road repair request", "reply_status": "No reply received"}
+    a = c.post("/api/v1/rti_first_appeal/draft", headers=H(raw), json={"lang": "en", "fields": appeal}).json()
+    assert a["complete"] and office in a["outcome"]["drafts"]["en"]
+    g = c.post("/api/v1/grievance/draft", headers=H(raw), json={"lang": "en", "fields": {
+        "department": office, "complaint": "The road outside my house has not been repaired for months.", "location": "Bhopal",
+        "incident_date": "2026-09-01", "full_name": "Asha Verma"}}).json()
+    assert g["errors"].get("department") is None, g["errors"]
+
+
+@pytest.mark.parametrize("bad", ["ab", "x" * 101, "\x00\x01 evil office", "1234", "   "])
+def test_an_office_name_must_be_a_real_short_line_of_text(bad):
+    c, _ = make()
+    raw, _k = key("*")
+    r = c.post("/api/v1/rti_application/draft", headers=H(raw), json={"lang": "en", "fields": {**RTI, "department": bad}}).json()
+    assert not r["complete"] and r["errors"]["department"]["code"] == "choice_invalid"
+
+
+def test_free_text_is_only_for_the_office_field_and_services_say_so():
+    c, _ = make()
+    raw, _k = key("*")
+    r = c.post("/api/v1/rti_application/draft", headers=H(raw), json={"lang": "en", "fields": {**RTI, "delivery": "by pigeon"}}).json()
+    assert r["errors"]["delivery"]["code"] == "choice_invalid"          # every other choice stays a choice
+    services = {s["id"]: s for s in c.get("/api/v1/services", headers=H(raw)).json()["services"]}
+    flag = lambda sid: [f.get("accepts_free_text") for f in services[sid]["fields"] if f["id"] == "department"]
+    assert flag("rti_application") == [True] and flag("rti_first_appeal") == [True] and flag("grievance") == [True]
+    assert not any(f.get("accepts_free_text") for f in services["rti_application"]["fields"] if f["id"] != "department")
