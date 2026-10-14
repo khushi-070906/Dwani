@@ -10,7 +10,7 @@
   "en": "Free hospital treatment up to ₹5 lakh a year per family at listed hospitals",
   "hi": "सूचीबद्ध अस्पतालों में परिवार को साल में ₹5 लाख तक मुफ़्त इलाज"
  },
- "form": null,
+ "form": "ayushman_card",
  "apply": {
   "en": "Check your name and get the card at beneficiary.nha.gov.in, the Ayushman app, or a CSC.",
   "hi": "beneficiary.nha.gov.in, आयुष्मान ऐप या CSC पर नाम देखें और कार्ड बनवाएँ।"
