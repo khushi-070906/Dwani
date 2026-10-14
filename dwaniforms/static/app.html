@@ -187,7 +187,11 @@
   .chips { display: flex; flex-wrap: wrap; gap: .5rem; }
   .chip { display: inline-flex; align-items: center; gap: .35rem; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: .3rem .8rem;
           font-size: .82rem; font-weight: 700; color: var(--navy); }
-  .chip i { font-style: normal; color: var(--forest); }
+  .chip i { font-style: normal; color: var(--forest); display: inline-flex; align-items: center; }
+  .ic { width: 1.1em; height: 1.1em; flex: none; }
+  .row .ri .ic { width: 22px; height: 22px; }
+  .mic .ic { width: 34px; height: 34px; }
+  .btn .ic { width: 1.15em; height: 1.15em; vertical-align: -.2em; margin-right: .25rem; }
   /* "Add to phone": shown only when the browser actually offers to install, so it never sits there doing nothing */
   .chip.install { margin-top: .6rem; border-color: var(--forest); color: var(--forest); background: var(--forest-soft); }
   .chip.install i { font-size: 1.05rem; line-height: 1; }
@@ -280,7 +284,7 @@
     #talk .assist .who, #talk .assist-links, #talk details.op { display: none; }
     #talk .assist .q { font-size: 1.08rem; }
     .srow { scroll-margin-bottom: 300px; }
-    #talk .micwrap { margin: .6rem 0 0; } #talk .mic { width: 60px; height: 60px; font-size: 1.4rem; }
+    #talk .micwrap { margin: .6rem 0 0; } #talk .mic { width: 60px; height: 60px; font-size: 1.4rem; } #talk .mic .ic { width: 28px; height: 28px; }
     #talk .yn { margin: .6rem 0 0; } #talk .yn button { padding: .6rem; }
   }
   @media print {
