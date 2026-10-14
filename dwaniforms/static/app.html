@@ -235,6 +235,12 @@
   .tabs button { border: 1px solid var(--line-2); background: var(--card); border-radius: 6px; padding: .3rem .8rem; font-weight: 700; font-size: .85rem; color: var(--navy); }
   .tabs button[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
   .letter { white-space: pre-wrap; font: 1rem/1.75 var(--serif); color: var(--navy); background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 1.4rem 1.6rem; }
+  .trk h3 { margin: 0 0 .15rem; font-size: 1.05rem; } .trk .sub { color: var(--ink-3); font-size: .84rem; margin: 0 0 .5rem; overflow-wrap: anywhere; }
+  .trk .state { margin: .4rem 0 .7rem; } .trk .when { font-weight: 700; }
+  .trk .dates { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .6rem 1rem; margin: .4rem 0 .8rem; }
+  .trk label { display: block; font-size: .8rem; color: var(--ink-3); }
+  .trk input { font: inherit; width: 100%; border: 1px solid var(--line-2); border-radius: 8px; padding: .5rem .6rem; background: #fff; }
+  .trk .actions { margin-top: .4rem; }
   .kv { display: grid; grid-template-columns: max-content 1fr; gap: .35rem 1.2rem; margin: 0; }
   .kv dt { color: var(--ink-3); font-size: .88rem; } .kv dd { margin: 0; font-weight: 700; color: var(--navy); }
   .scheme { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .3rem 1rem; padding: 1rem 0; border-bottom: 1px solid var(--line); }
@@ -330,6 +336,11 @@
         <div class="groups" id="all-groups"></div>
       </div>
       <aside>
+        <div class="card trk" id="trk-card" hidden>
+          <h3 data-t="trk_title">My applications</h3>
+          <p class="state" id="trk-sum" style="font-size:.9rem"></p>
+          <button class="btn ghost" type="button" id="trk-open" data-t="trk_open">Open the list</button>
+        </div>
         <div class="card">
           <h3 data-t="how_title">How it works</h3>
           <ol class="how">
@@ -418,6 +429,16 @@
   </section>
 
   <!-- RESULT -->
+  <section id="tracker" hidden>
+    <div class="layout">
+      <div class="main">
+        <div class="crumbs no-print"><button type="button" data-back data-t="home_crumb">Home</button> / <span data-t="trk_title">My applications</span></div>
+        <h2 data-t="trk_title">My applications</h2>
+        <div class="alert" data-t="trk_note">Kept only on this phone; nothing is sent anywhere. Only the office and the dates are saved, not your name, address or what you asked. Dates follow the RTI Act and are not legal advice. This page cannot know whether an office has replied: enter the dates yourself.</div>
+        <div id="trk-list"></div>
+      </div>
+    </div>
+  </section>
   <section id="result" hidden>
     <div class="layout">
       <div class="main">
@@ -448,7 +469,9 @@
             <button class="btn" type="button" id="pdf" data-t="pdf">Download PDF</button>
             <button class="btn ghost" type="button" id="print-letter" data-t="print">Print</button>
             <button class="btn ghost" type="button" id="json" data-t="json">Data file (for portal upload)</button>
+            <button class="btn" type="button" id="trk-save" data-t="trk_save" hidden>Save to my applications</button>
           </div>
+          <p class="muted small" id="trk-msg" role="status" style="margin:.5rem 0 0"></p>
         </div>
         <div class="card sagecard">
           <h3 data-t="what_next">What next?</h3>
@@ -484,7 +507,7 @@
   var B = location.pathname.replace(/\/$/, "");
   var $ = function (id) { return document.getElementById(id); };
   var UI = {
-    hi: { ai_title: "इस कागज़ के बारे में एक सवाल", ai_ph: "अपना सवाल लिखिए (नाम या नंबर नहीं)", ai_ask: "AI से पूछें", ai_consent: "आपका सवाल जवाब के लिए एक AI सेवा को भेजा जाएगा। सिर्फ़ सवाल और कागज़ का प्रकार जाता है; फ़ोटो, आपका नाम या कोई नंबर नहीं जाता। आपके लिखे नंबर मिटा दिए जाते हैं। AI ग़लत भी हो सकता है।", ai_send: "हाँ, भेजिए", ai_cancel: "नहीं, मत भेजिए", ai_wait: "जवाब लाया जा रहा है…", ai_warn: "यह AI का जवाब है। यह ग़लत हो सकता है और क़ानूनी सलाह नहीं है। धोखे के लिए 1930 पर और मुफ़्त क़ानूनी मदद के लिए 15100 पर फ़ोन कीजिए।", ai_fail: "अभी जवाब नहीं मिल सका। कृपया बाद में कोशिश कीजिए या दफ़्तर में पूछिए।", ocr_btn: "फ़ोटो से पढ़ें", ocr_private: "फ़ोटो सिर्फ़ इसी फ़ोन पर पढ़ी जाती है। कहीं भेजी या रखी नहीं जाती।", ocr_loading: "फ़ोटो पढ़ने की तैयारी (लगभग 7 MB, सिर्फ़ पहली बार)…", ocr_reading: "फ़ोटो पढ़ी जा रही है…", ocr_found: "कागज़ पर यह मिला (एक-एक करके पूछा जाएगा कि सही है या नहीं)", ocr_paper: "कागज़", ocr_none: "फ़ोटो से पक्का कुछ पढ़ा नहीं जा सका। कृपया बोलकर या लिखकर बताइए।", ocr_failed: "फ़ोटो पढ़ी नहीं जा सकी। कृपया बोलकर या लिखकर बताइए।", doc_note: "अपने आधार कार्ड, राशन कार्ड या खसरे की नक़ल की फ़ोटो लीजिए। फ़ोटो में जो नंबर और शब्द मिलेंगे, वही जवाब माने जाएँगे, और मैं हर एक पर पूछूँगी कि वह सही है या नहीं।", g_explain: "कागज़ समझिए", k_explain: "कागज़ का मतलब", ex_what: "यह क्या है", ex_do: "क्या करें", ex_wrong: "अगर इसमें कुछ ग़लत है", ex_beware: "धोखे से बचिए", ex_help: "अगर धोखा हो गया", ex_date: "कागज़ पर लिखी तारीख", ex_amount: "रकम", ex_left: "दिन बाकी", ex_passed: "यह तारीख निकल चुकी है", ex_today: "यह तारीख आज है", ex_note: "सामान्य जानकारी, क़ानूनी सलाह नहीं। जाँची गई:", next_explain: "कागज़ संभालकर रखिए। अगर किसी दफ़्तर ने आपके साथ ग़लत किया है, तो होम पेज से शिकायत लिख सकते हैं।",
+    hi: { trk_title: "मेरे आवेदन", trk_save: "मेरे आवेदनों में सहेजें", trk_saved: "इस फ़ोन में सहेज लिया। होम पेज पर “मेरे आवेदन” में मिलेगा।", trk_note: "सिर्फ़ इसी फ़ोन में रहता है; कहीं भेजा नहीं जाता। सिर्फ़ दफ़्तर और तारीख़ें सहेजी जाती हैं, आपका नाम, पता या माँगी गई सूचना नहीं। तारीख़ें आरटीआई अधिनियम के हिसाब से हैं, क़ानूनी सलाह नहीं। दफ़्तर ने जवाब दिया या नहीं, यह पेज नहीं जान सकता: तारीख़ें आप ख़ुद भरिए।", trk_empty: "अभी कुछ सहेजा नहीं है। आरटीआई या शिकायत तैयार होने पर “मेरे आवेदनों में सहेजें” दबाइए।", trk_sent: "भेजने की तारीख़", trk_reply: "जवाब मिलने की तारीख़", trk_appeal: "प्रथम अपील भेजने की तारीख़", trk_decision: "अपील का फ़ैसला मिलने की तारीख़", trk_ref: "संदर्भ संख्या", trk_check_on: "फिर देखने की तारीख़", trk_unsent: "अभी भेजा नहीं गया। भेजने पर तारीख़ भर दीजिए।", trk_s_wait: "जवाब का इंतज़ार। दफ़्तर के पास समय है इस तारीख़ तक:", trk_s_first: "30 दिन में जवाब नहीं आया। प्रथम अपील आप ज़्यादा से ज़्यादा इस तारीख़ तक कर सकते हैं:", trk_s_reply: "जवाब मिल गया। संतोषजनक न हो तो प्रथम अपील इस तारीख़ तक कीजिए:", trk_s_wait2: "प्रथम अपील भेजी गई। फ़ैसला इस तारीख़ तक होना चाहिए:", trk_s_second: "फ़ैसला न आए या आप संतुष्ट न हों, तो सूचना आयोग में दूसरी अपील ज़्यादा से ज़्यादा इस तारीख़ तक कर सकते हैं:", trk_late: "यह समय-सीमा निकल चुकी है। फिर भी आप अपील कर सकते हैं और देरी माफ़ करने का अनुरोध कर सकते हैं।", trk_days_left: "दिन बाकी", trk_days_over: "दिन पहले", trk_closed: "पूरा हुआ", trk_do_appeal: "प्रथम अपील लिखें", trk_cal: "कैलेंडर में याद दिलाना जोड़ें", trk_done: "पूरा हुआ मानें", trk_reopen: "फिर से खोलें", trk_remove: "हटाएँ", trk_sure: "हटाने के लिए फिर दबाइए", trk_open: "सूची खोलें", ai_title: "इस कागज़ के बारे में एक सवाल", ai_ph: "अपना सवाल लिखिए (नाम या नंबर नहीं)", ai_ask: "AI से पूछें", ai_consent: "आपका सवाल जवाब के लिए एक AI सेवा को भेजा जाएगा। सिर्फ़ सवाल और कागज़ का प्रकार जाता है; फ़ोटो, आपका नाम या कोई नंबर नहीं जाता। आपके लिखे नंबर मिटा दिए जाते हैं। AI ग़लत भी हो सकता है।", ai_send: "हाँ, भेजिए", ai_cancel: "नहीं, मत भेजिए", ai_wait: "जवाब लाया जा रहा है…", ai_warn: "यह AI का जवाब है। यह ग़लत हो सकता है और क़ानूनी सलाह नहीं है। धोखे के लिए 1930 पर और मुफ़्त क़ानूनी मदद के लिए 15100 पर फ़ोन कीजिए।", ai_fail: "अभी जवाब नहीं मिल सका। कृपया बाद में कोशिश कीजिए या दफ़्तर में पूछिए।", ocr_btn: "फ़ोटो से पढ़ें", ocr_private: "फ़ोटो सिर्फ़ इसी फ़ोन पर पढ़ी जाती है। कहीं भेजी या रखी नहीं जाती।", ocr_loading: "फ़ोटो पढ़ने की तैयारी (लगभग 7 MB, सिर्फ़ पहली बार)…", ocr_reading: "फ़ोटो पढ़ी जा रही है…", ocr_found: "कागज़ पर यह मिला (एक-एक करके पूछा जाएगा कि सही है या नहीं)", ocr_paper: "कागज़", ocr_none: "फ़ोटो से पक्का कुछ पढ़ा नहीं जा सका। कृपया बोलकर या लिखकर बताइए।", ocr_failed: "फ़ोटो पढ़ी नहीं जा सकी। कृपया बोलकर या लिखकर बताइए।", doc_note: "अपने आधार कार्ड, राशन कार्ड या खसरे की नक़ल की फ़ोटो लीजिए। फ़ोटो में जो नंबर और शब्द मिलेंगे, वही जवाब माने जाएँगे, और मैं हर एक पर पूछूँगी कि वह सही है या नहीं।", g_explain: "कागज़ समझिए", k_explain: "कागज़ का मतलब", ex_what: "यह क्या है", ex_do: "क्या करें", ex_wrong: "अगर इसमें कुछ ग़लत है", ex_beware: "धोखे से बचिए", ex_help: "अगर धोखा हो गया", ex_date: "कागज़ पर लिखी तारीख", ex_amount: "रकम", ex_left: "दिन बाकी", ex_passed: "यह तारीख निकल चुकी है", ex_today: "यह तारीख आज है", ex_note: "सामान्य जानकारी, क़ानूनी सलाह नहीं। जाँची गई:", next_explain: "कागज़ संभालकर रखिए। अगर किसी दफ़्तर ने आपके साथ ग़लत किया है, तो होम पेज से शिकायत लिख सकते हैं।",
       a11y_home: "ध्वनिForms होम", a11y_bigger: "अक्षर बड़े करें", a11y_lang: "भाषा चुनें", install: "फ़ोन में लगाएँ", tagline: "बोलकर फ़ॉर्म भरें", hello: "नमस्ते", welcome_kicker: "सरकारी फ़ॉर्म, बोलकर", chip1: "बोलकर या लिखकर", chip2: "हर जवाब की जाँच", chip3: "30 मिनट बाद मिट जाता है", hello_sub: "आज क्या करना है? नीचे से चुनिए, फिर बोलकर या लिखकर जवाब दीजिए। हर जवाब फ़ॉर्म पर जाने से पहले आपको पढ़कर सुनाया जाएगा।",
       most: "सबसे ज़्यादा किए जाने वाले काम", everything: "बाकी सब", how_title: "कैसे काम करता है", how1: "फ़ॉर्म चुनिए। सवाल एक-एक करके आएँगे।",
       how2: "माइक दबाकर बोलिए, या लिखिए। हर जवाब पढ़कर सुनाया जाएगा: \"क्या यह सही है?\"", how3: "आख़िर में भरा हुआ फ़ॉर्म या पत्र डाउनलोड या प्रिंट कीजिए।",
@@ -521,7 +544,7 @@
       no_recog: "इस ब्राउज़र में इस भाषा में बोलकर जवाब नहीं हो पा रहा। लिखकर जवाब दीजिए।", by_word: "बटा" },
     en: {}
   };
-  var EN = { ai_title: "A question about this paper", ai_ph: "Type your question (no names or numbers)", ai_ask: "Ask the AI", ai_consent: "Your question will be sent to an AI service to be answered. Only the question and the kind of paper go; not the photo, your name or any number. Numbers you type are blanked out. The AI can be wrong.", ai_send: "Yes, send it", ai_cancel: "No, do not send", ai_wait: "Getting an answer…", ai_warn: "This is an AI answer. It can be wrong and is not legal advice. For fraud call 1930; for free legal help call 15100.", ai_fail: "Could not get an answer just now. Please try again later or ask at the office.", ocr_btn: "Read from a photo", ocr_private: "The photo is read on this phone only. It is not sent or stored anywhere.", ocr_loading: "Getting the reader ready (about 7 MB, first time only)…", ocr_reading: "Reading the photo…", ocr_found: "Found on the paper (I will ask one by one whether it is right)", ocr_paper: "Paper", ocr_none: "Could not read anything for sure from the photo. Please say or type it.", ocr_failed: "Could not read the photo. Please say or type it.", doc_note: "Take a photo of your Aadhaar card, ration card or khasra copy. Only the numbers and words found are used as answers, and I will ask you whether each one is right.", g_explain: "Understand a paper", k_explain: "Paper explained", ex_what: "What it is", ex_do: "What to do", ex_wrong: "If something on it is wrong", ex_beware: "Watch out for fraud", ex_help: "If you were cheated", ex_date: "Date on the paper", ex_amount: "Amount", ex_left: "days left", ex_passed: "This date has passed", ex_today: "This date is today", ex_note: "General guidance, not legal advice. Checked on", next_explain: "Keep the paper safe. If an office has treated you unfairly, you can write a complaint from the home page.",
+  var EN = { trk_title: "My applications", trk_save: "Save to my applications", trk_saved: "Saved on this phone. Find it under My applications on the home page.", trk_note: "Kept only on this phone; nothing is sent anywhere. Only the office and the dates are saved, not your name, address or what you asked. Dates follow the RTI Act and are not legal advice. This page cannot know whether an office has replied: enter the dates yourself.", trk_empty: "Nothing saved yet. When an RTI or a complaint is ready, tap “Save to my applications”.", trk_sent: "Sent on", trk_reply: "Reply received on", trk_appeal: "First appeal sent on", trk_decision: "Appeal decision received on", trk_ref: "Reference number", trk_check_on: "Check again on", trk_unsent: "Not sent yet. Enter the date when you send it.", trk_s_wait: "Waiting for the reply. The office has time until", trk_s_first: "No reply within 30 days. You can file the first appeal, at the latest by", trk_s_reply: "Reply received. If it is not satisfactory, file the first appeal by", trk_s_wait2: "First appeal sent. The decision is due by", trk_s_second: "If there is no decision, or you are not satisfied, you can make a second appeal to the Information Commission, at the latest by", trk_late: "This time limit has passed. You can still appeal and ask for the delay to be excused.", trk_days_left: "days left", trk_days_over: "days ago", trk_closed: "Marked as done", trk_do_appeal: "Write the first appeal", trk_cal: "Add a reminder to my calendar", trk_done: "Mark as done", trk_reopen: "Open again", trk_remove: "Remove", trk_sure: "Tap again to remove", trk_open: "Open the list", ai_title: "A question about this paper", ai_ph: "Type your question (no names or numbers)", ai_ask: "Ask the AI", ai_consent: "Your question will be sent to an AI service to be answered. Only the question and the kind of paper go; not the photo, your name or any number. Numbers you type are blanked out. The AI can be wrong.", ai_send: "Yes, send it", ai_cancel: "No, do not send", ai_wait: "Getting an answer…", ai_warn: "This is an AI answer. It can be wrong and is not legal advice. For fraud call 1930; for free legal help call 15100.", ai_fail: "Could not get an answer just now. Please try again later or ask at the office.", ocr_btn: "Read from a photo", ocr_private: "The photo is read on this phone only. It is not sent or stored anywhere.", ocr_loading: "Getting the reader ready (about 7 MB, first time only)…", ocr_reading: "Reading the photo…", ocr_found: "Found on the paper (I will ask one by one whether it is right)", ocr_paper: "Paper", ocr_none: "Could not read anything for sure from the photo. Please say or type it.", ocr_failed: "Could not read the photo. Please say or type it.", doc_note: "Take a photo of your Aadhaar card, ration card or khasra copy. Only the numbers and words found are used as answers, and I will ask you whether each one is right.", g_explain: "Understand a paper", k_explain: "Paper explained", ex_what: "What it is", ex_do: "What to do", ex_wrong: "If something on it is wrong", ex_beware: "Watch out for fraud", ex_help: "If you were cheated", ex_date: "Date on the paper", ex_amount: "Amount", ex_left: "days left", ex_passed: "This date has passed", ex_today: "This date is today", ex_note: "General guidance, not legal advice. Checked on", next_explain: "Keep the paper safe. If an office has treated you unfairly, you can write a complaint from the home page.",
     next_advisor: "Tap 'Fill this form' next to a scheme: some of your answers will already be filled in. The department makes the final decision.",
     next_lookup: "This comes from a saved copy of the records. For anything important, also check the official portal.",
     a11y_home: "DwaniForms home", a11y_bigger: "Bigger text", a11y_lang: "Choose a language", install: "Add to phone", tagline: "Fill forms by speaking", hello: "Namaste", unavailable: "Not available yet", questions: "questions", g_forms: "Government forms",
@@ -593,7 +616,7 @@
       });
     });
   }
-  function show(id) { ["home", "talk", "result"].forEach(function (v) { $(v).hidden = v !== id; }); try { window.scrollTo(0, 0); } catch (e) {} }
+  function show(id) { ["home", "talk", "result", "tracker"].forEach(function (v) { $(v).hidden = v !== id; }); try { window.scrollTo(0, 0); } catch (e) {} }
   // The id of the form being filled, kept for THIS TAB only, so a reload or a phone that went to sleep can pick the
   // same form up again. Only the id is stored: every answer stays on the server and is dropped there after 30 minutes.
   var SID_KEY = "dwaniforms:sid";
@@ -701,6 +724,7 @@
     });
     var meta = (caps.records && caps.records.meta) || {};
     $("demo-note").hidden = !Object.keys(meta).some(function (k) { return meta[k] && meta[k].demo; });
+    trkHome(); if (!$("tracker").hidden) trkRender();
   }
   $("home-link").addEventListener("click", goHome);
   $("talk-back").addEventListener("click", goHome);
@@ -735,7 +759,9 @@
     $("net-retry").onclick = function () { $("net-banner").hidden = true; if (retry) retry(); };
   }
   function start(formId, prefillFrom) { needConsent(function () { doStart(formId, prefillFrom); }, !!prefillFrom); }
+  var pendingSuggest = null;          // {form, values}: set by "Write the first appeal" in My applications
   function doStart(formId, prefillFrom) {
+    var carry = pendingSuggest && pendingSuggest.form === formId ? pendingSuggest.values : null; pendingSuggest = null;
     $("net-banner").hidden = true;
     var body = { form_id: formId, lang: lang };
     if (prefillFrom) body.prefill_from = prefillFrom;
@@ -746,6 +772,8 @@
       $("talk-title").textContent = r.title || ""; $("crumb-title").textContent = r.title || "";
       $("heard").textContent = ""; resetPhoto();
       show("talk"); render(r);
+      // the same road a photo takes: the values are only suggestions, each one is read back with "is this correct?"
+      if (carry) api("/sessions/" + sid + "/suggest", { method: "POST", json: { values: carry } }).then(render).catch(function () {});
     }).catch(function (e) { netError(e, function () { doStart(formId, prefillFrom); }); });
   }
   function serverVoiceOK() { return caps.asr && (caps.asr_langs || []).indexOf(lang) > -1 && navigator.mediaDevices && window.isSecureContext; }
@@ -997,8 +1025,10 @@
   try { if (localStorage.getItem("dwaniforms:big")) { document.body.classList.add("big"); $("big-btn").setAttribute("aria-pressed", "true"); } } catch (e) {}
 
   // ---------- result ----------
+  var lastResult = null;
   function showResult(r) {
     stopListening();
+    lastResult = r;
     var o = r.outcome || {};
     var fields = r.fields || [];
     var kicker = o.type === "draft" ? t("k_draft") : o.type === "lookup" ? (o.found ? t("k_found") : t("k_notfound")) : o.type === "advisor" ? t("k_advice") : o.type === "explain" ? t("k_explain") : t("k_form");
@@ -1019,6 +1049,8 @@
     $("pdf").hidden = o.type === "advisor" || o.type === "lookup" || o.type === "explain";
     $("json").hidden = !!o.type;
     $("print-letter").hidden = false;
+    var sv = $("trk-save"); sv.hidden = !(TR && trkStore() && (o.type === "draft" || !o.type)); sv.disabled = false;
+    sv.textContent = t("trk_save"); $("trk-msg").textContent = "";
     if (o.type === "draft") renderDraft(o);
     else if (o.type === "lookup") renderLookup(o);
     else if (o.type === "advisor") renderAdvice(o);
@@ -1293,6 +1325,107 @@
     if (e.persisted || (cur && !cur.done)) return;
     endSession();
   });
+
+  // ---------- My applications: a list kept on this phone, with the dates an RTI runs on ----------
+  // Nothing here reaches the server. The saved entry holds the office, the dates and a reference number the person types,
+  // never a name, an address or what was asked. js/tracker.js has the date arithmetic (and is tested against the server's).
+  var TR = null;
+  loadScript(B + "/assets/js/tracker.js").then(function () { TR = window.DwaniTracker; trkHome(); }).catch(function () {});
+  function trkStore() { try { return TR && window.localStorage ? TR.store(window.localStorage) : null; } catch (e) { return null; } }
+  function longDate(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+    if (!m) return iso || "";
+    try { return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(locale(), { day: "numeric", month: "long", year: "numeric" }); }
+    catch (e) { return m[3] + "/" + m[2] + "/" + m[1]; }
+  }
+  var TRK_STATE = { unsent: "trk_unsent", wait: "trk_s_wait", first: "trk_s_first", reply: "trk_s_reply", wait2: "trk_s_wait2", second: "trk_s_second", other: "trk_check_on", closed: "trk_closed" };
+  // {text, date, urgent}: one sentence for a case, e.g. "No reply within 30 days. You can file the first appeal, at the latest by 12 November 2026 (9 days left)"
+  function trkLine(a, p) {
+    if (p.phase === "other" && !p.date) return { text: "", urgent: false };         // a form with no date chosen: nothing to say
+    var out = { text: t(TRK_STATE[p.phase] || "trk_unsent"), urgent: false };
+    if (p.date) {
+      var n = p.left;
+      out.text += " " + longDate(p.date) + " (" + Math.abs(n) + " " + t(n < 0 ? "trk_days_over" : "trk_days_left") + ")";
+      out.urgent = n < 0 || n <= 7;
+      if (p.late) out.text += ". " + t("trk_late");
+    }
+    return out;
+  }
+  function trkHome() {
+    var card = $("trk-card"), st = trkStore();
+    var list = st ? st.list() : [];
+    card.hidden = !list.length;
+    if (!list.length) return;
+    // the case whose date is nearest; with no dates yet, the newest open one (so "not sent yet" is still said)
+    var now = TR.today(), u = TR.urgent(list, now), sum = $("trk-sum");
+    if (!u) { var open = list.filter(function (a) { return !a.closed; })[0]; if (open) u = { a: open, p: TR.phase(open, now) }; }
+    var lt = u ? trkLine(u.a, u.p).text : "";
+    sum.textContent = u ? (u.a.dept || u.a.title) + (lt ? ": " + lt : "") : "";
+    sum.hidden = !u;
+  }
+  function trkStamp() { return TR.today(); }
+  $("trk-save").addEventListener("click", function () {
+    var st = trkStore(); if (!st || !lastResult) return;
+    var x = TR.fromResult(lastResult.flow, lastResult.title, lastResult.fields, trkStamp());
+    if (!st.add(x)) return;                                  // storage blocked or full: the button stays, nothing is claimed
+    this.disabled = true; $("trk-msg").textContent = t("trk_saved"); trkHome();
+  });
+  $("trk-open").addEventListener("click", function () { trkRender(); show("tracker"); });
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function trkField(label, type, value, onchange, max) {
+    var w = el("div"), l = el("label", null, label), i = el("input");
+    i.type = type; i.value = value || ""; if (max) i.maxLength = max;
+    i.addEventListener("change", function () { onchange(i.value.trim()); });
+    l.appendChild(i); w.appendChild(l); return w;
+  }
+  function trkRender() {
+    var box = $("trk-list"), st = trkStore(); box.innerHTML = "";
+    var list = st ? st.list() : [];
+    if (!list.length) { box.appendChild(el("p", "muted", t("trk_empty"))); return; }
+    var now = TR.today();
+    list.forEach(function (a) {
+      var p = TR.phase(a, now), line = trkLine(a, p);
+      var card = el("div", "card trk");
+      card.appendChild(el("h3", null, a.title || ""));
+      if (a.dept) card.appendChild(el("p", "sub", a.dept));
+      if (line.text) card.appendChild(el("div", "alert state" + (line.urgent && p.phase !== "closed" ? " warn" : ""), line.text));
+      var set = function (patch) { st.update(a.id, patch); trkRender(); trkHome(); };
+      var d = el("div", "dates");
+      if (a.kind === "rti") {
+        d.appendChild(trkField(t("trk_sent"), "date", a.sent, function (v) { set({ sent: v }); }));
+        if (a.sent && !a.appeal) d.appendChild(trkField(t("trk_reply"), "date", a.reply, function (v) { set({ reply: v }); }));
+        if (a.sent) d.appendChild(trkField(t("trk_appeal"), "date", a.appeal, function (v) { set({ appeal: v }); }));
+        if (a.appeal) d.appendChild(trkField(t("trk_decision"), "date", a.decision, function (v) { set({ decision: v }); }));
+      } else {
+        d.appendChild(trkField(t("trk_check_on"), "date", a.check, function (v) { set({ check: v }); }));
+      }
+      d.appendChild(trkField(t("trk_ref"), "text", a.ref, function (v) { set({ ref: v }); }, 40));
+      card.appendChild(d);
+      var acts = el("div", "actions");
+      var btn = function (label, cls, fn) { var b = el("button", "btn " + cls, label); b.type = "button"; b.addEventListener("click", fn); acts.appendChild(b); return b; };
+      if (a.kind === "rti" && (p.phase === "first" || p.phase === "reply")) {
+        btn(t("trk_do_appeal"), "", function () {
+          var v = {}; if (a.dept) v.department = a.dept; if (a.sent) v.rti_date = a.sent;
+          pendingSuggest = { form: "rti_first_appeal", values: v }; start("rti_first_appeal");
+        });
+      }
+      if (p.date && !p.late) {
+        btn(t("trk_cal"), "ghost", function () {
+          var text = TR.ics(a, p, trkLine(a, p).text); if (!text) return;
+          var url = URL.createObjectURL(new Blob([text], { type: "text/calendar" })), link = document.createElement("a");
+          link.href = url; link.download = "dwaniforms-reminder.ics"; document.body.appendChild(link); link.click();
+          setTimeout(function () { document.body.removeChild(link); URL.revokeObjectURL(url); }, 1000);
+        });
+      }
+      btn(a.closed ? t("trk_reopen") : t("trk_done"), "ghost", function () { set({ closed: !a.closed }); });
+      var armed = false;
+      var rm = btn(t("trk_remove"), "ghost", function () {
+        if (!armed) { armed = true; rm.textContent = t("trk_sure"); return; }
+        st.remove(a.id); trkRender(); trkHome();
+      });
+      card.appendChild(acts); box.appendChild(card);
+    });
+  }
 
   // ---------- installing on the phone, and coming back ----------
   if ("serviceWorker" in navigator && location.protocol === "https:") {
