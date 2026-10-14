@@ -194,7 +194,24 @@
   "ex_wrong": "ਜੇ ਇਸ ਵਿੱਚ ਕੁਝ ਗਲਤ ਹੈ",
   "g_explain": "ਕਾਗਜ਼ ਸਮਝੋ",
   "k_explain": "ਕਾਗਜ਼ ਦਾ ਮਤਲਬ",
-  "next_explain": "ਕਾਗਜ਼ ਸੰਭਾਲ ਕੇ ਰੱਖੋ। ਜੇ ਕਿਸੇ ਦਫ਼ਤਰ ਨੇ ਤੁਹਾਡੇ ਨਾਲ ਗਲਤ ਕੀਤਾ ਹੈ, ਤਾਂ ਹੋਮ ਪੇਜ ਤੋਂ ਸ਼ਿਕਾਇਤ ਲਿਖ ਸਕਦੇ ਹੋ।"
+  "next_explain": "ਕਾਗਜ਼ ਸੰਭਾਲ ਕੇ ਰੱਖੋ। ਜੇ ਕਿਸੇ ਦਫ਼ਤਰ ਨੇ ਤੁਹਾਡੇ ਨਾਲ ਗਲਤ ਕੀਤਾ ਹੈ, ਤਾਂ ਹੋਮ ਪੇਜ ਤੋਂ ਸ਼ਿਕਾਇਤ ਲਿਖ ਸਕਦੇ ਹੋ।",
+  "ocr_btn": "ਫ਼ੋਟੋ ਤੋਂ ਪੜ੍ਹੋ",
+  "ocr_private": "ਫ਼ੋਟੋ ਸਿਰਫ਼ ਇਸੇ ਫ਼ੋਨ 'ਤੇ ਪੜ੍ਹੀ ਜਾਂਦੀ ਹੈ। ਕਿਤੇ ਭੇਜੀ ਜਾਂ ਰੱਖੀ ਨਹੀਂ ਜਾਂਦੀ।",
+  "ocr_loading": "ਫ਼ੋਟੋ ਪੜ੍ਹਨ ਦੀ ਤਿਆਰੀ (ਲਗਭਗ 7 MB, ਸਿਰਫ਼ ਪਹਿਲੀ ਵਾਰ)…",
+  "ocr_reading": "ਫ਼ੋਟੋ ਪੜ੍ਹ ਰਹੇ ਹਾਂ…",
+  "ocr_found": "ਕਾਗਜ਼ 'ਤੇ ਇਹ ਮਿਲਿਆ (ਮੈਂ ਇੱਕ-ਇੱਕ ਕਰਕੇ ਪੁੱਛਾਂਗਾ ਕਿ ਸਹੀ ਹੈ ਜਾਂ ਨਹੀਂ)",
+  "ocr_paper": "ਕਾਗਜ਼",
+  "ocr_none": "ਫ਼ੋਟੋ ਤੋਂ ਕੁਝ ਪੱਕਾ ਨਹੀਂ ਪੜ੍ਹਿਆ ਜਾ ਸਕਿਆ। ਕਿਰਪਾ ਕਰਕੇ ਬੋਲ ਕੇ ਜਾਂ ਲਿਖ ਕੇ ਦੱਸੋ।",
+  "ocr_failed": "ਫ਼ੋਟੋ ਪੜ੍ਹੀ ਨਹੀਂ ਜਾ ਸਕੀ। ਕਿਰਪਾ ਕਰਕੇ ਬੋਲ ਕੇ ਜਾਂ ਲਿਖ ਕੇ ਦੱਸੋ।",
+  "ai_title": "ਇਸ ਕਾਗਜ਼ ਬਾਰੇ ਇੱਕ ਸਵਾਲ",
+  "ai_ph": "ਆਪਣਾ ਸਵਾਲ ਲਿਖੋ (ਨਾਮ ਜਾਂ ਨੰਬਰ ਨਹੀਂ)",
+  "ai_ask": "AI ਨੂੰ ਪੁੱਛੋ",
+  "ai_consent": "ਜਵਾਬ ਲਈ ਤੁਹਾਡਾ ਸਵਾਲ ਇੱਕ AI ਸੇਵਾ ਨੂੰ ਭੇਜਿਆ ਜਾਵੇਗਾ। ਸਿਰਫ਼ ਸਵਾਲ ਅਤੇ ਕਾਗਜ਼ ਦੀ ਕਿਸਮ ਜਾਂਦੀ ਹੈ; ਫ਼ੋਟੋ, ਤੁਹਾਡਾ ਨਾਮ ਜਾਂ ਕੋਈ ਨੰਬਰ ਨਹੀਂ ਜਾਂਦਾ। ਤੁਹਾਡੇ ਲਿਖੇ ਨੰਬਰ ਮਿਟਾ ਦਿੱਤੇ ਜਾਂਦੇ ਹਨ। AI ਗ਼ਲਤ ਵੀ ਹੋ ਸਕਦਾ ਹੈ।",
+  "ai_send": "ਹਾਂ, ਭੇਜੋ",
+  "ai_cancel": "ਨਹੀਂ, ਨਾ ਭੇਜੋ",
+  "ai_wait": "ਜਵਾਬ ਲਿਆਂਦਾ ਜਾ ਰਿਹਾ ਹੈ…",
+  "ai_warn": "ਇਹ AI ਦਾ ਜਵਾਬ ਹੈ। ਇਹ ਗ਼ਲਤ ਹੋ ਸਕਦਾ ਹੈ ਅਤੇ ਕਾਨੂੰਨੀ ਸਲਾਹ ਨਹੀਂ ਹੈ। ਧੋਖੇ ਲਈ 1930 'ਤੇ ਅਤੇ ਮੁਫ਼ਤ ਕਾਨੂੰਨੀ ਮਦਦ ਲਈ 15100 'ਤੇ ਫ਼ੋਨ ਕਰੋ।",
+  "ai_fail": "ਹੁਣ ਜਵਾਬ ਨਹੀਂ ਮਿਲ ਸਕਿਆ। ਕਿਰਪਾ ਕਰਕੇ ਬਾਅਦ ਵਿੱਚ ਕੋਸ਼ਿਸ਼ ਕਰੋ ਜਾਂ ਦਫ਼ਤਰ ਵਿੱਚ ਪੁੱਛੋ।"
  },
  "text": {
   "Bank KYC": "ਬੈਂਕ ਕੇਵਾਈਸੀ",
@@ -489,7 +506,28 @@
   "This is your electricity bill: how much you owe for the power you used, and the last date to pay it.": "ਇਹ ਤੁਹਾਡਾ ਬਿਜਲੀ ਦਾ ਬਿੱਲ ਹੈ: ਤੁਸੀਂ ਜਿੰਨੀ ਬਿਜਲੀ ਵਰਤੀ ਉਸਦੇ ਪੈਸੇ, ਅਤੇ ਭਰਨ ਦੀ ਆਖ਼ਰੀ ਤਾਰੀਖ।",
   "This is your water bill from the water board or the municipality: the amount you owe and the last date to pay.": "ਇਹ ਜਲ ਬੋਰਡ ਜਾਂ ਨਗਰ ਨਿਗਮ ਦਾ ਪਾਣੀ ਦਾ ਬਿੱਲ ਹੈ: ਕਿੰਨੇ ਪੈਸੇ ਦੇਣੇ ਹਨ ਅਤੇ ਭਰਨ ਦੀ ਆਖ਼ਰੀ ਤਾਰੀਖ।",
   "Understand a paper (bill, notice, summons)": "ਕਾਗਜ਼ ਸਮਝੋ (ਬਿੱਲ, ਨੋਟਿਸ, ਸੰਮਨ)",
-  "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.": "ਇਹ ਕਿਹੜਾ ਕਾਗਜ਼ ਹੈ? ਜਿਵੇਂ: ਬਿਜਲੀ ਦਾ ਬਿੱਲ, ਪਾਣੀ ਦਾ ਬਿੱਲ, ਪ੍ਰਾਪਰਟੀ ਟੈਕਸ, ਬੈਂਕ ਕਰਜ਼ਾ, ਬੈਂਕ ਕੇਵਾਈਸੀ ਮੈਸੇਜ, ਅਦਾਲਤ ਦਾ ਸੰਮਨ, ਆਮਦਨ ਕਰ ਦਾ ਨੋਟਿਸ, ਟ੍ਰੈਫ਼ਿਕ ਚਲਾਨ, ਜਾਂ ਕੁਝ ਹੋਰ।"
+  "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.": "ਇਹ ਕਿਹੜਾ ਕਾਗਜ਼ ਹੈ? ਜਿਵੇਂ: ਬਿਜਲੀ ਦਾ ਬਿੱਲ, ਪਾਣੀ ਦਾ ਬਿੱਲ, ਪ੍ਰਾਪਰਟੀ ਟੈਕਸ, ਬੈਂਕ ਕਰਜ਼ਾ, ਬੈਂਕ ਕੇਵਾਈਸੀ ਮੈਸੇਜ, ਅਦਾਲਤ ਦਾ ਸੰਮਨ, ਆਮਦਨ ਕਰ ਦਾ ਨੋਟਿਸ, ਟ੍ਰੈਫ਼ਿਕ ਚਲਾਨ, ਜਾਂ ਕੁਝ ਹੋਰ।",
+  "Ayushman card details (PM-JAY)": "ਆਯੁਸ਼ਮਾਨ ਕਾਰਡ ਦੀ ਜਾਣਕਾਰੀ (ਪੀਐਮ-ਜੇਏਵਾਈ)",
+  "Class / course": "ਜਮਾਤ / ਕੋਰਸ",
+  "Disability (%)": "ਅਪੰਗਤਾ (%)",
+  "Family members": "ਪਰਿਵਾਰ ਦੇ ਮੈਂਬਰ",
+  "Have you already checked that your family is on the Ayushman list? You can say skip.": "ਕੀ ਤੁਸੀਂ ਪਹਿਲਾਂ ਹੀ ਦੇਖ ਲਿਆ ਹੈ ਕਿ ਤੁਹਾਡਾ ਪਰਿਵਾਰ ਆਯੁਸ਼ਮਾਨ ਸੂਚੀ ਵਿੱਚ ਹੈ? ਤੁਸੀਂ ਛੱਡ ਵੀ ਸਕਦੇ ਹੋ।",
+  "How many people are in your family?": "ਤੁਹਾਡੇ ਪਰਿਵਾਰ ਵਿੱਚ ਕੁੱਲ ਕਿੰਨੇ ਲੋਕ ਹਨ?",
+  "Last exam (%)": "ਆਖ਼ਰੀ ਪ੍ਰੀਖਿਆ (%)",
+  "Level of study": "ਪੜ੍ਹਾਈ ਦਾ ਪੱਧਰ",
+  "On Ayushman list": "ਆਯੁਸ਼ਮਾਨ ਸੂਚੀ ਵਿੱਚ ਨਾਮ",
+  "Parent / guardian name": "ਮਾਪੇ / ਸਰਪ੍ਰਸਤ ਦਾ ਨਾਮ",
+  "Pension application (old age, widow, disability)": "ਪੈਨਸ਼ਨ ਲਈ ਅਰਜ਼ੀ (ਬੁਢਾਪਾ, ਵਿਧਵਾ, ਅਪੰਗਤਾ)",
+  "Pension type": "ਪੈਨਸ਼ਨ ਦੀ ਕਿਸਮ",
+  "Scholarship application (student)": "ਵਜ਼ੀਫ਼ੇ ਲਈ ਅਰਜ਼ੀ (ਵਿਦਿਆਰਥੀ)",
+  "School / college": "ਸਕੂਲ / ਕਾਲਜ",
+  "What are you studying: school up to class 10, class 11 or 12, diploma or ITI, a college degree, or post-graduation or higher?": "ਤੁਸੀਂ ਕੀ ਪੜ੍ਹ ਰਹੇ ਹੋ: ਦਸਵੀਂ ਤੱਕ ਦਾ ਸਕੂਲ, ਗਿਆਰਵੀਂ ਜਾਂ ਬਾਰ੍ਹਵੀਂ, ਡਿਪਲੋਮਾ ਜਾਂ ਆਈਟੀਆਈ, ਕਾਲਜ ਦੀ ਡਿਗਰੀ, ਜਾਂ ਪੋਸਟ-ਗ੍ਰੈਜੂਏਸ਼ਨ ਜਾਂ ਉਸ ਤੋਂ ਉੱਪਰ?",
+  "What is the name of your school or college?": "ਤੁਹਾਡੇ ਸਕੂਲ ਜਾਂ ਕਾਲਜ ਦਾ ਨਾਮ ਕੀ ਹੈ?",
+  "What is the percentage of disability written on your disability certificate?": "ਤੁਹਾਡੇ ਅਪੰਗਤਾ ਸਰਟੀਫਿਕੇਟ 'ਤੇ ਕਿੰਨੇ ਪ੍ਰਤੀਸ਼ਤ ਅਪੰਗਤਾ ਲਿਖੀ ਹੈ?",
+  "What is your parent's or guardian's name?": "ਤੁਹਾਡੇ ਮਾਪਿਆਂ ਜਾਂ ਸਰਪ੍ਰਸਤ ਦਾ ਨਾਮ ਕੀ ਹੈ?",
+  "What percentage did you get in your last exam? For example: 72.5.": "ਤੁਹਾਡੀ ਆਖ਼ਰੀ ਪ੍ਰੀਖਿਆ ਵਿੱਚ ਕਿੰਨੇ ਪ੍ਰਤੀਸ਼ਤ ਅੰਕ ਆਏ? ਜਿਵੇਂ: 72.5।",
+  "Which class or course are you in? For example: class 9, B.A. second year.": "ਤੁਸੀਂ ਕਿਸ ਜਮਾਤ ਜਾਂ ਕੋਰਸ ਵਿੱਚ ਹੋ? ਜਿਵੇਂ: ਨੌਵੀਂ ਜਮਾਤ, ਬੀ.ਏ. ਦੂਜਾ ਸਾਲ।",
+  "Which pension are you applying for: old age, widow, or disability?": "ਤੁਸੀਂ ਕਿਹੜੀ ਪੈਨਸ਼ਨ ਲਈ ਅਰਜ਼ੀ ਦੇ ਰਹੇ ਹੋ: ਬੁਢਾਪਾ, ਵਿਧਵਾ ਜਾਂ ਅਪੰਗਤਾ?"
  },
  "options": {
   "Male": [
@@ -823,6 +861,49 @@
    "ਪਾਣੀ ਦਾ ਬਿੱਲ",
    "ਪਾਣੀ",
    "ਪਾਣੀ ਬਿੱਲ"
+  ],
+  "Class 11-12": [
+   "ਗਿਆਰਵੀਂ-ਬਾਰ੍ਹਵੀਂ",
+   "ਗਿਆਰਵੀਂ",
+   "ਬਾਰ੍ਹਵੀਂ",
+   "ਪਲੱਸ ਟੂ"
+  ],
+  "Degree (graduation)": [
+   "ਡਿਗਰੀ",
+   "ਗ੍ਰੈਜੂਏਸ਼ਨ",
+   "ਕਾਲਜ",
+   "ਬੀਏ",
+   "ਬੀਐਸਸੀ"
+  ],
+  "Diploma / ITI": [
+   "ਡਿਪਲੋਮਾ",
+   "ਆਈਟੀਆਈ",
+   "ਪੌਲੀਟੈਕਨਿਕ"
+  ],
+  "Disability pension": [
+   "ਅਪੰਗਤਾ",
+   "ਅਪਾਹਜ",
+   "ਦਿਵਿਆਂਗ"
+  ],
+  "Old age pension": [
+   "ਬੁਢਾਪਾ",
+   "ਬਜ਼ੁਰਗ",
+   "ਬੁੱਢੇ"
+  ],
+  "Post-graduation or higher": [
+   "ਪੋਸਟ-ਗ੍ਰੈਜੂਏਸ਼ਨ",
+   "ਪੋਸਟ ਗ੍ਰੈਜੂਏਸ਼ਨ",
+   "ਐਮਏ",
+   "ਮਾਸਟਰਜ਼",
+   "ਪੀਐਚਡੀ"
+  ],
+  "School (up to class 10)": [
+   "ਸਕੂਲ",
+   "ਦਸਵੀਂ",
+   "ਨੌਵੀਂ"
+  ],
+  "Widow pension": [
+   "ਵਿਧਵਾ"
   ]
  },
  "words": {
