@@ -24,6 +24,8 @@ ok(/30 days/.test(pEn) && /30 दिन/.test(pHi), "privacy: says how soon they
 // --- what the browser keeps, now that the app can be installed on a phone
 ok(/not among them/i.test(pEn) && /जवाब इनमें नहीं होते/.test(pHi), "privacy: says answers are NOT stored on the phone");
 ok(/never uploaded/i.test(pEn) && /न अपलोड करते हैं/.test(pHi), "privacy: says a photographed paper is read on the phone and never uploaded");
+ok(/Aadhaar card, ration card or khasra copy/i.test(pEn) && /on your phone only/i.test(pEn) && /only its last four digits/i.test(pEn) && /आधार कार्ड, राशन कार्ड या खसरे/.test(pHi) && /आख़िरी चार अंक/.test(pHi),
+   "privacy: a photo of an Aadhaar / ration / khasra paper is read on the phone; only the values found are sent, confirmed one by one, Aadhaar shown masked");
 ok(/do not ask for camera permission/i.test(pEn) && /कैमरे की अनुमति नहीं माँगते/.test(pHi), "privacy: no camera permission is asked");
 ok(/off unless you see an "Ask the AI" box/i.test(pEn) && /तभी चालू है जब/.test(pHi), "privacy: the AI question is off unless the box is shown");
 ok(/Every question asks again/i.test(pEn) && /हर सवाल पर दोबारा पूछा जाता है/.test(pHi), "privacy: consent is asked for every question");
