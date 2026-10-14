@@ -356,17 +356,18 @@
 
   /* ---- DwaniForms promotion (a separate product, so its own green palette) ---- */
   .promo-forms { padding: 0.5rem 0 3rem; }
-  .promo-card { display: grid; grid-template-columns: 1.6fr 1fr; gap: 1.5rem; align-items: center; background: #0b5d4b; color: #fff; border-bottom: 5px solid #e8a317;
-                border-radius: 26px; padding: 2rem 2.2rem; }
-  .promo-tag { display: inline-block; background: #e8a317; color: #1f2a26; font-weight: 800; font-size: 0.8rem; border-radius: 999px; padding: 0.2rem 0.75rem; }
+  .promo-card { display: grid; grid-template-columns: 1.6fr 1fr; gap: 1.5rem; align-items: center; background: linear-gradient(135deg, #1F5E4D 0%, #1E3F55 100%); color: #fff;
+                border-radius: 14px; padding: 2rem 2.2rem; }
+  .promo-tag { display: inline-block; background: #F0B968; color: #1E2A44; font-weight: 800; font-size: 0.8rem; border-radius: 6px; padding: 0.2rem 0.7rem; }
   .promo-card h2 { margin: 0.6rem 0 0.4rem; display: flex; align-items: baseline; gap: 0.4rem; }
   .promo-dwani { font-family: var(--font-display); font-weight: 400; font-size: 2.4rem; }
   .promo-forms-word { font-weight: 800; letter-spacing: 0.16em; color: #e8a317; text-transform: uppercase; font-size: 1.1rem; }
   .promo-card p { color: #dcefe7; margin: 0 0 0.6rem; }
   .promo-card ul { margin: 0 0 1.2rem; padding-left: 1.2rem; color: #dcefe7; }
-  .promo-cta { display: inline-block; background: #e8a317; color: #1f2a26; font-weight: 800; text-decoration: none; padding: 0.75rem 1.2rem; border-radius: 12px; }
-  .promo-visual { display: flex; justify-content: center; gap: 0.8rem; font-size: 2.6rem; }
-  .promo-visual span { background: rgba(255,255,255,0.1); border-radius: 22px; padding: 0.8rem 1rem; }
+  .promo-cta { display: inline-block; background: #fff; color: #1F5E4D; font-weight: 800; text-decoration: none; padding: 0.7rem 1.3rem; border-radius: 8px; }
+  .promo-cta:hover { background: #E3EEE8; }
+  .promo-visual { display: flex; justify-content: center; gap: 0.8rem; color: #F0B968; }
+  .promo-visual span { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; padding: 0.9rem 1rem; display: grid; place-items: center; }
   @media (max-width: 760px) { .promo-card { grid-template-columns: 1fr; padding: 1.5rem; } .promo-visual { display: none; } }
 
   /* ---- DwaniForms logo: identical to the app's header (dwaniforms/static/app.html .brand) ---- */
@@ -616,7 +617,7 @@
       </ul>
       <a class="promo-cta" href="https://dwaniforms.onrender.com" rel="noopener">Visit DwaniForms →</a>
     </div>
-    <div class="promo-visual" aria-hidden="true"><span>🎤</span><span>📝</span><span>✓</span></div>
+    <div class="promo-visual" aria-hidden="true"><span><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span><span><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M9.5 12h5M9.5 16h5"/></svg></span><span><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg></span></div>
   </div>
 </section>
 
