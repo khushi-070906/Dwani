@@ -5,101 +5,90 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DwaniForms: speak, and the form fills itself</title>
 <meta name="description" content="DwaniForms fills government forms, complaints and RTI applications, checks land and ration records, and finds schemes, just by speaking in your own language. Works offline at CSCs, panchayats and hospitals.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%231F5E4D'/><circle cx='32' cy='32' r='24' fill='none' stroke='%23ffffff' stroke-opacity='.5' stroke-dasharray='2 3'/><text x='50%25' y='62%25' font-size='30' text-anchor='middle' fill='white' font-family='serif'>ध</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%231F5E4D'/><circle cx='32' cy='32' r='24' fill='none' stroke='%23fff' stroke-opacity='.5' stroke-dasharray='2 3'/><path fill='%23fff' transform='translate(20.14 42.64) scale(0.038 -0.038)' d='M358 560H644V540H544V0H404V118Q383 81 337 60Q291 39 223 39Q155 39 101 78Q47 117 47 187Q47 240 78 277Q108 314 167 325V329Q119 335 90 364Q60 392 60 432Q60 515 131 540H-20V560H295V540Q241 540 220 512Q200 483 200 436Q200 390 225 362Q250 335 294 335H321V315H295Q244 315 218 282Q192 249 192 198Q192 147 223 117Q254 87 297 87Q340 87 369 108Q398 130 404 169V540H358Z'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;600;800&family=Kalam:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Lato:wght@400;700&family=Noto+Serif+Devanagari:wght@600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Lato:wght@400;700&family=Mukta:wght@400;600;800&family=Noto+Serif+Devanagari:wght@500;600;700&family=Kalam:wght@400;700&display=swap">
+<link rel="stylesheet" href="brand.css">
 <style>
   :root {
     /* PropertySetu family: forest + navy on sage, serif headings */
     --peacock: #1F5E4D; --peacock-2: #2B7562; --peacock-3: #16463A; --leaf: #1F5E4D; --haldi: #D9772B; --haldi-soft: #FBF1DC;
+    --gold: #F0B968; --gold-ink: #8A5B0F; --clay: #A5503A; --slate: #3D6A87; --ochre: #A9741A;
     --sindoor: #D9772B; --sindoor-soft: #FBEBDD; --paper: #FFFFFF; --sand: #EEF0EA; --line: #DCDFD6;
     --ink: #1E2A44; --ink-2: #4A5468; --ink-3: #6B7385; --navy: #1E2A44;
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body { margin: 0; background: var(--sand); color: var(--ink); font: 18px/1.6 "Lato", "Mukta", "Nirmala UI", system-ui, sans-serif; }
-  h1, h2, h3 { font-family: "Source Serif 4", "Noto Serif Devanagari", Georgia, serif; color: var(--navy); }
+  body { margin: 0; background: var(--sand); color: var(--ink); font: 18px/1.6 var(--sans); }
+  h1, h2, h3 { font-family: var(--serif); color: var(--navy); }
   .hero h1, .hero h2, .hero h3 { color: #fff; }
-  .use-now { display: inline-flex; align-items: center; gap: .5rem; background: #fff; color: var(--navy); text-decoration: none; font-weight: 800;
-             padding: .9rem 1.4rem; border-radius: 10px; margin: 0 .6rem .6rem 0; border: 2px solid #fff; }
-  .use-now:hover { background: var(--sand); }
+  .use-now, .cta { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 48px; padding: .65rem 1.4rem; border-radius: 8px;
+             font: 700 1rem var(--sans); text-decoration: none; border: 1px solid transparent; margin: 0 .6rem .6rem 0; transition: background .15s, border-color .15s; }
+  .use-now { background: #fff; color: var(--navy); border-color: #fff; }
+  .use-now:hover { background: var(--forest-soft, #E3EEE8); }
   .use-band { background: var(--navy); color: #fff; border-radius: 14px; padding: 1.8rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.2rem; flex-wrap: wrap; }
   .use-band h2 { color: #fff; margin: 0 0 .3rem; } .use-band p { margin: 0; color: #C9D2E3; }
   a { color: var(--peacock-2); }
-  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 1.3rem; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
   [data-lang="hi"] .en, [data-lang="en"] .hi { display: none !important; }
-  .hero { background: var(--peacock); color: #fff; position: relative; overflow: hidden; }
-  .hero::after { content: ""; position: absolute; width: 620px; height: 620px; border-radius: 50%; right: -180px; top: -220px;
-    background: radial-gradient(circle, rgba(232,163,23,.28), rgba(192,80,42,.08) 45%, transparent 70%); }
-  nav { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 0; }
-  .logo { display: flex; align-items: baseline; gap: 0.45rem; text-decoration: none; }
-  .logo .dwani { font-family: "Rozha One", Georgia, serif; font-size: 2.2rem; color: #fff; line-height: 1; }
-  .logo .forms { font-weight: 800; letter-spacing: .18em; color: var(--haldi); text-transform: uppercase; font-size: .92rem; }
-  .nav-links { display: flex; gap: 1.3rem; align-items: center; font-weight: 600; }
-  .nav-links a { text-decoration: none; color: #d3e9e0; }
-  .nav-links a:hover { color: #fff; }
-  .lang { border: 0; background: var(--haldi); color: var(--ink); border-radius: 999px; padding: .3rem .9rem; font: 800 .9rem "Mukta", sans-serif; cursor: pointer; }
-  .hero-grid { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: center; padding: 2.5rem 0 4.5rem; }
-  .eyebrow { display: inline-flex; gap: .5rem; align-items: center; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
-    border-radius: 999px; padding: .25rem .8rem; font-size: .9rem; color: #e3f1ea; }
-  .eyebrow b { background: var(--sindoor); color: #fff; border-radius: 999px; padding: 0 .5rem; font-size: .78rem; }
-  .hero h1 { font-size: clamp(2.4rem, 5.4vw, 4rem); line-height: 1.04; margin: 1rem 0; letter-spacing: -.01em; }
-  .hero h1 .hl { color: var(--haldi); position: relative; white-space: nowrap; }
-  .hero h1 .hl::after { content: ""; position: absolute; left: 0; right: 0; bottom: .05em; height: .14em; background: var(--sindoor); border-radius: 4px; transform: rotate(-1deg); }
-  .hero p.sub { color: #d3e9e0; font-size: 1.18rem; margin: 0 0 1.6rem; max-width: 34rem; }
-  .cta { display: inline-flex; align-items: center; gap: .5rem; background: var(--haldi); color: var(--ink); text-decoration: none; font-weight: 800;
-         padding: .9rem 1.4rem; border-radius: 16px; margin: 0 .6rem .6rem 0; box-shadow: 0 8px 0 #a87410; transition: transform .1s, box-shadow .1s; }
-  .cta:active { transform: translateY(4px); box-shadow: 0 4px 0 #a87410; }
-  .cta.ghost { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,.5); box-shadow: none; }
-  .stats { display: flex; gap: 1.6rem; margin-top: 1.4rem; flex-wrap: wrap; }
+  .hero { background: var(--peacock); color: #fff; position: relative; overflow: hidden; padding: 0; }
+  .hero-grid { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: center; padding: 3rem 0 4rem; }
+  .eyebrow { display: inline-flex; gap: .5rem; align-items: center; color: #BFE3D3; font: 700 .78rem var(--sans); letter-spacing: .14em; text-transform: uppercase; }
+  .eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; }
+  .hero h1 { font-size: clamp(2.1rem, 4.4vw, 3.2rem); line-height: 1.12; font-weight: 600; margin: 1rem 0; letter-spacing: -.01em; }
+  .hero h1 .hl { color: #BFE3D3; white-space: nowrap; }
+  .hero p.sub { color: #d3e9e0; font-size: 1.1rem; margin: 0 0 1.8rem; max-width: 34rem; }
+  .cta { background: transparent; color: #fff; border-color: rgba(255,255,255,.55); }
+  .cta:hover { background: rgba(255,255,255,.1); border-color: #fff; }
+  .cta.ghost { border-color: transparent; padding-left: .2rem; padding-right: .2rem; text-decoration: underline; text-underline-offset: 5px; text-decoration-color: rgba(255,255,255,.5); }
+  .cta.ghost:hover { background: transparent; text-decoration-color: #fff; }
+  .stats { display: flex; gap: 2.2rem; margin-top: 2.2rem; padding-top: 1.2rem; border-top: 1px solid rgba(255,255,255,.2); flex-wrap: wrap; }
   .stats div { font-size: .9rem; color: #c0ddd1; }
-  .stats b { display: block; font-size: 1.6rem; color: #fff; line-height: 1.1; }
-  .device { background: var(--paper); color: var(--ink); border-radius: 30px; border: 8px solid #06382c;
-            box-shadow: 0 40px 80px -30px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.1); transform: rotate(1.5deg); overflow: hidden; }
+  .stats b { display: block; font: 600 1.5rem/1.1 var(--serif); color: #fff; }
+  .device { background: var(--paper); color: var(--ink); border-radius: 18px; border: 1px solid rgba(255,255,255,.25);
+            box-shadow: 0 30px 60px -30px rgba(0,0,0,.55); overflow: hidden; }
   .device-bar { background: var(--peacock-3); display: flex; justify-content: space-between; align-items: center; padding: .55rem 1rem; }
-  .device-bar .logo .dwani { font-size: 1.35rem; } .device-bar .logo .forms { font-size: .7rem; }
   .device-bar small { color: #9cc8b8; font-size: .78rem; }
   .device .mini { padding: 1rem; display: grid; gap: .55rem; }
-  .bubble { border-radius: 18px; padding: .65rem .9rem; max-width: 88%; font-size: .98rem; line-height: 1.45; }
-  .bubble.bot { background: #e3f0ea; border-bottom-left-radius: 6px; }
-  .bubble.me { background: var(--haldi-soft); justify-self: end; align-self: flex-end; border-bottom-right-radius: 6px; }
-  .bubble.sys { background: var(--sindoor-soft); justify-self: center; align-self: center; font-size: .82rem; color: #8a2d12; font-weight: 600; }
+  .bubble { border-radius: 12px; padding: .65rem .9rem; max-width: 88%; font-size: .98rem; line-height: 1.45; }
+  .bubble.bot { background: #E3EEE8; border-bottom-left-radius: 4px; }
+  .bubble.me { background: #F1F2EE; border: 1px solid var(--line); justify-self: end; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .bubble.sys { background: #E3EEE8; justify-self: center; align-self: center; font-size: .82rem; color: var(--peacock); font-weight: 700; }
   .device .microw { display: flex; justify-content: center; padding: .4rem 0 1rem; }
   section { padding: 4.5rem 0; }
   h2 { font-size: clamp(1.8rem, 3.8vw, 2.6rem); line-height: 1.15; margin: 0 0 .6rem; }
   .lead { color: var(--ink-2); max-width: 760px; margin: 0 0 2rem; font-size: 1.1rem; }
-  .kicker { color: var(--sindoor); font-weight: 800; letter-spacing: .14em; text-transform: uppercase; font-size: .82rem; }
-  #stories { background: var(--paper); border-top: 6px solid var(--haldi); }
+  .kicker { color: var(--peacock); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: .8rem; }
+  #stories { background: var(--paper); border-top: 1px solid var(--line); }
   .people { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9rem; margin: 1.5rem 0 1.4rem; }
-  .person { display: flex; gap: .8rem; align-items: center; text-align: left; background: #fff; border: 2px solid var(--line); border-radius: 20px;
-            padding: .8rem 1rem; cursor: pointer; font: inherit; color: inherit; transition: border-color .15s, transform .15s; }
-  .person:hover { transform: translateY(-2px); }
-  .person[aria-pressed="true"] { border-color: var(--peacock); background: #e9f3ee; }
-  .avatar { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; font-size: 1.6rem; flex: none; }
+  .person { display: flex; gap: .8rem; align-items: center; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 12px;
+            padding: .8rem 1rem; cursor: pointer; font: inherit; color: inherit; transition: border-color .15s, background .15s; }
+  .person:hover { border-color: var(--peacock-2); }
+  .person[aria-pressed="true"] { border-color: var(--peacock); box-shadow: inset 0 0 0 1px var(--peacock); background: #F4F8F6; }
+  .person .avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font: 600 1.25rem/1 var(--serif); background: #E3EEE8; color: var(--peacock); flex: none; }
+  .person .avatar span { display: inline; font: inherit; color: inherit; line-height: 1; }
   .person b { display: block; font-size: 1.05rem; } .person span { color: var(--ink-2); font-size: .88rem; line-height: 1.3; display: block; }
   .stage { display: grid; grid-template-columns: 1.05fr .95fr; gap: 1.4rem; align-items: start; }
-  .kiosk { background: #fff; border-radius: 28px; border: 2px solid var(--line); overflow: hidden; box-shadow: 0 30px 60px -40px rgba(11,93,75,.6); }
+  .kiosk { background: #fff; border-radius: 14px; border: 1px solid var(--line); overflow: hidden; box-shadow: 0 30px 60px -40px rgba(11,93,75,.6); }
   .kiosk-top { background: var(--peacock); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: .6rem 1rem; }
-  .kiosk-top .logo .dwani { font-size: 1.4rem; } .kiosk-top .logo .forms { font-size: .7rem; }
   .scene { color: #cfe5dc; font-size: .82rem; }
-  .progress { height: 8px; background: #e6efe9; } .progress i { display: block; height: 100%; width: 0; background: var(--haldi); transition: width .5s; }
+  .progress { height: 8px; background: #e6efe9; } .progress i { display: block; height: 100%; width: 0; background: var(--peacock); transition: width .5s; }
   .chat { height: 420px; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: .55rem; scroll-behavior: smooth; }
   .chat .bubble { animation: pop .35s ease-out both; }
   .chat .bubble .tr { display: block; font-size: .8rem; color: var(--ink-3); margin-top: .15rem; }
-  .chat .bubble.me::before { content: "🗣 "; }
   @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.97); } to { opacity: 1; transform: none; } }
   .typing { display: inline-flex; gap: 4px; } .typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--peacock-2); animation: blink 1s infinite; }
   .typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
   @keyframes blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
-  .kiosk-foot { border-top: 2px dashed var(--line); padding: .9rem 1rem 1.1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-  .mic { width: 74px; height: 74px; border-radius: 50%; border: 0; background: var(--peacock); color: #fff; font-size: 1.9rem; display: grid; place-items: center; flex: none; }
-  .mic.live { background: var(--sindoor); animation: ring 1.1s infinite; }
-  @keyframes ring { 0% { box-shadow: 0 0 0 0 rgba(192,80,42,.45); } 100% { box-shadow: 0 0 0 22px rgba(192,80,42,0); } }
+  .kiosk-foot { border-top: 1px solid var(--line); padding: .9rem 1rem 1.1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .mic { width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--peacock); color: #fff; display: grid; place-items: center; flex: none; }
+  .mic.live { background: var(--peacock); animation: ring 1.4s infinite; }
+  @keyframes ring { 0% { box-shadow: 0 0 0 0 rgba(31,94,77,.35); } 100% { box-shadow: 0 0 0 16px rgba(31,94,77,0); } }
   .wave { display: flex; align-items: center; gap: 3px; height: 34px; flex: 1; }
   .wave i { flex: 1; max-width: 6px; height: 6px; border-radius: 4px; background: var(--line); transition: height .12s; }
-  .wave.live i { background: var(--sindoor); }
+  .wave.live i { background: var(--peacock-2); }
   .controls { display: flex; gap: .5rem; }
-  .ctl { border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: .45rem .8rem; font: 700 .9rem "Mukta", sans-serif; cursor: pointer; color: var(--peacock); }
+  .ctl { border: 1px solid var(--line-2, #C9CEC2); background: #fff; border-radius: 8px; padding: .45rem .8rem; font: 700 .9rem "Mukta", sans-serif; cursor: pointer; color: var(--peacock); }
   .ctl.primary { background: var(--peacock); border-color: var(--peacock); color: #fff; }
   .paper { background: #fffdf7; border-radius: 6px; padding: 1.6rem 1.6rem 1.8rem; position: relative; min-height: 560px;
            box-shadow: 0 1px 0 #e9dfc8, 0 2px 0 #fff, 0 3px 0 #e9dfc8, 0 24px 50px -30px rgba(30,36,51,.45);
@@ -124,79 +113,57 @@
   .chip-row { display: flex; gap: .4rem; flex-wrap: wrap; padding-left: 1.2rem; margin: .4rem 0; }
   .chip { background: var(--peacock); color: #fff; border-radius: 999px; padding: .15rem .7rem; font-size: .82rem; font-weight: 700; animation: pop .4s both; }
   .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-  .feat { border-radius: 24px; padding: 1.4rem; color: #fff; min-height: 220px; display: flex; flex-direction: column; gap: .4rem; }
-  .feat .ico { font-size: 2.2rem; } .feat h3 { margin: .2rem 0; font-size: 1.2rem; } .feat p { margin: 0; font-size: .96rem; opacity: .92; }
-  .f1 { background: var(--peacock); } .f2 { background: var(--sindoor); } .f3 { background: #3d6a87; } .f4 { background: var(--leaf); }
+  .feat { background: #fff; color: var(--ink); border: 1px solid var(--line); border-top: 3px solid var(--peacock); border-radius: 12px; padding: 1.4rem; min-height: 200px; display: flex; flex-direction: column; gap: .4rem; }
+  .feat h3 { margin: .2rem 0; font-size: 1.2rem; color: var(--navy); } .feat p { margin: 0; font-size: .96rem; color: var(--ink-2); } .feat h3 { margin: .2rem 0; font-size: 1.2rem; } .feat p { margin: 0; font-size: .96rem; opacity: .92; }
   .how { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; counter-reset: s; }
-  .how div { background: #fff; border: 2px solid var(--line); border-radius: 24px; padding: 1.3rem 1.3rem 1.3rem 4.4rem; position: relative; }
-  .how div::before { counter-increment: s; content: counter(s); position: absolute; left: 1.2rem; top: 1.2rem; width: 2.4rem; height: 2.4rem; border-radius: 12px;
-                     background: var(--haldi); display: grid; place-items: center; font-weight: 800; transform: rotate(-6deg); }
-  .trust { background: var(--peacock-3); color: #fff; border-radius: 32px; padding: 2.4rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
-  .trust b { color: var(--haldi); display: block; font-size: 1.15rem; margin-bottom: .2rem; } .trust span { color: #c3ded2; }
+  .how div { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 1.3rem 1.3rem 1.3rem 4.4rem; position: relative; }
+  .how div::before { counter-increment: s; content: counter(s); position: absolute; left: 1.2rem; top: 1.2rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;
+                     background: var(--peacock); color: #fff; display: grid; place-items: center; font-weight: 700; }
+  .trust { background: var(--peacock-3); color: #fff; border-radius: 14px; padding: 2.2rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
+  .trust b { color: #BFE3D3; display: block; font-size: 1.15rem; margin-bottom: .2rem; } .trust span { color: #c3ded2; }
   .pills { display: flex; flex-wrap: wrap; gap: .5rem; }
-  .pill { background: #fff; border: 2px solid var(--line); border-radius: 999px; padding: .4rem 1rem; font-weight: 600; }
-  .pilot { background: var(--haldi); border-radius: 32px; padding: 2.6rem; text-align: center; position: relative; overflow: hidden; }
-  .pilot h2 { margin-top: 0; }
-  .pilot .cta { background: var(--peacock); color: #fff; box-shadow: 0 8px 0 #06382c; }
-  .note { font-size: .86rem; color: #5b4500; margin-top: 1rem; }
+  .pill { background: #fff; border: 1px solid var(--line-2, #C9CEC2); border-radius: 8px; padding: .4rem .85rem; font-weight: 600; font-size: .95rem; }
+  .pilot { background: var(--peacock); color: #fff; border-radius: 14px; padding: 2.6rem; text-align: center; position: relative; overflow: hidden; }
+  .pilot h2 { margin-top: 0; color: #fff; }
+  .pilot .cta { background: #fff; color: var(--peacock); border-color: #fff; margin-right: 0; }
+  .pilot .cta:hover { background: #E3EEE8; }
+  .note { font-size: .86rem; color: #BFE3D3; margin-top: 1rem; }
   .disclaimer { flex-basis: 100%; margin: .4rem 0 0; font-size: .8rem; color: var(--ink-3); border-top: 1px solid var(--line); padding-top: .8rem; }
-  footer { padding: 2rem 0 3rem; color: var(--ink-3); font-size: .92rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  footer { padding: 2rem 0 3rem; color: var(--ink-3); font-size: .92rem; display: flex; justify-content: flex-start; align-items: center; flex-wrap: wrap; gap: .8rem 1.6rem; }
   @media (max-width: 960px) {
     .hero-grid, .stage { grid-template-columns: 1fr; } .grid4 { grid-template-columns: 1fr 1fr; } .how, .trust { grid-template-columns: 1fr; }
-    .people { grid-template-columns: 1fr; } .device { transform: none; } .nav-links a.hide-sm { display: none; } .chat { height: 360px; }
+    .people { grid-template-columns: 1fr; } .device { transform: none; } .df-top .nav-links a.hide-sm { display: none; } .chat { height: 360px; }
   }
-  @media (max-width: 560px) { .grid4 { grid-template-columns: 1fr; } .row { grid-template-columns: 1fr; gap: 0; } }
+  @media (max-width: 560px) { .grid4 { grid-template-columns: 1fr; } .row { grid-template-columns: 1fr; gap: 0; }
+    .hero .use-now, .hero .cta { display: flex; width: 100%; margin-right: 0; }
+    .hero h1 { font-size: 2.05rem; } .stats { gap: 1.2rem 1.6rem; } }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
-  .logo .emb { align-self: center; width: 2.3rem; height: 2.3rem; border-radius: 50%; background: #fff; color: #1F5E4D; display: grid; place-items: center;
-               font-family: "Noto Serif Devanagari", Georgia, serif; font-size: 1.25rem; box-shadow: inset 0 0 0 3px #1F5E4D, inset 0 0 0 4px rgba(255,255,255,.9); margin-right: .2rem;
-               outline: 1.5px dashed rgba(255,255,255,.55); outline-offset: 2px; }
-
-  @media (max-width: 560px) { .nav-links a { display: none; } }
-
-  /* ---- DwaniForms logo: identical to the app's header (dwaniforms/static/app.html .brand) ---- */
-  .df-brand { display: inline-flex; align-items: center; gap: .7rem; text-decoration: none; }
-  .df-seal { width: 40px; height: 40px; border-radius: 50%; background: #1F5E4D; color: #fff; display: grid; place-items: center; position: relative;
-             font: 400 1.25rem/1 "Rozha One", Georgia, serif; flex: none; }
-  .df-seal::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; border: 1px dashed rgba(255,255,255,.55); }
-  .df-word { display: flex; flex-direction: column; line-height: 1.05; text-align: left; }
-  .df-word b { font: 400 1.45rem "Rozha One", Georgia, serif; color: #1F5E4D; }
-  .df-word b span { font: 600 1.3rem "Source Serif 4", "Noto Serif Devanagari", "Mukta", Georgia, serif; color: #1E2A44; margin-left: .1rem; }
-  .df-word small { font: 400 .72rem "Mukta", "Lato", sans-serif; color: #6B7385; }
-  .df-brand.sm { gap: .5rem; } .df-brand.sm .df-seal { width: 28px; height: 28px; font-size: .9rem; } .df-brand.sm .df-seal::after { inset: 3px; }
-  .df-brand.sm .df-word b { font-size: 1.05rem; } .df-brand.sm .df-word b span { font-size: .95rem; } .df-brand.sm .df-word small { display: none; }
-
-  .topbar { background: #fff; border-bottom: 1px solid #DCDFD6; position: relative; z-index: 3; }
-  .topbar nav { padding: .7rem 0; }
-  .topbar .nav-links a { color: #4A5468; } .topbar .nav-links a:hover { color: #1F5E4D; }
-  .topbar .lang { background: #fff; border: 1px solid #C9CEC2; color: #1E2A44; border-radius: 8px; font: 700 .88rem "Lato", "Mukta", sans-serif; padding: .4rem .7rem; }
   .device-bar, .kiosk-top { background: #fff !important; border-bottom: 1px solid #DCDFD6; }
   .device-bar small, .kiosk-top .scene { color: #6B7385 !important; }
 </style>
 </head>
 <body data-lang="en">
 
-<div class="topbar"><div class="wrap">
-    <nav>
-      <a class="df-brand" href="#" aria-label="DwaniForms"><span class="df-seal" aria-hidden="true">ध</span><span class="df-word"><b lang="hi">ध्वनि<span lang="en">Forms</span></b><small><span class="en">Fill forms by speaking</span><span class="hi" lang="hi">बोलकर फ़ॉर्म भरें</span></small></span></a>
-      <div class="nav-links">
+<header class="df-top"><div class="df-wrap">
+  <a class="df-brand" href="#" aria-label="DwaniForms"><span class="df-seal" aria-hidden="true">ध</span><span class="df-word"><b lang="hi">ध्वनि<span lang="en">Forms</span></b><small><span class="en">Fill forms by speaking</span><span class="hi" lang="hi">बोलकर फ़ॉर्म भरें</span></small></span></a>
+  <div class="nav-links">
         <a class="hide-sm" href="#stories"><span class="en">See it in action</span><span class="hi" lang="hi">चलता हुआ देखिए</span></a>
         <a class="hide-sm" href="#what"><span class="en">What it does</span><span class="hi" lang="hi">क्या करता है</span></a>
         <a href="#pilot"><span class="en">Run a pilot</span><span class="hi" lang="hi">पायलट</span></a>
         <button class="lang" id="lang" type="button" aria-label="Switch language">हिन्दी</button>
       </div>
-    </nav>
-</div></div>
-<header class="hero">
+</div></header>
+<section class="hero">
   <div class="wrap">
     <div class="hero-grid">
       <div>
-        <span class="eyebrow"><b>NEW</b><span class="en">From the DwaniLive team</span><span class="hi" lang="hi">DwaniLive टीम की नई पेशकश</span></span>
+        <span class="eyebrow"><span class="en">From the DwaniLive team</span><span class="hi" lang="hi">DwaniLive टीम की नई पेशकश</span></span>
         <h1><span class="en">Speak.<br>The form <span class="hl">fills itself.</span></span><span class="hi" lang="hi">बोलिए।<br>फ़ॉर्म <span class="hl">ख़ुद भरेगा।</span></span></h1>
         <p class="sub"><span class="en">For everyone who has ever stood at a counter, unsure what to write. DwaniForms asks one question at a time in their own language, reads every answer back, and catches mistakes before they reach the office.</span>
           <span class="hi" lang="hi">हर उस इंसान के लिए जो कभी काउंटर पर खड़ा होकर सोचता रहा कि क्या लिखूँ। DwaniForms उनकी अपनी भाषा में एक-एक सवाल पूछता है, हर जवाब पढ़कर सुनाता है, और गलती दफ़्तर पहुँचने से पहले पकड़ लेता है।</span></p>
         <a class="use-now" href="https://dwaniforms-app.onrender.com/form/"><span class="en">Use it now, from home →</span><span class="hi" lang="hi">अभी इस्तेमाल करें, घर से →</span></a>
-        <a class="cta" href="#stories">▶ <span class="en">Watch a real form get filled</span><span class="hi" lang="hi">असली फ़ॉर्म भरता देखिए</span></a>
+        <a class="cta" href="#stories"><span class="en">Watch a real form get filled</span><span class="hi" lang="hi">असली फ़ॉर्म भरता देखिए</span></a>
         <a class="cta ghost" href="#pilot"><span class="en">Run a pilot</span><span class="hi" lang="hi">पायलट चलाइए</span></a>
         <div class="stats">
           <div><b>13</b><span class="en">languages</span><span class="hi" lang="hi">भाषाएँ</span></div>
@@ -208,15 +175,15 @@
         <div class="device-bar"><span class="df-brand sm" aria-label="DwaniForms"><span class="df-seal" aria-hidden="true">ध</span><span class="df-word"><b lang="hi">ध्वनि<span lang="en">Forms</span></b><small><span class="en">Fill forms by speaking</span><span class="hi" lang="hi">बोलकर फ़ॉर्म भरें</span></small></span></span><small>CSC · सीतापुर</small></div>
         <div class="mini">
           <div class="bubble bot" lang="hi">आपके पास कितने एकड़ ज़मीन है?</div>
-          <div class="bubble me" lang="hi">🗣 ढाई एकड़ है जी</div>
+          <div class="bubble me" lang="hi">ढाई एकड़ है जी</div>
           <div class="bubble bot" lang="hi">आपने कहा: 2.5 एकड़। क्या यह सही है?</div>
           <div class="bubble sys">✓ PM-Kisan · 8 / 9</div>
         </div>
-        <div class="microw"><div class="mic live">🎤</div></div>
+        <div class="microw"><div class="mic live"><svg class="mic-ico" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div></div>
       </div>
     </div>
   </div>
-</header>
+</section>
 
 <section id="stories"><div class="wrap">
   <span class="kicker"><span class="en">Real life, three times</span><span class="hi" lang="hi">असली ज़िंदगी, तीन बार</span></span>
@@ -224,13 +191,13 @@
   <p class="lead"><span class="en">Pick someone. On the left is what they hear and say at the kiosk; on the right, the paper the operator prints, filling in as they speak.</span>
     <span class="hi" lang="hi">किसी को चुनिए। बाईं ओर कियोस्क पर जो वे सुनते और बोलते हैं; दाईं ओर वह कागज़ जो ऑपरेटर प्रिंट करेगा, जो उनके बोलते-बोलते भरता है।</span></p>
   <div class="people" role="group" aria-label="Choose a story">
-    <button class="person" type="button" data-story="farmer" aria-pressed="true"><span class="avatar" style="background:#e3f0ea">👨🏽‍🌾</span>
+    <button class="person" type="button" data-story="farmer" aria-pressed="true"><span class="avatar" aria-hidden="true"><span class="en">R</span><span class="hi" lang="hi">र</span></span>
       <span><b><span class="en">Ramesh, 46 · farmer</span><span class="hi" lang="hi">रमेश, 46 · किसान</span></b>
       <span><span class="en">Applies for PM-Kisan at the village CSC</span><span class="hi" lang="hi">गाँव के सीएससी पर पीएम-किसान का आवेदन</span></span></span></button>
-    <button class="person" type="button" data-story="complaint" aria-pressed="false"><span class="avatar" style="background:var(--sindoor-soft)">👩🏽</span>
+    <button class="person" type="button" data-story="complaint" aria-pressed="false"><span class="avatar" aria-hidden="true"><span class="en">S</span><span class="hi" lang="hi">स</span></span>
       <span><b><span class="en">Sunita, 34 · complaint</span><span class="hi" lang="hi">सुनीता, 34 · शिकायत</span></b>
       <span><span class="en">No electricity in her village for two weeks</span><span class="hi" lang="hi">गाँव में दो हफ़्ते से बिजली नहीं</span></span></span></button>
-    <button class="person" type="button" data-story="schemes" aria-pressed="false"><span class="avatar" style="background:var(--haldi-soft)">👵🏽</span>
+    <button class="person" type="button" data-story="schemes" aria-pressed="false"><span class="avatar" aria-hidden="true"><span class="en">K</span><span class="hi" lang="hi">क</span></span>
       <span><b><span class="en">Kamla ji, 62 · schemes</span><span class="hi" lang="hi">कमला जी, 62 · योजनाएँ</span></b>
       <span><span class="en">A widow who doesn't know what she can claim</span><span class="hi" lang="hi">विधवा हैं, नहीं जानतीं क्या-क्या मिल सकता है</span></span></span></button>
   </div>
@@ -240,7 +207,7 @@
       <div class="progress"><i id="prog"></i></div>
       <div class="chat" id="chat" aria-live="polite"></div>
       <div class="kiosk-foot">
-        <div class="mic" id="mic" aria-hidden="true">🎤</div>
+        <div class="mic" id="mic" aria-hidden="true"><svg class="mic-ico" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
         <div class="wave" id="wave" aria-hidden="true"></div>
         <div class="controls">
           <button class="ctl" type="button" id="restart" aria-label="Restart">↺</button>
@@ -267,13 +234,13 @@
   <p class="lead"><span class="en">Built for the counter at a CSC, a panchayat bhawan, a bank mitra or a hospital registration desk.</span>
     <span class="hi" lang="hi">सीएससी, पंचायत भवन, बैंक मित्र या अस्पताल के पंजीकरण काउंटर के लिए।</span></p>
   <div class="grid4">
-    <div class="feat f1"><div class="ico">📝</div><h3><span class="en">Government forms</span><span class="hi" lang="hi">सरकारी फ़ॉर्म</span></h3>
+    <div class="feat"><h3><span class="en">Government forms</span><span class="hi" lang="hi">सरकारी फ़ॉर्म</span></h3>
       <p><span class="en">PM-Kisan, e-Shram, income certificate, bank KYC, hospital registration. Aadhaar, mobile and IFSC checked as they're spoken.</span><span class="hi" lang="hi">पीएम-किसान, ई-श्रम, आय प्रमाण पत्र, बैंक केवाईसी, अस्पताल पंजीकरण। आधार, मोबाइल, आईएफ़एससी बोलते ही जाँचे जाते हैं।</span></p></div>
-    <div class="feat f2"><div class="ico">📢</div><h3><span class="en">Complaints and RTI</span><span class="hi" lang="hi">शिकायत और आरटीआई</span></h3>
+    <div class="feat"><h3><span class="en">Complaints and RTI</span><span class="hi" lang="hi">शिकायत और आरटीआई</span></h3>
       <p><span class="en">Say what happened. Department, place and date are picked out, and a ready-to-sign letter is drafted.</span><span class="hi" lang="hi">बताइए क्या हुआ। विभाग, जगह, तारीख़ अपने आप निकलती है और पत्र तैयार होता है।</span></p></div>
-    <div class="feat f3"><div class="ico">🔍</div><h3><span class="en">Land and ration records</span><span class="hi" lang="hi">ज़मीन और राशन रिकॉर्ड</span></h3>
+    <div class="feat"><h3><span class="en">Land and ration records</span><span class="hi" lang="hi">ज़मीन और राशन रिकॉर्ड</span></h3>
       <p><span class="en">"एक सौ पैंतालीस बटा दो" becomes khasra 145/2, read back from the kiosk's saved copy.</span><span class="hi" lang="hi">"एक सौ पैंतालीस बटा दो" बन जाता है खसरा 145/2, कियोस्क की सहेजी कॉपी से।</span></p></div>
-    <div class="feat f4"><div class="ico">💡</div><h3><span class="en">Which schemes can I get?</span><span class="hi" lang="hi">कौन सी योजना मिलेगी?</span></h3>
+    <div class="feat"><h3><span class="en">Which schemes can I get?</span><span class="hi" lang="hi">कौन सी योजना मिलेगी?</span></h3>
       <p><span class="en">A short chat, then the schemes they likely qualify for and the forms to fill, already partly filled in.</span><span class="hi" lang="hi">छोटी सी बातचीत, फिर योजनाएँ और भरने वाले फ़ॉर्म, कुछ पहले से भरे हुए।</span></p></div>
   </div>
 </div></section>
@@ -320,7 +287,7 @@
 
 <div class="wrap"><footer>
   <span><a class="df-brand sm" href="#" aria-label="DwaniForms"><span class="df-seal" aria-hidden="true">ध</span><span class="df-word"><b lang="hi">ध्वनि<span lang="en">Forms</span></b><small><span class="en">Fill forms by speaking</span><span class="hi" lang="hi">बोलकर फ़ॉर्म भरें</span></small></span></a> · <span class="en">a</span> <a href="https://dhwani-elit.onrender.com">DwaniLive</a> <span class="en">project</span><span class="hi" lang="hi">की पहल</span></span>
-  <span><a href="privacy.html"><span class="en">Privacy</span><span class="hi" lang="hi">निजता</span></a></span> · <span><a href="terms.html"><span class="en">Terms</span><span class="hi" lang="hi">शर्तें</span></a></span>
+  <span><a href="privacy.html"><span class="en">Privacy</span><span class="hi" lang="hi">निजता</span></a></span> <span><a href="terms.html"><span class="en">Terms</span><span class="hi" lang="hi">शर्तें</span></a></span>
   <p class="disclaimer"><span class="en">DwaniForms is an independent project. It is not a government website and is not affiliated with any government
     department. Official applications are decided by the department concerned; always check its official portal.</span>
     <span class="hi" lang="hi">DwaniForms एक स्वतंत्र परियोजना है। यह सरकारी वेबसाइट नहीं है और किसी सरकारी विभाग से जुड़ी नहीं है। आवेदन पर फ़ैसला
