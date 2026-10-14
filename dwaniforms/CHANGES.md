@@ -256,3 +256,18 @@ The app was audited in a real browser at phone width, on the home screen and mid
   to `unparsed` rather than being guessed.
 - All three are on the company API (`/names/match`, `/address/parse`, `/speech/parse`) with their own key scopes
   (`names`, `address`, `speech`).
+
+## Document reader: photo of an Aadhaar card, ration card or khasra copy fills the form
+
+- `static/ocr/dwani-docs.js` (parsing only, no look-behind so older iPhones run it): from the text of a photo it finds the
+  Aadhaar number (accepted only if its Verhoeff check digit is right; a 16-digit virtual ID is ignored), name (the line above
+  the date of birth), date of birth, gender, mobile and PIN code (by their labels), father's name (from S/O), the ration
+  card number and the khasra number. Nothing is guessed: a value with no clear label is not suggested.
+- The page shows "Read from a photo" on every form and on the ration and land look-ups (not only Samjhao), reads with the same
+  on-device engine (English pass first, Hindi + English only when the card was not read fully) and sends only the values
+  found to `/suggest` -- the same endpoint, same checks, same "is this correct?" for each; a "no" asks the question normally.
+- An Aadhaar number is spoken in full for the yes but listed on the screen with its last four digits only.
+- `doc_note` string in all eight packs (draft); privacy page (English and Hindi) says what is read and what is sent.
+- Tests: `tests/js/dwaniforms_docs.test.js` (parsing), `tests/js/dwaniforms_docs_page.test.js` (real page, real server),
+  `tests/test_dwaniforms_docs.py` (server). Checked once in a real Chromium with the real engine on a generated card.
+
