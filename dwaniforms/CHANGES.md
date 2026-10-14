@@ -291,3 +291,30 @@ the same dates. Tests: `tests/js/dwaniforms_tracker.test.js`, `tests/js/dwanifor
 could only send "Other" and the letter read "PIO, Other". The API now accepts the office's own name as free text (3-100 printable
 characters) and prints it as sent; `/services` marks the field `accepts_free_text`. The voice app and every other choice are
 unchanged. Tests: `tests/test_dwaniforms_b2b.py`.
+
+## One logo and one set of fonts on every page
+The logo and the fonts differed between the app, its numbers page and the website (privacy and terms had their own colours, body font and heading font; the favicon was drawn with whatever serif the device had; the logo font was fetched only from Google).
+- One logo (seal with ध + ध्वनिForms) with the same size, colours and fonts on the app, the numbers page, the website home, privacy and terms. The website keeps its copy in `dwaniforms_site/brand.css`; the app and the numbers page keep theirs inline. The app footer now shows the logo too.
+- One font set: Rozha One (logo), Source Serif 4 (headings), Lato then Mukta (text), Noto Serif Devanagari (Hindi headings). Rozha One, Source Serif 4 and Mukta now ship with the website and Rozha One and Source Serif 4 ship with the app, so the logo and the headings look the same when Google Fonts is slow or blocked (all SIL OFL; licence texts sit next to the files). Lato is not shipped: its licence reserves the name, so only the original files may be copied.
+- Fixed: the Google Fonts address asked for Lato weight 800, which Lato does not have; Google refuses the whole request in that case, so no font loaded. Every page now asks for the same list, with valid weights.
+- One favicon on all five pages, drawn from the logo glyph itself (no system font involved). Privacy and terms had none or an older one.
+- Privacy and terms use the same colours, header, heading font and footer as the rest; the top bar is 64 px high and starts at the same left edge on every page; old unused logo rules removed.
+- Numbers page (`/form/metrics/view`) gets the logo and the same fonts (its font files are one level up from its address).
+- The service worker keeps the new font file; `CACHE` is now `dwaniforms-v4`.
+- `tests/test_dwaniforms_brand.py` fails when the logo rules, the font stacks, the Google Fonts list, the favicon or the bundled font files drift apart between pages.
+
+## Website: a calmer home page
+The home page looked childish: chunky buttons with a thick offset shadow, three different button shapes in a row, an orange "NEW" chip, a hand-drawn orange underline, emoji faces and icons, rainbow cards (dark headings on green, orange and blue), a tilted phone, tilted numbered tiles, and big orange boxes.
+- Buttons: one flat style (8 px corners, 48 px high): a white primary, an outlined secondary and a plain link; on a phone they stack at full width.
+- Heading: smaller, one colour with a soft green second line; the eyebrow is a small ruled label instead of a chip.
+- Phone picture straight, not tilted, with calm bubbles; the microphone is a drawn icon, not an emoji; the speakers are initials, not faces.
+- The four service cards are one white style with a green top edge; the numbered steps are green circles; the ready-today list is plain tags; the pilot box is brand green instead of orange; the footer links sit together instead of being spread across the page.
+- Fixed: a leftover half-rule in the home page's style sheet made the phone picture's header dark with dark letters; the test now catches a stray rule like that.
+
+## Website: colour back in, kept calm
+The first calm pass was nearly all one green. Colour is back, in a small muted set so it reads as professional: forest green (main), navy, terracotta, slate blue and ochre, plus a soft gold as the one accent.
+- Hero: forest green sliding into a deep navy-teal; the label, the second heading line and the three numbers in soft gold.
+- The four service cards each get a soft tint, a coloured top edge and a drawn line icon (forms: green, complaints: terracotta, records: slate, schemes: ochre); the three story speakers and the tags carry the same colours as small accents.
+- Numbered steps in green, slate and ochre; the "use it from home" band has a gold hairline; the offline/private/honest band has gold headings; the pilot band runs green to navy.
+- Section labels are dark gold, which stays readable (about 5:1) on the sage page.
+- Still no emoji, no thick shadows and no tilted shapes.
