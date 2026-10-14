@@ -12,6 +12,7 @@ Drafts are only drafts: the citizen (or operator) reads, signs and submits them;
 from __future__ import annotations
 
 import datetime as dt
+from . import clock
 
 DRAFT_FOOTER_EN = "This draft was prepared with DwaniForms from what the applicant said. Please read it before signing."
 DRAFT_FOOTER_HI = "यह मसौदा आवेदक की कही बातों से DwaniForms ने तैयार किया है। हस्ताक्षर से पहले पढ़ लें।"
@@ -76,7 +77,7 @@ def _dept_hi(value: str) -> str:
 
 
 def grievance_draft(session, today: dt.date | None = None, **_) -> dict:
-    today = today or dt.date.today()
+    today = today or clock.today()
     dep, place = _v(session, "department"), _v(session, "location")
     when = _v(session, "incident_date")
     en = [
@@ -122,7 +123,7 @@ def grievance_draft(session, today: dt.date | None = None, **_) -> dict:
 
 
 def rti_draft(session, today: dt.date | None = None, **_) -> dict:
-    today = today or dt.date.today()
+    today = today or clock.today()
     bpl = _v(session, "bpl") == "Yes"
     period = _v(session, "period")
     en = [
@@ -207,7 +208,7 @@ def appeal_timing(rti_date: str, reply_date: str, today: dt.date) -> dict:
 
 
 def rti_appeal_draft(session, today: dt.date | None = None, **_) -> dict:
-    today = today or dt.date.today()
+    today = today or clock.today()
     dep, sent, replied = _v(session, "department"), _v(session, "rti_date"), _v(session, "reply_date")
     got_reply = _v(session, "reply_status").startswith("Reply")
     timing = appeal_timing(sent, replied if got_reply else "", today)
