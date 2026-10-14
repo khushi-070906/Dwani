@@ -354,3 +354,8 @@ The first calm pass was nearly all one green. Colour is back, in a small muted s
 - The question list is cached for five minutes; the replies to `understand` and `advise` are `no-store`.
 - New `YOJANA.md` documents the endpoints, what is stored (nothing) and how to keep a scheme current. A test now fails if a word on the page exists in only one language.
 
+## Two insurance schemes added to the scheme advisor
+- PM Jeevan Jyoti Bima Yojana (₹2 lakh life cover for ₹436 a year, ages 18-50) and PM Suraksha Bima Yojana (₹2 lakh accident cover for ₹20 a year, ages 18-70). Both need a bank account linked to Aadhaar; the rules were checked against the banks' own scheme pages on 14 Oct 2026 (official site: jansuraksha.gov.in), so please confirm the premiums there before a pilot, as they are revised from time to time.
+- They appear in DwaniYojana and in the spoken scheme advisor, with text in all ten languages (the eight language packs are drafts until a native speaker reviews them, like the rest).
+- Tests: the age limits (17 and 51 get nothing, 62 gets accident cover but not life cover), and a check that every scheme has text in every language.
+
