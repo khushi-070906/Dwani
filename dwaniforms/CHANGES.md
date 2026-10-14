@@ -284,3 +284,10 @@ the first appeal" opens that form with the office and the RTI date offered as su
 There is **no connection to any government system**: the page cannot know whether an office replied, so the person enters the
 dates. The date rules live in `static/js/tracker.js` and a test runs them against the server's own `outcomes.appeal_timing` on
 the same dates. Tests: `tests/js/dwaniforms_tracker.test.js`, `tests/js/dwaniforms_tracker_page.test.js`, `tests/test_dwaniforms_tracker.py`.
+
+## Company API: any office name
+
+`department` on `rti_application`, `rti_first_appeal` and `grievance` took only the voice app's twelve offices, so a platform
+could only send "Other" and the letter read "PIO, Other". The API now accepts the office's own name as free text (3-100 printable
+characters) and prints it as sent; `/services` marks the field `accepts_free_text`. The voice app and every other choice are
+unchanged. Tests: `tests/test_dwaniforms_b2b.py`.
