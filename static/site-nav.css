@@ -43,6 +43,7 @@
   transition: transform 0.12s ease;
 }
 .nav-cta:hover { transform: translateY(-1px); color: #fff5e6; }
+.site-header .nav-cta, .site-header .nav-cta:hover { color: #fff5e6; }   /* beats '.site-header a { color: inherit }' */
 .nav-account { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.86rem; color: var(--ink); padding: 0 0.4rem 0 0.2rem; white-space: nowrap; }
 .nav-avatar {
   width: 2.1rem; height: 2.1rem; border-radius: 50%; flex-shrink: 0;
