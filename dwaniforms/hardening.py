@@ -28,10 +28,13 @@ from fastapi.responses import FileResponse, JSONResponse
 LIMITS = {
     "new_session": (30, 600),     # 30 new conversations per 10 minutes per IP (a whole CSC queue fits)
     "api": (300, 60),             # 300 API calls per minute per IP
+    "ai": (10, 3600),             # 10 questions to the AI service per hour per IP (each one costs money)
 }
 
 CSP = ("default-src 'self'; "
-       "script-src 'self' 'unsafe-inline' blob:; "            # the page's own inline script + the mic AudioWorklet
+       # the page's own inline script + the mic AudioWorklet; 'wasm-unsafe-eval' lets the photo reader compile its
+       # WebAssembly (it allows WebAssembly only -- eval() and new Function() stay blocked)
+       "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob:; "
        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
        "font-src 'self' data: https://fonts.gstatic.com; "
        "img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self' blob:; "
@@ -120,7 +123,8 @@ def install(app, service, prefix: str = "/form", version: str = "") -> None:
         path = request.url.path
         if enabled and path.startswith(prefix) and not path.startswith(prefix + "/assets") and path not in (prefix + "/health",):
             ip = client_ip(request)
-            buckets = ["api"] + (["new_session"] if request.method == "POST" and path == prefix + "/sessions" else [])
+            buckets = ["api"] + (["new_session"] if request.method == "POST" and path == prefix + "/sessions" else []) + \
+                      (["ai"] if request.method == "POST" and path.endswith("/ask") else [])
             for b in buckets:
                 ok, retry = limiter.allow(b, ip)
                 if not ok:
