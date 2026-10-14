@@ -200,6 +200,10 @@
   .photo { margin: .9rem 0 .2rem; padding: .7rem .8rem; border: 1px dashed var(--line-2); border-radius: 10px; background: #fff; }
   .photo .btn { width: 100%; }
   .photo p { margin: .45rem 0 0; }
+  .photo-info { margin-top: .5rem; font-size: .82rem; }
+  .photo-info summary { cursor: pointer; color: var(--ink-3); padding: .3rem 0; }
+  .photo-info summary:focus-visible { outline: 3px solid var(--focus, #1F5E4D); outline-offset: 2px; border-radius: 4px; }
+  .main > .trk { margin: 0 0 1.4rem; }
   #photo-status { margin-top: .4rem; font-size: .9rem; color: var(--ink-2); }
   .photo-found { margin-top: .5rem; font-size: .9rem; }
   .photo-found dl { display: grid; grid-template-columns: auto 1fr; gap: .15rem .7rem; margin: .35rem 0 0; }
@@ -239,7 +243,7 @@
   .tabs button { border: 1px solid var(--line-2); background: var(--card); border-radius: 6px; padding: .3rem .8rem; font-weight: 700; font-size: .85rem; color: var(--navy); }
   .tabs button[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
   .letter { white-space: pre-wrap; font: 1rem/1.75 var(--serif); color: var(--navy); background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 1.4rem 1.6rem; }
-  .trk h3 { margin: 0 0 .15rem; font-size: 1.05rem; } .trk .sub { color: var(--ink-3); font-size: .84rem; margin: 0 0 .5rem; overflow-wrap: anywhere; }
+  .trk h3, .trk h2 { margin: 0 0 .15rem; font-size: 1.05rem; } .trk .sub { color: var(--ink-3); font-size: .84rem; margin: 0 0 .5rem; overflow-wrap: anywhere; }
   .trk .state { margin: .4rem 0 .7rem; } .trk .when { font-weight: 700; }
   .trk .dates { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .6rem 1rem; margin: .4rem 0 .8rem; }
   .trk label { display: block; font-size: .8rem; color: var(--ink-3); }
