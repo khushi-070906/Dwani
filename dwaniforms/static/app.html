@@ -875,7 +875,7 @@
       var opts = f.options || [{ value: "Yes", label: t("yes_word") }, { value: "No", label: t("no_word") }];
       return "<span class='checks'>" + opts.map(function (o) {
         var on = o.value === value;
-        return "<span class='ck" + (on ? " on" : "") + "'><i>" + (on ? "✓" : "") + "</i>" + esc(o.label) + "</span>";
+        return "<span class='ck" + (on ? " on" : "") + "'><i>" + (on ? icon("check") : "") + "</i>" + esc(o.label) + "</span>";
       }).join("") + "</span>";
     }
     var shown = native && native !== value ? native : value;
@@ -896,8 +896,8 @@
       li.innerHTML = "<div class='lbl'><b>" + esc(local || f.label) + (f.required === false ? "" : " <span class='req'>*</span>") + "</b>" +
         (local ? "<small>" + esc(f.label) + "</small>" : "") + "</div>" +
         "<div class='val'>" + paperValue(f, pending ? r.pending : f.value, pending ? "" : f.native) +
-        (pending ? "<div class='note-pen'>✎ " + esc(t("pencil")) + "</div>" : "") +
-        (f.value && !pending ? (f.needs_review ? "<div class='note-review'>• " + esc(t("review")) + "</div>" : "<div class='note-ok'>✓ " + esc(t("inked")) + "</div>") : "") +
+        (pending ? "<div class='note-pen'>" + icon("pencil") + " " + esc(t("pencil")) + "</div>" : "") +
+        (f.value && !pending ? (f.needs_review ? "<div class='note-review'>• " + esc(t("review")) + "</div>" : "<div class='note-ok'>" + icon("check") + " " + esc(t("inked")) + "</div>") : "") +
         "</div><button type='button' class='redo'></button>";
       var b = li.querySelector(".redo"); b.textContent = t("redo");
       b.addEventListener("click", function () { api("/sessions/" + sid + "/redo", { method: "POST", json: { field_id: f.id } }).then(render); });
