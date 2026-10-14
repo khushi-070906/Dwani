@@ -1186,7 +1186,8 @@
     function hhmm(t) { var d = new Date(t); return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
     var head = "DwaniLive captions\nSession " + sessionId.toUpperCase() + " · " + displayNameFor(currentLang) +
                " · " + new Date(captionLog[0].t).toLocaleDateString() + "\n\n";
-    var body = captionLog.map(function (h) { return "[" + hhmm(h.t) + "] " + h.text; }).join("\n") + "\n";
+    var body = captionLog.map(function (h) { return "[" + hhmm(h.t) + "] " + h.text; }).join("\n") + "\n" +
+               "\n-- Captions by DwaniLive: live translation for conferences, classes and meetings. https://dhwani-elit.onrender.com\n";
     var url = URL.createObjectURL(new Blob([head + body], { type: "text/plain;charset=utf-8" }));
     var a = document.createElement("a");
     a.href = url;
