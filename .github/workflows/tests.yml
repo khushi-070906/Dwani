@@ -81,6 +81,9 @@ jobs:
       - name: DwaniYojana (which schemes might I get? - tap through, answer screen, nothing stored)
         working-directory: tests/js
         run: DWANIFORMS_URL=http://127.0.0.1:8130 node dwaniforms_yojana.test.js
+      - name: DwaniYojana by voice (the browser's recognizer faked, the server real)
+        working-directory: tests/js
+        run: DWANIFORMS_URL=http://127.0.0.1:8130 node dwaniforms_yojana_voice.test.js
       - name: Language packs complete
         run: python -m dwaniforms.langpacks check
       - name: No server errors
