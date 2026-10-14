@@ -26,6 +26,8 @@ ok(/not among them/i.test(pEn) && /जवाब इनमें नहीं ह
 ok(/never uploaded/i.test(pEn) && /न अपलोड करते हैं/.test(pHi), "privacy: says a photographed paper is read on the phone and never uploaded");
 ok(/Aadhaar card, ration card or khasra copy/i.test(pEn) && /on your phone only/i.test(pEn) && /only its last four digits/i.test(pEn) && /आधार कार्ड, राशन कार्ड या खसरे/.test(pHi) && /आख़िरी चार अंक/.test(pHi),
    "privacy: a photo of an Aadhaar / ration / khasra paper is read on the phone; only the values found are sent, confirmed one by one, Aadhaar shown masked");
+ok(/My applications.{0,40}only on your phone/i.test(pEn) && /never holds your name, address, phone number or what you asked/i.test(pEn) && /सिर्फ़ आपके फ़ोन में/.test(pHi) && /कभी नहीं होती/.test(pHi),
+   "privacy: the My applications list stays on the phone and holds no name, address or question");
 ok(/do not ask for camera permission/i.test(pEn) && /कैमरे की अनुमति नहीं माँगते/.test(pHi), "privacy: no camera permission is asked");
 ok(/off unless you see an "Ask the AI" box/i.test(pEn) && /तभी चालू है जब/.test(pHi), "privacy: the AI question is off unless the box is shown");
 ok(/Every question asks again/i.test(pEn) && /हर सवाल पर दोबारा पूछा जाता है/.test(pHi), "privacy: consent is asked for every question");
