@@ -6,6 +6,7 @@ import datetime as dt
 import re
 
 from .spoken import land_unit, spoken_to_code, spoken_to_khasra, spoken_to_date, spoken_to_digits, spoken_to_int, spoken_to_number
+from . import clock
 
 Result = tuple[bool, "str | None", str]
 
@@ -79,7 +80,7 @@ def date(text: str, min_age: int | None = None, max_age: int | None = None, toda
     """future=True is for dates printed on a paper -- a bill's last date, a hearing date -- which may be ahead of
     today and are often said without a year ("15 November"): the year is then taken as this year, or next year if
     that day is more than six months behind us. Birth dates and incident dates keep refusing the future."""
-    today = today or dt.date.today()
+    today = today or clock.today()
     parsed = spoken_to_date(text, today)
     if not parsed and future:
         parsed = spoken_to_date(f"{text} {today.year}", today)
