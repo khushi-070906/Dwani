@@ -1166,8 +1166,8 @@
         d.querySelector(".ben").textContent = s.benefit;
         d.querySelector(".how").textContent = t("how_get") + ": " + s.apply;
         (s.reasons || []).forEach(function (x) { var li = document.createElement("li"); li.textContent = x; d.querySelector(".rs").appendChild(li); });
-        (s.checks || []).forEach(function (x) { var li = document.createElement("li"); li.textContent = "✓ " + x; d.querySelector(".cs").appendChild(li); });
-        d.querySelector(".src").textContent = s.source + " · " + t("reviewed") + " " + s.last_reviewed + (s.stale ? " · ⚠ " + t("stale") : "");
+        (s.checks || []).forEach(function (x) { var li = document.createElement("li"); li.innerHTML = icon("check") + " " + esc(x); d.querySelector(".cs").appendChild(li); });
+        d.querySelector(".src").innerHTML = esc(s.source + " · " + t("reviewed") + " " + s.last_reviewed) + (s.stale ? " · " + icon("warn") + " " + esc(t("stale")) : "");
         if (s.form) {
           var b = document.createElement("button"); b.type = "button"; b.className = "btn forest";
           b.textContent = t("fill"); b.title = (o.form_titles || {})[s.form] || "";
