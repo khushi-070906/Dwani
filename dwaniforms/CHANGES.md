@@ -318,3 +318,9 @@ The first calm pass was nearly all one green. Colour is back, in a small muted s
 - Numbered steps in green, slate and ochre; the "use it from home" band has a gold hairline; the offline/private/honest band has gold headings; the pilot band runs green to navy.
 - Section labels are dark gold, which stays readable (about 5:1) on the sage page.
 - Still no emoji, no thick shadows and no tilted shapes.
+
+## Home page and phone: fewer repeats, nothing hidden behind the assistant
+- The five most-used services are listed once. "Everything else" no longer repeats them (PM-Kisan, Samjhao, complaint, scheme advisor and land record used to appear twice).
+- "My applications" sits above the lists, where a person coming back for their RTI will see it, instead of in the side column that falls to the bottom on a phone. Its heading is an h2 so headings still step down one level at a time.
+- On a phone the assistant panel no longer covers most of the screen: the two notes about the photo (read on this phone only; what the photo is used for) sit behind one line, "How the photo is used", so the question, the form rows, the mic and the typing box fit together.
+- The offline cache is `dwaniforms-v5`, so phones that already installed the app pick the new page up.
