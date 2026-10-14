@@ -188,3 +188,12 @@ def test_every_scheme_has_text_in_all_ten_languages_and_a_recent_review_date():
             for lang in langpacks.packs():
                 assert langpacks.text(lang, s[part]["en"]), (s["id"], part, lang)
 
+
+def test_accident_insurance_pmsby_goes_to_70_so_a_man_past_the_life_cover_age_still_gets_it():
+    facts = {"age": 62, "gender": "Male", "area": "Rural", "occupation": "Farmer", "land_acres": 1, "annual_income": 100000,
+             "income_tax_payer": "No", "govt_employee": "No", "bank_account": "Yes"}
+    got = {i["id"] for k in ("likely", "maybe") for i in yojana.advise(T, facts, "en")[k]}
+    assert "pmsby" in got and "pmjjby" not in got              # 62: past 50 for life cover, within 70 for accident cover
+    old = {i["id"] for k in ("likely", "maybe") for i in yojana.advise(T, {**facts, "age": 71}, "en")[k]}
+    assert "pmsby" not in old
+

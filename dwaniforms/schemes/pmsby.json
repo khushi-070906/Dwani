@@ -1,0 +1,51 @@
+{
+ "id": "pmsby",
+ "name": {
+  "en": "PM Suraksha Bima Yojana (accident insurance)",
+  "hi": "पीएम सुरक्षा बीमा योजना (दुर्घटना बीमा)"
+ },
+ "ministry": "Ministry of Finance (Department of Financial Services)",
+ "source": "https://jansuraksha.gov.in",
+ "benefit": {
+  "en": "₹2 lakh for death or full disability from an accident, ₹1 lakh for partial disability, for ₹20 a year",
+  "hi": "दुर्घटना में मृत्यु या पूरी विकलांगता पर ₹2 लाख, आंशिक विकलांगता पर ₹1 लाख, साल के ₹20 में"
+ },
+ "form": null,
+ "apply": {
+  "en": "Fill a short form at your bank and name a nominee; the yearly ₹20 is taken from your account by itself.",
+  "hi": "बैंक में एक छोटा फ़ॉर्म भरें और नॉमिनी का नाम लिखें; साल के ₹20 खाते से अपने-आप कट जाते हैं।"
+ },
+ "rules": [
+  {
+   "fact": "age",
+   "gte": 18,
+   "lte": 70,
+   "why": {
+    "en": "you must be between 18 and 70",
+    "hi": "18 से 70 साल की उम्र होनी चाहिए"
+   }
+  },
+  {
+   "fact": "bank_account",
+   "eq": "Yes",
+   "soft": true,
+   "why": {
+    "en": "you need a savings bank account (a Jan Dhan account works)",
+    "hi": "बचत खाता चाहिए (जन धन खाता चलेगा)"
+   }
+  },
+  {
+   "check": {
+    "en": "Your bank account must be linked to Aadhaar.",
+    "hi": "बैंक खाता आधार से जुड़ा होना चाहिए।"
+   }
+  },
+  {
+   "check": {
+    "en": "Join or renew before 1 June each year, and keep ₹20 in the account.",
+    "hi": "हर साल 1 जून से पहले जुड़ें या नवीनीकरण करें, और खाते में ₹20 रखें।"
+   }
+  }
+ ],
+ "last_reviewed": "2026-10-14"
+}
