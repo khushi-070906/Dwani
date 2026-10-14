@@ -853,7 +853,7 @@
     $("mic").disabled = !ok;
     $("mic-label").textContent = ok ? t("tap") : t("voice_off");
     $("voice-src").textContent = browserVoiceOK() ? t("browser_voice") : "";
-    $("status").textContent = r.phase === "escalate" ? "⚠" : "";
+    $("status").innerHTML = r.phase === "escalate" ? icon("warn") : "";
     if (r.phase === "escalate") $("op-panel").open = true;
   }
   var BOXES = { aadhaar: [4, 4, 4], mobile: [10], pincode: [6], ifsc: [4, 7], pan: [10] };
@@ -1054,7 +1054,7 @@
   $("reveal").addEventListener("change", function () { reveal = this.checked; if (sid) api("/sessions/" + sid).then(function (s) { renderSheet(s.fields || [], cur || {}); }); });
   $("op-set").addEventListener("click", function () {
     api("/sessions/" + sid + "/operator", { method: "POST", json: { field_id: $("op-field").value, value: $("op-value").value } })
-      .then(function (r) { $("op-msg").textContent = "✓"; $("op-value").value = ""; render(r); })
+      .then(function (r) { $("op-msg").innerHTML = icon("check"); $("op-value").value = ""; render(r); })
       .catch(function (e) { $("op-msg").textContent = e.message; });
   });
   $("big-btn").addEventListener("click", function () {
