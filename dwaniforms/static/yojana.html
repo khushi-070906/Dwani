@@ -53,6 +53,10 @@
   .opt.skip { border-style: dashed; color: var(--ink-3); font-weight: 400; }
   .num { display: flex; gap: 10px; }
   .num input { flex: 1; min-width: 0; font: inherit; font-size: 24px; padding: 8px 14px; min-height: 56px; border: 2px solid var(--line-2); border-radius: 12px; color: var(--ink); background: #fff; }
+  .micbtn { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin: 2px 0 6px; }
+  .micbtn.on { background: #A12B2B; border-color: #A12B2B; color: #fff; }
+  .heard { min-height: 1.5em; margin: 4px 0 0; color: var(--ink-2); font-weight: 600; }
+  .vnote { margin: 0 0 14px; color: var(--ink-3); font-size: 14px; }
   .err { color: #A12B2B; font-weight: 600; min-height: 1.5em; margin: 8px 0 0; }
   .total { font-family: "Source Serif 4", "Mukta", serif; font-size: 32px; line-height: 1.2; margin: 0 0 6px; color: var(--navy); }
   .total b { color: var(--forest); font-size: 56px; }
@@ -96,6 +100,11 @@
       <div class="bar" aria-hidden="true"><i id="fill"></i></div>
       <h2 id="qh" tabindex="-1"></h2>
       <button type="button" class="say" id="say"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l5 4V6L7 10H4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg><span data-t="listen"></span></button>
+      <div id="voice" hidden>
+        <button type="button" class="btn micbtn" id="mic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span data-t="speak"></span></button>
+        <p id="heard" class="heard" role="status"></p>
+        <p class="vnote" data-t="voice_note"></p>
+      </div>
       <div id="answers"></div>
     </section>
 
@@ -114,7 +123,7 @@
 
   var T = {
     hi: { h1: "मुझे कौन-सी सरकारी योजना मिल सकती है?", lead: "कुछ सवाल, हर एक पर एक टैप। फिर दिखेंगी वे योजनाएँ जो आपके लिए बन सकती हैं।",
-          f1: "लॉगिन नहीं", f2: "एक मिनट से कम", f3: "जवाब सेव नहीं होते", go: "शुरू करें", back: "पीछे", listen: "सुनिए", skip: "छोड़ दें",
+          f1: "लॉगिन नहीं", f2: "एक मिनट से कम", f3: "जवाब सेव नहीं होते", go: "शुरू करें", back: "पीछे", listen: "सुनिए", speak: "बोलकर जवाब दें", listening: "सुन रहे हैं… बोलिए", not_understood: "समझ नहीं आया। फिर बोलिए, या नीचे टैप कीजिए।", mic_denied: "माइक की अनुमति नहीं मिली। नीचे टैप कीजिए।", no_hear: "कुछ सुनाई नहीं दिया। फिर कोशिश कीजिए।", voice_note: "बोलने पर आपका ब्राउज़र आवाज़ को लिखने के लिए Google को भेज सकता है। न चाहें तो नीचे टैप कीजिए।", skip: "छोड़ दें",
           yes: "हाँ", no: "नहीं", next: "आगे", of: "में से", need_num: "एक संख्या लिखिए", range: "इस संख्या की सीमा", unit_acres: "एकड़",
           privacy: "आपके जवाब इस फ़ोन के बाहर सेव नहीं होते। शेयर कार्ड पर सिर्फ़ योजनाओं के नाम होते हैं, आपकी जानकारी नहीं।",
           total_pre: "आपको", total_post: "योजनाएँ मिल सकती हैं", total_none: "अभी कोई योजना पक्की नहीं दिखी", more: "और जाँचने लायक", likely: "मिल सकती हैं", maybe: "जाँच ज़रूरी है",
@@ -124,7 +133,7 @@
           card_title: "मुझे सरकारी योजनाएँ मिल सकती हैं", card_n: "योजनाएँ", card_more: "और", card_foot: "आप भी देखें:", card_note: "यह मार्गदर्शन है, फ़ैसला नहीं।",
           share_text: "मुझे {n} सरकारी योजनाएँ मिल सकती हैं। आप भी देखिए:", loading: "देख रहे हैं…" },
     en: { h1: "Which government schemes might I get?", lead: "A few questions, one tap each. Then you'll see the schemes you may be able to get.",
-          f1: "No sign-in", f2: "Under a minute", f3: "Nothing is saved", go: "Start", back: "Back", listen: "Listen", skip: "Skip",
+          f1: "No sign-in", f2: "Under a minute", f3: "Nothing is saved", go: "Start", back: "Back", listen: "Listen", speak: "Answer by speaking", listening: "Listening… go ahead", not_understood: "Did not catch that. Say it again, or tap below.", mic_denied: "The microphone is blocked. Tap below instead.", no_hear: "Heard nothing. Try again.", voice_note: "When you speak, your browser may send the sound to Google to turn it into words. If you would rather not, tap below.", skip: "Skip",
           yes: "Yes", no: "No", next: "Next", of: "of", need_num: "Type a number", range: "This number must be between", unit_acres: "acres",
           privacy: "Your answers are not saved anywhere beyond this phone. The share card shows scheme names only, never your details.",
           total_pre: "You may get", total_post: "schemes", total_none: "No scheme looks certain yet", more: "more worth checking", likely: "You may get", maybe: "Needs checking",
@@ -229,6 +238,7 @@
       setTimeout(function () { inp.focus(); }, 0);
     }
     if (!q.required) { var sk = opt(t("skip"), undefined, "skip"); sk.style.marginTop = "10px"; box.appendChild(sk); }
+    $("heard").textContent = ""; $("mic").classList.remove("on");
     if (q.kind !== "number" || q.id === "annual_income") $("qh").focus();
   }
 
@@ -339,6 +349,33 @@
         }
       }, "image/png");
     });
+  }
+
+  // Speaking an answer: the browser turns speech into words; the server says what the words mean for THIS question (the same readers
+  // the spoken forms use). Where the browser cannot listen the button is simply not shown.
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition, listening = null;
+  function say(msg) { $("heard").textContent = msg; }
+  function heardAs(q, said) {
+    say("\u201C" + said + "\u201D");
+    if (!q.required && /छोड़|छोड|skip/i.test(said)) { answer(q, undefined); return; }
+    fetch("yojana/understand", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q.id, text: said, lang: lang }) })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (d) { if (current !== q) return; if (d.value === null || d.value === undefined) say("\u201C" + said + "\u201D \u2014 " + t("not_understood")); else answer(q, d.value); })
+      .catch(function () { say(t("err")); });
+  }
+  if (SR) {
+    $("voice").hidden = false;
+    $("mic").onclick = function () {
+      if (!current) return;
+      if (listening) { try { listening.stop(); } catch (e) {} return; }
+      var q = current, r = new SR(), gotSomething = false;
+      r.lang = lang === "hi" ? "hi-IN" : "en-IN"; r.interimResults = false; r.maxAlternatives = 1; listening = r;
+      $("mic").classList.add("on"); say(t("listening"));
+      r.onresult = function (e) { gotSomething = true; heardAs(q, e.results[0][0].transcript); };
+      r.onerror = function (e) { gotSomething = true; say(e.error === "not-allowed" || e.error === "service-not-allowed" ? t("mic_denied") : t("no_hear")); };
+      r.onend = function () { listening = null; $("mic").classList.remove("on"); if (!gotSomething) say(t("no_hear")); };
+      try { r.start(); } catch (e) { listening = null; $("mic").classList.remove("on"); }
+    };
   }
 
   $("go").onclick = begin;
