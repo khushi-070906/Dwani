@@ -175,3 +175,12 @@ Real Whisper/NLLB, the microphone path and text-to-speech must still be tried on
   `address.parse("H-24, gali no. 3, near Shiv mandir, Uttam Nagar")` splits an address into house, street, landmark, locality ...;
   `spoken.spoken_to_date("pandrah march do hazaar do")` is (15, 3, 2002). Tests: `tests/test_dwaniforms_spoken_dates.py`, `test_dwaniforms_names.py`, `test_dwaniforms_address.py`, `test_dwaniforms_tools_api.py`,
   `tests/test_dwaniforms_scheme_forms.py`. All three helpers are also on the company API (see `API.md`).
+
+## Photo of an Aadhaar card, ration card or khasra copy
+
+On any form (and the ration and land look-ups) "Read from a photo" reads the picture **on the phone** and suggests the matching
+answers: Aadhaar number (check digit must be right), name, date of birth, gender, mobile, PIN code, father's name, ration card
+number, khasra number. Each goes through the usual "is this correct?" and a "no" asks the question normally. The number is
+spoken in full for the yes but shown with its last four digits only. Parsing: `static/ocr/dwani-docs.js`; tests:
+`tests/js/dwaniforms_docs.test.js`, `tests/js/dwaniforms_docs_page.test.js`, `tests/test_dwaniforms_docs.py`.
+
