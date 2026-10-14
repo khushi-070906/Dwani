@@ -324,3 +324,8 @@ The first calm pass was nearly all one green. Colour is back, in a small muted s
 - "My applications" sits above the lists, where a person coming back for their RTI will see it, instead of in the side column that falls to the bottom on a phone. Its heading is an h2 so headings still step down one level at a time.
 - On a phone the assistant panel no longer covers most of the screen: the two notes about the photo (read on this phone only; what the photo is used for) sit behind one line, "How the photo is used", so the question, the form rows, the mic and the typing box fit together.
 - The offline cache is `dwaniforms-v5`, so phones that already installed the app pick the new page up.
+
+## The app uses drawn icons, like the website
+- The service list, the three promises on the welcome card, the microphone, the photo button and the home-page chips use line icons in the brand green instead of emoji. Emoji look different on every phone (and some old phones show empty boxes); the icons look the same everywhere and follow the text colour.
+- What the person said is shown in quotation marks instead of after a speech-bubble emoji.
+- The offline cache is `dwaniforms-v6`.
