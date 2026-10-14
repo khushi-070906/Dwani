@@ -75,6 +75,9 @@ jobs:
       - name: Document photo test (Aadhaar card into a form, masked, confirmed)
         working-directory: tests/js
         run: DWANIFORMS_URL=http://127.0.0.1:8130 node dwaniforms_docs_page.test.js
+      - name: My applications (dates, saved list, first appeal)
+        working-directory: tests/js
+        run: node dwaniforms_tracker.test.js && DWANIFORMS_URL=http://127.0.0.1:8130 node dwaniforms_tracker_page.test.js
       - name: Language packs complete
         run: python -m dwaniforms.langpacks check
       - name: No server errors
