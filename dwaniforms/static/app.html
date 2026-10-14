@@ -1265,7 +1265,7 @@
     recog.onresult = function (ev) {
       var txt = "";
       for (var k = ev.resultIndex; k < ev.results.length; k++) { txt += ev.results[k][0].transcript; if (ev.results[k].isFinal) finalText += ev.results[k][0].transcript; }
-      $("heard").textContent = "🗣 " + (finalText || txt);
+      $("heard").textContent = "“" + (finalText || txt) + "”";
     };
     recog.onerror = function (ev) {
       if (ev.error === "language-not-supported") { noRecog[lang] = true; $("mic").disabled = true; $("mic-label").textContent = t("no_recog"); return; }
@@ -1326,7 +1326,7 @@
     fetch(B + "/sessions/" + sid + "/audio", { method: "POST", headers: Object.assign({ "x-sample-rate": "16000", "content-type": "application/octet-stream" },
       reveal ? { "x-reveal-sensitive": "1" } : {}), body: pcm.buffer })
       .then(function (res) { return res.json().then(function (j) { if (!res.ok) throw new Error(j.detail || res.status); return j; }); })
-      .then(function (j) { $("heard").textContent = "🗣 " + j.transcript; $("status").textContent = ""; render(j); })
+      .then(function (j) { $("heard").textContent = "“" + j.transcript + "”"; $("status").textContent = ""; render(j); })
       .catch(function (err) { $("status").textContent = err.message; $("mic").disabled = !voiceOK(); });
   }
   $("mic").addEventListener("click", function () {
