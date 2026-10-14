@@ -116,3 +116,14 @@ def test_the_shared_header_asks_an_endpoint_that_exists_whether_you_are_logged_i
     """The careers header once asked /api/me, which does not exist, so a logged-in person was always shown 'Log in'."""
     asked = re.search(r'fetch\("(/[^"]+)"', text(STATIC / "site-nav.js")).group(1)
     assert f'@app.get("{asked}")' in text(ROOT / "license_server.py"), f"site-nav.js asks {asked}, which license_server does not serve"
+
+
+def test_attendees_see_who_made_the_captions_and_so_does_a_saved_transcript():
+    """The attendee page is shown to a whole room at every event: it says whose captions they are (plain text, since the
+    room network may have no internet), and a transcript saved and passed on carries the same line."""
+    page = text(STATIC / "index.html")
+    assert re.search(r'<p class="join-credit">Live translation by <b>DwaniLive</b>', page)
+    assert "dhwani-elit.onrender.com" in page[page.index('class="join-credit"'):][:200]
+    assert "<a" not in page[page.index('class="join-credit"'):][:200].split("</p>")[0], "no link: the room's network may be offline"
+    save = page[page.index('getElementById("save-btn").addEventListener'):][:1500]
+    assert "Captions by DwaniLive" in save and "https://dhwani-elit.onrender.com" in save
