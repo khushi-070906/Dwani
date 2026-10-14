@@ -33,6 +33,11 @@ class NewSession(BaseModel):
     prefill_from: str | None = Field(None, max_length=32, pattern=r"^[0-9a-f]+$")   # a finished scheme-advisor session
 
 
+class YojanaIn(BaseModel):
+    lang: str = Field("hi", pattern=r"^[a-z]{2,3}$")
+    facts: dict = Field(default_factory=dict)
+
+
 class TextIn(BaseModel):
     text: str = Field(max_length=2000)
 
@@ -162,6 +167,28 @@ def create_router(service: FormService, prefix: str = "/form") -> APIRouter:
         from .eligibility import load_schemes, stale
         return [{"id": x["id"], "name": x["name"], "source": x["source"], "last_reviewed": x["last_reviewed"],
                  "stale": stale(x)} for x in load_schemes()]
+
+    @router.get("/yojana", include_in_schema=False)
+    async def yojana_page():
+        """DwaniYojana: 'which schemes might I get?' for anyone, no sign-in (yojana.py)."""
+        return FileResponse(STATIC / "yojana.html", headers={"Cache-Control": "no-cache"})
+
+    @router.get("/yojana/questions")
+    async def yojana_questions(lang: str = "hi"):
+        """The questions DwaniYojana asks, straight from the advisor's interview, so the page cannot drift from the rules."""
+        from . import yojana
+        if lang not in ("hi", "en"):
+            raise HTTPException(404, "no such language")
+        return yojana.questions(service.templates[yojana.TEMPLATE_ID], lang)
+
+    @router.post("/yojana/advise")
+    async def yojana_advise(body: YojanaIn):
+        """Stateless: answers in, schemes out. Nothing is stored and no session is created."""
+        from . import yojana
+        try:
+            return yojana.advise(service.templates[yojana.TEMPLATE_ID], body.facts, body.lang, service.templates)
+        except yojana.BadFacts as e:
+            raise HTTPException(422, str(e))
 
     @router.post("/sessions")
     async def create(body: NewSession, request: Request):
