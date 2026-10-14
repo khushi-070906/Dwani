@@ -402,8 +402,10 @@
         <div class="photo" id="photo" hidden>
           <button class="btn ghost" type="button" id="photo-btn"><span aria-hidden="true">📷</span> <span data-t="ocr_btn">Read from a photo</span></button>
           <input type="file" id="photo-file" accept="image/*" hidden aria-label="Photo">
+          <details class="photo-info"><summary data-t="photo_info">How the photo is used</summary>
           <p class="muted small" id="photo-note" data-t="ocr_private">The photo is read on this phone only. It is not sent or stored anywhere.</p>
           <p class="muted small" id="doc-note" data-t="doc_note" hidden>Take a photo of your Aadhaar card, ration card or khasra copy. Only the numbers and words found are used as answers, and I will ask you whether each one is right.</p>
+          </details>
           <div id="photo-status" role="status" aria-live="polite"></div>
           <div class="photo-found" id="photo-found" hidden><b data-t="ocr_found">Found on the paper (I will ask one by one whether it is right)</b><dl id="photo-list"></dl></div>
         </div>
