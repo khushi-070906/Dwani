@@ -125,3 +125,22 @@ def test_the_voice_endpoint_answers_and_refuses(client):
 def test_the_page_tells_people_their_browser_may_send_speech_to_google():
     assert "Google" in PAGE[PAGE.index("voice_note: \"बोलने"):][:200] and "Google" in PAGE[PAGE.index("voice_note: \"When you speak"):][:200]
     assert "webkitSpeechRecognition" in PAGE and "$(\"voice\").hidden = false" in PAGE   # shown only where the browser can listen
+
+
+def test_a_shared_link_has_a_title_a_description_and_a_real_preview_picture(client):
+    meta = dict(re.findall(r'<meta (?:property|name)="((?:og|twitter):[a-z:]+)" content="([^"]*)"', PAGE))
+    for key in ("og:title", "og:description", "og:image", "og:url", "og:image:alt"):
+        assert meta.get(key), key
+    assert meta["twitter:card"] == "summary_large_image"
+    # chat apps fetch the picture from outside, so the address must be absolute https and one the app really serves
+    assert meta["og:image"].startswith("https://") and "/form/assets/img/" in meta["og:image"]
+    name = meta["og:image"].rsplit("/", 1)[1]
+    r = client.get("/form/assets/img/" + name)
+    assert r.status_code == 200 and r.headers["content-type"] == "image/png"
+    data = r.content
+    assert data[:8] == b"\x89PNG\r\n\x1a\n"
+    width, height = int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big")
+    assert (width, height) == (int(meta["og:image:width"]), int(meta["og:image:height"])) == (1200, 630)
+    assert len(data) < 300_000                       # a slow phone should still get the preview
+    assert meta["og:url"].endswith("/form/yojana")
+
