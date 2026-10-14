@@ -41,7 +41,12 @@ async function open(w, id) {
   ok(q(w, ".welcome h1").textContent === "नमस्ते" && /हर जवाब की जाँच/.test(q(w, ".chips").textContent), "home: welcome card in Hindi with the three promises");
   ok($(w, "top-list").querySelectorAll(".row").length === 5 && q(w, '#top-list [data-form="scheme_advisor"]') && q(w, '#top-list [data-form="samjhao"]'),
      "home: the five most-used services, incl. the scheme advisor and 'understand a paper'");
-  ok($(w, "all-groups").querySelectorAll(".group").length === 5, "home: everything else, grouped");
+  ok($(w, "all-groups").querySelectorAll(".group").length === 3, "home: everything else, grouped");
+  {
+    const top = [...w.document.querySelectorAll("#top-list [data-form]")].map((b) => b.dataset.form);
+    const rest = [...w.document.querySelectorAll("#all-groups [data-form]")].map((b) => b.dataset.form);
+    ok(!rest.some((id) => top.includes(id)) && new Set(rest).size === rest.length, "home: nothing is listed twice (top list and 'everything else')");
+  }
   ok(!$(w, "demo-note").hidden, "demo records -> the amber 'demo version' card is shown");
   // Which languages this server can really do is its own answer (Hindi, English + every lang/*.json pack): the page must
   // offer exactly those, no more. Asked of the server rather than hard-coded, so adding a pack does not break the test.

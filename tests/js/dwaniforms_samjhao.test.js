@@ -39,7 +39,7 @@ function isoIn(days) { const d = new Date(); d.setDate(d.getDate() + days); retu
   await until(() => q(w, '#top-list [data-form="samjhao"]'));
   ok(!!q(w, '#top-list [data-form="samjhao"]'), "Samjhao is one of the most-used tasks on the home page");
   ok(/कागज़ समझिए/.test(q(w, '#top-list [data-form="samjhao"]').textContent), "and is named in Hindi");
-  ok([...w.document.querySelectorAll("#all-groups .group h3")].some((h) => h.textContent === "कागज़ समझिए"), "it has its own group");
+  ok(![...w.document.querySelectorAll("#all-groups [data-form]")].some((b) => b.dataset.form === "samjhao"), "and it is not repeated under 'everything else'");
   ok(!!q(w, '#all-groups [data-form="rti_first_appeal"]'), "the RTI first appeal is listed with complaints and RTI");
 
   // --- a bill with a last date 12 days away

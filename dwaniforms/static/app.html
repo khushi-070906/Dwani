@@ -715,12 +715,14 @@
     var top = ["pm_kisan", "samjhao", "grievance", "scheme_advisor", "land_record"].map(function (id) { return byId[id]; }).filter(Boolean);
     var tl = $("top-list"); tl.innerHTML = "";
     top.forEach(function (f) { tl.appendChild(rowBtn(f, "row")); });
+    var inTop = {}; top.forEach(function (f) { inTop[f.id] = true; });
+    var rest = all.filter(function (f) { return !inTop[f.id]; });          // shown once: what is in the top list is not repeated below
     var groups = [["g_forms", function (f) { return f.flow === "form"; }], ["g_voice", function (f) { return f.flow === "grievance" || f.flow === "rti" || f.flow === "rti_appeal"; }],
                   ["g_explain", function (f) { return f.flow === "explain"; }],
                   ["g_records", function (f) { return f.flow === "lookup_land" || f.flow === "lookup_ration"; }], ["g_schemes", function (f) { return f.flow === "advisor"; }]];
     var ag = $("all-groups"); ag.innerHTML = "";
     groups.forEach(function (g) {
-      var items = all.filter(g[1]); if (!items.length) return;
+      var items = rest.filter(g[1]); if (!items.length) return;
       var d = document.createElement("div"); d.className = "group";
       // h3, not h4: these sit under the "Everything else" h2, and a screen reader reads a skipped level as a gap
       var h = document.createElement("h3"); h.textContent = t(g[0]); d.appendChild(h);
