@@ -843,8 +843,20 @@ def signup(req: SignupRequest, response: Response):
     return {"ok": True, "email": email, "name": name}
 
 
+def _address_key(request: Request) -> str:
+    ip = (request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+          or (request.client.host if request.client else "?"))
+    return hashlib.sha256(("dwani-login:" + ip).encode()).hexdigest()[:16]
+
+
 @app.post("/login")
-def login(req: LoginRequest, response: Response):
+def login(req: LoginRequest, request: Request, response: Response):
+    email_key, address_key = normalize_email(req.email), _address_key(request)
+    wait = max(auth_guard.LOGIN_PER_EMAIL.retry_after(email_key), auth_guard.LOGIN_PER_ADDRESS.retry_after(address_key))
+    if wait:
+        # Before any password is checked, so guessing gets no answer at all while the wait lasts.
+        raise HTTPException(status_code=429, detail=f"Too many incorrect attempts. Try again in {max(1, round(wait / 60))} minute(s), "
+                            "or use 'Forgot password'.", headers={"Retry-After": str(wait)})
     with db() as conn:
         row = conn.execute(
             "SELECT id, password_hash FROM users WHERE LOWER(email) = ? ORDER BY id LIMIT 1",
@@ -854,8 +866,11 @@ def login(req: LoginRequest, response: Response):
     # Same error for "no such user" and "wrong password" -- don't leak which
     # one it was, that's a user-enumeration side channel.
     if row is None or row["password_hash"] is None or not verify_password(req.password, row["password_hash"]):
+        auth_guard.LOGIN_PER_EMAIL.record_failure(email_key)
+        auth_guard.LOGIN_PER_ADDRESS.record_failure(address_key)
         raise HTTPException(status_code=401, detail="Incorrect email or password.")
 
+    auth_guard.LOGIN_PER_EMAIL.clear(email_key)
     token = create_session(row["id"])
     set_session_cookie(response, token)
     return {"ok": True}
