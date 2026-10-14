@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ध्वनिYojana · मुझे कौन-सी सरकारी योजना मिल सकती है?</title>
+<meta name="description" content="Answer a few taps and see which government schemes you may get. No sign-in, nothing saved.">
+<meta name="theme-color" content="#1F5E4D">
+<link rel="icon" href="assets/img/icon-192.png">
+<style>
+  @font-face { font-family: "Rozha One"; src: url("assets/fonts/RozhaOne-Regular.ttf") format("truetype"); font-display: swap; }
+  @font-face { font-family: "Source Serif 4"; src: url("assets/fonts/SourceSerif4-latin.woff2") format("woff2"); font-weight: 500 700; font-display: swap; }
+  @font-face { font-family: "Mukta"; src: url("assets/fonts/Mukta-Regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Mukta"; src: url("assets/fonts/Mukta-SemiBold.ttf") format("truetype"); font-weight: 600 700; font-display: swap; }
+  :root { --forest: #1F5E4D; --forest-2: #2B7562; --forest-soft: #E3EEE8; --navy: #1E2A44; --sage: #EEF0EA; --card: #FFFFFF;
+          --line: #DCDFD6; --line-2: #C9CEC2; --ink: #1E2A44; --ink-2: #3F4A63; --ink-3: #5B6579; --amber-ink: #8A4B00; --amber-soft: #FBF1DD; }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--sage); color: var(--ink); font: 18px/1.55 "Mukta", system-ui, sans-serif; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 16px 56px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--navy); }
+  .seal { width: 40px; height: 40px; border-radius: 50%; background: var(--forest); color: #fff; display: grid; place-items: center;
+          font-family: "Rozha One", serif; font-size: 22px; line-height: 1; }
+  .word { font-family: "Rozha One", "Source Serif 4", serif; font-size: 22px; line-height: 1.1; }
+  .word span { font-family: "Source Serif 4", serif; font-weight: 600; }
+  .lang { display: inline-flex; border: 1.5px solid var(--line-2); border-radius: 999px; overflow: hidden; background: #fff; }
+  .lang button { border: 0; background: none; font: inherit; font-weight: 600; font-size: 15px; padding: 6px 14px; min-height: 40px; color: var(--ink-2); cursor: pointer; }
+  .lang button[aria-pressed="true"] { background: var(--forest); color: #fff; }
+  h1, h2 { font-family: "Source Serif 4", "Mukta", serif; font-weight: 600; margin: 0; line-height: 1.25; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+  .hero h1 { font-size: 30px; margin: 8px 0 10px; color: var(--navy); }
+  .hero p { margin: 0 0 16px; color: var(--ink-2); }
+  .facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; padding: 0; list-style: none; }
+  .facts li { background: var(--forest-soft); color: var(--forest); border-radius: 999px; padding: 4px 12px; font-size: 15px; font-weight: 600; }
+  .go, .btn { font: inherit; font-weight: 700; border-radius: 12px; min-height: 52px; padding: 10px 20px; cursor: pointer; border: 2px solid var(--forest); }
+  .go { background: var(--forest); color: #fff; width: 100%; font-size: 20px; }
+  .btn { background: #fff; color: var(--forest); }
+  .btn.solid { background: var(--forest); color: #fff; }
+  .go:focus-visible, .btn:focus-visible, .opt:focus-visible, .lang button:focus-visible, input:focus-visible, .back:focus-visible, .say:focus-visible { outline: 3px solid #E0A100; outline-offset: 2px; }
+  .bar { height: 8px; border-radius: 99px; background: var(--sage-2, #E5E8E0); overflow: hidden; margin: 6px 0 16px; }
+  .bar i { display: block; height: 100%; background: var(--forest); width: 0; transition: width .2s; }
+  .qtop { display: flex; align-items: center; justify-content: space-between; color: var(--ink-3); font-size: 15px; }
+  .back, .say { border: 0; background: none; color: var(--forest); font: inherit; font-weight: 600; cursor: pointer; padding: 8px 4px; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }
+  .back[hidden] { display: none; }
+  #qh:focus, #start-h:focus { outline: none; }   /* focus is moved here for screen readers; it is not a control */
+  .ic { width: 20px; height: 20px; flex: none; }
+  .q h2 { font-size: 26px; margin: 4px 0 16px; color: var(--navy); }
+  .opts { display: grid; gap: 10px; }
+  .opts.two { grid-template-columns: 1fr 1fr; }
+  .opt { text-align: left; font: inherit; font-weight: 600; font-size: 19px; min-height: 56px; padding: 10px 16px; border-radius: 12px; border: 2px solid var(--line-2); background: #fff; color: var(--ink); cursor: pointer; }
+  .opt:active { background: var(--forest-soft); border-color: var(--forest); }
+  .opt.skip { border-style: dashed; color: var(--ink-3); font-weight: 400; }
+  .num { display: flex; gap: 10px; }
+  .num input { flex: 1; min-width: 0; font: inherit; font-size: 24px; padding: 8px 14px; min-height: 56px; border: 2px solid var(--line-2); border-radius: 12px; color: var(--ink); background: #fff; }
+  .err { color: #A12B2B; font-weight: 600; min-height: 1.5em; margin: 8px 0 0; }
+  .total { font-family: "Source Serif 4", "Mukta", serif; font-size: 32px; line-height: 1.2; margin: 0 0 6px; color: var(--navy); }
+  .total b { color: var(--forest); font-size: 56px; }
+  .sub { color: var(--ink-2); margin: 0 0 16px; }
+  .scheme { border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin: 0 0 10px; background: #fff; }
+  .scheme h3 { margin: 0 0 2px; font-size: 20px; color: var(--navy); }
+  .scheme .ben { margin: 0; color: var(--forest); font-weight: 600; }
+  .scheme .how { margin: 6px 0 0; color: var(--ink-2); font-size: 16px; }
+  .scheme .why { margin: 6px 0 0; padding: 6px 10px; border-radius: 8px; background: var(--amber-soft); color: var(--amber-ink); font-size: 15px; }
+  .group { margin: 22px 0 8px; font-size: 20px; color: var(--navy); }
+  .share { display: grid; gap: 10px; margin: 18px 0; }
+  .meta { color: var(--ink-3); font-size: 14.5px; margin: 14px 0 0; }
+  .meta.stale { color: var(--amber-ink); font-weight: 600; }
+  .privacy { color: var(--ink-3); font-size: 14.5px; text-align: center; margin: 18px 0 0; }
+  .cta { margin-top: 18px; padding: 16px; border-radius: 14px; background: var(--forest-soft); color: var(--navy); }
+  .cta a { color: var(--forest); font-weight: 700; }
+  [hidden] { display: none !important; }
+  @media (max-width: 400px) { .opts.two { grid-template-columns: 1fr; } .hero h1 { font-size: 26px; } }
+  @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="./" aria-label="DwaniForms"><span class="seal" aria-hidden="true">ध</span><span class="word" lang="hi">ध्वनि<span lang="en">Yojana</span></span></a>
+    <div class="lang" role="group" aria-label="Language / भाषा">
+      <button type="button" data-l="hi" aria-pressed="true">हिन्दी</button><button type="button" data-l="en" aria-pressed="false">English</button>
+    </div>
+  </header>
+
+  <main id="main" aria-live="polite">
+    <section id="start" class="card hero">
+      <h1 id="start-h" data-t="h1"></h1>
+      <p data-t="lead"></p>
+      <ul class="facts"><li data-t="f1"></li><li data-t="f2"></li><li data-t="f3"></li></ul>
+      <button type="button" class="go" id="go" data-t="go"></button>
+    </section>
+
+    <section id="ask" class="card q" hidden>
+      <div class="qtop"><button type="button" class="back" id="back"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg><span data-t="back"></span></button><span id="count"></span></div>
+      <div class="bar" aria-hidden="true"><i id="fill"></i></div>
+      <h2 id="qh" tabindex="-1"></h2>
+      <button type="button" class="say" id="say"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l5 4V6L7 10H4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg><span data-t="listen"></span></button>
+      <div id="answers"></div>
+    </section>
+
+    <section id="out" class="card" hidden>
+      <div id="result"></div>
+    </section>
+  </main>
+  <p class="privacy" data-t="privacy"></p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var lang = "hi", questions = [], facts = {}, trail = [], current = null, last = null;
+
+  var T = {
+    hi: { h1: "मुझे कौन-सी सरकारी योजना मिल सकती है?", lead: "कुछ सवाल, हर एक पर एक टैप। फिर दिखेंगी वे योजनाएँ जो आपके लिए बन सकती हैं।",
+          f1: "लॉगिन नहीं", f2: "एक मिनट से कम", f3: "जवाब सेव नहीं होते", go: "शुरू करें", back: "पीछे", listen: "सुनिए", skip: "छोड़ दें",
+          yes: "हाँ", no: "नहीं", next: "आगे", of: "में से", need_num: "एक संख्या लिखिए", range: "इस संख्या की सीमा", unit_acres: "एकड़",
+          privacy: "आपके जवाब इस फ़ोन के बाहर सेव नहीं होते। शेयर कार्ड पर सिर्फ़ योजनाओं के नाम होते हैं, आपकी जानकारी नहीं।",
+          total_pre: "आपको", total_post: "योजनाएँ मिल सकती हैं", total_none: "अभी कोई योजना पक्की नहीं दिखी", more: "और जाँचने लायक", likely: "मिल सकती हैं", maybe: "जाँच ज़रूरी है",
+          how: "कैसे लें", share: "दोस्तों-परिवार को भेजें", share_wa: "WhatsApp पर भेजें", save: "कार्ड सेव करें", again: "फिर से देखें",
+          reviewed: "नियम जाँचे गए", stale: "कुछ नियम दोबारा जाँचने हैं, आधिकारिक पोर्टल भी देखें।", disc: "यह मार्गदर्शन है, फ़ैसला नहीं। आख़िरी निर्णय संबंधित विभाग करता है।",
+          cta: "इनमें से किसी का फ़ॉर्म बोलकर भरना है?", cta_link: "ध्वनिForms खोलें", err: "अभी जवाब नहीं आया। इंटरनेट देखिए और फिर कोशिश कीजिए।",
+          card_title: "मुझे सरकारी योजनाएँ मिल सकती हैं", card_n: "योजनाएँ", card_more: "और", card_foot: "आप भी देखें:", card_note: "यह मार्गदर्शन है, फ़ैसला नहीं।",
+          share_text: "मुझे {n} सरकारी योजनाएँ मिल सकती हैं। आप भी देखिए:", loading: "देख रहे हैं…" },
+    en: { h1: "Which government schemes might I get?", lead: "A few questions, one tap each. Then you'll see the schemes you may be able to get.",
+          f1: "No sign-in", f2: "Under a minute", f3: "Nothing is saved", go: "Start", back: "Back", listen: "Listen", skip: "Skip",
+          yes: "Yes", no: "No", next: "Next", of: "of", need_num: "Type a number", range: "This number must be between", unit_acres: "acres",
+          privacy: "Your answers are not saved anywhere beyond this phone. The share card shows scheme names only, never your details.",
+          total_pre: "You may get", total_post: "schemes", total_none: "No scheme looks certain yet", more: "more worth checking", likely: "You may get", maybe: "Needs checking",
+          how: "How to get it", share: "Send to friends and family", share_wa: "Send on WhatsApp", save: "Save the card", again: "Start again",
+          reviewed: "Rules checked on", stale: "Some rules need re-checking; look at the official portal too.", disc: "This is guidance, not a decision. The department makes the final call.",
+          cta: "Want to fill one of these forms by speaking?", cta_link: "Open DwaniForms", err: "No answer yet. Check your internet and try again.",
+          card_title: "I may get government schemes", card_n: "schemes", card_more: "and", card_foot: "Check yours:", card_note: "Guidance, not a decision.",
+          share_text: "I may get {n} government schemes. Check yours:", loading: "Looking…" }
+  };
+  var t = function (k) { return T[lang][k]; };
+
+  // Short on-screen wording. The question itself (what is asked, its options, when it is skipped) comes from the server, from the
+  // advisor's own interview; this table only gives each option a short label in both languages.
+  var HEAD = {
+    age: ["आपकी उम्र कितनी है?", "How old are you?"], gender: ["आप कौन हैं?", "Are you…"], area: ["आप कहाँ रहते हैं?", "Where do you live?"],
+    occupation: ["आप क्या काम करते हैं?", "What work do you do?"], land_acres: ["आपके नाम कितनी ज़मीन है?", "How much land is in your name?"],
+    annual_income: ["परिवार की साल भर की कमाई?", "Your family's income for a year?"], income_tax_payer: ["क्या परिवार में कोई आयकर भरता है?", "Does anyone in the family pay income tax?"],
+    govt_employee: ["परिवार में कोई सरकारी कर्मचारी या पेंशनर?", "A government employee or pensioner in the family?"], epfo: ["क्या तनख्वाह से पीएफ / ईएसआईसी कटता है?", "Is PF or ESIC cut from your pay?"],
+    bank_account: ["क्या आपका बैंक खाता है?", "Do you have a bank account?"], ration_card: ["राशन कार्ड कौन-सा है?", "Which ration card do you have?"],
+    house: ["आप किस घर में रहते हैं?", "What kind of house do you live in?"], lpg: ["घर में गैस कनेक्शन (एलपीजी) है?", "Is there an LPG gas connection at home?"],
+    widow: ["क्या आप विधवा हैं?", "Are you a widow?"], disability: ["क्या दिव्यांगता प्रमाणपत्र है?", "Do you have a disability certificate?"]
+  };
+  var OPT = {
+    "Male": ["पुरुष", "Male"], "Female": ["महिला", "Female"], "Other": ["अन्य", "Other"], "Rural": ["गाँव", "Village"], "Urban": ["शहर / कस्बा", "Town or city"],
+    "Farmer": ["किसान", "Farmer"], "Farm labourer": ["खेत मज़दूर", "Farm labourer"], "Daily-wage / unorganised worker": ["दिहाड़ी / मज़दूरी", "Daily-wage worker"],
+    "Salaried (private)": ["प्राइवेट नौकरी", "Private job"], "Government job": ["सरकारी नौकरी", "Government job"], "Self-employed / small business": ["अपना काम / दुकान", "Own business"],
+    "Student": ["विद्यार्थी", "Student"], "Homemaker": ["गृहिणी", "Homemaker"], "Not working": ["कोई काम नहीं", "Not working"],
+    "AAY": ["अंत्योदय", "Antyodaya (AAY)"], "PHH / BPL": ["पात्र गृहस्थी / बीपीएल", "Priority / BPL"], "Other (APL)": ["कोई और कार्ड", "Another card"], "None": ["राशन कार्ड नहीं है", "No ration card"],
+    "Pucca house": ["पक्का घर", "Pucca house"], "Kutcha house": ["कच्चा घर", "Kutcha house"], "No house": ["अपना घर नहीं", "No house of my own"]
+  };
+  // Income is asked in bands; the top of the band is sent, so a borderline family is shown "needs checking" rather than promised a scheme.
+  var INCOME = [[100000, "₹1 लाख से कम", "Under ₹1 lakh"], [200000, "₹1 – 2 लाख", "₹1 – 2 lakh"], [300000, "₹2 – 3 लाख", "₹2 – 3 lakh"],
+                [500000, "₹3 – 5 लाख", "₹3 – 5 lakh"], [1000000, "₹5 लाख से ज़्यादा", "Over ₹5 lakh"]];
+  var pick = function (pair) { return pair[lang === "hi" ? 0 : 1]; };
+
+  function apply() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-t]").forEach(function (el) { el.textContent = t(el.dataset.t); });
+    document.title = lang === "hi" ? "ध्वनिYojana · मुझे कौन-सी सरकारी योजना मिल सकती है?" : "DwaniYojana · Which government schemes might I get?";
+    document.querySelectorAll(".lang button").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.l === lang ? "true" : "false"); });
+  }
+
+  function applicable(q) {
+    var w = q.when; if (!w) return true;
+    var v = facts[w.field]; if (v === undefined) return false;
+    if (w.in) return w.in.indexOf(v) >= 0;
+    if (w.not_in) return w.not_in.indexOf(v) < 0;
+    if (w.eq) return v === w.eq;
+    return true;
+  }
+  function stepsNow() { return questions.filter(applicable); }
+
+  function show(which) { ["start", "ask", "out"].forEach(function (id) { $(id).hidden = id !== which; }); }
+
+  function getQuestions() {
+    return fetch("yojana/questions?lang=" + lang).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (q) { questions = q; });
+  }
+
+  function begin() {
+    facts = {}; trail = []; last = null;
+    (questions.length ? Promise.resolve() : getQuestions()).then(function () { ask(questions[0]); }).catch(function () { alert(t("err")); });
+  }
+
+  function ask(q) {
+    current = q; show("ask");
+    var steps = stepsNow(), i = steps.indexOf(q);
+    $("count").textContent = (i + 1) + " " + t("of") + " ~" + steps.length;
+    $("fill").style.width = Math.round((i / Math.max(steps.length, 1)) * 100) + "%";
+    $("back").hidden = !trail.length;
+    var h = (HEAD[q.id] || [q.prompt, q.prompt])[lang === "hi" ? 0 : 1];
+    $("qh").textContent = h;
+    var box = $("answers"); box.textContent = "";
+    function opt(label, value, cls) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "opt" + (cls ? " " + cls : ""); b.textContent = label;
+      b.onclick = function () { answer(q, value); }; return b;
+    }
+    if (q.kind === "choice") {
+      var g = document.createElement("div"); g.className = "opts" + (q.options.length <= 3 ? " two" : "");
+      q.options.forEach(function (v) { g.appendChild(opt(OPT[v] ? OPT[v][lang === "hi" ? 0 : 1] : v, v)); });
+      box.appendChild(g);
+    } else if (q.kind === "yesno") {
+      var y = document.createElement("div"); y.className = "opts two";
+      y.appendChild(opt(t("yes"), "Yes")); y.appendChild(opt(t("no"), "No")); box.appendChild(y);
+    } else if (q.id === "annual_income") {
+      var gi = document.createElement("div"); gi.className = "opts";
+      INCOME.forEach(function (b) { gi.appendChild(opt(pick([b[1], b[2]]), b[0])); }); box.appendChild(gi);
+    } else {
+      var row = document.createElement("div"); row.className = "num";
+      var inp = document.createElement("input"); inp.type = "number"; inp.inputMode = q.id === "age" ? "numeric" : "decimal"; inp.min = q.min || 0; inp.max = q.max;
+      inp.step = q.id === "age" ? "1" : "any"; inp.id = "num-in"; inp.setAttribute("aria-label", $("qh").textContent);
+      if (q.id === "land_acres") inp.placeholder = t("unit_acres");
+      var go = document.createElement("button"); go.type = "button"; go.className = "btn solid"; go.textContent = t("next");
+      var err = document.createElement("p"); err.className = "err"; err.setAttribute("role", "alert");
+      function submit() {
+        var n = parseFloat(inp.value);
+        if (!isFinite(n)) { err.textContent = t("need_num"); return; }
+        if (n < (q.min || 0) || n > q.max) { err.textContent = t("range") + " " + (q.min || 0) + " – " + q.max; return; }
+        answer(q, n);
+      }
+      go.onclick = submit; inp.onkeydown = function (e) { if (e.key === "Enter") { e.preventDefault(); submit(); } };
+      row.appendChild(inp); row.appendChild(go); box.appendChild(row); box.appendChild(err);
+      setTimeout(function () { inp.focus(); }, 0);
+    }
+    if (!q.required) { var sk = opt(t("skip"), undefined, "skip"); sk.style.marginTop = "10px"; box.appendChild(sk); }
+    if (q.kind !== "number" || q.id === "annual_income") $("qh").focus();
+  }
+
+  function answer(q, value) {
+    if (value === undefined) delete facts[q.id]; else facts[q.id] = value;
+    trail.push(q);
+    // answers that no longer apply (changed gender after going back) must not linger
+    questions.forEach(function (x) { if (!applicable(x)) delete facts[x.id]; });
+    var steps = stepsNow(), next = steps[steps.indexOf(q) + 1];
+    if (next) ask(next); else finish();
+  }
+
+  $("back").onclick = function () {
+    var prev = trail.pop(); if (!prev) return;
+    delete facts[prev.id]; ask(prev);
+  };
+
+  function finish() {
+    show("out"); $("result").textContent = t("loading");
+    fetch("yojana/advise", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lang: lang, facts: facts }) })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (d) { last = d; render(d); })
+      .catch(function () { $("result").textContent = t("err"); });
+  }
+
+  function schemeCard(s, maybe) {
+    var d = document.createElement("div"); d.className = "scheme";
+    var h = document.createElement("h3"); h.textContent = s.name; d.appendChild(h);
+    var b = document.createElement("p"); b.className = "ben"; b.textContent = s.benefit; d.appendChild(b);
+    var a = document.createElement("p"); a.className = "how"; a.textContent = t("how") + ": " + s.apply; d.appendChild(a);
+    if (maybe && s.reasons && s.reasons.length) { var w = document.createElement("p"); w.className = "why"; w.textContent = s.reasons.join(" · "); d.appendChild(w); }
+    return d;
+  }
+
+  function render(d) {
+    var box = $("result"); box.textContent = "";
+    var n = d.likely.length, m = d.maybe.length;
+    var p = document.createElement("p"); p.className = "total";
+    if (n) { p.textContent = t("total_pre") + " "; var bn = document.createElement("b"); bn.textContent = n; p.appendChild(bn); p.appendChild(document.createTextNode(" " + t("total_post"))); }
+    else p.textContent = t("total_none");
+    box.appendChild(p);
+    if (m) { var sp = document.createElement("p"); sp.className = "sub"; sp.textContent = "+ " + m + " " + t("more"); box.appendChild(sp); }
+    if (n) {
+      var sh = document.createElement("div"); sh.className = "share";
+      var b1 = document.createElement("button"); b1.type = "button"; b1.className = "go"; b1.textContent = t("share"); b1.onclick = shareCard;
+      var b2 = document.createElement("a"); b2.className = "btn"; b2.style.textAlign = "center"; b2.style.textDecoration = "none"; b2.style.lineHeight = "30px";
+      b2.target = "_blank"; b2.rel = "noopener"; b2.textContent = t("share_wa"); b2.href = "https://wa.me/?text=" + encodeURIComponent(shareText() + " " + shareUrl());
+      sh.appendChild(b1); sh.appendChild(b2); box.appendChild(sh);
+      var g = document.createElement("h2"); g.className = "group"; g.textContent = t("likely"); box.appendChild(g);
+      d.likely.forEach(function (s) { box.appendChild(schemeCard(s, false)); });
+    }
+    if (m) { var g2 = document.createElement("h2"); g2.className = "group"; g2.textContent = t("maybe"); box.appendChild(g2); d.maybe.forEach(function (s) { box.appendChild(schemeCard(s, true)); }); }
+    var meta = document.createElement("p"); var stale = d.likely.concat(d.maybe).some(function (s) { return s.stale; });
+    meta.className = "meta" + (stale ? " stale" : "");
+    meta.textContent = (d.reviewed ? t("reviewed") + ": " + d.reviewed + ". " : "") + (stale ? t("stale") + " " : "") + t("disc");
+    box.appendChild(meta);
+    if (n + m) {
+      var cta = document.createElement("div"); cta.className = "cta"; cta.appendChild(document.createTextNode(t("cta") + " "));
+      var l = document.createElement("a"); l.href = "./"; l.textContent = t("cta_link"); cta.appendChild(l); box.appendChild(cta);
+    }
+    var again = document.createElement("button"); again.type = "button"; again.className = "btn"; again.style.marginTop = "18px"; again.textContent = t("again");
+    again.onclick = function () { show("start"); $("start-h").focus(); }; box.appendChild(again);
+    $("start-h").tabIndex = -1;
+    box.scrollIntoView({ behavior: "auto", block: "start" });
+  }
+
+  function shareUrl() { return location.origin + location.pathname.replace(/\/$/, ""); }
+  function shareText() { return t("share_text").replace("{n}", last ? last.likely.length : ""); }
+
+  // The card is drawn here, in the browser, from scheme names only. Nothing about the person (age, gender, income, ...) is on it.
+  function drawCard() {
+    var W = 1080, H = 1350, c = document.createElement("canvas"); c.width = W; c.height = H; var x = c.getContext("2d");
+    x.fillStyle = "#1F5E4D"; x.fillRect(0, 0, W, H);
+    x.fillStyle = "#FFFFFF"; roundRect(x, 60, 60, W - 120, H - 120, 40); x.fill();
+    x.fillStyle = "#1F5E4D"; x.beginPath(); x.arc(150, 150, 46, 0, 7); x.fill();
+    x.fillStyle = "#fff"; x.font = "52px 'Rozha One', serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("ध", 150, 154);
+    x.textAlign = "left"; x.fillStyle = "#1E2A44"; x.font = "44px 'Rozha One', serif"; x.fillText("ध्वनिYojana", 220, 150);
+    var n = last.likely.length;
+    x.textBaseline = "alphabetic"; x.fillStyle = "#1E2A44"; x.font = "600 54px 'Source Serif 4', 'Mukta', serif"; x.fillText(t("card_title"), 110, 300);
+    x.fillStyle = "#1F5E4D"; x.font = "700 230px 'Source Serif 4', serif"; x.fillText(String(n), 110, 540);
+    var numW = x.measureText(String(n)).width;          // measured in the big font, before the font changes
+    x.fillStyle = "#1E2A44"; x.font = "600 64px 'Mukta', sans-serif"; x.fillText(t("card_n"), 110 + numW + 24, 540);
+    x.font = "600 44px 'Mukta', sans-serif"; var y = 650, names = last.likely.slice(0, 5);
+    names.forEach(function (s) {
+      x.fillStyle = "#1F5E4D"; x.beginPath(); x.arc(125, y - 14, 10, 0, 7); x.fill();
+      x.fillStyle = "#1E2A44"; x.fillText(fit(x, s.name, W - 300), 160, y); y += 78;
+    });
+    if (n > names.length) { x.fillStyle = "#5B6579"; x.fillText("+ " + (n - names.length) + " " + t("card_more"), 160, y); }
+    x.fillStyle = "#EEF0EA"; roundRect(x, 110, H - 330, W - 220, 170, 24); x.fill();
+    x.fillStyle = "#3F4A63"; x.font = "400 34px 'Mukta', sans-serif"; x.fillText(t("card_foot"), 140, H - 270);
+    x.fillStyle = "#1F5E4D"; x.font = "700 40px 'Mukta', sans-serif"; x.fillText(shareUrl().replace(/^https?:\/\//, ""), 140, H - 212);
+    x.fillStyle = "#5B6579"; x.font = "400 28px 'Mukta', sans-serif"; x.fillText(t("card_note"), 110, H - 110);
+    return c;
+  }
+  function fit(x, s, w) { while (x.measureText(s).width > w && s.length > 4) s = s.slice(0, -2); return s; }
+  function roundRect(x, a, b, w, h, r) { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); }
+
+  function shareCard() {
+    var fonts = ["52px 'Rozha One'", "600 54px 'Source Serif 4'", "700 40px 'Mukta'", "400 30px 'Mukta'"];
+    Promise.all(fonts.map(function (f) { return document.fonts ? document.fonts.load(f, "धYojana0") : null; })).catch(function () {}).then(function () {
+      var c = drawCard();
+      c.toBlob(function (blob) {
+        var file = new File([blob], "dwaniyojana.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], text: shareText() + " " + shareUrl() }).catch(function () {});
+        } else {
+          var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "dwaniyojana.png"; document.body.appendChild(a); a.click(); a.remove();
+        }
+      }, "image/png");
+    });
+  }
+
+  $("go").onclick = begin;
+  $("say").onclick = function () {
+    if (!window.speechSynthesis || !current) return;
+    speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance($("qh").textContent); u.lang = lang === "hi" ? "hi-IN" : "en-IN"; u.rate = .9; speechSynthesis.speak(u);
+  };
+  if (!window.speechSynthesis) $("say").hidden = true;
+  document.querySelectorAll(".lang button").forEach(function (b) {
+    b.onclick = function () {
+      if (b.dataset.l === lang) return;
+      lang = b.dataset.l; apply(); questions = [];
+      if (!$("ask").hidden && current) { var id = current.id; getQuestions().then(function () { ask(questions.filter(function (q) { return q.id === id; })[0]); }); }
+      else if (!$("out").hidden && last) finish();
+    };
+  });
+  apply();
+})();
+</script>
+</body>
+</html>
