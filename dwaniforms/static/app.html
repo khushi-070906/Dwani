@@ -195,7 +195,6 @@
   #status .ic { color: var(--amber-ink); }
   .row .ri .ic { width: 22px; height: 22px; }
   .mic .ic { width: 34px; height: 34px; }
-  .yn .ic { width: 1.1em; height: 1.1em; vertical-align: -.2em; stroke-width: 2.4; }
   .btn .ic { width: 1.15em; height: 1.15em; vertical-align: -.2em; margin-right: .25rem; }
   /* "Add to phone": shown only when the browser actually offers to install, so it never sits there doing nothing */
   .chip.install { margin-top: .6rem; border-color: var(--forest); color: var(--forest); background: var(--forest-soft); }
@@ -343,10 +342,10 @@
           <p class="lead" data-t="hello_sub">What would you like to do today? Choose below, then answer by speaking or typing. Every answer is read back to you before it goes on the form.</p>
           <div class="chips">
             <span class="chip"><i><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></i><span data-t="chip1">Speak or type</span></span>
-            <span class="chip"><i><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i><span data-t="chip2">Every answer checked</span></span>
+            <span class="chip"><i>✓</i><span data-t="chip2">Every answer checked</span></span>
             <span class="chip"><i><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></i><span data-t="chip3">Deleted after 30 minutes</span></span>
           </div>
-          <button class="chip install no-print" id="install-btn" type="button" hidden><i><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4v11M7.5 11L12 15.5 16.5 11M5 20h14"/></svg></i><span data-t="install">Add to phone</span></button>
+          <button class="chip install no-print" id="install-btn" type="button" hidden><i>⤓</i><span data-t="install">Add to phone</span></button>
         </div>
         <div class="card trk" id="trk-card" hidden>
           <h2 data-t="trk_title">My applications</h2>
@@ -405,8 +404,8 @@
         <div class="alert warn" id="mt-note" hidden data-t="mt">Some questions are machine-translated. If one sounds odd, ask for help.</div>
         <div class="alert" id="draft-note" hidden data-t="draft_note" style="font-size:.8rem;padding:.45rem .7rem">Questions in this language were written by hand but have not yet been checked by a native speaker. Tell us if anything sounds odd.</div>
         <div class="yn" id="yn" hidden>
-          <button class="yes" type="button" id="btn-yes" data-t="yes" data-icon="check">Yes, correct</button>
-          <button class="no" type="button" id="btn-no" data-t="no" data-icon="cross">No</button>
+          <button class="yes" type="button" id="btn-yes" data-t="yes">Yes, correct</button>
+          <button class="no" type="button" id="btn-no" data-t="no">No</button>
         </div>
         <div class="photo" id="photo" hidden>
           <button class="btn ghost" type="button" id="photo-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 8h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="14" r="3.5"/></svg> <span data-t="ocr_btn">Read from a photo</span></button>
@@ -463,8 +462,8 @@
     <div class="layout">
       <div class="main">
         <div class="crumbs no-print"><button type="button" data-back data-t="home_crumb">Home</button> / <span id="res-crumb"></span></div>
-        <div class="steps no-print"><span class="s done"><i><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i><span data-t="step1">Fill in</span></span><span class="bar"></span>
-          <span class="s done"><i><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i><span data-t="step2">Check</span></span><span class="bar"></span><span class="s on"><i>3</i><span data-t="step3">Ready</span></span></div>
+        <div class="steps no-print"><span class="s done"><i>✓</i><span data-t="step1">Fill in</span></span><span class="bar"></span>
+          <span class="s done"><i>✓</i><span data-t="step2">Check</span></span><span class="bar"></span><span class="s on"><i>3</i><span data-t="step3">Ready</span></span></div>
         <div class="cert lattice" id="cert">
           <span class="seal" aria-hidden="true">ध</span>
           <div class="kicker" id="cert-kicker"></div>
@@ -621,10 +620,7 @@
     document.documentElement.lang = lang;
     document.querySelectorAll("[data-t]").forEach(function (el) {
       if (!el.dataset.en) el.dataset.en = el.textContent;
-      var txt = (UI[lang] && UI[lang][el.dataset.t]) || el.dataset.en;
-      if (el.dataset.icon) {   // the tick / cross is drawn; a language table may still carry a text one in front of its words
-        el.innerHTML = icon(el.dataset.icon) + " "; el.appendChild(document.createTextNode(txt.replace(/^[\u2713\u2717]\s*/, "")));
-      } else el.textContent = txt;
+      el.textContent = (UI[lang] && UI[lang][el.dataset.t]) || el.dataset.en;
     });
     document.querySelectorAll("[data-tp]").forEach(function (el) {
       if (!el.dataset.enp) el.dataset.enp = el.placeholder;
@@ -830,7 +826,7 @@
     document.querySelectorAll("#steps .s").forEach(function (s) {
       var n = +s.dataset.step;
       s.className = "s" + (n < step ? " done" : n === step ? " on" : "");
-      s.querySelector("i").innerHTML = n < step ? icon("check") : n;
+      s.querySelector("i").textContent = n < step ? "✓" : n;
       // which of the three steps we are on, for a reader that cannot see the dark circle
       if (n === step) s.setAttribute("aria-current", "step"); else s.removeAttribute("aria-current");
     });
@@ -849,7 +845,7 @@
     var filled = fields.filter(function (f) { return f.value; }).length;
     $("bar").style.width = (fields.length ? Math.round(100 * filled / fields.length) : 0) + "%";
     var pos = fields.findIndex(function (f) { return f.id === r.field_id; });
-    $("step-count").innerHTML = pos > -1 ? esc(t("step") + " " + (pos + 1) + " / " + fields.length) : icon("check") + " " + filled + " / " + fields.length;
+    $("step-count").textContent = pos > -1 ? t("step") + " " + (pos + 1) + " / " + fields.length : "✓ " + filled + " / " + fields.length;
     $("sheet").classList.toggle("final", r.phase === "final" || r.phase === "fix");
     setSteps(r.phase, false);
     renderSheet(fields, r);
@@ -857,7 +853,7 @@
     $("mic").disabled = !ok;
     $("mic-label").textContent = ok ? t("tap") : t("voice_off");
     $("voice-src").textContent = browserVoiceOK() ? t("browser_voice") : "";
-    $("status").innerHTML = r.phase === "escalate" ? icon("warn") : "";
+    $("status").textContent = r.phase === "escalate" ? "⚠" : "";
     if (r.phase === "escalate") $("op-panel").open = true;
   }
   var BOXES = { aadhaar: [4, 4, 4], mobile: [10], pincode: [6], ifsc: [4, 7], pan: [10] };
@@ -879,7 +875,7 @@
       var opts = f.options || [{ value: "Yes", label: t("yes_word") }, { value: "No", label: t("no_word") }];
       return "<span class='checks'>" + opts.map(function (o) {
         var on = o.value === value;
-        return "<span class='ck" + (on ? " on" : "") + "'><i>" + (on ? icon("check") : "") + "</i>" + esc(o.label) + "</span>";
+        return "<span class='ck" + (on ? " on" : "") + "'><i>" + (on ? "✓" : "") + "</i>" + esc(o.label) + "</span>";
       }).join("") + "</span>";
     }
     var shown = native && native !== value ? native : value;
@@ -900,8 +896,8 @@
       li.innerHTML = "<div class='lbl'><b>" + esc(local || f.label) + (f.required === false ? "" : " <span class='req'>*</span>") + "</b>" +
         (local ? "<small>" + esc(f.label) + "</small>" : "") + "</div>" +
         "<div class='val'>" + paperValue(f, pending ? r.pending : f.value, pending ? "" : f.native) +
-        (pending ? "<div class='note-pen'>" + icon("pencil") + " " + esc(t("pencil")) + "</div>" : "") +
-        (f.value && !pending ? (f.needs_review ? "<div class='note-review'>• " + esc(t("review")) + "</div>" : "<div class='note-ok'>" + icon("check") + " " + esc(t("inked")) + "</div>") : "") +
+        (pending ? "<div class='note-pen'>✎ " + esc(t("pencil")) + "</div>" : "") +
+        (f.value && !pending ? (f.needs_review ? "<div class='note-review'>• " + esc(t("review")) + "</div>" : "<div class='note-ok'>✓ " + esc(t("inked")) + "</div>") : "") +
         "</div><button type='button' class='redo'></button>";
       var b = li.querySelector(".redo"); b.textContent = t("redo");
       b.addEventListener("click", function () { api("/sessions/" + sid + "/redo", { method: "POST", json: { field_id: f.id } }).then(render); });
@@ -1058,7 +1054,7 @@
   $("reveal").addEventListener("change", function () { reveal = this.checked; if (sid) api("/sessions/" + sid).then(function (s) { renderSheet(s.fields || [], cur || {}); }); });
   $("op-set").addEventListener("click", function () {
     api("/sessions/" + sid + "/operator", { method: "POST", json: { field_id: $("op-field").value, value: $("op-value").value } })
-      .then(function (r) { $("op-msg").innerHTML = icon("check"); $("op-value").value = ""; render(r); })
+      .then(function (r) { $("op-msg").textContent = "✓"; $("op-value").value = ""; render(r); })
       .catch(function (e) { $("op-msg").textContent = e.message; });
   });
   $("big-btn").addEventListener("click", function () {
@@ -1170,8 +1166,8 @@
         d.querySelector(".ben").textContent = s.benefit;
         d.querySelector(".how").textContent = t("how_get") + ": " + s.apply;
         (s.reasons || []).forEach(function (x) { var li = document.createElement("li"); li.textContent = x; d.querySelector(".rs").appendChild(li); });
-        (s.checks || []).forEach(function (x) { var li = document.createElement("li"); li.innerHTML = icon("check") + " " + esc(x); d.querySelector(".cs").appendChild(li); });
-        d.querySelector(".src").innerHTML = esc(s.source + " · " + t("reviewed") + " " + s.last_reviewed) + (s.stale ? " · " + icon("warn") + " " + esc(t("stale")) : "");
+        (s.checks || []).forEach(function (x) { var li = document.createElement("li"); li.textContent = "✓ " + x; d.querySelector(".cs").appendChild(li); });
+        d.querySelector(".src").textContent = s.source + " · " + t("reviewed") + " " + s.last_reviewed + (s.stale ? " · ⚠ " + t("stale") : "");
         if (s.form) {
           var b = document.createElement("button"); b.type = "button"; b.className = "btn forest";
           b.textContent = t("fill"); b.title = (o.form_titles || {})[s.form] || "";
