@@ -46,6 +46,8 @@ async function open(w, id) {
     const top = [...w.document.querySelectorAll("#top-list [data-form]")].map((b) => b.dataset.form);
     const rest = [...w.document.querySelectorAll("#all-groups [data-form]")].map((b) => b.dataset.form);
     ok(!rest.some((id) => top.includes(id)) && new Set(rest).size === rest.length, "home: nothing is listed twice (top list and 'everything else')");
+    ok(w.document.querySelector("#top-list").previousElementSibling.tagName === "H2" && w.document.querySelector("#trk-card").compareDocumentPosition(w.document.querySelector("#top-list")) & 4,
+       "home: 'My applications' sits above the lists");
   }
   ok(!$(w, "demo-note").hidden, "demo records -> the amber 'demo version' card is shown");
   // Which languages this server can really do is its own answer (Hindi, English + every lang/*.json pack): the page must
