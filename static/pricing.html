@@ -807,7 +807,7 @@
         const res = await fetch(`${API_BASE}/license-status?license_key=${encodeURIComponent(licenseKey)}&email=${encodeURIComponent(email)}`);
         const data = await res.json();
         if (data.status === 'active') {
-          statusEl.innerHTML = '✅ Active, ready to run <code>activate.py</code>';
+          statusEl.innerHTML = '✓ Active, ready to run <code>activate.py</code>';
           clearInterval(poll);
         } else if (attempts > 20) {
           statusEl.textContent = 'Still processing. Check your email for confirmation.';
