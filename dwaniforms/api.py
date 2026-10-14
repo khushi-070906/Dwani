@@ -33,6 +33,12 @@ class NewSession(BaseModel):
     prefill_from: str | None = Field(None, max_length=32, pattern=r"^[0-9a-f]+$")   # a finished scheme-advisor session
 
 
+class YojanaSay(BaseModel):
+    question: str = Field(max_length=40)
+    text: str = Field("", max_length=300)
+    lang: str = Field("hi", pattern=r"^[a-z]{2,3}$")
+
+
 class YojanaIn(BaseModel):
     lang: str = Field("hi", pattern=r"^[a-z]{2,3}$")
     facts: dict = Field(default_factory=dict)
@@ -180,6 +186,15 @@ def create_router(service: FormService, prefix: str = "/form") -> APIRouter:
         if lang not in ("hi", "en"):
             raise HTTPException(404, "no such language")
         return yojana.questions(service.templates[yojana.TEMPLATE_ID], lang)
+
+    @router.post("/yojana/understand")
+    async def yojana_understand(body: YojanaSay):
+        """What spoken words mean for one question. Stateless; the words are not kept."""
+        from . import yojana
+        try:
+            return {"value": yojana.understand(service.templates[yojana.TEMPLATE_ID], body.question, body.text, body.lang)}
+        except yojana.BadFacts as e:
+            raise HTTPException(422, str(e))
 
     @router.post("/yojana/advise")
     async def yojana_advise(body: YojanaIn):
