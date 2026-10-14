@@ -92,6 +92,12 @@ Response (always HTTP 200 when the request itself was well formed, so you can ca
 
 Only a **complete** call is counted against the key's quota.
 
+**Any office.** The voice app lists twelve offices; a platform's users file with any public authority. For the `department`
+field of `rti_application`, `rti_first_appeal` and `grievance` the API therefore also accepts the office's own name as plain
+text (3 to 100 printable characters, with at least one letter). It is printed in the letter exactly as sent, in the English
+and the Hindi version alike. `/services` marks these fields with `"accepts_free_text": true`; every other choice must still
+be one of its `options`.
+
 ### `POST /names/match`, `POST /address/parse`, `POST /speech/parse`
 
 Plain helpers, no form behind them. Nothing is kept or logged.
