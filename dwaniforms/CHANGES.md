@@ -334,3 +334,10 @@ The first calm pass was nearly all one green. Colour is back, in a small muted s
 - The ticks (answer checked, step done, confirmed note, the options you chose), the red cross on "No", the pencil on a not-yet-confirmed answer, the warning on a scheme whose rules need re-checking, and the download arrow on "Add to phone" are line icons, not text symbols. Text symbols come from whatever font a phone has and are sometimes coloured emoji.
 - "Yes" and "No" get their tick and cross in every language, including English. A tick left at the front of a language table's words is not drawn twice.
 - The offline cache is `dwaniforms-v7`.
+
+## DwaniYojana: "which schemes might I get?" for anyone
+- A new page, `/form/yojana`, for people who are not filling a form yet: about ten taps (age, work, family, house...), then the schemes they may get, each with its benefit, how to apply, the date its rules were last checked, and a warning where they are old. No sign-in, no session, nothing stored.
+- It uses the scheme advisor's own interview and rules (`templates/scheme_advisor.json`, `schemes/*.json`), so keeping a scheme current is still editing one JSON file. The page asks only the questions some scheme actually checks, taken from the server, so it cannot drift from the rules. Income is asked in bands and the top of the band is used, so a borderline family sees "needs checking" instead of a promise.
+- Answers go to the server in one request (`POST /form/yojana/advise`); anything the advisor would not accept is refused with 422.
+- "Send to friends and family" draws a share card in the browser (shared as a picture where the phone allows, otherwise saved; a WhatsApp text link sits beside it). The card shows scheme names and a count, never an answer.
+- The marketing site links to it.
