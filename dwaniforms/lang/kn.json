@@ -194,7 +194,24 @@
   "ex_wrong": "ಇದರಲ್ಲಿ ಏನಾದರೂ ತಪ್ಪಿದ್ದರೆ",
   "g_explain": "ಕಾಗದ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ",
   "k_explain": "ಕಾಗದದ ಅರ್ಥ",
-  "next_explain": "ಕಾಗದವನ್ನು ಜೋಪಾನವಾಗಿಡಿ. ಯಾವುದಾದರೂ ಕಚೇರಿ ನಿಮಗೆ ಅನ್ಯಾಯ ಮಾಡಿದ್ದರೆ, ಮುಖಪುಟದಿಂದ ದೂರು ಬರೆಯಬಹುದು."
+  "next_explain": "ಕಾಗದವನ್ನು ಜೋಪಾನವಾಗಿಡಿ. ಯಾವುದಾದರೂ ಕಚೇರಿ ನಿಮಗೆ ಅನ್ಯಾಯ ಮಾಡಿದ್ದರೆ, ಮುಖಪುಟದಿಂದ ದೂರು ಬರೆಯಬಹುದು.",
+  "ocr_btn": "ಫೋಟೋದಿಂದ ಓದಿ",
+  "ocr_private": "ಫೋಟೋವನ್ನು ಈ ಫೋನ್‌ನಲ್ಲೇ ಓದಲಾಗುತ್ತದೆ. ಎಲ್ಲಿಗೂ ಕಳುಹಿಸುವುದಿಲ್ಲ, ಉಳಿಸುವುದಿಲ್ಲ.",
+  "ocr_loading": "ಫೋಟೋ ಓದಲು ಸಿದ್ಧಗೊಳ್ಳುತ್ತಿದೆ (ಸುಮಾರು 7 MB, ಮೊದಲ ಬಾರಿ ಮಾತ್ರ)…",
+  "ocr_reading": "ಫೋಟೋ ಓದಲಾಗುತ್ತಿದೆ…",
+  "ocr_found": "ಕಾಗದದಲ್ಲಿ ಇದು ಸಿಕ್ಕಿತು (ಸರಿಯೇ ಎಂದು ಒಂದೊಂದಾಗಿ ಕೇಳುತ್ತೇನೆ)",
+  "ocr_paper": "ಕಾಗದ",
+  "ocr_none": "ಫೋಟೋದಿಂದ ಖಚಿತವಾಗಿ ಏನೂ ಓದಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಹೇಳಿ ಅಥವಾ ಬರೆಯಿರಿ.",
+  "ocr_failed": "ಫೋಟೋವನ್ನು ಓದಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಹೇಳಿ ಅಥವಾ ಬರೆಯಿರಿ.",
+  "ai_title": "ಈ ಕಾಗದದ ಬಗ್ಗೆ ಒಂದು ಪ್ರಶ್ನೆ",
+  "ai_ph": "ನಿಮ್ಮ ಪ್ರಶ್ನೆ ಬರೆಯಿರಿ (ಹೆಸರು ಅಥವಾ ಸಂಖ್ಯೆ ಬೇಡ)",
+  "ai_ask": "AI ಯನ್ನು ಕೇಳಿ",
+  "ai_consent": "ಉತ್ತರಕ್ಕಾಗಿ ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಒಂದು AI ಸೇವೆಗೆ ಕಳುಹಿಸಲಾಗುತ್ತದೆ. ಪ್ರಶ್ನೆ ಮತ್ತು ಕಾಗದದ ಪ್ರಕಾರ ಮಾತ್ರ ಹೋಗುತ್ತದೆ; ಫೋಟೋ, ನಿಮ್ಮ ಹೆಸರು ಅಥವಾ ಯಾವುದೇ ಸಂಖ್ಯೆ ಹೋಗುವುದಿಲ್ಲ. ನೀವು ಬರೆದ ಸಂಖ್ಯೆಗಳನ್ನು ಅಳಿಸಲಾಗುತ್ತದೆ. AI ತಪ್ಪಾಗಬಹುದು.",
+  "ai_send": "ಹೌದು, ಕಳುಹಿಸಿ",
+  "ai_cancel": "ಇಲ್ಲ, ಕಳುಹಿಸಬೇಡಿ",
+  "ai_wait": "ಉತ್ತರ ತರಲಾಗುತ್ತಿದೆ…",
+  "ai_warn": "ಇದು AI ಉತ್ತರ. ಇದು ತಪ್ಪಾಗಿರಬಹುದು ಮತ್ತು ಕಾನೂನು ಸಲಹೆ ಅಲ್ಲ. ವಂಚನೆಗೆ 1930 ಗೆ ಮತ್ತು ಉಚಿತ ಕಾನೂನು ಸಹಾಯಕ್ಕೆ 15100 ಗೆ ಕರೆ ಮಾಡಿ.",
+  "ai_fail": "ಈಗ ಉತ್ತರ ಸಿಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ನಂತರ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಕಚೇರಿಯಲ್ಲಿ ಕೇಳಿ."
  },
  "text": {
   "Bank KYC": "ಬ್ಯಾಂಕ್ ಕೆವೈಸಿ",
@@ -489,7 +506,28 @@
   "This is your electricity bill: how much you owe for the power you used, and the last date to pay it.": "ಇದು ನಿಮ್ಮ ವಿದ್ಯುತ್ ಬಿಲ್: ನೀವು ಬಳಸಿದ ವಿದ್ಯುತ್‌ನ ಹಣ, ಮತ್ತು ಪಾವತಿಸುವ ಕೊನೆಯ ದಿನಾಂಕ.",
   "This is your water bill from the water board or the municipality: the amount you owe and the last date to pay.": "ಇದು ಜಲಮಂಡಳಿ ಅಥವಾ ನಗರಸಭೆಯ ನೀರಿನ ಬಿಲ್: ಎಷ್ಟು ಹಣ ಕಟ್ಟಬೇಕು ಮತ್ತು ಪಾವತಿಸುವ ಕೊನೆಯ ದಿನಾಂಕ.",
   "Understand a paper (bill, notice, summons)": "ಕಾಗದ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ (ಬಿಲ್, ನೋಟಿಸ್, ಸಮನ್ಸ್)",
-  "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.": "ಇದು ಯಾವ ಕಾಗದ? ಉದಾಹರಣೆಗೆ: ವಿದ್ಯುತ್ ಬಿಲ್, ನೀರಿನ ಬಿಲ್, ಆಸ್ತಿ ತೆರಿಗೆ, ಬ್ಯಾಂಕ್ ಸಾಲ, ಬ್ಯಾಂಕ್ ಕೆವೈಸಿ ಸಂದೇಶ, ನ್ಯಾಯಾಲಯದ ಸಮನ್ಸ್, ಆದಾಯ ತೆರಿಗೆ ನೋಟಿಸ್, ಸಂಚಾರ ಚಲನ್, ಅಥವಾ ಬೇರೆ ಏನಾದರೂ."
+  "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.": "ಇದು ಯಾವ ಕಾಗದ? ಉದಾಹರಣೆಗೆ: ವಿದ್ಯುತ್ ಬಿಲ್, ನೀರಿನ ಬಿಲ್, ಆಸ್ತಿ ತೆರಿಗೆ, ಬ್ಯಾಂಕ್ ಸಾಲ, ಬ್ಯಾಂಕ್ ಕೆವೈಸಿ ಸಂದೇಶ, ನ್ಯಾಯಾಲಯದ ಸಮನ್ಸ್, ಆದಾಯ ತೆರಿಗೆ ನೋಟಿಸ್, ಸಂಚಾರ ಚಲನ್, ಅಥವಾ ಬೇರೆ ಏನಾದರೂ.",
+  "Ayushman card details (PM-JAY)": "ಆಯುಷ್ಮಾನ್ ಕಾರ್ಡ್ ವಿವರಗಳು (ಪಿಎಂ-ಜೆಎವೈ)",
+  "Class / course": "ತರಗತಿ / ಕೋರ್ಸ್",
+  "Disability (%)": "ಅಂಗವಿಕಲತೆ (%)",
+  "Family members": "ಕುಟುಂಬದ ಸದಸ್ಯರು",
+  "Have you already checked that your family is on the Ayushman list? You can say skip.": "ನಿಮ್ಮ ಕುಟುಂಬ ಆಯುಷ್ಮಾನ್ ಪಟ್ಟಿಯಲ್ಲಿದೆ ಎಂದು ನೀವು ಈಗಾಗಲೇ ನೋಡಿದ್ದೀರಾ? ನೀವು ಬಿಟ್ಟುಬಿಡಬಹುದು.",
+  "How many people are in your family?": "ನಿಮ್ಮ ಕುಟುಂಬದಲ್ಲಿ ಒಟ್ಟು ಎಷ್ಟು ಜನರಿದ್ದಾರೆ?",
+  "Last exam (%)": "ಕೊನೆಯ ಪರೀಕ್ಷೆ (%)",
+  "Level of study": "ಓದಿನ ಹಂತ",
+  "On Ayushman list": "ಆಯುಷ್ಮಾನ್ ಪಟ್ಟಿಯಲ್ಲಿ ಹೆಸರು",
+  "Parent / guardian name": "ಪೋಷಕರ / ಪಾಲಕರ ಹೆಸರು",
+  "Pension application (old age, widow, disability)": "ಪಿಂಚಣಿ ಅರ್ಜಿ (ವೃದ್ಧಾಪ್ಯ, ವಿಧವಾ, ಅಂಗವಿಕಲತೆ)",
+  "Pension type": "ಪಿಂಚಣಿಯ ವಿಧ",
+  "Scholarship application (student)": "ವಿದ್ಯಾರ್ಥಿವೇತನ ಅರ್ಜಿ (ವಿದ್ಯಾರ್ಥಿ)",
+  "School / college": "ಶಾಲೆ / ಕಾಲೇಜು",
+  "What are you studying: school up to class 10, class 11 or 12, diploma or ITI, a college degree, or post-graduation or higher?": "ನೀವು ಏನು ಓದುತ್ತಿದ್ದೀರಿ: 10ನೇ ತರಗತಿವರೆಗಿನ ಶಾಲೆ, 11 ಅಥವಾ 12ನೇ ತರಗತಿ, ಡಿಪ್ಲೊಮಾ ಅಥವಾ ಐಟಿಐ, ಕಾಲೇಜು ಪದವಿ, ಅಥವಾ ಸ್ನಾತಕೋತ್ತರ ಅಥವಾ ಅದಕ್ಕಿಂತ ಮೇಲೆ?",
+  "What is the name of your school or college?": "ನಿಮ್ಮ ಶಾಲೆ ಅಥವಾ ಕಾಲೇಜಿನ ಹೆಸರೇನು?",
+  "What is the percentage of disability written on your disability certificate?": "ನಿಮ್ಮ ಅಂಗವಿಕಲತೆ ಪ್ರಮಾಣಪತ್ರದಲ್ಲಿ ಎಷ್ಟು ಶೇಕಡಾ ಅಂಗವಿಕಲತೆ ಬರೆದಿದೆ?",
+  "What is your parent's or guardian's name?": "ನಿಮ್ಮ ಪೋಷಕರ ಅಥವಾ ಪಾಲಕರ ಹೆಸರೇನು?",
+  "What percentage did you get in your last exam? For example: 72.5.": "ನಿಮ್ಮ ಕೊನೆಯ ಪರೀಕ್ಷೆಯಲ್ಲಿ ಎಷ್ಟು ಶೇಕಡಾ ಅಂಕ ಬಂದಿತು? ಉದಾಹರಣೆಗೆ: 72.5.",
+  "Which class or course are you in? For example: class 9, B.A. second year.": "ನೀವು ಯಾವ ತರಗತಿ ಅಥವಾ ಕೋರ್ಸ್‌ನಲ್ಲಿದ್ದೀರಿ? ಉದಾಹರಣೆಗೆ: 9ನೇ ತರಗತಿ, ಬಿ.ಎ. ಎರಡನೇ ವರ್ಷ.",
+  "Which pension are you applying for: old age, widow, or disability?": "ನೀವು ಯಾವ ಪಿಂಚಣಿಗೆ ಅರ್ಜಿ ಹಾಕುತ್ತಿದ್ದೀರಿ: ವೃದ್ಧಾಪ್ಯ, ವಿಧವಾ ಅಥವಾ ಅಂಗವಿಕಲತೆ?"
  },
  "options": {
   "Male": [
@@ -825,6 +863,50 @@
    "ನೀರಿನ ಬಿಲ್",
    "ನೀರು",
    "ನೀರಿನ ಕರ"
+  ],
+  "Class 11-12": [
+   "11-12ನೇ ತರಗತಿ",
+   "ಪಿಯುಸಿ",
+   "ಹನ್ನೊಂದನೇ",
+   "ಹನ್ನೆರಡನೇ"
+  ],
+  "Degree (graduation)": [
+   "ಪದವಿ",
+   "ಡಿಗ್ರಿ",
+   "ಕಾಲೇಜು",
+   "ಬಿಎ",
+   "ಬಿಎಸ್ಸಿ"
+  ],
+  "Diploma / ITI": [
+   "ಡಿಪ್ಲೊಮಾ",
+   "ಐಟಿಐ",
+   "ಪಾಲಿಟೆಕ್ನಿಕ್"
+  ],
+  "Disability pension": [
+   "ಅಂಗವಿಕಲ",
+   "ಅಂಗವಿಕಲತೆ",
+   "ವಿಕಲಚೇತನ"
+  ],
+  "Old age pension": [
+   "ವೃದ್ಧಾಪ್ಯ",
+   "ವೃದ್ಧ",
+   "ಹಿರಿಯ",
+   "ಮುದುಕ"
+  ],
+  "Post-graduation or higher": [
+   "ಸ್ನಾತಕೋತ್ತರ",
+   "ಎಂಎ",
+   "ಮಾಸ್ಟರ್ಸ್",
+   "ಪಿಎಚ್‌ಡಿ"
+  ],
+  "School (up to class 10)": [
+   "ಶಾಲೆ",
+   "ಹತ್ತನೇ",
+   "ಎಸ್ಸೆಸ್ಸೆಲ್ಸಿ"
+  ],
+  "Widow pension": [
+   "ವಿಧವಾ",
+   "ವಿಧವೆ"
   ]
  },
  "words": {
