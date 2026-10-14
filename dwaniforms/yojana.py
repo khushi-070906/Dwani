@@ -99,3 +99,63 @@ def questions(template: FormTemplate, lang: str) -> list[dict]:
                     "options": [o.value for o in f.options],
                     "min": f.params.get("minimum"), "max": f.params.get("maximum")})
     return out
+
+
+# ---- speaking an answer ------------------------------------------------------------------------------------------------
+# The page can listen (the browser turns speech into text) and asks the server what the words mean for ONE question. The
+# understanding is the interview's own: the same number reader (Hindi and English number words), the same yes/no reader and
+# the same option synonyms as the spoken forms. Nothing is stored.
+INCOME_BANDS = (100000, 200000, 300000, 500000, 1000000)    # tops of the bands the page offers (the page shows their labels)
+_DONT_KNOW = ("पता नहीं", "मालूम नहीं", "पता नही", "don't know", "dont know", "do not know", "not sure", "no idea")
+
+
+def _match_option(field, text: str, lang: str):
+    from .messages import _words
+    from .spoken import ascii_digits
+
+    def norm(x: str) -> str:
+        return " " + " ".join(_words(ascii_digits(x))) + " "
+    t = norm(text)
+    found: dict[str, int] = {}           # option -> words in its longest matching synonym ("farm labour" beats "labour")
+    for o in field.options:
+        for s in [o.value, *o.synonyms.get(lang, []), *o.synonyms.get("en", [])]:
+            n = norm(s)
+            if n.strip() and n in t:
+                found[o.value] = max(found.get(o.value, 0), len(n.split()))
+    if not found:
+        return None
+    top = max(found.values())
+    best = [v for v, n in found.items() if n == top]
+    return best[0] if len(best) == 1 else None          # two options matched equally well: ask again
+
+
+def understand(template: FormTemplate, qid: str, text: str, lang: str):
+    """The value the spoken `text` gives for question `qid`, or None when it was not understood (the page then says so)."""
+    from . import validators
+    from .messages import parse_yes_no
+    try:
+        f = template.field_by_id(qid)
+    except KeyError:
+        raise BadFacts("unknown question")
+    if qid not in {q["id"] for q in questions(template, lang)}:
+        raise BadFacts("this question is not asked here")
+    text = (text or "").strip()
+    if not text or any(w in text.lower() for w in _DONT_KNOW):
+        return None
+    if f.kind == "number":
+        ok, v, _ = validators.VALIDATORS["number"](text, **f.params)
+        if not ok:
+            return None
+        try:
+            n = Decimal(v)
+        except InvalidOperation:
+            return None
+        if qid == "annual_income":
+            return next((b for b in INCOME_BANDS if n <= b), INCOME_BANDS[-1])
+        return int(n) if n == n.to_integral_value() else float(n)      # "2.5 acres" is 2.5, not an error
+    if f.kind == "choice":
+        return _match_option(f, text, lang)
+    if f.kind == "yesno":
+        yn = parse_yes_no(text)
+        return None if yn is None else ("Yes" if yn else "No")
+    return None
