@@ -12,6 +12,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 import unicodedata
+from . import clock
 
 _DIGIT_TRANSLATION = {}
 for _base in (0x0966, 0x09E6, 0x0A66, 0x0AE6, 0x0B66, 0x0BE6, 0x0C66, 0x0CE6, 0x0D66, 0x0660, 0x06F0):
@@ -291,7 +292,7 @@ def spoken_to_number(text: str):
         if tok in _QTY_IGNORE:
             continue
         # Hindi "do" (2) only counts before a scale word or after सवा/साढ़े/पौने ("paune do")
-        if tok == "do" and not (nxt in _SCALES or mod is not None):
+        if tok == "do" and not (nxt in _SCALES or mod is not None or (i > 0 and toks[i - 1] in _SCALES and seen)):
             continue
         value = None
         if re.fullmatch(r"\d+(?:\.\d+)?", tok):
@@ -335,14 +336,17 @@ def spoken_to_number(text: str):
     return result.to_integral_value() if result == result.to_integral_value() else result.normalize()
 
 
-def spoken_to_int(text: str) -> int | None:
-    """Quantity reading (age, income, land area): "twenty five" / "पच्चीस" / "2 lakh 50 thousand" / "३५" -> int."""
+def spoken_to_int(text: str, do_is_two: bool = False) -> int | None:
+    """Quantity reading (age, income, land area): "twenty five" / "पच्चीस" / "2 lakh 50 thousand" / "३५" -> int.
+
+    do_is_two: in a date ("do hazaar do") every "do" is the number 2; in a quantity it is usually the word "do"."""
     toks = _tokens(text)
     total, current, seen = 0, 0, False
     for i, tok in enumerate(toks):
         if tok in _QTY_IGNORE:
             continue
-        if tok == "do" and not (i + 1 < len(toks) and toks[i + 1] in _SCALES):
+        if tok == "do" and not do_is_two and not (i + 1 < len(toks) and toks[i + 1] in _SCALES) \
+                and not (i > 0 and toks[i - 1] in _SCALES and seen):      # "do hazaar do": the last do is 2
             continue
         if tok.isdecimal():
             current += int(tok); seen = True
@@ -442,7 +446,36 @@ _MONTHS = {
     "जनवरी": 1, "फरवरी": 2, "फ़रवरी": 2, "मार्च": 3, "अप्रैल": 4, "मई": 5, "जून": 6, "जुलाई": 7, "अगस्त": 8, "सितंबर": 9,
     "सितम्बर": 9, "अक्टूबर": 10, "नवंबर": 11, "नवम्बर": 11, "दिसंबर": 12, "दिसम्बर": 12,
 }
+_MONTHS.update({
+    # Hindi months written in Latin letters (Whisper's Hinglish output, or what a volunteer types)
+    "janvari": 1, "janwari": 1, "farvari": 2, "farwari": 2, "faravari": 2, "march": 3, "maarch": 3, "aprail": 4, "mai": 5,
+    "may": 5, "joon": 6, "jun": 6, "julai": 7, "jooly": 7, "agast": 8, "agust": 8, "sitambar": 9, "sitamber": 9,
+    "aktoobar": 10, "aktubar": 10, "october": 10, "navambar": 11, "navamber": 11, "disambar": 12, "disamber": 12,
+    "दिसम्बर": 12, "जनबरी": 1, "फ़रबरी": 2, "अगसत": 8,
+})
 _MONTHS = {_norm(k): v for k, v in _MONTHS.items()}
+
+# "pehli march" (1st) .. "chauthi" (4th) are the only irregular day ordinals in Hindi; 5th onwards is "paanchvi" etc.
+_ORDINAL_DAYS = {_norm(k): v for k, v in {
+    "पहली": 1, "पहला": 1, "पहले": 1, "pehli": 1, "pehla": 1, "pahli": 1, "pahla": 1, "pehle": 1,
+    "दूसरी": 2, "दूसरा": 2, "doosri": 2, "dusri": 2, "doosra": 2, "dusra": 2,
+    "तीसरी": 3, "तीसरा": 3, "teesri": 3, "tisri": 3, "teesra": 3,
+    "चौथी": 4, "चौथा": 4, "chauthi": 4, "chautha": 4,
+    "first": 1, "second": 2, "third": 3, "fourth": 4,
+}.items()}
+
+
+def _day_words(words: list[str]) -> list[str]:
+    """Day ordinals become plain numbers; "paanchvi / पाँचवीं / fifth"-style endings are cut so the number is left."""
+    out = []
+    for w in words:
+        if w in _ORDINAL_DAYS:
+            out.append(str(_ORDINAL_DAYS[w])); continue
+        m = re.fullmatch(r"(.+?)(vi|vin|vi\.|वीं|वी|वां|वा|th|nd|rd|st)", w)
+        if m and (_number_word(m[1]) is not None or m[1].isdecimal()):
+            out.append(m[1]); continue
+        out.append(w)
+    return out
 
 
 def _expand_year(y: int, this_year: int) -> int:
@@ -454,7 +487,7 @@ def _expand_year(y: int, this_year: int) -> int:
 
 def spoken_to_date(text: str, today: "dt.date | None" = None) -> tuple[int, int, int] | None:
     """"15 August 1990" / "१५/०८/१९९०" / "fifteen august nineteen ninety" / "15-8-90" -> (day, month, year) or None."""
-    this_year = (today or dt.date.today()).year
+    this_year = (today or clock.today()).year
     t = ascii_digits(text.lower())
     m = re.search(r"\b(\d{1,2})\s*[/\-. ]\s*(\d{1,2})\s*[/\-. ]\s*(\d{4}|\d{2})\b", t)
     if m:
@@ -465,8 +498,8 @@ def spoken_to_date(text: str, today: "dt.date | None" = None) -> tuple[int, int,
     month_idx = next((i for i, tk in enumerate(toks) if tk in _MONTHS), None)
     if month_idx is None:
         return None
-    before = " ".join(toks[:month_idx]); after = " ".join(toks[month_idx + 1:])
-    day, year = spoken_to_int(before), None
+    before = " ".join(_day_words(toks[:month_idx])); after = " ".join(toks[month_idx + 1:])
+    day, year = spoken_to_int(before, do_is_two=True), None
     ytoks = after.split()
     if len(ytoks) >= 2 and all(w in _EN_TENS or w in _EN_UNITS or w in _HI_NUM or w.isdecimal() for w in ytoks):
         # "nineteen ninety" style: two two-digit halves
@@ -475,8 +508,8 @@ def spoken_to_date(text: str, today: "dt.date | None" = None) -> tuple[int, int,
             if a is not None and b is not None and 10 <= a <= 99 and 0 <= b <= 99:
                 year = a * 100 + b; break
     if year is None:
-        year = spoken_to_int(after)
-    if day is None or year is None:
+        year = spoken_to_int(after, do_is_two=True)
+    if day is None or year is None or not 1 <= day <= 31:
         return None
     year = _expand_year(year, this_year)
     return day, _MONTHS[toks[month_idx]], year
