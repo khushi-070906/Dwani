@@ -114,7 +114,9 @@
   .chip-row { display: flex; gap: .4rem; flex-wrap: wrap; padding-left: 1.2rem; margin: .4rem 0; }
   .chip { background: var(--peacock); color: #fff; border-radius: 999px; padding: .15rem .7rem; font-size: .82rem; font-weight: 700; animation: pop .4s both; }
   .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-  .feat { background: #fff; color: var(--ink); border: 1px solid var(--line); border-top: 3px solid var(--peacock); border-radius: 12px; padding: 1.4rem; min-height: 200px; display: flex; flex-direction: column; gap: .4rem; }
+  .feat { --c: var(--peacock); --t: #EEF5F1; background: var(--t); color: var(--ink); border: 1px solid rgba(30,42,68,.08); border-top: 3px solid var(--c); border-radius: 12px; padding: 1.4rem; min-height: 200px; display: flex; flex-direction: column; gap: .4rem; }
+  .feat.c2 { --c: var(--clay); --t: #FBF0EB; } .feat.c3 { --c: var(--slate); --t: #ECF3F8; } .feat.c4 { --c: var(--ochre); --t: #FBF4E3; }
+  .feat .ico { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; border: 1px solid rgba(30,42,68,.08); margin-bottom: .3rem; }
   .feat h3 { margin: .2rem 0; font-size: 1.2rem; color: var(--navy); } .feat p { margin: 0; font-size: .96rem; color: var(--ink-2); } .feat h3 { margin: .2rem 0; font-size: 1.2rem; } .feat p { margin: 0; font-size: .96rem; opacity: .92; }
   .how { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; counter-reset: s; }
   .how div { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 1.3rem 1.3rem 1.3rem 4.4rem; position: relative; }
@@ -235,13 +237,13 @@
   <p class="lead"><span class="en">Built for the counter at a CSC, a panchayat bhawan, a bank mitra or a hospital registration desk.</span>
     <span class="hi" lang="hi">सीएससी, पंचायत भवन, बैंक मित्र या अस्पताल के पंजीकरण काउंटर के लिए।</span></p>
   <div class="grid4">
-    <div class="feat"><h3><span class="en">Government forms</span><span class="hi" lang="hi">सरकारी फ़ॉर्म</span></h3>
+    <div class="feat c1"><div class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M9.5 12h5M9.5 16h5"/></svg></div><h3><span class="en">Government forms</span><span class="hi" lang="hi">सरकारी फ़ॉर्म</span></h3>
       <p><span class="en">PM-Kisan, e-Shram, income certificate, bank KYC, hospital registration. Aadhaar, mobile and IFSC checked as they're spoken.</span><span class="hi" lang="hi">पीएम-किसान, ई-श्रम, आय प्रमाण पत्र, बैंक केवाईसी, अस्पताल पंजीकरण। आधार, मोबाइल, आईएफ़एससी बोलते ही जाँचे जाते हैं।</span></p></div>
-    <div class="feat"><h3><span class="en">Complaints and RTI</span><span class="hi" lang="hi">शिकायत और आरटीआई</span></h3>
+    <div class="feat c2"><div class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M12 8.5v3M12 13.6v.1"/></svg></div><h3><span class="en">Complaints and RTI</span><span class="hi" lang="hi">शिकायत और आरटीआई</span></h3>
       <p><span class="en">Say what happened. Department, place and date are picked out, and a ready-to-sign letter is drafted.</span><span class="hi" lang="hi">बताइए क्या हुआ। विभाग, जगह, तारीख़ अपने आप निकलती है और पत्र तैयार होता है।</span></p></div>
-    <div class="feat"><h3><span class="en">Land and ration records</span><span class="hi" lang="hi">ज़मीन और राशन रिकॉर्ड</span></h3>
+    <div class="feat c3"><div class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></div><h3><span class="en">Land and ration records</span><span class="hi" lang="hi">ज़मीन और राशन रिकॉर्ड</span></h3>
       <p><span class="en">"एक सौ पैंतालीस बटा दो" becomes khasra 145/2, read back from the kiosk's saved copy.</span><span class="hi" lang="hi">"एक सौ पैंतालीस बटा दो" बन जाता है खसरा 145/2, कियोस्क की सहेजी कॉपी से।</span></p></div>
-    <div class="feat"><h3><span class="en">Which schemes can I get?</span><span class="hi" lang="hi">कौन सी योजना मिलेगी?</span></h3>
+    <div class="feat c4"><div class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg></div><h3><span class="en">Which schemes can I get?</span><span class="hi" lang="hi">कौन सी योजना मिलेगी?</span></h3>
       <p><span class="en">A short chat, then the schemes they likely qualify for and the forms to fill, already partly filled in.</span><span class="hi" lang="hi">छोटी सी बातचीत, फिर योजनाएँ और भरने वाले फ़ॉर्म, कुछ पहले से भरे हुए।</span></p></div>
   </div>
 </div></section>
