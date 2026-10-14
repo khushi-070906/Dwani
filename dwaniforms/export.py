@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 
 from .session import FormSession
+from . import clock
 
 def _font_dirs() -> list[Path]:
     """Where to look for Mukta-Regular.ttf: $DWANIFORMS_FONT_DIR, then dwaniforms/fonts/. Falls back to Helvetica."""
@@ -80,7 +81,7 @@ def to_pdf(session: FormSession, mask_sensitive: bool = False) -> bytes:
     t.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#bbbbbb")),
                            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eeeeee")), ("VALIGN", (0, 0), (-1, -1), "TOP")]))
     story = [Paragraph(session.template.title, head),
-             Paragraph(f"Filled by voice on {dt.date.today().isoformat()} (spoken language: {session.lang}). Generated on this device; no data left it.", small),
+             Paragraph(f"Filled by voice on {clock.today().isoformat()} (spoken language: {session.lang}). Generated on this device; no data left it.", small),
              Spacer(1, 6 * mm), t, Spacer(1, 6 * mm)]
     if review:
         story.append(Paragraph("Items marked [CHECK] were not verified automatically (e.g. a spoken name converted to Latin script). "
