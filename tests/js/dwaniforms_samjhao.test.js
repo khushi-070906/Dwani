@@ -80,7 +80,8 @@ function isoIn(days) { const d = new Date(); d.setDate(d.getDate() + days); retu
   // --- the photo of a paper: a real page, a real server; only the engine and the camera picture are stood in
   {
     const OCRTEXT = "ELECTRICITY BILL\nAmount Payable: Rs. 2,890.00\nDue Date: " + isoIn(9);
-    const posted = [], realOcr = require(path.join(__dirname, "..", "..", "dwaniforms", "static", "ocr", "dwani-ocr.js"));
+    const posted = [], realOcr = require(path.join(__dirname, "..", "..", "dwaniforms", "static", "ocr", "dwani-ocr.js")),
+      realDocs = require(path.join(__dirname, "..", "..", "dwaniforms", "static", "ocr", "dwani-docs.js"));
     w = new JSDOM(html, { url: BASE + "/form/", runScripts: "dangerously", pretendToBeVisual: true,
       beforeParse(w) {
         w.sessionStorage.setItem("dwaniforms:consent", "v1"); w.localStorage.setItem("dwaniforms:lang", "en");
@@ -95,6 +96,7 @@ function isoIn(days) { const d = new Date(); d.setDate(d.getDate() + days); retu
           if (el.tagName === "SCRIPT" && /\/assets\/ocr\//.test(el.src)) {
             w.scriptsAsked.push(el.src.split("/").pop());
             if (/tesseract/.test(el.src)) w.Tesseract = { createWorker: async () => ({ reinitialize: async () => {}, recognize: async () => ({ data: { text: OCRTEXT } }) }) };
+            else if (/dwani-docs/.test(el.src)) w.DwaniDocs = realDocs;
             else w.DwaniOCR = realOcr;
             setTimeout(() => el.onload && el.onload(), 0); return el;
           }
@@ -104,13 +106,13 @@ function isoIn(days) { const d = new Date(); d.setDate(d.getDate() + days); retu
     await until(() => q(w, '[data-form="pm_kisan"]'));
     q(w, '[data-form="pm_kisan"]').click();
     await until(() => !$(w, "talk").hidden && $(w, "question").textContent);
-    ok($(w, "photo").hidden, "no photo button on a form that has nothing to read from a paper");
+    ok(!$(w, "photo").hidden && !$(w, "doc-note").hidden, "a form offers 'Read from a photo' of an Aadhaar / ration / khasra paper");
     ok(w.scriptsAsked.length === 0, "the 7 MB engine is not fetched until someone uses it");
     $(w, "talk-back").click();
     await until(() => !$(w, "home").hidden);
     q(w, '#top-list [data-form="samjhao"]').click();
     await until(() => !$(w, "talk").hidden && $(w, "question").textContent);
-    ok(!$(w, "photo").hidden, "Samjhao offers 'Read from a photo'");
+    ok(!$(w, "photo").hidden && $(w, "doc-note").hidden, "Samjhao offers 'Read from a photo' without the Aadhaar note");
     ok(/phone only/.test($(w, "photo-note").textContent) && /not sent or stored/.test($(w, "photo-note").textContent), "and says the photo stays on the phone");
     const file = new w.File([new Uint8Array(10)], "bill.jpg", { type: "image/jpeg" });
     Object.defineProperty($(w, "photo-file"), "files", { value: [file], configurable: true });
