@@ -65,3 +65,9 @@ def test_pricing_page_has_drawn_icons_not_emoji():
     body = re.sub(r"<script.*?</script>", "", body, flags=re.S)
     for ch in EMOJI:
         assert ch not in body, f"emoji {ch!r} is back on the pricing page"
+
+
+def test_pricing_divider_is_a_quiet_line_not_a_flower_garland():
+    t = text(STATIC / "pricing.html")
+    assert 'class="garland" aria-hidden="true"></div>' in t, "the divider should have no flower or leaf shapes inside"
+    assert ".garland span" not in t and ".bloom" not in t
