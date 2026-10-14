@@ -383,6 +383,7 @@
           <button class="btn ghost" type="button" id="photo-btn"><span aria-hidden="true">📷</span> <span data-t="ocr_btn">Read from a photo</span></button>
           <input type="file" id="photo-file" accept="image/*" hidden aria-label="Photo">
           <p class="muted small" id="photo-note" data-t="ocr_private">The photo is read on this phone only. It is not sent or stored anywhere.</p>
+          <p class="muted small" id="doc-note" data-t="doc_note" hidden>Take a photo of your Aadhaar card, ration card or khasra copy. Only the numbers and words found are used as answers, and I will ask you whether each one is right.</p>
           <div id="photo-status" role="status" aria-live="polite"></div>
           <div class="photo-found" id="photo-found" hidden><b data-t="ocr_found">Found on the paper (I will ask one by one whether it is right)</b><dl id="photo-list"></dl></div>
         </div>
@@ -483,7 +484,7 @@
   var B = location.pathname.replace(/\/$/, "");
   var $ = function (id) { return document.getElementById(id); };
   var UI = {
-    hi: { ai_title: "इस कागज़ के बारे में एक सवाल", ai_ph: "अपना सवाल लिखिए (नाम या नंबर नहीं)", ai_ask: "AI से पूछें", ai_consent: "आपका सवाल जवाब के लिए एक AI सेवा को भेजा जाएगा। सिर्फ़ सवाल और कागज़ का प्रकार जाता है; फ़ोटो, आपका नाम या कोई नंबर नहीं जाता। आपके लिखे नंबर मिटा दिए जाते हैं। AI ग़लत भी हो सकता है।", ai_send: "हाँ, भेजिए", ai_cancel: "नहीं, मत भेजिए", ai_wait: "जवाब लाया जा रहा है…", ai_warn: "यह AI का जवाब है। यह ग़लत हो सकता है और क़ानूनी सलाह नहीं है। धोखे के लिए 1930 पर और मुफ़्त क़ानूनी मदद के लिए 15100 पर फ़ोन कीजिए।", ai_fail: "अभी जवाब नहीं मिल सका। कृपया बाद में कोशिश कीजिए या दफ़्तर में पूछिए।", ocr_btn: "फ़ोटो से पढ़ें", ocr_private: "फ़ोटो सिर्फ़ इसी फ़ोन पर पढ़ी जाती है। कहीं भेजी या रखी नहीं जाती।", ocr_loading: "फ़ोटो पढ़ने की तैयारी (लगभग 7 MB, सिर्फ़ पहली बार)…", ocr_reading: "फ़ोटो पढ़ी जा रही है…", ocr_found: "कागज़ पर यह मिला (एक-एक करके पूछा जाएगा कि सही है या नहीं)", ocr_paper: "कागज़", ocr_none: "फ़ोटो से पक्का कुछ पढ़ा नहीं जा सका। कृपया बोलकर या लिखकर बताइए।", ocr_failed: "फ़ोटो पढ़ी नहीं जा सकी। कृपया बोलकर या लिखकर बताइए।", g_explain: "कागज़ समझिए", k_explain: "कागज़ का मतलब", ex_what: "यह क्या है", ex_do: "क्या करें", ex_wrong: "अगर इसमें कुछ ग़लत है", ex_beware: "धोखे से बचिए", ex_help: "अगर धोखा हो गया", ex_date: "कागज़ पर लिखी तारीख", ex_amount: "रकम", ex_left: "दिन बाकी", ex_passed: "यह तारीख निकल चुकी है", ex_today: "यह तारीख आज है", ex_note: "सामान्य जानकारी, क़ानूनी सलाह नहीं। जाँची गई:", next_explain: "कागज़ संभालकर रखिए। अगर किसी दफ़्तर ने आपके साथ ग़लत किया है, तो होम पेज से शिकायत लिख सकते हैं।",
+    hi: { ai_title: "इस कागज़ के बारे में एक सवाल", ai_ph: "अपना सवाल लिखिए (नाम या नंबर नहीं)", ai_ask: "AI से पूछें", ai_consent: "आपका सवाल जवाब के लिए एक AI सेवा को भेजा जाएगा। सिर्फ़ सवाल और कागज़ का प्रकार जाता है; फ़ोटो, आपका नाम या कोई नंबर नहीं जाता। आपके लिखे नंबर मिटा दिए जाते हैं। AI ग़लत भी हो सकता है।", ai_send: "हाँ, भेजिए", ai_cancel: "नहीं, मत भेजिए", ai_wait: "जवाब लाया जा रहा है…", ai_warn: "यह AI का जवाब है। यह ग़लत हो सकता है और क़ानूनी सलाह नहीं है। धोखे के लिए 1930 पर और मुफ़्त क़ानूनी मदद के लिए 15100 पर फ़ोन कीजिए।", ai_fail: "अभी जवाब नहीं मिल सका। कृपया बाद में कोशिश कीजिए या दफ़्तर में पूछिए।", ocr_btn: "फ़ोटो से पढ़ें", ocr_private: "फ़ोटो सिर्फ़ इसी फ़ोन पर पढ़ी जाती है। कहीं भेजी या रखी नहीं जाती।", ocr_loading: "फ़ोटो पढ़ने की तैयारी (लगभग 7 MB, सिर्फ़ पहली बार)…", ocr_reading: "फ़ोटो पढ़ी जा रही है…", ocr_found: "कागज़ पर यह मिला (एक-एक करके पूछा जाएगा कि सही है या नहीं)", ocr_paper: "कागज़", ocr_none: "फ़ोटो से पक्का कुछ पढ़ा नहीं जा सका। कृपया बोलकर या लिखकर बताइए।", ocr_failed: "फ़ोटो पढ़ी नहीं जा सकी। कृपया बोलकर या लिखकर बताइए।", doc_note: "अपने आधार कार्ड, राशन कार्ड या खसरे की नक़ल की फ़ोटो लीजिए। फ़ोटो में जो नंबर और शब्द मिलेंगे, वही जवाब माने जाएँगे, और मैं हर एक पर पूछूँगी कि वह सही है या नहीं।", g_explain: "कागज़ समझिए", k_explain: "कागज़ का मतलब", ex_what: "यह क्या है", ex_do: "क्या करें", ex_wrong: "अगर इसमें कुछ ग़लत है", ex_beware: "धोखे से बचिए", ex_help: "अगर धोखा हो गया", ex_date: "कागज़ पर लिखी तारीख", ex_amount: "रकम", ex_left: "दिन बाकी", ex_passed: "यह तारीख निकल चुकी है", ex_today: "यह तारीख आज है", ex_note: "सामान्य जानकारी, क़ानूनी सलाह नहीं। जाँची गई:", next_explain: "कागज़ संभालकर रखिए। अगर किसी दफ़्तर ने आपके साथ ग़लत किया है, तो होम पेज से शिकायत लिख सकते हैं।",
       a11y_home: "ध्वनिForms होम", a11y_bigger: "अक्षर बड़े करें", a11y_lang: "भाषा चुनें", install: "फ़ोन में लगाएँ", tagline: "बोलकर फ़ॉर्म भरें", hello: "नमस्ते", welcome_kicker: "सरकारी फ़ॉर्म, बोलकर", chip1: "बोलकर या लिखकर", chip2: "हर जवाब की जाँच", chip3: "30 मिनट बाद मिट जाता है", hello_sub: "आज क्या करना है? नीचे से चुनिए, फिर बोलकर या लिखकर जवाब दीजिए। हर जवाब फ़ॉर्म पर जाने से पहले आपको पढ़कर सुनाया जाएगा।",
       most: "सबसे ज़्यादा किए जाने वाले काम", everything: "बाकी सब", how_title: "कैसे काम करता है", how1: "फ़ॉर्म चुनिए। सवाल एक-एक करके आएँगे।",
       how2: "माइक दबाकर बोलिए, या लिखिए। हर जवाब पढ़कर सुनाया जाएगा: \"क्या यह सही है?\"", how3: "आख़िर में भरा हुआ फ़ॉर्म या पत्र डाउनलोड या प्रिंट कीजिए।",
@@ -520,7 +521,7 @@
       no_recog: "इस ब्राउज़र में इस भाषा में बोलकर जवाब नहीं हो पा रहा। लिखकर जवाब दीजिए।", by_word: "बटा" },
     en: {}
   };
-  var EN = { ai_title: "A question about this paper", ai_ph: "Type your question (no names or numbers)", ai_ask: "Ask the AI", ai_consent: "Your question will be sent to an AI service to be answered. Only the question and the kind of paper go; not the photo, your name or any number. Numbers you type are blanked out. The AI can be wrong.", ai_send: "Yes, send it", ai_cancel: "No, do not send", ai_wait: "Getting an answer…", ai_warn: "This is an AI answer. It can be wrong and is not legal advice. For fraud call 1930; for free legal help call 15100.", ai_fail: "Could not get an answer just now. Please try again later or ask at the office.", ocr_btn: "Read from a photo", ocr_private: "The photo is read on this phone only. It is not sent or stored anywhere.", ocr_loading: "Getting the reader ready (about 7 MB, first time only)…", ocr_reading: "Reading the photo…", ocr_found: "Found on the paper (I will ask one by one whether it is right)", ocr_paper: "Paper", ocr_none: "Could not read anything for sure from the photo. Please say or type it.", ocr_failed: "Could not read the photo. Please say or type it.", g_explain: "Understand a paper", k_explain: "Paper explained", ex_what: "What it is", ex_do: "What to do", ex_wrong: "If something on it is wrong", ex_beware: "Watch out for fraud", ex_help: "If you were cheated", ex_date: "Date on the paper", ex_amount: "Amount", ex_left: "days left", ex_passed: "This date has passed", ex_today: "This date is today", ex_note: "General guidance, not legal advice. Checked on", next_explain: "Keep the paper safe. If an office has treated you unfairly, you can write a complaint from the home page.",
+  var EN = { ai_title: "A question about this paper", ai_ph: "Type your question (no names or numbers)", ai_ask: "Ask the AI", ai_consent: "Your question will be sent to an AI service to be answered. Only the question and the kind of paper go; not the photo, your name or any number. Numbers you type are blanked out. The AI can be wrong.", ai_send: "Yes, send it", ai_cancel: "No, do not send", ai_wait: "Getting an answer…", ai_warn: "This is an AI answer. It can be wrong and is not legal advice. For fraud call 1930; for free legal help call 15100.", ai_fail: "Could not get an answer just now. Please try again later or ask at the office.", ocr_btn: "Read from a photo", ocr_private: "The photo is read on this phone only. It is not sent or stored anywhere.", ocr_loading: "Getting the reader ready (about 7 MB, first time only)…", ocr_reading: "Reading the photo…", ocr_found: "Found on the paper (I will ask one by one whether it is right)", ocr_paper: "Paper", ocr_none: "Could not read anything for sure from the photo. Please say or type it.", ocr_failed: "Could not read the photo. Please say or type it.", doc_note: "Take a photo of your Aadhaar card, ration card or khasra copy. Only the numbers and words found are used as answers, and I will ask you whether each one is right.", g_explain: "Understand a paper", k_explain: "Paper explained", ex_what: "What it is", ex_do: "What to do", ex_wrong: "If something on it is wrong", ex_beware: "Watch out for fraud", ex_help: "If you were cheated", ex_date: "Date on the paper", ex_amount: "Amount", ex_left: "days left", ex_passed: "This date has passed", ex_today: "This date is today", ex_note: "General guidance, not legal advice. Checked on", next_explain: "Keep the paper safe. If an office has treated you unfairly, you can write a complaint from the home page.",
     next_advisor: "Tap 'Fill this form' next to a scheme: some of your answers will already be filled in. The department makes the final decision.",
     next_lookup: "This comes from a saved copy of the records. For anything important, also check the official portal.",
     a11y_home: "DwaniForms home", a11y_bigger: "Bigger text", a11y_lang: "Choose a language", install: "Add to phone", tagline: "Fill forms by speaking", hello: "Namaste", unavailable: "Not available yet", questions: "questions", g_forms: "Government forms",
@@ -767,7 +768,8 @@
     if (r.done) { showResult(r); return; }
     $("question").textContent = r.text;
     speak(r.speak || r.text);
-    $("photo").hidden = r.flow !== "explain";
+    $("photo").hidden = !(r.flow === "explain" || r.flow === "form" || /^lookup/.test(r.flow));
+    $("doc-note").hidden = r.flow === "explain";
     $("mt-note").hidden = !r.machine_translated;
     $("draft-note").hidden = !(PACKS[lang] && PACKS[lang].status !== "reviewed");
     $("yn").hidden = !(r.phase === "confirm" || r.phase === "final");
@@ -858,7 +860,7 @@
   function ocrReady() {
     if (!ocrEngine) {
       var base = B + "/assets/ocr/";
-      ocrEngine = Promise.all([loadScript(base + "tesseract.min.js"), loadScript(base + "dwani-ocr.js")]).then(function () {
+      ocrEngine = Promise.all([loadScript(base + "tesseract.min.js"), loadScript(base + "dwani-ocr.js"), loadScript(base + "dwani-docs.js")]).then(function () {
         ocrLangs = "eng";
         return Tesseract.createWorker(["eng"], 1, { workerPath: base + "worker.min.js", workerBlobURL: false,
           corePath: base + "tesseract-core-simd-lstm.js", langPath: base.slice(0, -1), gzip: true, cacheMethod: "none" });
@@ -866,17 +868,33 @@
     }
     return ocrEngine;
   }
-  function ocrPass(w, langs, canvas) {
+  function ocrText(w, langs, canvas) {
     var key = langs.join("+"), ready = key === ocrLangs ? Promise.resolve() : w.reinitialize(langs).then(function () { ocrLangs = key; });
-    return ready.then(function () { return w.recognize(canvas); }).then(function (res) {
-      return DwaniOCR.read((res && res.data && res.data.text) || "", new Date());
-    });
+    return ready.then(function () { return w.recognize(canvas); }).then(function (res) { return (res && res.data && res.data.text) || ""; });
+  }
+  function ocrPass(w, langs, canvas) {
+    return ocrText(w, langs, canvas).then(function (text) { return DwaniOCR.read(text, new Date()); });
   }
   function ocrRead(w, canvas) {
     return ocrPass(w, ["eng"], canvas).then(function (a) {
       if (a.paper && a.due_date && a.amount) return a;
       return ocrPass(w, ["hin", "eng"], canvas).then(function (b) {
         return { paper: a.paper || b.paper, due_date: a.due_date || b.due_date, amount: a.amount || b.amount };
+      });
+    });
+  }
+  // An identity or land paper for a form: the numbers come from the English pass, the Hindi words ("राशन कार्ड", "खसरा")
+  // from the Hindi + English pass. A value found by both is kept from the English pass (it keeps the digits).
+  function docRead(w, canvas) {
+    var today = new Date();
+    return ocrText(w, ["eng"], canvas).then(function (a) {
+      var ra = DwaniDocs.read(a, today);
+      if (ra.kind === "aadhaar" && ra.values.dob && ra.values.gender) return ra.values;
+      return ocrText(w, ["hin", "eng"], canvas).then(function (b) {
+        var rb = DwaniDocs.read(b, today), out = {}, k;
+        for (k in rb.values) out[k] = rb.values[k];
+        for (k in ra.values) out[k] = ra.values[k];
+        return out;
       });
     });
   }
@@ -903,11 +921,25 @@
     var o = f && (f.options || []).filter(function (x) { return x.value === value; })[0];
     return o ? o.label : value;
   }
+  var DOC_ROWS = ["aadhaar", "full_name", "father_name", "dob", "gender", "mobile", "pincode", "ration_card", "card_no", "khasra"];
+  function docShown(id, v) {
+    var f = ((cur && cur.fields) || []).filter(function (x) { return x.id === id; })[0] || {};
+    if (f.sensitive) return "•••• " + String(v).slice(-4);               // an Aadhaar number is never drawn in full
+    return shownValue({ kind: f.kind, value: v, options: f.options });
+  }
   function showFound(want) {
     var dl = $("photo-list"); dl.innerHTML = "";
-    var rows = [["paper", t("ocr_paper"), want.paper && ocrFieldLabel("paper", want.paper)],
-                ["due_date", t("ex_date"), want.due_date && shownValue({ kind: "date", value: want.due_date })],
-                ["amount", t("ex_amount"), want.amount && "₹ " + Number(want.amount).toLocaleString("en-IN")]];
+    var rows = [];
+    if (cur && cur.flow !== "explain") {
+      DOC_ROWS.forEach(function (id) {
+        var f = ((cur && cur.fields) || []).filter(function (x) { return x.id === id; })[0];
+        if (want[id] && f) rows.push([id, f.label_local || f.label || id, docShown(id, want[id])]);
+      });
+    } else {
+      rows = [["paper", t("ocr_paper"), want.paper && ocrFieldLabel("paper", want.paper)],
+              ["due_date", t("ex_date"), want.due_date && shownValue({ kind: "date", value: want.due_date })],
+              ["amount", t("ex_amount"), want.amount && "₹ " + Number(want.amount).toLocaleString("en-IN")]];
+    }
     rows.forEach(function (r) {
       if (!r[2]) return;
       var dt = document.createElement("dt"), dd = document.createElement("dd");
@@ -916,21 +948,27 @@
     $("photo-found").hidden = !dl.children.length;
   }
   function readPhoto(file) {
-    var st = $("photo-status"), btn = $("photo-btn");
+    var st = $("photo-status"), btn = $("photo-btn"), forForm = !!cur && cur.flow !== "explain";
     btn.disabled = true; showFound({});
     st.textContent = t("ocr_loading");
     Promise.all([ocrReady(), photoCanvas(file)]).then(function (a) {
       st.textContent = t("ocr_reading");
-      return ocrRead(a[0], a[1]);
+      return forForm ? docRead(a[0], a[1]) : ocrRead(a[0], a[1]);
     }).then(function (got) {
       var want = {};
-      ["paper", "due_date", "amount"].forEach(function (k) { if (got[k]) want[k] = got[k]; });
+      if (forForm) {
+        // only fields this form actually asks for; the server also ignores any other
+        var ids = ((cur && cur.fields) || []).map(function (x) { return x.id; });
+        Object.keys(got).forEach(function (k) { if (got[k] && ids.indexOf(k) > -1) want[k] = got[k]; });
+      } else {
+        ["paper", "due_date", "amount"].forEach(function (k) { if (got[k]) want[k] = got[k]; });
+      }
       if (!Object.keys(want).length) { st.textContent = t("ocr_none"); return; }
       // Only these few values go to the server, never the picture. It reads each back and asks "is this correct?".
       return api("/sessions/" + sid + "/suggest", { method: "POST", json: { values: want } }).then(function (r) {
         var took = {}; (r.suggested || []).forEach(function (k) { took[k] = want[k]; });
         st.textContent = Object.keys(took).length ? "" : t("ocr_none");
-        showFound(took); render(r);
+        render(r); showFound(took);
       });
     }).catch(function () { st.textContent = t("ocr_failed"); })
       .then(function () { btn.disabled = false; });
