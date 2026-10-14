@@ -153,3 +153,8 @@ def test_every_word_on_the_page_exists_in_both_languages():
     for k in re.findall(r'data-t="([a-z_0-9]+)"', PAGE):
         assert k in keys(hi), k
 
+
+def test_a_browser_without_javascript_is_told_what_to_do_in_both_languages():
+    note = re.search(r"<noscript>(.*?)</noscript>", PAGE, re.S).group(1)
+    assert "JavaScript" in note and re.search(r"[\u0900-\u097F]", note) and "turn on JavaScript" in note
+
