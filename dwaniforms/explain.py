@@ -13,6 +13,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from . import langpacks
+from . import clock
 
 PAPER_DIR = Path(__file__).parent / "papers"
 FALLBACK = "Something else"
@@ -41,7 +42,7 @@ def days_until(iso: str, today: dt.date) -> int | None:
 
 
 def explain_outcome(session, today: dt.date | None = None, **_) -> dict:
-    today = today or dt.date.today()
+    today = today or clock.today()
     lang = session.lang
     a = session.answers.get("paper")
     p = papers().get(a.value if a else "") or papers()[FALLBACK]
