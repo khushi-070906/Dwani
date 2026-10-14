@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from dwaniforms import explain, langpacks
+from dwaniforms import clock, explain, langpacks
 from dwaniforms.schema import load_all
 from dwaniforms.service import FormService
 
@@ -90,7 +90,7 @@ def test_each_paper_name_picks_that_paper(lang):
 
 # ---- the answer -------------------------------------------------------------------------------------------------
 def test_hindi_bill_with_a_date_ahead_counts_the_days_and_warns_of_fraud():
-    due = (dt.date.today() + dt.timedelta(days=12)).strftime("%d/%m/%Y")
+    due = (clock.today() + dt.timedelta(days=12)).strftime("%d/%m/%Y")
     s, r = _run("hi", ["बिजली का बिल", due, "1850"])
     o = r.outcome
     assert o["type"] == "explain" and o["paper"] == "electricity_bill"
@@ -101,7 +101,7 @@ def test_hindi_bill_with_a_date_ahead_counts_the_days_and_warns_of_fraud():
 
 
 def test_a_date_that_has_passed_says_go_today():
-    s, r = _run("en", ["traffic challan", (dt.date.today() - dt.timedelta(days=5)).strftime("%d/%m/%Y"), "skip"])
+    s, r = _run("en", ["traffic challan", (clock.today() - dt.timedelta(days=5)).strftime("%d/%m/%Y"), "skip"])
     assert r.outcome["days"] == -5 and "has already passed" in r.outcome["say"]
 
 
