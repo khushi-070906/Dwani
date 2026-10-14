@@ -189,6 +189,10 @@
           font-size: .82rem; font-weight: 700; color: var(--navy); }
   .chip i { font-style: normal; color: var(--forest); display: inline-flex; align-items: center; }
   .ic { width: 1.1em; height: 1.1em; flex: none; }
+  .steps .s i .ic, .ck i .ic { width: .8rem; height: .8rem; stroke-width: 3; }
+  .ck i .ic { width: .7rem; height: .7rem; }
+  .note-pen .ic, .note-ok .ic, .count .ic, #status .ic, .scheme .ic, #op-msg .ic { width: .95em; height: .95em; vertical-align: -.15em; stroke-width: 2.2; }
+  #status .ic { color: var(--amber-ink); }
   .row .ri .ic { width: 22px; height: 22px; }
   .mic .ic { width: 34px; height: 34px; }
   .btn .ic { width: 1.15em; height: 1.15em; vertical-align: -.2em; margin-right: .25rem; }
@@ -602,7 +606,11 @@
     "advisor": "<path d=\"M9 18h6M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z\"/>",
     "mic": "<rect x=\"9\" y=\"3\" width=\"6\" height=\"11\" rx=\"3\"/><path d=\"M5 11a7 7 0 0 0 14 0M12 18v3\"/>",
     "lock": "<rect x=\"5\" y=\"11\" width=\"14\" height=\"10\" rx=\"2\"/><path d=\"M8 11V8a4 4 0 0 1 8 0v3\"/>",
-    "camera": "<path d=\"M4 8h3l2-3h6l2 3h3v12H4z\"/><circle cx=\"12\" cy=\"14\" r=\"3.5\"/>"};
+    "camera": "<path d=\"M4 8h3l2-3h6l2 3h3v12H4z\"/><circle cx=\"12\" cy=\"14\" r=\"3.5\"/>",
+    "cross": "<path d=\"M6 6l12 12M18 6L6 18\"/>",
+    "check": "<path d=\"M5 12.5l4.5 4.5L19 7\"/>",
+    "warn": "<path d=\"M12 4l9 16H3z\"/><path d=\"M12 10v4M12 17v.1\"/>",
+    "pencil": "<path d=\"M4 20l1-4L16 5l3 3L8 19z\"/><path d=\"M14 7l3 3\"/>"};
   function icon(name) { return '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + (ICON[name] || ICON.form) + "</svg>"; }
   var lang = "hi", sid = null, cur = null, forms = [], caps = {}, reveal = false, inkedBefore = {};
 
