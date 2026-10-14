@@ -23,6 +23,12 @@ ok(/30 days/.test(pEn) && /30 दिन/.test(pHi), "privacy: says how soon they
 
 // --- what the browser keeps, now that the app can be installed on a phone
 ok(/not among them/i.test(pEn) && /जवाब इनमें नहीं होते/.test(pHi), "privacy: says answers are NOT stored on the phone");
+ok(/never uploaded/i.test(pEn) && /न अपलोड करते हैं/.test(pHi), "privacy: says a photographed paper is read on the phone and never uploaded");
+ok(/do not ask for camera permission/i.test(pEn) && /कैमरे की अनुमति नहीं माँगते/.test(pHi), "privacy: no camera permission is asked");
+ok(/off unless you see an "Ask the AI" box/i.test(pEn) && /तभी चालू है जब/.test(pHi), "privacy: the AI question is off unless the box is shown");
+ok(/Every question asks again/i.test(pEn) && /हर सवाल पर दोबारा पूछा जाता है/.test(pHi), "privacy: consent is asked for every question");
+ok(/Not<\/strong> the photo/i.test(privacy.document.querySelector("main > .en").innerHTML) && /नहीं<\/strong> जाता: फ़ोटो/.test(privacy.document.querySelector("main > .hi").innerHTML), "privacy: says the photo, amount and name never go to the AI");
+ok(/Anthropic/.test(pEn) && /Anthropic/.test(pHi) && /do not store your question/i.test(pEn), "privacy: names who answers and says nothing is stored");
 ok(/one tab/.test(pEn) && /एक टैब/.test(pHi), "privacy: explains the session id kept for one tab");
 
 // --- the promises terms of use must make plainly
