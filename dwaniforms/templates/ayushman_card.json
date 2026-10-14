@@ -1,0 +1,227 @@
+{
+ "id": "ayushman_card",
+ "title": "Ayushman card details (PM-JAY)",
+ "glossary": [
+  "Ayushman",
+  "PM-JAY",
+  "Aadhaar",
+  "ration card",
+  "eKYC"
+ ],
+ "form_language": "en",
+ "titles": {
+  "hi": "आयुष्मान कार्ड की जानकारी (पीएम-जय)"
+ },
+ "fields": [
+  {
+   "id": "full_name",
+   "kind": "name",
+   "label": "Full name",
+   "prompt": {
+    "en": "What is your full name?",
+    "hi": "अपना पूरा नाम बताइए।"
+   },
+   "labels": {
+    "hi": "पूरा नाम"
+   }
+  },
+  {
+   "id": "father_name",
+   "kind": "name",
+   "label": "Father / husband name",
+   "prompt": {
+    "en": "What is your father's or husband's name?",
+    "hi": "अपने पिता या पति का नाम बताइए।"
+   },
+   "labels": {
+    "hi": "पिता / पति का नाम"
+   }
+  },
+  {
+   "id": "dob",
+   "kind": "date",
+   "label": "Date of birth",
+   "prompt": {
+    "en": "What is your date of birth? Say day, month and year.",
+    "hi": "अपनी जन्म तिथि बताइए: दिन, महीना और साल।"
+   },
+   "params": {},
+   "labels": {
+    "hi": "जन्म तिथि"
+   }
+  },
+  {
+   "id": "gender",
+   "kind": "choice",
+   "label": "Gender",
+   "prompt": {
+    "en": "Are you male, female or other?",
+    "hi": "आप पुरुष हैं, महिला हैं या अन्य?"
+   },
+   "options": [
+    {
+     "value": "Male",
+     "synonyms": {
+      "en": [
+       "male",
+       "man",
+       "boy"
+      ],
+      "hi": [
+       "पुरुष",
+       "आदमी",
+       "मर्द",
+       "लड़का"
+      ]
+     }
+    },
+    {
+     "value": "Female",
+     "synonyms": {
+      "en": [
+       "female",
+       "woman",
+       "girl"
+      ],
+      "hi": [
+       "महिला",
+       "औरत",
+       "स्त्री",
+       "लड़की"
+      ]
+     }
+    },
+    {
+     "value": "Other",
+     "synonyms": {
+      "en": [
+       "other",
+       "transgender"
+      ],
+      "hi": [
+       "अन्य",
+       "ट्रांसजेंडर"
+      ]
+     }
+    }
+   ],
+   "labels": {
+    "hi": "लिंग"
+   }
+  },
+  {
+   "id": "mobile",
+   "kind": "mobile",
+   "label": "Mobile number",
+   "prompt": {
+    "en": "What is your mobile number?",
+    "hi": "अपना मोबाइल नंबर बताइए।"
+   },
+   "labels": {
+    "hi": "मोबाइल नंबर"
+   }
+  },
+  {
+   "id": "aadhaar",
+   "kind": "aadhaar",
+   "label": "Aadhaar number",
+   "prompt": {
+    "en": "Please say your Aadhaar number, one digit at a time.",
+    "hi": "अपना आधार नंबर एक-एक अंक बोलकर बताइए।"
+   },
+   "labels": {
+    "hi": "आधार नंबर"
+   }
+  },
+  {
+   "id": "ration_card",
+   "kind": "text",
+   "label": "Ration card number",
+   "prompt": {
+    "en": "Please say your ration card number, one digit at a time.",
+    "hi": "अपना राशन कार्ड नंबर एक-एक अंक बोलकर बताइए।"
+   },
+   "required": false,
+   "labels": {
+    "hi": "राशन कार्ड नंबर"
+   }
+  },
+  {
+   "id": "village",
+   "kind": "place",
+   "label": "Village / town",
+   "prompt": {
+    "en": "Which village or town do you live in?",
+    "hi": "आप किस गाँव या शहर में रहते हैं?"
+   },
+   "labels": {
+    "hi": "गाँव / कस्बा"
+   }
+  },
+  {
+   "id": "district",
+   "kind": "place",
+   "label": "District",
+   "prompt": {
+    "en": "Which district is that?",
+    "hi": "आपका ज़िला कौन सा है?"
+   },
+   "labels": {
+    "hi": "जिला"
+   }
+  },
+  {
+   "id": "state",
+   "kind": "place",
+   "label": "State",
+   "prompt": {
+    "en": "Which state?",
+    "hi": "आपका राज्य कौन सा है?"
+   },
+   "labels": {
+    "hi": "राज्य"
+   }
+  },
+  {
+   "id": "pincode",
+   "kind": "pincode",
+   "label": "PIN code",
+   "prompt": {
+    "en": "What is your PIN code?",
+    "hi": "अपना पिन कोड बताइए।"
+   },
+   "labels": {
+    "hi": "पिन कोड"
+   }
+  },
+  {
+   "id": "family_members",
+   "kind": "number",
+   "label": "Family members",
+   "prompt": {
+    "en": "How many people are in your family?",
+    "hi": "आपके परिवार में कुल कितने लोग हैं?"
+   },
+   "labels": {
+    "hi": "परिवार के सदस्य"
+   },
+   "params": {
+    "minimum": 1,
+    "maximum": 50
+   }
+  },
+  {
+   "id": "listed",
+   "kind": "yesno",
+   "label": "On Ayushman list",
+   "required": false,
+   "prompt": {
+    "en": "Have you already checked that your family is on the Ayushman list? You can say skip.",
+    "hi": "क्या आपने देख लिया है कि आपका परिवार आयुष्मान सूची में है? आप छोड़ भी सकते हैं।"
+   },
+   "labels": {
+    "hi": "आयुष्मान सूची में नाम"
+   }
+  }
+ ]
+}
