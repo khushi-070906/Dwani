@@ -83,3 +83,8 @@ services:
         value: "1"
       - key: DWANIFORMS_METRICS_TOKEN      # opens /form/metrics (anonymous counts) for whoever sends it
         generateValue: true
+      - key: DWANIFORMS_KEY_SECRET         # switches on the company API (/api/v1) and signs its keys; see dwaniforms/API.md
+        generateValue: true                # copy it from the dashboard to your own computer to issue keys; never share it
+      # OFF by default. To let people ask one question about a paper (Samjhao), add DWANIFORMS_AI_KEY in the Render
+      # dashboard (Environment -> Add, an Anthropic API key; never put it in this file). Read dwaniforms/ai.py and the
+      # privacy page's "Asking an AI" section first: it is the one place the app talks to anyone else.
