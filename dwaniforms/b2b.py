@@ -35,7 +35,7 @@ from . import address as addr_mod
 from . import apikeys, clock, names, spoken
 from .hardening import RateLimiter, client_ip
 from .messages import MESSAGES
-from .session import FormSession
+from .session import Answer, FormSession
 
 log = logging.getLogger("dwaniforms.api")
 
@@ -133,10 +133,22 @@ def _text(v) -> str | None:
     return v if isinstance(v, str) else None
 
 
-def field_spec(f) -> dict:
+# A platform's users file with any public authority, not one of the twelve offices the voice app lists. For these fields
+# the API also takes the office's own name as plain text (3-100 printable characters) and prints it in the letter as given.
+FREE_TEXT = {("rti", "department"), ("rti_appeal", "department"), ("grievance", "department")}
+
+
+def _free_text(value: str) -> str | None:
+    v = " ".join(value.split())
+    return v if 3 <= len(v) <= 100 and v.isprintable() and any(ch.isalpha() for ch in v) else None
+
+
+def field_spec(f, flow: str = "") -> dict:
     out = {"id": f.id, "label": f.label, "kind": f.kind, "required": f.required, "sensitive": f.sensitive}
     if f.options:
         out["options"] = [o.value for o in f.options]
+    if (flow, f.id) in FREE_TEXT:
+        out["accepts_free_text"] = True
     if f.when:
         out["when"] = f.when
     params = {k: v for k, v in f.params.items() if k in PARAMS}
@@ -163,6 +175,10 @@ async def run_draft(service, template, lang: str, raw: dict) -> dict:
             continue
         else:
             ok, err = s.operator_set(f.id, value)
+            if not ok and err == "choice_invalid" and (template.flow, f.id) in FREE_TEXT and _free_text(value):
+                v = _free_text(value)
+                s.answers[f.id] = Answer(v, v, needs_review=False)
+                ok = True
             if not ok:
                 errors[f.id] = {"code": err, "message": PROBLEMS.get(err) or MESSAGES["en"].get(err, "Not accepted.")}
     missing = [f.id for f in template.fields if f.required and s.applicable(f) and f.id not in s.answers and f.id not in errors]
@@ -250,7 +266,7 @@ def build_api(service, meter: Meter | None = None) -> FastAPI:
         k = authenticate(request)
         stamp(response, k)
         return {"services": [{"id": t.id, "service": apikeys.GROUPS[t.flow], "title": t.title,
-                              "description": t.description.get("en", ""), "fields": [field_spec(f) for f in t.fields]}
+                              "description": t.description.get("en", ""), "fields": [field_spec(f, t.flow) for f in t.fields]}
                              for t in offered(k).values()],
                 "languages": service.capabilities()["langs"]}
 
