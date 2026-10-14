@@ -341,3 +341,7 @@ The first calm pass was nearly all one green. Colour is back, in a small muted s
 - Answers go to the server in one request (`POST /form/yojana/advise`); anything the advisor would not accept is refused with 422.
 - "Send to friends and family" draws a share card in the browser (shared as a picture where the phone allows, otherwise saved; a WhatsApp text link sits beside it). The card shows scheme names and a count, never an answer.
 - The marketing site links to it.
+
+## DwaniYojana can be answered by speaking
+- Where the browser can listen, each question has an "Answer by speaking" button. The words go to `POST /form/yojana/understand`, which reads them for that one question with the spoken forms' own readers: Hindi and English number words ("बासठ", "ढाई एकड़", "डेढ़ लाख"), yes/no and each option's synonyms. "पता नहीं" is never turned into a No. Income spoken as an amount is rounded up to its band. Nothing is stored.
+- The page says plainly that the browser may send the sound to Google; tapping always works. Where the browser cannot listen the button is not shown.
