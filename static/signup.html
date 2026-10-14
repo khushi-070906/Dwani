@@ -533,7 +533,10 @@
 </footer>
 
 <script>
-  const nextPath = new URLSearchParams(window.location.search).get('next') || '/dashboard.html';
+  // Only a path on this site ("/pricing.html"), never "//host", "/\\host", "javascript:..." or an address with a line break:
+  // this value is used as the page to open after logging in.
+  const rawNext = new URLSearchParams(window.location.search).get('next') || '';
+  const nextPath = /^\/(?![\/\\])[^\x00-\x1f\x7f\\]*$/.test(rawNext) ? rawNext : '/dashboard.html';
   document.getElementById('google-login-link').href =
     '/auth/google/login?next=' + encodeURIComponent(nextPath);
   document.getElementById('login-switch-link').href =
