@@ -21,6 +21,7 @@ import sys
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from pathlib import Path
+from . import clock
 
 SCHEMES_DIR = Path(__file__).parent / "schemes"
 STALE_DAYS = 180
@@ -95,7 +96,7 @@ def stale(scheme: dict, today: dt.date | None = None) -> bool:
         reviewed = dt.date.fromisoformat(scheme["last_reviewed"])
     except (KeyError, ValueError):
         return True
-    return ((today or dt.date.today()) - reviewed).days > STALE_DAYS
+    return ((today or clock.today()) - reviewed).days > STALE_DAYS
 
 
 def advise(facts: dict, lang: str = "en", templates: dict | None = None, today: dt.date | None = None) -> dict:
