@@ -3,7 +3,7 @@
    What it keeps: the page itself, the bundled fonts and icons, and the three public lists (services, capabilities,
    screen text). NOTHING from /sessions is ever read, cached or even intercepted -- that is where a citizen's answers
    live, and they stay on the server. Bump CACHE to roll out a new page. */
-const CACHE = "dwaniforms-v3";
+const CACHE = "dwaniforms-v5";
 const SHELL = [
   "./",
   "./manifest.webmanifest",
@@ -13,7 +13,8 @@ const SHELL = [
   "./assets/img/icon-maskable-512.png",
   "./assets/fonts/RozhaOne-Regular.ttf",
   "./assets/fonts/Mukta-Regular.ttf",
-  "./assets/fonts/Mukta-SemiBold.ttf"
+  "./assets/fonts/Mukta-SemiBold.ttf",
+  "./assets/fonts/SourceSerif4-latin.woff2"
 ];
 
 self.addEventListener("install", (e) => {
