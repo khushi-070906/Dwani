@@ -468,6 +468,7 @@
   .modal-card h1 { font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; margin: 0 0 0.3rem; }
   .modal-card > p.sub { color: var(--ink-dim); font-size: 0.88rem; margin: 0 0 1.4rem; line-height: 1.5; }
 </style>
+<link rel="stylesheet" href="/static/account.css">
 </head>
 <body>
 
@@ -601,55 +602,38 @@
       const data = await res.json();
       await populateNavAccount(data.name, data.email, data.gender);
 
+      const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      // Stable "latest" URLs: publish a new GitHub release and every
+      // dashboard picks it up -- no more hard-coded v1.0.1 links going stale.
+      const RELEASES = 'https://github.com/khushi-070906/Dwani/releases/latest/download/';
+
       let subscriptionHtml;
       if (data.subscription) {
         const sub = data.subscription;
-        const statusClass = 'dash-status-' + sub.status;
-        // Stable "latest" URLs: publish a new GitHub release and every
-        // dashboard picks it up -- no more hard-coded v1.0.1 links going stale.
-        const RELEASES = 'https://github.com/khushi-070906/Dwani/releases/latest/download/';
-        const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-        let setupHtml = '';
-        if (sub.status === 'active') {
-          setupHtml = `
-            <div class="dash-row" style="flex-direction:column; align-items:flex-start; gap:0.6rem; margin-top:1rem;">
-              <span class="label">Get DwaniLive running (Windows 10/11, 64-bit)</span>
-              <div style="display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center;">
-                <a class="dash-cta" href="${RELEASES}DwaniLive-Setup.exe">Download DwaniLive</a>
-                <span id="dash-release" style="font-size:0.85rem; color:var(--ink-faint);"></span>
-                <a href="${RELEASES}DwaniLive-win64.zip" style="font-size:0.85rem; color:var(--ink-faint);">or portable .zip</a>
-              </div>
-              <p style="margin:0.4rem 0 0; font-size:0.9rem;"><b>1.</b> Run <code>DwaniLive-Setup.exe</code>. If Windows shows "Windows protected your PC", click <b>More info &rarr; Run anyway</b> (normal for new apps).</p>
-              <p style="margin:0.4rem 0 0; font-size:0.9rem;"><b>2.</b> DwaniLive opens and downloads its models once (~1.1&nbsp;GB, resumes if your internet drops). Then it asks for your license &mdash; paste this key and your email <b>${esc(data.email)}</b>:</p>
-              <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
-                <div class="dash-license-box" id="dash-key" style="user-select:all;">${esc(sub.license_key)}</div>
-                <button type="button" class="dash-cta" id="dash-copy-key" style="border:none; cursor:pointer;">Copy key</button>
-              </div>
-              <p style="margin:0.4rem 0 0; font-size:0.9rem;"><b>3.</b> Allow the Windows network prompt so phones can join. After this first run, DwaniLive works fully offline &mdash; just open it from the Start menu.</p>
-              <p style="margin:0.4rem 0 0; font-size:0.82rem; color:var(--ink-faint);">Stuck? In the DwaniLive window click <b>Copy error report</b> and send it to us.</p>
+        const statusClass = 'dash-status-' + esc(sub.status);
+        const setupHtml = sub.status === 'active' ? `
+          <div class="dash-setup">
+            <div class="dash-setup-head">
+              <a class="dash-cta" href="${RELEASES}DwaniLive-Setup.exe">Download for Windows</a>
+              <span class="dash-small"><span id="dash-release"></span> <a href="${RELEASES}DwaniLive-win64.zip">Portable .zip</a></span>
             </div>
-          `;
-        } else {
-          setupHtml = `
-            <p style="margin-top:1rem; font-size:0.9rem; color:var(--ink-faint);">
-              Your download links and setup command will appear here once payment is confirmed (usually within a minute).
-            </p>
-          `;
-        }
-
+            <ol class="dash-steps">
+              <li>Run <code>DwaniLive-Setup.exe</code>. If Windows says &ldquo;Windows protected your PC&rdquo;, click <b>More info &rarr; Run anyway</b>. This is normal for new apps.</li>
+              <li>DwaniLive downloads its models once (about 1.1&nbsp;GB, and it resumes if your internet drops). Then it asks for your licence: paste the key above and your email, <b>${esc(data.email)}</b>.</li>
+              <li>Allow the Windows network prompt so phones can join. After this first run it works fully offline.</li>
+            </ol>
+            <p class="dash-small">Stuck? In the DwaniLive window click <b>Copy error report</b> and send it to us.</p>
+          </div>
+        ` : `
+          <p class="dash-small">Your download and setup steps appear here once payment is confirmed (usually within a minute).</p>
+        `;
         subscriptionHtml = `
-          <div class="dash-row">
-            <span class="label">Plan</span>
-            <span class="value"><span class="dash-tier-badge">${sub.tier}</span></span>
-          </div>
-          <div class="dash-row">
-            <span class="label">Status</span>
-            <span class="value ${statusClass}">${sub.status}</span>
-          </div>
-          <div class="dash-row" style="flex-direction:column; align-items:flex-start; gap:0.4rem;">
-            <span class="label">License key</span>
-            <div class="dash-license-box">${sub.license_key}</div>
+          <div class="dash-row"><span class="label">Plan</span><span class="value dash-plan">${esc(sub.tier)}</span></div>
+          <div class="dash-row"><span class="label">Status</span><span class="value ${statusClass}">${esc(sub.status)}</span></div>
+          <div class="dash-row dash-keyrow">
+            <span class="label">Licence key</span>
+            <span class="dash-keybox"><code class="dash-license-box" id="dash-key">${esc(sub.license_key)}</code>
+              <button type="button" class="dash-copy" id="dash-copy-key">Copy</button></span>
           </div>
           ${setupHtml}
         `;
@@ -663,8 +647,8 @@
       }
 
       card.innerHTML = `
-        <h1>Welcome, ${data.name || data.email}</h1>
-        <p class="sub">${data.email}</p>
+        <h1>${esc(data.name || data.email)}</h1>
+        <p class="sub">${esc(data.email)}</p>
         ${subscriptionHtml}
       `;
       fetch('/api/release').then((r) => (r.ok ? r.json() : null)).then((rel) => {
@@ -676,8 +660,8 @@
         copyBtn.addEventListener('click', () => {
           const key = document.getElementById('dash-key').textContent.trim();
           navigator.clipboard.writeText(key).then(() => {
-            copyBtn.textContent = 'Copied ✓';
-            setTimeout(() => { copyBtn.textContent = 'Copy key'; }, 1800);
+            copyBtn.textContent = 'Copied';
+            setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1800);
           }).catch(() => {});
         });
       }
