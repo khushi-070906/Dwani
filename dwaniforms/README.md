@@ -197,3 +197,10 @@ the first appeal" opens that form with the office and the RTI date offered as su
 There is **no connection to any government system**: the page cannot know whether an office replied, so the person enters the
 dates. The date rules live in `static/js/tracker.js` and a test runs them against the server's own `outcomes.appeal_timing` on
 the same dates. Tests: `tests/js/dwaniforms_tracker.test.js`, `tests/js/dwaniforms_tracker_page.test.js`, `tests/test_dwaniforms_tracker.py`.
+
+## Which schemes might I get? (DwaniYojana)
+
+`/form/yojana` is a no-sign-in page for people who are not filling a form yet: about ten taps (or spoken answers), then the
+schemes they may get, with how to apply and when the rules were last checked, and a share card that shows scheme names only.
+It reuses the advisor's rules and stores nothing. Endpoints, privacy and how to keep a scheme current: `YOJANA.md`.
+
