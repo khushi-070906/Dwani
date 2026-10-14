@@ -78,6 +78,9 @@ jobs:
       - name: My applications (dates, saved list, first appeal)
         working-directory: tests/js
         run: node dwaniforms_tracker.test.js && DWANIFORMS_URL=http://127.0.0.1:8130 node dwaniforms_tracker_page.test.js
+      - name: DwaniYojana (which schemes might I get? - tap through, answer screen, nothing stored)
+        working-directory: tests/js
+        run: DWANIFORMS_URL=http://127.0.0.1:8130 node dwaniforms_yojana.test.js
       - name: Language packs complete
         run: python -m dwaniforms.langpacks check
       - name: No server errors
