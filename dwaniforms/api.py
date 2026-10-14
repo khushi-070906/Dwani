@@ -185,7 +185,7 @@ def create_router(service: FormService, prefix: str = "/form") -> APIRouter:
         from . import yojana
         if lang not in ("hi", "en"):
             raise HTTPException(404, "no such language")
-        return yojana.questions(service.templates[yojana.TEMPLATE_ID], lang)
+        return JSONResponse(yojana.questions(service.templates[yojana.TEMPLATE_ID], lang), headers={"Cache-Control": "public, max-age=300"})
 
     @router.post("/yojana/understand")
     async def yojana_understand(body: YojanaSay):

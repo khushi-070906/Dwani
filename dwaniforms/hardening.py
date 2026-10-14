@@ -139,7 +139,7 @@ def install(app, service, prefix: str = "/form", version: str = "") -> None:
         h.setdefault("Permissions-Policy", "microphone=(self), camera=(), geolocation=()")
         if request.url.scheme == "https" or request.headers.get("x-forwarded-proto") == "https":
             h.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
-        if path.startswith(prefix + "/sessions"):
+        if path.startswith(prefix + "/sessions") or path in (prefix + "/yojana/advise", prefix + "/yojana/understand"):
             h.setdefault("Cache-Control", "no-store")            # answers must never sit in a shared cache
         return response
 

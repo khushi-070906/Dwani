@@ -158,3 +158,12 @@ def test_a_browser_without_javascript_is_told_what_to_do_in_both_languages():
     note = re.search(r"<noscript>(.*?)</noscript>", PAGE, re.S).group(1)
     assert "JavaScript" in note and re.search(r"[\u0900-\u097F]", note) and "turn on JavaScript" in note
 
+
+def test_the_list_of_questions_may_be_cached_for_a_few_minutes_but_answers_never(client):
+    q = client.get("/form/yojana/questions?lang=en")
+    assert q.headers["cache-control"] == "public, max-age=300"          # no personal data in it; saves a round trip on a slow network
+    for path, body in (("/form/yojana/advise", {"facts": FARMER}), ("/form/yojana/understand", {"question": "age", "text": "sixty two", "lang": "en"})):
+        r = client.post(path, json=body)
+        assert r.status_code == 200 and r.headers["cache-control"] == "no-store", path        # derived from what the person told us
+    assert client.get("/form/yojana").headers["cache-control"] == "no-cache"
+
