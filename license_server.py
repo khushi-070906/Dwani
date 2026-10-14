@@ -77,6 +77,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from licensing import License, sign_license, TIER_FEATURES, TIER_DEFAULT_MAX_ATTENDEES
+import auth_guard
 
 load_dotenv()  # reads .env in the current directory if present, no-op if it doesn't exist
 
@@ -150,6 +151,15 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def _security_headers(request: Request, call_next):
+    """Every page, API answer and the /careers sub-app: not framed by other sites, no type guessing (auth_guard.py)."""
+    response = await call_next(request)
+    for name, value in auth_guard.SECURITY_HEADERS.items():
+        response.headers.setdefault(name, value)
+    return response
 
 # Serve pricing.html directly, and static/ for any future assets (css, js,
 # images) it references.
