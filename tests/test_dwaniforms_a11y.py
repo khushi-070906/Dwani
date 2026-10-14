@@ -101,3 +101,12 @@ def test_headings_do_not_skip_a_level():
 
 def test_the_current_step_is_announced():
     assert 'setAttribute("aria-current", "step")' in APP
+
+
+def test_small_draft_and_note_text_keeps_aa_contrast():
+    # the pencilled (not yet confirmed) rows and the pencil note were pale grey / orange on near-white
+    for sel_text in (".pencil .line, .pencil .boxes .b, .pencil .ck.on {", ".note-pen {"):
+        i = APP.index(sel_text); rule = APP[i:APP.index("}", i)]
+        col = re.search(r"color:\s*(#[0-9A-Fa-f]{6}|var\(--[a-z0-9-]+\))", rule).group(1)
+        col = var(col[6:-1]) if col.startswith("var(") else col
+        assert contrast(col, "#FCFCF9") >= 4.5, (sel_text, col)
