@@ -31,12 +31,12 @@
   a { color: var(--peacock-2); }
   .wrap { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
   [data-lang="hi"] .en, [data-lang="en"] .hi { display: none !important; }
-  .hero { background: var(--peacock); color: #fff; position: relative; overflow: hidden; padding: 0; }
+  .hero { background: linear-gradient(135deg, #1F5E4D 0%, #19503F 55%, #1E3F55 100%); color: #fff; position: relative; overflow: hidden; padding: 0; }
   .hero-grid { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: center; padding: 3rem 0 4rem; }
-  .eyebrow { display: inline-flex; gap: .5rem; align-items: center; color: #BFE3D3; font: 700 .78rem var(--sans); letter-spacing: .14em; text-transform: uppercase; }
+  .eyebrow { display: inline-flex; gap: .5rem; align-items: center; color: var(--gold); font: 700 .78rem var(--sans); letter-spacing: .14em; text-transform: uppercase; }
   .eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; }
   .hero h1 { font-size: clamp(2.1rem, 4.4vw, 3.2rem); line-height: 1.12; font-weight: 600; margin: 1rem 0; letter-spacing: -.01em; }
-  .hero h1 .hl { color: #BFE3D3; white-space: nowrap; }
+  .hero h1 .hl { color: var(--gold); white-space: nowrap; }
   .hero p.sub { color: #d3e9e0; font-size: 1.1rem; margin: 0 0 1.8rem; max-width: 34rem; }
   .cta { background: transparent; color: #fff; border-color: rgba(255,255,255,.55); }
   .cta:hover { background: rgba(255,255,255,.1); border-color: #fff; }
@@ -44,7 +44,7 @@
   .cta.ghost:hover { background: transparent; text-decoration-color: #fff; }
   .stats { display: flex; gap: 2.2rem; margin-top: 2.2rem; padding-top: 1.2rem; border-top: 1px solid rgba(255,255,255,.2); flex-wrap: wrap; }
   .stats div { font-size: .9rem; color: #c0ddd1; }
-  .stats b { display: block; font: 600 1.5rem/1.1 var(--serif); color: #fff; }
+  .stats b { display: block; font: 600 1.5rem/1.1 var(--serif); color: var(--gold); }
   .device { background: var(--paper); color: var(--ink); border-radius: 18px; border: 1px solid rgba(255,255,255,.25);
             box-shadow: 0 30px 60px -30px rgba(0,0,0,.55); overflow: hidden; }
   .device-bar { background: var(--peacock-3); display: flex; justify-content: space-between; align-items: center; padding: .55rem 1rem; }
