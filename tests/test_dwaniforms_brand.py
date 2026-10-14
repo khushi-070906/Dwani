@@ -174,3 +174,11 @@ def test_app_has_drawn_icons_not_emoji():
     for ch in "🎤🎙🔒📷🗣📝📢📄⚖🧾🗺🍚💡":
         assert ch not in t, f"emoji {ch!r} is back in the app"
     assert "function icon(" in t and t.count('class="ic"') >= 4
+
+
+def test_the_dwaniforms_site_writes_to_the_team_mailbox():
+    from pathlib import Path
+    site = Path(__file__).resolve().parent.parent / "dwaniforms_site"
+    for n in ("index", "privacy", "terms"):
+        t = (site / f"{n}.html").read_text(encoding="utf-8")
+        assert "dwanilive@gmail.com" in t and "khushimittal070906" not in t, n
