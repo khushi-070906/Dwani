@@ -1,0 +1,12 @@
+Photo reading for "Understand a paper" (Samjhao). Everything in this folder runs in the person's own browser; the photo
+is never sent to the server.
+
+  tesseract.min.js, worker.min.js        tesseract.js 7.0.0          Apache-2.0   https://github.com/naptha/tesseract.js
+  tesseract-core-simd-lstm.js / .wasm    tesseract.js-core 7.0.0     Apache-2.0   https://github.com/naptha/tesseract.js-core
+  eng.traineddata.gz, hin.traineddata.gz tessdata_best (int, 4.0.0)  Apache-2.0   https://github.com/tesseract-ocr/tessdata_best
+                                         via @tesseract.js-data/eng and /hin 1.0.0
+  dwani-ocr.js                           DwaniForms' own: finds the kind of paper, the last date and the amount in the text
+
+The full Apache License 2.0 is in LICENSE-Apache-2.0.txt. Only the SIMD + LSTM build of the core is shipped (every phone
+browser since 2021-2023 has WebAssembly SIMD); an older browser is told photo reading is not available and types instead.
+To upgrade: replace the files from the same npm packages, then bump CACHE in ../sw.js so phones fetch the new ones.
