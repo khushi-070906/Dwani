@@ -71,3 +71,13 @@ def test_pricing_divider_is_a_quiet_line_not_a_flower_garland():
     t = text(STATIC / "pricing.html")
     assert 'class="garland" aria-hidden="true"></div>' in t, "the divider should have no flower or leaf shapes inside"
     assert ".garland span" not in t and ".bloom" not in t
+
+
+def test_careers_pages_use_the_shared_logo_fonts_and_footer():
+    # /careers must look like the rest of the website: the shared brand.css, no second copy of the logo rules, the site footer
+    base = (ROOT / "careers" / "templates" / "base.html").read_text(encoding="utf-8")
+    assert 'href="/static/brand.css"' in base
+    assert "/changelog" in base and "dwaniforms.onrender.com" in base, "the footer should carry the site's links"
+    nav = text(STATIC / "site-nav.css")
+    assert not re.search(r"^\.brand-name", nav, flags=re.M), "site-nav.css has its own logo rules"
+    assert ".site-header .nav-cta" in nav, "the Log in button must stay light on its gradient"

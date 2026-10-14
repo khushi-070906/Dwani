@@ -396,3 +396,9 @@ def test_public_pages_use_the_website_nav(client):
         assert 'class="active" aria-current="page">Careers<' in page
     admin = client.get("/admin/login").text
     assert "site-nav.css" not in admin and "admin-header" in admin
+
+
+def test_careers_home_matches_the_website(client):
+    page = client.get("/").text
+    assert 'href="/static/brand.css"' in page and 'class="eyebrow"' in page and 'class="c-roles"' in page
+    assert "How it works" in page and "What's new" in page and "DwaniForms" in page   # the site's footer links
