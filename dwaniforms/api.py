@@ -41,6 +41,15 @@ class RedoIn(BaseModel):
     field_id: str = Field(max_length=64)
 
 
+class SuggestIn(BaseModel):
+    values: dict[str, str] = Field(max_length=8)             # field id -> a value read off a photographed paper
+
+
+class AskIn(BaseModel):
+    question: str = Field(max_length=300)
+    consent: bool = False                                    # the person said "yes, send this question" -- every time
+
+
 class OperatorIn(BaseModel):
     field_id: str = Field(max_length=64)
     value: str = Field(max_length=500)
@@ -119,14 +128,18 @@ def create_router(service: FormService, prefix: str = "/form") -> APIRouter:
 
     @router.get("/assets/{kind}/{name}")
     async def asset(kind: str, name: str):
-        """Logo and fonts, bundled so a kiosk with no internet still looks right."""
+        """Logo, fonts and the photo reader (ocr/), bundled so a kiosk with no internet still works."""
         import re as _re
-        if kind not in ("fonts", "img") or not _re.fullmatch(r"[\w.-]+", name):
+        if kind not in ("fonts", "img", "ocr") or not _re.fullmatch(r"[\w.-]+", name):
             raise HTTPException(404)
         p = (STATIC / kind / name).resolve()
         if STATIC.resolve() not in p.parents or not p.is_file():
             raise HTTPException(404)
-        return FileResponse(p, headers={"Cache-Control": "public, max-age=86400"})
+        # .gz is the language data: sent as the raw bytes the reader unzips itself. Labelled "gzip", a browser would
+        # unzip it first and the reader would choke. .wasm must say so, or the browser refuses to compile it.
+        media = {".wasm": "application/wasm", ".gz": "application/octet-stream", ".js": "text/javascript",
+                 ".txt": "text/plain; charset=utf-8"}.get(p.suffix)
+        return FileResponse(p, media_type=media, headers={"Cache-Control": "public, max-age=86400"})
 
     @router.get("/forms")
     async def forms():
@@ -207,6 +220,37 @@ def create_router(service: FormService, prefix: str = "/form") -> APIRouter:
         had been read back but not yet confirmed is asked once more rather than quietly kept."""
         s = session(sid)
         return _resp(s, request, await service.finish(s, await s.ask_current()), session_id=s.id)
+
+    @router.post("/sessions/{sid}/suggest")
+    async def suggest(sid: str, body: SuggestIn, request: Request):
+        """Answers the phone read off a photo of a paper (Samjhao). The photo itself never arrives here, only these few
+        values. Each is checked like a typed answer and then read back with "is this correct?" when its question
+        comes up; a "no" asks the question the normal way."""
+        s = session(sid)
+        if any(len(k) > 64 or len(v) > 100 for k, v in body.values.items()):
+            raise HTTPException(422, "value too long")
+        taken = s.suggest(body.values)
+        return _resp(s, request, await service.finish(s, await s.ask_current()), suggested=taken)
+
+    @router.post("/sessions/{sid}/ask")
+    async def ask(sid: str, body: AskIn, request: Request):
+        """One question about a paper that Samjhao has explained, answered by an AI service. Exists only when the server
+        has an API key (ai.py); refuses without a fresh consent; stores and logs neither the question nor the answer."""
+        from . import ai
+        if not ai.enabled():
+            raise HTTPException(404, "not available")
+        s = session(sid)
+        if not body.consent:
+            raise HTTPException(422, "consent required")
+        if not body.question.strip():
+            raise HTTPException(422, "empty question")
+        if s.template.flow != "explain" or s.phase != "done":
+            raise HTTPException(409, "read the explanation first")
+        try:
+            answer = await ai.ask(s, body.question)
+        except ai.AIError as e:
+            raise HTTPException(503 if str(e) == "busy" else 502, "The AI service could not answer just now.")
+        return {"answer": answer}
 
     @router.post("/sessions/{sid}/redo")
     async def redo(sid: str, body: RedoIn, request: Request):
