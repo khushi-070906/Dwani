@@ -199,3 +199,12 @@ def test_the_yes_and_no_buttons_draw_their_tick_and_cross_in_every_language():
     app = (Path(__file__).resolve().parent.parent / "dwaniforms" / "static" / "app.html").read_text(encoding="utf-8")
     assert re.search(r'id="btn-yes"[^>]*data-icon="check"', app) and re.search(r'id="btn-no"[^>]*data-icon="cross"', app)
     assert r'replace(/^[\u2713\u2717]\s*/, "")' in app, "a text tick left in a language table would be drawn twice"
+
+
+def test_a_rejected_aadhaar_number_says_what_to_do_next_in_both_languages():
+    """A number that fails the checksum is usually one misheard digit; the person needs a way forward, not only 'try again'."""
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from dwaniforms.messages import MESSAGES
+    assert "type" in MESSAGES["en"]["aadhaar_invalid"] and "misheard" in MESSAGES["en"]["aadhaar_invalid"]
+    assert "लिखिए" in MESSAGES["hi"]["aadhaar_invalid"] and "अंक" in MESSAGES["hi"]["aadhaar_invalid"]
