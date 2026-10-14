@@ -148,8 +148,10 @@ details.box[open] summary { margin-bottom: 0.4rem; }
 .doc { display: flex; justify-content: space-between; gap: 0.6rem; align-items: center; padding: 0.6rem 0; border-bottom: 1px dashed var(--raised-2); flex-wrap: wrap; }
 .doc:last-child { border-bottom: none; }
 .doc.revoked { opacity: 0.55; }
-.site-footer { border-top: 1px solid var(--raised-2); padding: 1.5rem 0 2.5rem; color: var(--ink-faint); font-size: 0.88rem; }
-.site-footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem; }
+.site-footer { text-align: center; padding: 2.5rem 0 3rem; color: var(--ink-faint); font-size: 0.8rem; }
+.site-footer p { margin: 0 0 0.35rem; }
+.site-footer a { color: var(--accent-deep); font-weight: 600; text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
 
 /* applicant status timeline */
 ol.stages { list-style: none; padding: 0; margin: 1.4rem 0 0; }
