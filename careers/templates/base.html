@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;600;700;800&display=swap">
 <link rel="stylesheet" href="/static/brand.css">
+<script src="/static/avatar.js"></script>
 <link rel="stylesheet" href="{{ P }}/static/site.css">
 {% block head %}{% endblock %}
 {% block sitenav_assets %}<link rel="stylesheet" href="/static/site-nav.css">{% endblock %}
@@ -31,11 +32,10 @@
   </div>
   <button type="button" class="nav-hamburger" id="nav-hamburger" aria-label="Menu" aria-expanded="false">&#9776;</button>
   <div class="nav-right" id="nav-right">
-    <div class="nav-account" id="nav-account" style="display:none;">
+    <a class="nav-account" id="nav-account" href="/dashboard.html" title="My account" style="display:none;">
       <img class="nav-avatar" id="nav-avatar" alt="">
       <span id="nav-name-label"></span>
-    </div>
-    <a href="/dashboard.html" class="nav-icon-btn" id="nav-dashboard-btn" title="Dashboard" style="display:none;">&#9776;</a>
+    </a>
     <a href="/login.html" class="nav-cta" id="nav-login-cta">Log in</a>
   </div>
 </nav>

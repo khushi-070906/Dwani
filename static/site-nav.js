@@ -24,8 +24,7 @@
         dash = document.getElementById("nav-dashboard-btn");
     if (user) {
       var label = (user.name && user.name.trim()) || user.email;
-      var avatar = "https://api.dicebear.com/10.x/avataaars/svg?seed=" + encodeURIComponent(user.email) +
-        (user.gender === "male" ? "&facialHairProbability=30" : user.gender === "female" ? "&facialHairProbability=0" : "&facialHairProbability=10");
+      var avatar = window.dwaniAvatar ? window.dwaniAvatar(label, user.email) : "";
       document.getElementById("nav-avatar").src = avatar;
       document.getElementById("nav-name-label").textContent = label;
       acct.style.display = "flex"; if (dash) dash.style.display = "flex"; cta.style.display = "none";
