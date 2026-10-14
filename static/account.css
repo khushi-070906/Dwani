@@ -1,0 +1,40 @@
+/* The account pages (dashboard.html, settings.html): plain and quiet. One flat card, one font for text, flat buttons,
+   no mandala behind it. Loaded after each page's own styles so it wins. */
+.mandala-bg { display: none; }
+.dash-wrap { padding-top: 2rem; }
+.dash-card { max-width: 520px; background: var(--bg-raised); border: 1px solid var(--bg-raised-2); border-radius: 14px; box-shadow: none; padding: 1.75rem 1.5rem; }
+.dash-card h1 { font-family: var(--font-body); font-size: 1.25rem; font-weight: 700; letter-spacing: 0; margin: 0 0 0.15rem; overflow-wrap: anywhere; }
+.dash-card h2 { font-family: var(--font-body); font-size: 1rem; font-weight: 700; margin: 0 0 0.9rem; }
+.dash-card > p.sub { margin: 0 0 1.1rem; font-size: 0.88rem; color: var(--ink-dim); overflow-wrap: anywhere; }
+
+.dash-row { padding: 0.7rem 0; }
+.dash-row .value { font-weight: 700; }
+.dash-plan { text-transform: capitalize; }
+.dash-status-active::before, .dash-status-inactive::before, .dash-status-pending::before, .dash-status-past_due::before {
+  content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; margin-right: 0.45rem; vertical-align: 0.08em; }
+.dash-keyrow { flex-wrap: wrap; gap: 0.5rem; }
+.dash-keybox { display: inline-flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.dash-license-box { margin: 0; padding: 0.4rem 0.65rem; border-radius: 8px; font-size: 0.82rem; user-select: all; }
+.dash-copy { border: 1px solid var(--bg-raised-2); background: var(--bg); color: var(--ink-dim); border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.82rem; font-weight: 700; }
+.dash-copy:hover { background: var(--bg-raised-2); }
+
+.dash-setup { margin-top: 1.1rem; padding-top: 1.1rem; border-top: 1px solid var(--bg-raised-2); }
+.dash-setup-head { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+.dash-small { font-size: 0.82rem; color: var(--ink-faint); }
+.dash-small a { text-decoration: underline; }
+.dash-steps { margin: 1rem 0 0.8rem; padding-left: 1.2rem; font-size: 0.9rem; color: var(--ink-dim); line-height: 1.55; }
+.dash-steps li { margin-bottom: 0.5rem; }
+.dash-steps code { font-size: 0.85em; }
+
+.dash-cta, .btn-primary { background: var(--accent-deep); color: #fff; border-radius: 8px; box-shadow: none; padding: 0.65rem 1.1rem; }
+.dash-cta:hover, .btn-primary:hover { background: #8f3b09; transform: none; }
+.btn-primary { width: 100%; }
+.btn-danger { border-radius: 8px; }
+.field input, .field select { border-radius: 8px; }
+.dash-row .dash-status-active { color: #1a7a4c; }
+.dash-row .dash-status-inactive, .dash-row .dash-status-pending, .dash-row .dash-status-past_due { color: var(--error); }
+/* phones: the header must not push the page wider than the screen */
+@media (max-width: 560px) {
+  .nav-account span { display: none; }
+  .nav-shell { padding-left: 1rem; }
+}
