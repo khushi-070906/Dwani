@@ -26,6 +26,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .spoken import _norm
+from . import clock
 
 DEFAULT_DIR = Path(__file__).parent / "data" / "records"
 STALE_DAYS = 90
@@ -64,7 +65,7 @@ class Meta:
 
     def age_days(self, today: dt.date | None = None) -> int | None:
         try:
-            return ((today or dt.date.today()) - dt.date.fromisoformat(self.as_of)).days
+            return ((today or clock.today()) - dt.date.fromisoformat(self.as_of)).days
         except ValueError:
             return None
 
@@ -265,7 +266,7 @@ def write_demo(directory: Path | None = None, as_of: str | None = None) -> Path:
             w = csv.writer(f)
             w.writerow(cols)
             w.writerows(rows)
-    as_of = as_of or dt.date.today().isoformat()
+    as_of = as_of or clock.today().isoformat()
     meta = {k: {"as_of": as_of, "source": "DEMO DATA: fictional people and places", "demo": True} for k in ("land", "ration")}
     (d / "meta.json").write_text(json.dumps(meta, indent=1), encoding="utf-8")
     return d
