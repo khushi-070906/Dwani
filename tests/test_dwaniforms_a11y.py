@@ -103,6 +103,13 @@ def test_the_current_step_is_announced():
     assert 'setAttribute("aria-current", "step")' in APP
 
 
+def test_the_a_plus_button_has_its_visible_words_first_in_its_name():
+    """WCAG 2.5.3 'label in name': a person who says what they see ('A plus') must hit the button, so the accessible name
+    starts with the visible words."""
+    assert 'id="big-btn"' in APP and re.search(r'id="big-btn"[^>]*\bdata-vis\b', APP)
+    assert 'el.hasAttribute("data-vis")' in APP and "(el.innerText ||" in APP
+
+
 def test_small_draft_and_note_text_keeps_aa_contrast():
     # the pencilled (not yet confirmed) rows and the pencil note were pale grey / orange on near-white
     for sel_text in (".pencil .line, .pencil .boxes .b, .pencil .ck.on {", ".note-pen {"):

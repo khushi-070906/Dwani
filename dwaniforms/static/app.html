@@ -322,7 +322,7 @@
         <option value="te">తెలుగు</option><option value="mr">मराठी</option><option value="gu">ગુજરાતી</option><option value="kn">ಕನ್ನಡ</option>
         <option value="ml">മലയാളം</option><option value="pa">ਪੰਜਾਬੀ</option><option value="ur">اردو</option><option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option>
       </select>
-      <button class="tbtn no-print" id="big-btn" type="button" aria-pressed="false" data-ta="a11y_bigger" aria-label="Bigger text">A+</button>
+      <button class="tbtn no-print" id="big-btn" type="button" aria-pressed="false" data-ta="a11y_bigger" aria-label="Bigger text" data-vis>A+</button>
     </div>
   </div>
 </header>
@@ -622,7 +622,11 @@
     // speaker hears the questions in Tamil and the buttons in English.
     document.querySelectorAll("[data-ta]").forEach(function (el) {
       if (!el.dataset.ena) el.dataset.ena = el.getAttribute("aria-label") || "";
-      el.setAttribute("aria-label", (UI[lang] && UI[lang][el.dataset.ta]) || el.dataset.ena);
+      var name = (UI[lang] && UI[lang][el.dataset.ta]) || el.dataset.ena;
+      // WCAG 2.5.3 "label in name": a person who says what they see ("A plus") must hit the button, so the name starts
+      // with the words that are showing (display:none words, such as the tagline on a phone, are not in innerText).
+      if (el.hasAttribute("data-vis")) { var shown = (el.innerText || "").replace(/\s+/g, " ").trim(); if (shown) name = shown + " " + name; }
+      el.setAttribute("aria-label", name);
     });
   }
   // The mic is a toggle: say so, and say which way it is turned, not just paint it orange.
