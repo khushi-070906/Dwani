@@ -3,7 +3,7 @@
    What it keeps: the page itself, the bundled fonts and icons, and the three public lists (services, capabilities,
    screen text). NOTHING from /sessions is ever read, cached or even intercepted -- that is where a citizen's answers
    live, and they stay on the server. Bump CACHE to roll out a new page. */
-const CACHE = "dwaniforms-v6";
+const CACHE = "dwaniforms-v7";
 const SHELL = [
   "./",
   "./manifest.webmanifest",

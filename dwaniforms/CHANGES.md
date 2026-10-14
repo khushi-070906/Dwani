@@ -329,3 +329,8 @@ The first calm pass was nearly all one green. Colour is back, in a small muted s
 - The service list, the three promises on the welcome card, the microphone, the photo button and the home-page chips use line icons in the brand green instead of emoji. Emoji look different on every phone (and some old phones show empty boxes); the icons look the same everywhere and follow the text colour.
 - What the person said is shown in quotation marks instead of after a speech-bubble emoji.
 - The offline cache is `dwaniforms-v6`.
+
+## Ticks, crosses, the pencil and the warning are drawn too
+- The ticks (answer checked, step done, confirmed note, the options you chose), the red cross on "No", the pencil on a not-yet-confirmed answer, the warning on a scheme whose rules need re-checking, and the download arrow on "Add to phone" are line icons, not text symbols. Text symbols come from whatever font a phone has and are sometimes coloured emoji.
+- "Yes" and "No" get their tick and cross in every language, including English. A tick left at the front of a language table's words is not drawn twice.
+- The offline cache is `dwaniforms-v7`.
