@@ -18,6 +18,7 @@ from pathlib import Path
 
 from .messages import _words
 from .spoken import _norm, spoken_to_date
+from . import clock
 
 DATA = Path(__file__).parent / "data"
 
@@ -102,7 +103,7 @@ _MONTH_RE = re.compile(r"(january|february|march|april|may|june|july|august|sept
 def guess_date(text: str, today: dt.date | None = None) -> str | None:
     """ISO date of the incident, or None. Only a small window around a month name is read, so "2 baar 15 August"
     gives the 15th, not the 17th."""
-    today = today or dt.date.today()
+    today = today or clock.today()
     candidates = []
     for m in re.finditer(r"\b\d{1,2}\s*[/\-.]\s*\d{1,2}\s*[/\-.]\s*\d{2,4}\b", text):
         candidates.append(m.group(0))
