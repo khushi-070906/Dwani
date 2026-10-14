@@ -44,6 +44,11 @@ async function until(fn, ms = 8000) { const end = Date.now() + ms; while (Date.n
   ok(body.facts.age === 62 && body.facts.annual_income === 200000 && !("category" in body.facts), "one request carries the answers (income as the top of its band)");
   const wa = [].slice.call(d.querySelectorAll("a")).filter((a) => /wa\.me/.test(a.href))[0];
   ok(wa && !/Farmer|62|BPL|Kutcha/i.test(decodeURIComponent(wa.href)), "the WhatsApp message carries no personal answer");
+  let copied = null; Object.defineProperty(w.navigator, "clipboard", { configurable: true, value: { writeText: (x) => { copied = x; return Promise.resolve(); } } });
+  $("copy-list").click();
+  ok(await until(() => copied !== null) && /PM-KISAN|पीएम-किसान/.test(copied) && /^मुझे \d+ सरकारी योजनाएँ/.test(copied) && /\/form\/yojana$/.test(copied), "'Copy the list' copies the scheme names and the link");
+  ok(!/Farmer|62|BPL|Kutcha|किसान|1,00|200000/.test(copied.split("\n").filter((l) => !/•/.test(l)).join("\n")) && copied.split("\n").length >= 3, "the copied list has no personal answer");
+  ok(/कॉपी हो गई/.test($("result").textContent), "it says the list was copied");
   ok(!w.localStorage.length && !w.sessionStorage.length && !/;/.test(d.cookie), "nothing is stored in the browser");
 
   d.querySelector('.lang button[data-l="en"]').click();

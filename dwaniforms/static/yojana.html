@@ -137,7 +137,7 @@
           yes: "हाँ", no: "नहीं", next: "आगे", of: "में से", need_num: "एक संख्या लिखिए", range: "इस संख्या की सीमा", unit_acres: "एकड़",
           privacy: "आपके जवाब इस फ़ोन के बाहर सेव नहीं होते। शेयर कार्ड पर सिर्फ़ योजनाओं के नाम होते हैं, आपकी जानकारी नहीं।",
           total_pre: "आपको", total_post: "योजनाएँ मिल सकती हैं", total_none: "अभी कोई योजना पक्की नहीं दिखी", more: "और जाँचने लायक", likely: "मिल सकती हैं", maybe: "जाँच ज़रूरी है",
-          how: "कैसे लें", share: "दोस्तों-परिवार को भेजें", share_wa: "WhatsApp पर भेजें", save: "कार्ड सेव करें", again: "फिर से देखें",
+          how: "कैसे लें", share: "दोस्तों-परिवार को भेजें", share_wa: "WhatsApp पर भेजें", copy: "योजनाओं की सूची कॉपी करें", copied: "सूची कॉपी हो गई। कहीं भी चिपका दीजिए।", copy_failed: "कॉपी नहीं हो सकी। सूची को दबाकर चुनिए और कॉपी कीजिए।", save: "कार्ड सेव करें", again: "फिर से देखें",
           reviewed: "नियम जाँचे गए", stale: "कुछ नियम दोबारा जाँचने हैं, आधिकारिक पोर्टल भी देखें।", disc: "यह मार्गदर्शन है, फ़ैसला नहीं। आख़िरी निर्णय संबंधित विभाग करता है।",
           cta: "इनमें से किसी का फ़ॉर्म बोलकर भरना है?", cta_link: "ध्वनिForms खोलें", err: "अभी जवाब नहीं आया। इंटरनेट देखिए और फिर कोशिश कीजिए।",
           card_title: "मुझे सरकारी योजनाएँ मिल सकती हैं", card_n: "योजनाएँ", card_more: "और", card_foot: "आप भी देखें:", card_note: "यह मार्गदर्शन है, फ़ैसला नहीं।",
@@ -147,7 +147,7 @@
           yes: "Yes", no: "No", next: "Next", of: "of", need_num: "Type a number", range: "This number must be between", unit_acres: "acres",
           privacy: "Your answers are not saved anywhere beyond this phone. The share card shows scheme names only, never your details.",
           total_pre: "You may get", total_post: "schemes", total_none: "No scheme looks certain yet", more: "more worth checking", likely: "You may get", maybe: "Needs checking",
-          how: "How to get it", share: "Send to friends and family", share_wa: "Send on WhatsApp", save: "Save the card", again: "Start again",
+          how: "How to get it", share: "Send to friends and family", share_wa: "Send on WhatsApp", copy: "Copy the list of schemes", copied: "List copied. Paste it anywhere.", copy_failed: "Could not copy. Press and hold the list to select and copy it.", save: "Save the card", again: "Start again",
           reviewed: "Rules checked on", stale: "Some rules need re-checking; look at the official portal too.", disc: "This is guidance, not a decision. The department makes the final call.",
           cta: "Want to fill one of these forms by speaking?", cta_link: "Open DwaniForms", err: "No answer yet. Check your internet and try again.",
           card_title: "I may get government schemes", card_n: "schemes", card_more: "and", card_foot: "Check yours:", card_note: "Guidance, not a decision.",
@@ -296,7 +296,10 @@
       var b1 = document.createElement("button"); b1.type = "button"; b1.className = "go"; b1.textContent = t("share"); b1.onclick = shareCard;
       var b2 = document.createElement("a"); b2.className = "btn"; b2.style.textAlign = "center"; b2.style.textDecoration = "none"; b2.style.lineHeight = "30px";
       b2.target = "_blank"; b2.rel = "noopener"; b2.textContent = t("share_wa"); b2.href = "https://wa.me/?text=" + encodeURIComponent(shareText() + " " + shareUrl());
-      sh.appendChild(b1); sh.appendChild(b2); box.appendChild(sh);
+      var b3 = document.createElement("button"); b3.type = "button"; b3.className = "btn"; b3.id = "copy-list"; b3.textContent = t("copy");
+      var note = document.createElement("p"); note.className = "meta"; note.setAttribute("role", "status");
+      b3.onclick = function () { copyList(function (ok) { note.textContent = t(ok ? "copied" : "copy_failed"); }); };
+      sh.appendChild(b1); sh.appendChild(b2); sh.appendChild(b3); sh.appendChild(note); box.appendChild(sh);
       var g = document.createElement("h2"); g.className = "group"; g.textContent = t("likely"); box.appendChild(g);
       d.likely.forEach(function (s) { box.appendChild(schemeCard(s, false)); });
     }
@@ -313,6 +316,22 @@
     again.onclick = function () { show("start"); $("start-h").focus(); }; box.appendChild(again);
     $("start-h").tabIndex = -1;
     box.scrollIntoView({ behavior: "auto", block: "start" });
+  }
+
+  // Plain text for SMS, notes and chat apps that are not WhatsApp: scheme names only (same rule as the picture), then the link.
+  function listText() {
+    var names = last ? last.likely.map(function (s) { return "\u2022 " + s.name; }) : [];
+    return [shareText()].concat(names, [shareUrl()]).join("\n");
+  }
+  function copyList(done) {
+    var text = listText();
+    function old() {
+      var ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      var ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta); done(ok);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { done(true); }, old); else old();
   }
 
   function shareUrl() { return location.origin + location.pathname.replace(/\/$/, ""); }
