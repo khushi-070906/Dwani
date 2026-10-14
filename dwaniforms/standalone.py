@@ -53,6 +53,10 @@ def build_app(whisper_model: str | None, nllb_dir: str | None, sp_model: str, te
 
     app = FastAPI(title="DwaniForms", lifespan=lifespan)
     app.include_router(create_router(service))
+    from . import apikeys
+    if apikeys.enabled():                  # the company API exists only when the server has a key secret (see apikeys.py)
+        from .b2b import build_api
+        app.mount("/api/v1", build_api(service))
     from .hardening import install
     install(app, service, version="1.0")
 
