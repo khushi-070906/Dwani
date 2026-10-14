@@ -81,3 +81,32 @@ def test_careers_pages_use_the_shared_logo_fonts_and_footer():
     nav = text(STATIC / "site-nav.css")
     assert not re.search(r"^\.brand-name", nav, flags=re.M), "site-nav.css has its own logo rules"
     assert ".site-header .nav-cta" in nav, "the Log in button must stay light on its gradient"
+
+
+# ---- the account: a plain monogram avatar, one quiet account stylesheet, one contact address ----
+ACCOUNT_PAGES = ["dashboard", "settings", "login", "signup", "pricing", "forgot-password"]
+
+
+def test_avatar_is_drawn_locally_and_asks_for_no_gender():
+    assert (STATIC / "avatar.js").exists()
+    for n in ACCOUNT_PAGES:
+        t = text(STATIC / f"{n}.html")
+        assert 'src="/static/avatar.js"' in t, f"{n}: avatar.js is not loaded"
+        assert "dicebear" not in t.lower() and "avataaars" not in t, f"{n}: still fetches a cartoon avatar"
+        assert "-gender" not in t and "Gender" not in t, f"{n}: still asks for gender"
+        assert "nav-dashboard-btn" not in t, f"{n}: a second menu icon is back"
+    assert "dicebear" not in text(STATIC / "site-nav.js").lower()
+    assert "dicebear" not in (ROOT / "careers" / "templates" / "base.html").read_text(encoding="utf-8").lower()
+
+
+def test_account_pages_share_one_quiet_stylesheet():
+    for n in ("dashboard", "settings"):
+        assert 'href="/static/account.css"' in text(STATIC / f"{n}.html"), n
+    css = text(STATIC / "account.css")
+    assert ".mandala-bg { display: none; }" in css and "linear-gradient" not in css
+
+
+def test_the_contact_address_is_the_team_mailbox():
+    for rel in ("static/privacy.html", "static/terms.html", "static/help.html", "careers/config.toml"):
+        t = (ROOT / rel).read_text(encoding="utf-8")
+        assert "dwanilive@gmail.com" in t and "khushimittal070906" not in t, rel
