@@ -194,7 +194,24 @@
   "ex_wrong": "ఇందులో ఏదైనా తప్పు ఉంటే",
   "g_explain": "కాగితాన్ని అర్థం చేసుకోండి",
   "k_explain": "కాగితం అర్థం",
-  "next_explain": "కాగితాన్ని జాగ్రత్తగా ఉంచుకోండి. ఏదైనా కార్యాలయం మీకు అన్యాయం చేసి ఉంటే, హోమ్ పేజీ నుంచి ఫిర్యాదు రాయవచ్చు."
+  "next_explain": "కాగితాన్ని జాగ్రత్తగా ఉంచుకోండి. ఏదైనా కార్యాలయం మీకు అన్యాయం చేసి ఉంటే, హోమ్ పేజీ నుంచి ఫిర్యాదు రాయవచ్చు.",
+  "ocr_btn": "ఫోటో నుంచి చదవండి",
+  "ocr_private": "ఫోటోను ఈ ఫోన్‌లోనే చదువుతాం. ఎక్కడికీ పంపము, దాచము.",
+  "ocr_loading": "ఫోటో చదవడానికి సిద్ధమవుతోంది (సుమారు 7 MB, మొదటిసారి మాత్రమే)…",
+  "ocr_reading": "ఫోటో చదువుతున్నాం…",
+  "ocr_found": "కాగితంపై ఇది దొరికింది (సరైనదేనా అని ఒక్కొక్కటిగా అడుగుతాను)",
+  "ocr_paper": "కాగితం",
+  "ocr_none": "ఫోటో నుంచి ఖచ్చితంగా ఏమీ చదవలేకపోయాం. దయచేసి చెప్పండి లేదా రాయండి.",
+  "ocr_failed": "ఫోటోను చదవలేకపోయాం. దయచేసి చెప్పండి లేదా రాయండి.",
+  "ai_title": "ఈ కాగితం గురించి ఒక ప్రశ్న",
+  "ai_ph": "మీ ప్రశ్న రాయండి (పేరు లేదా నంబర్ వద్దు)",
+  "ai_ask": "AI ని అడగండి",
+  "ai_consent": "జవాబు కోసం మీ ప్రశ్న ఒక AI సేవకు పంపబడుతుంది. ప్రశ్న, కాగితం రకం మాత్రమే వెళ్తాయి; ఫోటో, మీ పేరు లేదా ఏ నంబర్ వెళ్లవు. మీరు రాసిన నంబర్లు తొలగించబడతాయి. AI తప్పు కూడా చెప్పవచ్చు.",
+  "ai_send": "అవును, పంపండి",
+  "ai_cancel": "వద్దు, పంపవద్దు",
+  "ai_wait": "జవాబు తెస్తున్నాం…",
+  "ai_warn": "ఇది AI జవాబు. ఇది తప్పు కావచ్చు, న్యాయ సలహా కాదు. మోసానికి 1930కి, ఉచిత న్యాయ సహాయానికి 15100కి ఫోన్ చేయండి.",
+  "ai_fail": "ఇప్పుడు జవాబు రాలేదు. దయచేసి తర్వాత ప్రయత్నించండి లేదా కార్యాలయంలో అడగండి."
  },
  "text": {
   "Bank KYC": "బ్యాంక్ కేవైసీ",
@@ -489,7 +506,28 @@
   "This is your electricity bill: how much you owe for the power you used, and the last date to pay it.": "ఇది మీ కరెంటు బిల్లు: మీరు వాడిన విద్యుత్తుకు డబ్బు, కట్టడానికి చివరి తేదీ.",
   "This is your water bill from the water board or the municipality: the amount you owe and the last date to pay.": "ఇది జల మండలి లేదా మున్సిపాలిటీ నీటి బిల్లు: ఎంత డబ్బు కట్టాలి, కట్టడానికి చివరి తేదీ.",
   "Understand a paper (bill, notice, summons)": "కాగితాన్ని అర్థం చేసుకోండి (బిల్లు, నోటీసు, సమన్లు)",
-  "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.": "ఇది ఏ కాగితం? ఉదాహరణకు: కరెంటు బిల్లు, నీటి బిల్లు, ఆస్తి పన్ను, బ్యాంకు రుణం, బ్యాంకు కేవైసీ సందేశం, కోర్టు సమన్లు, ఆదాయపు పన్ను నోటీసు, ట్రాఫిక్ చలాన్, లేదా ఇంకేదైనా."
+  "What kind of paper is it? For example: electricity bill, water bill, property tax, bank loan, bank KYC message, court summons, income tax notice, traffic challan, or something else.": "ఇది ఏ కాగితం? ఉదాహరణకు: కరెంటు బిల్లు, నీటి బిల్లు, ఆస్తి పన్ను, బ్యాంకు రుణం, బ్యాంకు కేవైసీ సందేశం, కోర్టు సమన్లు, ఆదాయపు పన్ను నోటీసు, ట్రాఫిక్ చలాన్, లేదా ఇంకేదైనా.",
+  "Ayushman card details (PM-JAY)": "ఆయుష్మాన్ కార్డు వివరాలు (పీఎం-జేఏవై)",
+  "Class / course": "తరగతి / కోర్సు",
+  "Disability (%)": "దివ్యాంగత (%)",
+  "Family members": "కుటుంబ సభ్యులు",
+  "Have you already checked that your family is on the Ayushman list? You can say skip.": "మీ కుటుంబం ఆయుష్మాన్ జాబితాలో ఉందో లేదో మీరు ఇప్పటికే చూశారా? వదిలేయవచ్చు.",
+  "How many people are in your family?": "మీ కుటుంబంలో మొత్తం ఎంతమంది ఉన్నారు?",
+  "Last exam (%)": "చివరి పరీక్ష (%)",
+  "Level of study": "చదువు స్థాయి",
+  "On Ayushman list": "ఆయుష్మాన్ జాబితాలో పేరు",
+  "Parent / guardian name": "తల్లిదండ్రులు / సంరక్షకుల పేరు",
+  "Pension application (old age, widow, disability)": "పెన్షన్ దరఖాస్తు (వృద్ధాప్య, వితంతు, దివ్యాంగ)",
+  "Pension type": "పెన్షన్ రకం",
+  "Scholarship application (student)": "స్కాలర్‌షిప్ దరఖాస్తు (విద్యార్థి)",
+  "School / college": "పాఠశాల / కళాశాల",
+  "What are you studying: school up to class 10, class 11 or 12, diploma or ITI, a college degree, or post-graduation or higher?": "మీరు ఏమి చదువుతున్నారు: పదో తరగతి వరకు పాఠశాల, 11 లేదా 12వ తరగతి, డిప్లొమా లేదా ఐటీఐ, డిగ్రీ, లేదా పోస్ట్ గ్రాడ్యుయేషన్ లేదా అంతకంటే పైన?",
+  "What is the name of your school or college?": "మీ పాఠశాల లేదా కళాశాల పేరు ఏమిటి?",
+  "What is the percentage of disability written on your disability certificate?": "మీ దివ్యాంగ సర్టిఫికెట్‌లో ఎంత శాతం దివ్యాంగత రాసి ఉంది?",
+  "What is your parent's or guardian's name?": "మీ తల్లిదండ్రుల లేదా సంరక్షకుల పేరు ఏమిటి?",
+  "What percentage did you get in your last exam? For example: 72.5.": "మీ చివరి పరీక్షలో ఎంత శాతం మార్కులు వచ్చాయి? ఉదాహరణ: 72.5.",
+  "Which class or course are you in? For example: class 9, B.A. second year.": "మీరు ఏ తరగతి లేదా కోర్సులో ఉన్నారు? ఉదాహరణ: తొమ్మిదో తరగతి, బి.ఏ. రెండో సంవత్సరం.",
+  "Which pension are you applying for: old age, widow, or disability?": "మీరు ఏ పెన్షన్‌కు దరఖాస్తు చేస్తున్నారు: వృద్ధాప్య, వితంతు, లేదా దివ్యాంగ?"
  },
  "options": {
   "Male": [
@@ -836,6 +874,53 @@
    "నీటి బిల్లు",
    "నీళ్లు",
    "నీటి పన్ను"
+  ],
+  "Class 11-12": [
+   "11-12 తరగతి",
+   "పదకొండు",
+   "పన్నెండు",
+   "ఇంటర్",
+   "ఇంటర్మీడియట్"
+  ],
+  "Degree (graduation)": [
+   "డిగ్రీ",
+   "గ్రాడ్యుయేషన్",
+   "కళాశాల",
+   "బీఏ",
+   "బీఎస్సీ"
+  ],
+  "Diploma / ITI": [
+   "డిప్లొమా",
+   "ఐటీఐ",
+   "పాలిటెక్నిక్"
+  ],
+  "Disability pension": [
+   "దివ్యాంగ",
+   "వికలాంగ",
+   "అంగవైకల్యం"
+  ],
+  "Old age pension": [
+   "వృద్ధాప్య",
+   "వృద్ధ",
+   "వయసు",
+   "ముసలి"
+  ],
+  "Post-graduation or higher": [
+   "పోస్ట్ గ్రాడ్యుయేషన్",
+   "పీజీ",
+   "ఎంఏ",
+   "మాస్టర్స్",
+   "పీహెచ్‌డీ"
+  ],
+  "School (up to class 10)": [
+   "పాఠశాల",
+   "స్కూల్",
+   "పదో తరగతి",
+   "పదో"
+  ],
+  "Widow pension": [
+   "వితంతు",
+   "వితంతువు"
   ]
  },
  "words": {
