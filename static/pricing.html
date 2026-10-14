@@ -190,31 +190,16 @@
   }
   .attendee-note strong { color: var(--ink); }
   .garland {
-    display: flex; align-items: flex-end; justify-content: center; gap: 3px; margin: 2.25rem 0 0;
-    position: relative; height: 34px;
+    position: relative; height: 14px; max-width: 360px; margin: 2.25rem auto 0;
   }
   .garland::before {
-    content: ""; position: absolute; top: 4px; left: 8%; right: 8%; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--ink-faint) 15%, var(--ink-faint) 85%, transparent);
-    opacity: 0.4;
+    content: ""; position: absolute; top: 6px; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--ink-faint) 20%, var(--ink-faint) 80%, transparent);
+    opacity: 0.5;
   }
-  .garland span {
-    width: 12px; height: 16px; margin-top: 5px;
-    clip-path: polygon(50% 0%, 100% 35%, 82% 100%, 18% 100%, 0% 35%);
-    background: linear-gradient(160deg, var(--mehndi), #2f4715);
-    opacity: 0.9;
-  }
-  .garland span.bloom {
-    width: 13px; height: 13px; margin-top: 0; border-radius: 50%; clip-path: none;
-    background:
-      radial-gradient(circle at 50% 50%, var(--accent) 0 30%, transparent 31%),
-      repeating-conic-gradient(var(--accent) 0deg 15deg, var(--accent-deep) 15deg 30deg);
-    box-shadow: 0 0 0 1px rgba(44,24,16,0.08);
-  }
-  .garland span.bloom.pink {
-    background:
-      radial-gradient(circle at 50% 50%, var(--accent-2) 0 30%, transparent 31%),
-      repeating-conic-gradient(var(--accent-2) 0deg 15deg, #8f1440 15deg 30deg);
+  .garland::after {
+    content: ""; position: absolute; top: 3px; left: calc(50% - 3.5px); width: 7px; height: 7px;
+    transform: rotate(45deg); background: var(--accent); opacity: 0.8;
   }
 
   /* ---------------- Billing toggle ---------------- */
@@ -529,7 +514,7 @@
   <div class="eyebrow-badge"><span class="dot"></span> Offline-first · No cloud, no data leaving the room</div>
   <h1>One activation. Zero internet at the venue.</h1>
   <p>DwaniLive turns any laptop into a live speech-translation hub for in-person talks. Activate once online, then run the whole conference on the local network: captions, Q&amp;A, and accessibility, included per plan.</p>
-  <div class="garland" aria-hidden="true"><span></span><span class="bloom"></span><span></span><span class="bloom pink"></span><span></span><span class="bloom"></span><span></span></div>
+  <div class="garland" aria-hidden="true"></div>
 </header>
 
 <section class="how-it-works-section wrap" id="how-it-works">
