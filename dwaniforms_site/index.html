@@ -122,8 +122,9 @@
   .how div { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 1.3rem 1.3rem 1.3rem 4.4rem; position: relative; }
   .how div::before { counter-increment: s; content: counter(s); position: absolute; left: 1.2rem; top: 1.2rem; width: 2.2rem; height: 2.2rem; border-radius: 50%;
                      background: var(--peacock); color: #fff; display: grid; place-items: center; font-weight: 700; }
+  .how div:nth-child(2)::before { background: var(--slate); } .how div:nth-child(3)::before { background: var(--ochre); }
   .trust { background: var(--peacock-3); color: #fff; border-radius: 14px; padding: 2.2rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
-  .trust b { color: #BFE3D3; display: block; font-size: 1.15rem; margin-bottom: .2rem; } .trust span { color: #c3ded2; }
+  .trust b { color: var(--gold); display: block; font-size: 1.15rem; margin-bottom: .2rem; } .trust span { color: #c3ded2; } .trust b span { color: inherit; }
   .pills { display: flex; flex-wrap: wrap; gap: .5rem; }
   .pill { background: #fff; border: 1px solid var(--line-2, #C9CEC2); border-radius: 8px; padding: .4rem .85rem; font-weight: 600; font-size: .95rem; }
   .pilot { background: var(--peacock); color: #fff; border-radius: 14px; padding: 2.6rem; text-align: center; position: relative; overflow: hidden; }
