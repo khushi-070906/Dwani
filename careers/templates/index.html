@@ -1,28 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="wrap narrow simple-hero">
+<section class="wrap c-hero">
+  <span class="eyebrow"><span class="dot"></span>Internships · {{ d.mode }}</span>
   <h1>Intern with {{ org.name }}</h1>
   <p>Help build live, offline captions that let everyone in a room follow a talk in their own language.
-     {{ d.mode }}, about {{ d.hours_per_week }} hours a week, around your classes.</p>
+     About {{ d.hours_per_week }} hours a week, around your classes.</p>
+  <div class="quiet-rule" aria-hidden="true"></div>
 </section>
 
-<section class="wrap narrow" id="roles">
-  <h2 class="simple-h2">Open roles</h2>
+<section class="wrap" id="roles">
+  <h2 class="c-h2">Open roles</h2>
   {% if roles %}
-  <ul class="role-list">
+  <ul class="c-roles">
     {% for r in roles %}
     <li>
-      <a href="{{ P }}/roles/{{ r.key }}">
+      <a class="role-card" href="{{ P }}/roles/{{ r.key }}">
         <span class="role-title">{{ r.title }}</span>
         <span class="role-sum">{{ r.summary }}</span>
         {% if r.closes_on %}<span class="role-meta">Apply by {{ r.closes_on|date }}</span>{% endif %}
+        <span class="role-go">See the role <span aria-hidden="true">→</span></span>
       </a>
     </li>
     {% endfor %}
   </ul>
   {% else %}
-  <p class="muted">No roles are open right now. Check back soon.</p>
+  <p class="muted c-empty">No roles are open right now. Check back soon.</p>
   {% endif %}
-  <p class="process">How it works: apply (10 minutes) → a short call → offer letter. You get a verifiable certificate when you finish.</p>
+</section>
+
+<section class="wrap c-how" aria-labelledby="how-h">
+  <h2 class="c-h2" id="how-h">How it works</h2>
+  <ol class="c-steps">
+    <li><span class="step-num">1</span><div><h3>Apply</h3><p>About 10 minutes. Send your resume as a PDF or a link.</p></div></li>
+    <li><span class="step-num">2</span><div><h3>A short call</h3><p>We talk about the projects and your classes.</p></div></li>
+    <li><span class="step-num">3</span><div><h3>Offer letter</h3><p>You get it by email and can check it online.</p></div></li>
+    <li><span class="step-num">4</span><div><h3>Certificate</h3><p>When you finish, you get a certificate anyone can verify.</p></div></li>
+  </ol>
 </section>
 {% endblock %}
