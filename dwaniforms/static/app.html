@@ -195,6 +195,7 @@
   #status .ic { color: var(--amber-ink); }
   .row .ri .ic { width: 22px; height: 22px; }
   .mic .ic { width: 34px; height: 34px; }
+  .yn .ic { width: 1.1em; height: 1.1em; vertical-align: -.2em; stroke-width: 2.4; }
   .btn .ic { width: 1.15em; height: 1.15em; vertical-align: -.2em; margin-right: .25rem; }
   /* "Add to phone": shown only when the browser actually offers to install, so it never sits there doing nothing */
   .chip.install { margin-top: .6rem; border-color: var(--forest); color: var(--forest); background: var(--forest-soft); }
@@ -404,8 +405,8 @@
         <div class="alert warn" id="mt-note" hidden data-t="mt">Some questions are machine-translated. If one sounds odd, ask for help.</div>
         <div class="alert" id="draft-note" hidden data-t="draft_note" style="font-size:.8rem;padding:.45rem .7rem">Questions in this language were written by hand but have not yet been checked by a native speaker. Tell us if anything sounds odd.</div>
         <div class="yn" id="yn" hidden>
-          <button class="yes" type="button" id="btn-yes" data-t="yes">Yes, correct</button>
-          <button class="no" type="button" id="btn-no" data-t="no">No</button>
+          <button class="yes" type="button" id="btn-yes" data-t="yes" data-icon="check">Yes, correct</button>
+          <button class="no" type="button" id="btn-no" data-t="no" data-icon="cross">No</button>
         </div>
         <div class="photo" id="photo" hidden>
           <button class="btn ghost" type="button" id="photo-btn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 8h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="14" r="3.5"/></svg> <span data-t="ocr_btn">Read from a photo</span></button>
@@ -620,7 +621,10 @@
     document.documentElement.lang = lang;
     document.querySelectorAll("[data-t]").forEach(function (el) {
       if (!el.dataset.en) el.dataset.en = el.textContent;
-      el.textContent = (UI[lang] && UI[lang][el.dataset.t]) || el.dataset.en;
+      var txt = (UI[lang] && UI[lang][el.dataset.t]) || el.dataset.en;
+      if (el.dataset.icon) {   // the tick / cross is drawn; a language table may still carry a text one in front of its words
+        el.innerHTML = icon(el.dataset.icon) + " "; el.appendChild(document.createTextNode(txt.replace(/^[\u2713\u2717]\s*/, "")));
+      } else el.textContent = txt;
     });
     document.querySelectorAll("[data-tp]").forEach(function (el) {
       if (!el.dataset.enp) el.dataset.enp = el.placeholder;
