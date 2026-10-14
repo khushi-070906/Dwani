@@ -36,7 +36,7 @@
   try { cached = JSON.parse(sessionStorage.getItem(CACHE_KEY)); } catch (e) {}
   show(cached);
   right.classList.add("ready");
-  fetch("/api/me", { credentials: "include" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (user) {
+  fetch("/me", { credentials: "include" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (user) {
     if (user) { try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ name: user.name, email: user.email, gender: user.gender })); } catch (e) {} }
     else { try { sessionStorage.removeItem(CACHE_KEY); } catch (e) {} }
     show(user);
