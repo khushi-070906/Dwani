@@ -45,6 +45,10 @@
   .explain li { margin: .25rem 0; }
   .explain .alert h3 { color: inherit; margin-top: 0; }
   .explain .ex-note { font-size: .8rem; margin: 1rem 0 0; }
+  .explain .ai .type { margin-top: .4rem; }
+  .explain .ai-consent { margin-top: .6rem; } .explain .ai-consent p { margin: 0 0 .6rem; }
+  .explain .ai-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .explain .ai-out { margin-top: .6rem; font-size: .92rem; color: var(--ink-2); } .explain .ai-answer p { margin: 0; color: var(--ink); }
   .wrap { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
   .muted { color: var(--ink-3); }
   /* The privacy link sits in running text; the words stay the size they are, the tappable box around them grows. */
@@ -189,6 +193,13 @@
   .yn button { padding: .8rem; border-radius: 8px; font-weight: 700; font-size: 1.05rem; }
   .yes { background: var(--forest); border: 1px solid var(--forest); color: #fff; }
   .no { background: var(--card); border: 1px solid var(--line-2); color: var(--bad-ink); }
+  .photo { margin: .9rem 0 .2rem; padding: .7rem .8rem; border: 1px dashed var(--line-2); border-radius: 10px; background: #fff; }
+  .photo .btn { width: 100%; }
+  .photo p { margin: .45rem 0 0; }
+  #photo-status { margin-top: .4rem; font-size: .9rem; color: var(--ink-2); }
+  .photo-found { margin-top: .5rem; font-size: .9rem; }
+  .photo-found dl { display: grid; grid-template-columns: auto 1fr; gap: .15rem .7rem; margin: .35rem 0 0; }
+  .photo-found dt { color: var(--ink-2); } .photo-found dd { margin: 0; font-weight: 700; }
   .micwrap { display: flex; align-items: center; gap: .9rem; margin: 1rem 0 .4rem; }
   .mic { width: 72px; height: 72px; border-radius: 50%; border: 0; background: var(--forest); color: #fff; font-size: 1.7rem; flex: none; position: relative;
          box-shadow: 0 0 0 6px var(--forest-soft); transition: background .2s; touch-action: none; user-select: none; -webkit-user-select: none; }
@@ -368,6 +379,13 @@
           <button class="yes" type="button" id="btn-yes" data-t="yes">Yes, correct</button>
           <button class="no" type="button" id="btn-no" data-t="no">No</button>
         </div>
+        <div class="photo" id="photo" hidden>
+          <button class="btn ghost" type="button" id="photo-btn"><span aria-hidden="true">📷</span> <span data-t="ocr_btn">Read from a photo</span></button>
+          <input type="file" id="photo-file" accept="image/*" hidden aria-label="Photo">
+          <p class="muted small" id="photo-note" data-t="ocr_private">The photo is read on this phone only. It is not sent or stored anywhere.</p>
+          <div id="photo-status" role="status" aria-live="polite"></div>
+          <div class="photo-found" id="photo-found" hidden><b data-t="ocr_found">Found on the paper (I will ask one by one whether it is right)</b><dl id="photo-list"></dl></div>
+        </div>
         <div class="micwrap">
           <button class="mic" id="mic" type="button" aria-pressed="false" data-ta="tap" aria-label="Speak" disabled>🎤</button>
           <div style="flex:1;min-width:0">
@@ -465,7 +483,7 @@
   var B = location.pathname.replace(/\/$/, "");
   var $ = function (id) { return document.getElementById(id); };
   var UI = {
-    hi: { g_explain: "कागज़ समझिए", k_explain: "कागज़ का मतलब", ex_what: "यह क्या है", ex_do: "क्या करें", ex_wrong: "अगर इसमें कुछ ग़लत है", ex_beware: "धोखे से बचिए", ex_help: "अगर धोखा हो गया", ex_date: "कागज़ पर लिखी तारीख", ex_amount: "रकम", ex_left: "दिन बाकी", ex_passed: "यह तारीख निकल चुकी है", ex_today: "यह तारीख आज है", ex_note: "सामान्य जानकारी, क़ानूनी सलाह नहीं। जाँची गई:", next_explain: "कागज़ संभालकर रखिए। अगर किसी दफ़्तर ने आपके साथ ग़लत किया है, तो होम पेज से शिकायत लिख सकते हैं।",
+    hi: { ai_title: "इस कागज़ के बारे में एक सवाल", ai_ph: "अपना सवाल लिखिए (नाम या नंबर नहीं)", ai_ask: "AI से पूछें", ai_consent: "आपका सवाल जवाब के लिए एक AI सेवा को भेजा जाएगा। सिर्फ़ सवाल और कागज़ का प्रकार जाता है; फ़ोटो, आपका नाम या कोई नंबर नहीं जाता। आपके लिखे नंबर मिटा दिए जाते हैं। AI ग़लत भी हो सकता है।", ai_send: "हाँ, भेजिए", ai_cancel: "नहीं, मत भेजिए", ai_wait: "जवाब लाया जा रहा है…", ai_warn: "यह AI का जवाब है। यह ग़लत हो सकता है और क़ानूनी सलाह नहीं है। धोखे के लिए 1930 पर और मुफ़्त क़ानूनी मदद के लिए 15100 पर फ़ोन कीजिए।", ai_fail: "अभी जवाब नहीं मिल सका। कृपया बाद में कोशिश कीजिए या दफ़्तर में पूछिए।", ocr_btn: "फ़ोटो से पढ़ें", ocr_private: "फ़ोटो सिर्फ़ इसी फ़ोन पर पढ़ी जाती है। कहीं भेजी या रखी नहीं जाती।", ocr_loading: "फ़ोटो पढ़ने की तैयारी (लगभग 7 MB, सिर्फ़ पहली बार)…", ocr_reading: "फ़ोटो पढ़ी जा रही है…", ocr_found: "कागज़ पर यह मिला (एक-एक करके पूछा जाएगा कि सही है या नहीं)", ocr_paper: "कागज़", ocr_none: "फ़ोटो से पक्का कुछ पढ़ा नहीं जा सका। कृपया बोलकर या लिखकर बताइए।", ocr_failed: "फ़ोटो पढ़ी नहीं जा सकी। कृपया बोलकर या लिखकर बताइए।", g_explain: "कागज़ समझिए", k_explain: "कागज़ का मतलब", ex_what: "यह क्या है", ex_do: "क्या करें", ex_wrong: "अगर इसमें कुछ ग़लत है", ex_beware: "धोखे से बचिए", ex_help: "अगर धोखा हो गया", ex_date: "कागज़ पर लिखी तारीख", ex_amount: "रकम", ex_left: "दिन बाकी", ex_passed: "यह तारीख निकल चुकी है", ex_today: "यह तारीख आज है", ex_note: "सामान्य जानकारी, क़ानूनी सलाह नहीं। जाँची गई:", next_explain: "कागज़ संभालकर रखिए। अगर किसी दफ़्तर ने आपके साथ ग़लत किया है, तो होम पेज से शिकायत लिख सकते हैं।",
       a11y_home: "ध्वनिForms होम", a11y_bigger: "अक्षर बड़े करें", a11y_lang: "भाषा चुनें", install: "फ़ोन में लगाएँ", tagline: "बोलकर फ़ॉर्म भरें", hello: "नमस्ते", welcome_kicker: "सरकारी फ़ॉर्म, बोलकर", chip1: "बोलकर या लिखकर", chip2: "हर जवाब की जाँच", chip3: "30 मिनट बाद मिट जाता है", hello_sub: "आज क्या करना है? नीचे से चुनिए, फिर बोलकर या लिखकर जवाब दीजिए। हर जवाब फ़ॉर्म पर जाने से पहले आपको पढ़कर सुनाया जाएगा।",
       most: "सबसे ज़्यादा किए जाने वाले काम", everything: "बाकी सब", how_title: "कैसे काम करता है", how1: "फ़ॉर्म चुनिए। सवाल एक-एक करके आएँगे।",
       how2: "माइक दबाकर बोलिए, या लिखिए। हर जवाब पढ़कर सुनाया जाएगा: \"क्या यह सही है?\"", how3: "आख़िर में भरा हुआ फ़ॉर्म या पत्र डाउनलोड या प्रिंट कीजिए।",
@@ -502,7 +520,7 @@
       no_recog: "इस ब्राउज़र में इस भाषा में बोलकर जवाब नहीं हो पा रहा। लिखकर जवाब दीजिए।", by_word: "बटा" },
     en: {}
   };
-  var EN = { g_explain: "Understand a paper", k_explain: "Paper explained", ex_what: "What it is", ex_do: "What to do", ex_wrong: "If something on it is wrong", ex_beware: "Watch out for fraud", ex_help: "If you were cheated", ex_date: "Date on the paper", ex_amount: "Amount", ex_left: "days left", ex_passed: "This date has passed", ex_today: "This date is today", ex_note: "General guidance, not legal advice. Checked on", next_explain: "Keep the paper safe. If an office has treated you unfairly, you can write a complaint from the home page.",
+  var EN = { ai_title: "A question about this paper", ai_ph: "Type your question (no names or numbers)", ai_ask: "Ask the AI", ai_consent: "Your question will be sent to an AI service to be answered. Only the question and the kind of paper go; not the photo, your name or any number. Numbers you type are blanked out. The AI can be wrong.", ai_send: "Yes, send it", ai_cancel: "No, do not send", ai_wait: "Getting an answer…", ai_warn: "This is an AI answer. It can be wrong and is not legal advice. For fraud call 1930; for free legal help call 15100.", ai_fail: "Could not get an answer just now. Please try again later or ask at the office.", ocr_btn: "Read from a photo", ocr_private: "The photo is read on this phone only. It is not sent or stored anywhere.", ocr_loading: "Getting the reader ready (about 7 MB, first time only)…", ocr_reading: "Reading the photo…", ocr_found: "Found on the paper (I will ask one by one whether it is right)", ocr_paper: "Paper", ocr_none: "Could not read anything for sure from the photo. Please say or type it.", ocr_failed: "Could not read the photo. Please say or type it.", g_explain: "Understand a paper", k_explain: "Paper explained", ex_what: "What it is", ex_do: "What to do", ex_wrong: "If something on it is wrong", ex_beware: "Watch out for fraud", ex_help: "If you were cheated", ex_date: "Date on the paper", ex_amount: "Amount", ex_left: "days left", ex_passed: "This date has passed", ex_today: "This date is today", ex_note: "General guidance, not legal advice. Checked on", next_explain: "Keep the paper safe. If an office has treated you unfairly, you can write a complaint from the home page.",
     next_advisor: "Tap 'Fill this form' next to a scheme: some of your answers will already be filled in. The department makes the final decision.",
     next_lookup: "This comes from a saved copy of the records. For anything important, also check the official portal.",
     a11y_home: "DwaniForms home", a11y_bigger: "Bigger text", a11y_lang: "Choose a language", install: "Add to phone", tagline: "Fill forms by speaking", hello: "Namaste", unavailable: "Not available yet", questions: "questions", g_forms: "Government forms",
@@ -725,7 +743,7 @@
       if (prev && prev !== prefillFrom) fetch(B + "/sessions/" + prev, { method: "DELETE", keepalive: true }).catch(function () {});
       sid = r.session_id; remember(sid); inkedBefore = {};
       $("talk-title").textContent = r.title || ""; $("crumb-title").textContent = r.title || "";
-      $("heard").textContent = "";
+      $("heard").textContent = ""; resetPhoto();
       show("talk"); render(r);
     }).catch(function (e) { netError(e, function () { doStart(formId, prefillFrom); }); });
   }
@@ -749,6 +767,7 @@
     if (r.done) { showResult(r); return; }
     $("question").textContent = r.text;
     speak(r.speak || r.text);
+    $("photo").hidden = r.flow !== "explain";
     $("mt-note").hidden = !r.machine_translated;
     $("draft-note").hidden = !(PACKS[lang] && PACKS[lang].status !== "reviewed");
     $("yn").hidden = !(r.phase === "confirm" || r.phase === "final");
@@ -822,6 +841,106 @@
     api("/sessions/" + sid + "/text", { method: "POST", json: { text: text } }).then(function (r) { $("status").textContent = ""; render(r); })
       .catch(function (e) { netError(e); $("status").textContent = ""; });
   }
+  // ---------- a photo of the paper (Samjhao) ----------
+  // The photo is read by an engine that runs ON THIS PHONE (a web worker, loaded from this server on first use). The
+  // picture is never uploaded and never stored; only the text found in it is used, and every suggestion goes through
+  // the same "is this correct?" question as an answer that was spoken. A "no" simply asks the question again.
+  var ocrEngine = null;
+  function loadScript(src) {
+    return new Promise(function (ok, bad) {
+      var el = document.createElement("script"); el.src = src; el.onload = ok;
+      el.onerror = function () { bad(new Error("load " + src)); }; document.head.appendChild(el);
+    });
+  }
+  // English first: it reads digits (dates, amounts) cleanly, where the Hindi model drops a "1" or a "0" now and then.
+  // Hindi + English runs only when the English pass did not find all three, which is what a Hindi paper needs.
+  var ocrLangs = "eng";
+  function ocrReady() {
+    if (!ocrEngine) {
+      var base = B + "/assets/ocr/";
+      ocrEngine = Promise.all([loadScript(base + "tesseract.min.js"), loadScript(base + "dwani-ocr.js")]).then(function () {
+        ocrLangs = "eng";
+        return Tesseract.createWorker(["eng"], 1, { workerPath: base + "worker.min.js", workerBlobURL: false,
+          corePath: base + "tesseract-core-simd-lstm.js", langPath: base.slice(0, -1), gzip: true, cacheMethod: "none" });
+      }).catch(function (e) { ocrEngine = null; throw e; });
+    }
+    return ocrEngine;
+  }
+  function ocrPass(w, langs, canvas) {
+    var key = langs.join("+"), ready = key === ocrLangs ? Promise.resolve() : w.reinitialize(langs).then(function () { ocrLangs = key; });
+    return ready.then(function () { return w.recognize(canvas); }).then(function (res) {
+      return DwaniOCR.read((res && res.data && res.data.text) || "", new Date());
+    });
+  }
+  function ocrRead(w, canvas) {
+    return ocrPass(w, ["eng"], canvas).then(function (a) {
+      if (a.paper && a.due_date && a.amount) return a;
+      return ocrPass(w, ["hin", "eng"], canvas).then(function (b) {
+        return { paper: a.paper || b.paper, due_date: a.due_date || b.due_date, amount: a.amount || b.amount };
+      });
+    });
+  }
+  // The photo, shrunk so a 12-megapixel picture does not take a minute to read, drawn the right way up.
+  function photoCanvas(file) {
+    var draw = function (img, w, h) {
+      var k = Math.min(1, 2200 / Math.max(w, h)), c = document.createElement("canvas");
+      c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      return c;
+    };
+    if (window.createImageBitmap) {
+      return createImageBitmap(file).then(function (bm) { var c = draw(bm, bm.width, bm.height); if (bm.close) bm.close(); return c; });
+    }
+    return new Promise(function (ok, bad) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); ok(draw(img, img.naturalWidth, img.naturalHeight)); };
+      img.onerror = function () { URL.revokeObjectURL(url); bad(new Error("image")); };
+      img.src = url;
+    });
+  }
+  function ocrFieldLabel(id, value) {
+    var f = ((cur && cur.fields) || []).filter(function (x) { return x.id === id; })[0];
+    var o = f && (f.options || []).filter(function (x) { return x.value === value; })[0];
+    return o ? o.label : value;
+  }
+  function showFound(want) {
+    var dl = $("photo-list"); dl.innerHTML = "";
+    var rows = [["paper", t("ocr_paper"), want.paper && ocrFieldLabel("paper", want.paper)],
+                ["due_date", t("ex_date"), want.due_date && shownValue({ kind: "date", value: want.due_date })],
+                ["amount", t("ex_amount"), want.amount && "₹ " + Number(want.amount).toLocaleString("en-IN")]];
+    rows.forEach(function (r) {
+      if (!r[2]) return;
+      var dt = document.createElement("dt"), dd = document.createElement("dd");
+      dt.textContent = r[1]; dd.textContent = r[2]; dl.appendChild(dt); dl.appendChild(dd);
+    });
+    $("photo-found").hidden = !dl.children.length;
+  }
+  function readPhoto(file) {
+    var st = $("photo-status"), btn = $("photo-btn");
+    btn.disabled = true; showFound({});
+    st.textContent = t("ocr_loading");
+    Promise.all([ocrReady(), photoCanvas(file)]).then(function (a) {
+      st.textContent = t("ocr_reading");
+      return ocrRead(a[0], a[1]);
+    }).then(function (got) {
+      var want = {};
+      ["paper", "due_date", "amount"].forEach(function (k) { if (got[k]) want[k] = got[k]; });
+      if (!Object.keys(want).length) { st.textContent = t("ocr_none"); return; }
+      // Only these few values go to the server, never the picture. It reads each back and asks "is this correct?".
+      return api("/sessions/" + sid + "/suggest", { method: "POST", json: { values: want } }).then(function (r) {
+        var took = {}; (r.suggested || []).forEach(function (k) { took[k] = want[k]; });
+        st.textContent = Object.keys(took).length ? "" : t("ocr_none");
+        showFound(took); render(r);
+      });
+    }).catch(function () { st.textContent = t("ocr_failed"); })
+      .then(function () { btn.disabled = false; });
+  }
+  function resetPhoto() { $("photo-status").textContent = ""; showFound({}); }
+  $("photo-btn").addEventListener("click", function () { $("photo-file").click(); });
+  $("photo-file").addEventListener("change", function () {
+    var f = this.files && this.files[0]; this.value = "";
+    if (f && sid) readPhoto(f);
+  });
   $("type-form").addEventListener("submit", function (e) { e.preventDefault(); var v = $("type-input").value.trim(); $("type-input").value = ""; send(v); });
   $("btn-yes").addEventListener("click", function () { send(lang === "en" ? "yes" : t("yes_word")); });
   $("btn-no").addEventListener("click", function () { send(lang === "en" ? "no" : t("no_word")); });
@@ -986,7 +1105,39 @@
     section("ex_beware", o.beware, "ex-sec alert warn");
     section("ex_help", o.help);
     if (o.last_reviewed) card.appendChild(el("p", "muted ex-note", t("ex_note") + " " + o.last_reviewed));
+    if (caps.ai && sid) card.appendChild(askBox());
     box.hidden = false;
+  }
+  // "A question about this paper" -- only when the server has an AI key. Every question asks first, every time: what
+  // leaves is said in plain words, and nothing is sent until the person says yes.
+  function askBox() {
+    function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+    var wrap = el("div", "ex-sec ai"), form = el("form", "type"), input = el("input"), go = el("button", "btn", t("ai_ask"));
+    wrap.appendChild(el("h3", null, t("ai_title")));
+    input.maxLength = 300; input.placeholder = t("ai_ph"); input.setAttribute("aria-label", t("ai_title")); input.autocomplete = "off";
+    go.type = "submit"; form.appendChild(input); form.appendChild(go); wrap.appendChild(form);
+    var consent = el("div", "alert ai-consent"), yes = el("button", "btn", t("ai_send")), no = el("button", "btn ghost", t("ai_cancel"));
+    consent.hidden = true; consent.setAttribute("role", "alertdialog"); consent.setAttribute("aria-label", t("ai_title"));
+    consent.appendChild(el("p", null, t("ai_consent")));
+    yes.type = "button"; no.type = "button";
+    var row = el("div", "ai-actions"); row.appendChild(yes); row.appendChild(no); consent.appendChild(row); wrap.appendChild(consent);
+    var out = el("div", "ai-out"); out.setAttribute("role", "status"); out.setAttribute("aria-live", "polite"); wrap.appendChild(out);
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!input.value.trim()) return;
+      consent.hidden = false; yes.focus();
+    });
+    no.addEventListener("click", function () { consent.hidden = true; input.focus(); });
+    yes.addEventListener("click", function () {
+      var q = input.value.trim(); if (!q || !sid) return;
+      consent.hidden = true; out.textContent = t("ai_wait"); go.disabled = true;
+      api("/sessions/" + sid + "/ask", { method: "POST", json: { question: q, consent: true } }).then(function (r) {
+        out.textContent = ""; input.value = "";
+        var card = el("div", "card ai-answer"); card.appendChild(el("p", null, r.answer)); card.appendChild(el("p", "muted ex-note", t("ai_warn")));
+        out.appendChild(card); speak(r.answer);
+      }).catch(function () { out.textContent = t("ai_fail"); }).then(function () { go.disabled = false; });
+    });
+    return wrap;
   }
   $("print-letter").addEventListener("click", function () {
     var letter = !$("draft").hidden;
