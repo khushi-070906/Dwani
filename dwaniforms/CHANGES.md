@@ -365,3 +365,10 @@ The first calm pass was nearly all one green. Colour is back, in a small muted s
 - "ज़मीन नहीं है" is 0 acres, so a farmer without land can answer by speaking.
 - More ways to say a number are understood: अठाईस, पैसठ, चौसठ, पन्द्रह, अठावन... (the same words are used by the spoken forms).
 - लड़की / लड़का and everyday work words (ऑटो, रिक्शा, चौकीदार, सफाई) are understood. A bare "नौकरी" is still asked again, since it could be private or government.
+
+## DwaniYojana page: accessibility audit fixes
+An automated audit (axe-core, phone width, every screen in both languages) found four things; it now reports none.
+- The logo link's spoken name now contains the words printed on it, plus where it goes ("ध्वनिYojana · DwaniForms home"), so voice control ("click DwaniYojana") works.
+- The privacy note is in a footer landmark.
+- Every screen has a heading at the top. The start screen's heading used to be the only top heading, so it vanished once the questions began.
+- The language buttons, the logo and the DwaniForms link after the result are 44 pixels tall.
