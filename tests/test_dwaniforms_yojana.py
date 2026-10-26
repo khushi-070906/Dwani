@@ -238,3 +238,11 @@ def test_no_is_not_zero_for_any_other_number_question():
 def test_everyday_words_for_gender_and_work_are_understood(qid, said, lang, expected):
     assert yojana.understand(T, qid, said, lang) == expected
 
+
+def test_the_logo_link_name_contains_the_words_you_see_on_it():
+    # a voice-control user says what they see ("click DwaniYojana"); the spoken name must contain the visible words (WCAG 2.5.3).
+    # So the name comes from the link's own text, with where it goes added after, not from an aria-label that replaces it.
+    link = re.search(r'<a class="brand"[^>]*>(.*?)</a>', PAGE, re.S)
+    assert link and "aria-label" not in link.group(0).split(">")[0]
+    text = re.sub(r"<[^>]+>", "", re.sub(r'<span class="seal".*?</span>', "", link.group(1)))
+    assert "ध्वनिYojana" in text and "DwaniForms home" in text
