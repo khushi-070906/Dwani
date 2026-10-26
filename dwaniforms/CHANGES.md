@@ -359,3 +359,9 @@ The first calm pass was nearly all one green. Colour is back, in a small muted s
 - They appear in DwaniYojana and in the spoken scheme advisor, with text in all ten languages (the eight language packs are drafts until a native speaker reviews them, like the rest).
 - Tests: the age limits (17 and 51 get nothing, 62 gets accident cover but not life cover), and a check that every scheme has text in every language.
 
+## DwaniYojana by voice: fewer answers lost, one wrong answer fixed
+- **"नहीं पता" and "pata nahi" were read as No.** They now mean "I don't know", like "पता नहीं": the question stays open instead of quietly removing a scheme.
+- **Income said per month was read as income per year.** "दस हज़ार महीना" is now 1,20,000 a year (the 1-2 lakh band) instead of the lowest band. Pay per day or week is not guessed; the page shows the bands to tap.
+- "ज़मीन नहीं है" is 0 acres, so a farmer without land can answer by speaking.
+- More ways to say a number are understood: अठाईस, पैसठ, चौसठ, पन्द्रह, अठावन... (the same words are used by the spoken forms).
+- लड़की / लड़का and everyday work words (ऑटो, रिक्शा, चौकीदार, सफाई) are understood. A bare "नौकरी" is still asked again, since it could be private or government.

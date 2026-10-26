@@ -31,6 +31,16 @@ All under `/form` (so `/form/yojana/questions`). None needs a key.
 Anything the advisor would not accept (an age of -1, an unknown question, an option that does not exist) is refused with 422.
 A language other than `hi` or `en` is a 404.
 
+## How spoken answers are read
+
+`POST /yojana/understand` reads the words for one question only, with the same readers the spoken forms use.
+
+- Numbers: Hindi and English words and the common alternative spellings (अठाईस, पैसठ, पन्द्रह...), decimals ("ढाई एकड़").
+- Income is turned into a year before it is put in a band: "दस हज़ार महीना" is 1,20,000 a year. Pay per day or per week is **not** guessed; the page then shows the bands to tap.
+- "ज़मीन नहीं है" is 0 acres; "No" is not 0 for any other number question.
+- "पता नहीं", "नहीं पता", "pata nahi", "idk" are never a No: they leave the question unanswered.
+- A choice that fits two options (a bare "नौकरी": private or government?) is not guessed. Add the words people really use to the option's `synonyms` in `templates/scheme_advisor.json`.
+
 ## Keeping the rules current
 
 Each scheme is one JSON file in `schemes/`. When you check a scheme against its official page, edit its `rules` or `benefit`
