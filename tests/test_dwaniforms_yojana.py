@@ -197,3 +197,12 @@ def test_accident_insurance_pmsby_goes_to_70_so_a_man_past_the_life_cover_age_st
     old = {i["id"] for k in ("likely", "maybe") for i in yojana.advise(T, {**facts, "age": 71}, "en")[k]}
     assert "pmsby" not in old
 
+
+@pytest.mark.parametrize("said,lang", [("नहीं पता", "hi"), ("मुझे नहीं पता", "hi"), ("पता ही नहीं", "hi"), ("नही पता", "hi"),
+                                       ("pata nahi", "hi"), ("nahi pata", "hi"), ("idk", "en")])
+def test_every_way_of_saying_i_do_not_know_stays_not_understood_never_a_no(said, lang):
+    # the one answer that must never become a "No": it would quietly remove a scheme from the list
+    assert yojana.understand(T, "bank_account", said, lang) is None
+    assert yojana.understand(T, "land_acres", said, lang) is None
+    assert yojana.understand(T, "annual_income", said, lang) is None
+

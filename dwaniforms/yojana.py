@@ -106,7 +106,8 @@ def questions(template: FormTemplate, lang: str) -> list[dict]:
 # understanding is the interview's own: the same number reader (Hindi and English number words), the same yes/no reader and
 # the same option synonyms as the spoken forms. Nothing is stored.
 INCOME_BANDS = (100000, 200000, 300000, 500000, 1000000)    # tops of the bands the page offers (the page shows their labels)
-_DONT_KNOW = ("पता नहीं", "मालूम नहीं", "पता नही", "don't know", "dont know", "do not know", "not sure", "no idea")
+_DONT_KNOW = ("पता नहीं", "मालूम नहीं", "पता नही", "नहीं पता", "नही पता", "नहीं मालूम", "पता ही नहीं", "pata nahi", "pata nhi", "nahi pata",
+              "malum nahi", "don't know", "dont know", "do not know", "not sure", "no idea", "idk")
 
 
 def _match_option(field, text: str, lang: str):
