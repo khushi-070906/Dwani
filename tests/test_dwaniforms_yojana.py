@@ -257,3 +257,10 @@ def test_every_screen_has_exactly_one_top_heading():
     assert len(re.findall(r"<h1\b", PAGE)) == 1
     h1_at = PAGE.index("<h1")
     assert h1_at < PAGE.index('<section id="start"') and h1_at < PAGE.index("<noscript>")
+
+
+def test_taps_on_the_header_and_the_link_after_the_result_are_at_least_44_pixels_tall():
+    css = re.search(r"<style>(.*?)</style>", PAGE, re.S).group(1)
+    for selector in (r"\.brand \{", r"\.lang button \{"):
+        assert re.search(selector + r"[^}]*min-height: 4[4-9]px", css), selector
+    assert re.search(r"\.cta a \{[^}]*padding: 10px", css)

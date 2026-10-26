@@ -29,13 +29,13 @@
   body { margin: 0; background: var(--sage); color: var(--ink); font: 18px/1.55 "Mukta", system-ui, sans-serif; }
   .wrap { max-width: 640px; margin: 0 auto; padding: 0 16px 56px; }
   header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; }
-  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--navy); }
+  .brand { display: flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: var(--navy); }
   .seal { width: 40px; height: 40px; border-radius: 50%; background: var(--forest); color: #fff; display: grid; place-items: center;
           font-family: "Rozha One", serif; font-size: 22px; line-height: 1; }
   .word { font-family: "Rozha One", "Source Serif 4", serif; font-size: 22px; line-height: 1.1; }
   .word span { font-family: "Source Serif 4", serif; font-weight: 600; }
   .lang { display: inline-flex; border: 1.5px solid var(--line-2); border-radius: 999px; overflow: hidden; background: #fff; }
-  .lang button { border: 0; background: none; font: inherit; font-weight: 600; font-size: 15px; padding: 6px 14px; min-height: 40px; color: var(--ink-2); cursor: pointer; }
+  .lang button { border: 0; background: none; font: inherit; font-weight: 600; font-size: 15px; padding: 6px 14px; min-height: 44px; color: var(--ink-2); cursor: pointer; }
   .lang button[aria-pressed="true"] { background: var(--forest); color: #fff; }
   h1, h2 { font-family: "Source Serif 4", "Mukta", serif; font-weight: 600; margin: 0; line-height: 1.25; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
@@ -83,7 +83,7 @@
   .meta.stale { color: var(--amber-ink); font-weight: 600; }
   .privacy { color: var(--ink-3); font-size: 14.5px; text-align: center; margin: 18px 0 0; }
   .cta { margin-top: 18px; padding: 16px; border-radius: 14px; background: var(--forest-soft); color: var(--navy); }
-  .cta a { color: var(--forest); font-weight: 700; }
+  .cta a { color: var(--forest); font-weight: 700; display: inline-block; padding: 10px 4px; }
   [hidden] { display: none !important; }
   @media (max-width: 400px) { .opts.two { grid-template-columns: 1fr; } .hero h1, .hero h2 { font-size: 26px; } }
   @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
