@@ -106,6 +106,9 @@ def questions(template: FormTemplate, lang: str) -> list[dict]:
 # understanding is the interview's own: the same number reader (Hindi and English number words), the same yes/no reader and
 # the same option synonyms as the spoken forms. Nothing is stored.
 INCOME_BANDS = (100000, 200000, 300000, 500000, 1000000)    # tops of the bands the page offers (the page shows their labels)
+_PER_MONTH = ("महीने", "महीना", "मासिक", "माह", "per month", "a month", "monthly", "every month", "each month", "/month", "mahine", "mahina")
+_PER_SHORT_WHILE = ("रोज़", "रोज", "दिहाड़ी", "दिहाडी", "हफ्ते", "हफ़्ते", "सप्ताह", "प्रतिदिन", "per day", "a day", "daily", "per week", "a week",
+                    "weekly", "roz", "hafte", "dihadi")
 _DONT_KNOW = ("पता नहीं", "मालूम नहीं", "पता नही", "नहीं पता", "नही पता", "नहीं मालूम", "पता ही नहीं", "pata nahi", "pata nhi", "nahi pata",
               "malum nahi", "don't know", "dont know", "do not know", "not sure", "no idea", "idk")
 
@@ -152,6 +155,11 @@ def understand(template: FormTemplate, qid: str, text: str, lang: str):
         except InvalidOperation:
             return None
         if qid == "annual_income":
+            low = text.lower()
+            if any(w in low for w in _PER_SHORT_WHILE):
+                return None                         # a day's or a week's pay is not a year's: ask them to tap the band instead
+            if any(w in low for w in _PER_MONTH):
+                n *= 12                             # "दस हज़ार महीना" is a year of 1,20,000, not 10,000
             return next((b for b in INCOME_BANDS if n <= b), INCOME_BANDS[-1])
         return int(n) if n == n.to_integral_value() else float(n)      # "2.5 acres" is 2.5, not an error
     if f.kind == "choice":

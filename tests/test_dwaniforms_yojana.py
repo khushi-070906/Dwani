@@ -206,3 +206,15 @@ def test_every_way_of_saying_i_do_not_know_stays_not_understood_never_a_no(said,
     assert yojana.understand(T, "land_acres", said, lang) is None
     assert yojana.understand(T, "annual_income", said, lang) is None
 
+
+@pytest.mark.parametrize("said,lang,band", [("महीने के दस हज़ार", "hi", 200000), ("दस हज़ार महीना", "hi", 200000), ("ten thousand a month", "en", 200000),
+                                            ("8000 per month", "en", 100000), ("पंद्रह हज़ार मासिक", "hi", 200000),
+                                            ("साल का अस्सी हज़ार", "hi", 100000), ("ढाई लाख", "hi", 300000)])
+def test_income_said_per_month_is_turned_into_a_year_before_it_is_put_in_a_band(said, lang, band):
+    assert yojana.understand(T, "annual_income", said, lang) == band
+
+
+@pytest.mark.parametrize("said,lang", [("रोज़ पाँच सौ", "hi"), ("दिहाड़ी चार सौ", "hi"), ("500 a day", "en"), ("हफ्ते के दो हज़ार", "hi")])
+def test_income_said_per_day_or_week_is_not_guessed(said, lang):
+    assert yojana.understand(T, "annual_income", said, lang) is None          # the page then shows the bands to tap
+
