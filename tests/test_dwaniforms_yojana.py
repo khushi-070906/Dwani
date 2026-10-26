@@ -229,3 +229,12 @@ def test_no_is_not_zero_for_any_other_number_question():
     assert yojana.understand(T, "annual_income", "no", "en") is None
     assert yojana.understand(T, "land_acres", "ज़मीन है", "hi") is None        # "I have land" with no size is not an answer
 
+
+@pytest.mark.parametrize("qid,said,lang,expected", [
+    ("gender", "लड़की", "hi", "Female"), ("gender", "मैं लड़का हूँ", "hi", "Male"), ("gender", "girl", "en", "Female"), ("gender", "boy", "en", "Male"),
+    ("occupation", "ऑटो चलाता हूँ", "hi", "Daily-wage / unorganised worker"), ("occupation", "रिक्शा", "hi", "Daily-wage / unorganised worker"),
+    ("occupation", "I drive an auto", "en", "Daily-wage / unorganised worker"), ("occupation", "watchman", "en", "Daily-wage / unorganised worker"),
+    ("occupation", "नौकरी करता हूँ", "hi", None)])               # "a job" could be private or government: ask again, do not guess
+def test_everyday_words_for_gender_and_work_are_understood(qid, said, lang, expected):
+    assert yojana.understand(T, qid, said, lang) == expected
+
