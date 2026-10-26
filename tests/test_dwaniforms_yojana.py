@@ -246,3 +246,7 @@ def test_the_logo_link_name_contains_the_words_you_see_on_it():
     assert link and "aria-label" not in link.group(0).split(">")[0]
     text = re.sub(r"<[^>]+>", "", re.sub(r'<span class="seal".*?</span>', "", link.group(1)))
     assert "ध्वनिYojana" in text and "DwaniForms home" in text
+
+
+def test_the_privacy_note_sits_in_a_landmark_so_a_screen_reader_can_reach_it():
+    assert re.search(r'<footer>\s*<p class="privacy"', PAGE)
