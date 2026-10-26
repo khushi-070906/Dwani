@@ -218,3 +218,14 @@ def test_income_said_per_month_is_turned_into_a_year_before_it_is_put_in_a_band(
 def test_income_said_per_day_or_week_is_not_guessed(said, lang):
     assert yojana.understand(T, "annual_income", said, lang) is None          # the page then shows the bands to tap
 
+
+@pytest.mark.parametrize("said,lang", [("ज़मीन नहीं है", "hi"), ("कोई ज़मीन नहीं", "hi"), ("नहीं", "hi"), ("no land", "en"), ("none", "en")])
+def test_no_land_is_zero_acres(said, lang):
+    assert yojana.understand(T, "land_acres", said, lang) == 0
+
+
+def test_no_is_not_zero_for_any_other_number_question():
+    assert yojana.understand(T, "age", "नहीं", "hi") is None
+    assert yojana.understand(T, "annual_income", "no", "en") is None
+    assert yojana.understand(T, "land_acres", "ज़मीन है", "hi") is None        # "I have land" with no size is not an answer
+

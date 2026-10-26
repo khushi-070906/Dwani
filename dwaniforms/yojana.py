@@ -149,6 +149,8 @@ def understand(template: FormTemplate, qid: str, text: str, lang: str):
     if f.kind == "number":
         ok, v, _ = validators.VALIDATORS["number"](text, **f.params)
         if not ok:
+            if qid == "land_acres" and (parse_yes_no(text) is False or text.lower().strip(" .") in ("none", "nil")):
+                return 0                            # "ज़मीन नहीं है", "no land": a farmer without land is a real answer
             return None
         try:
             n = Decimal(v)
