@@ -250,3 +250,10 @@ def test_the_logo_link_name_contains_the_words_you_see_on_it():
 
 def test_the_privacy_note_sits_in_a_landmark_so_a_screen_reader_can_reach_it():
     assert re.search(r'<footer>\s*<p class="privacy"', PAGE)
+
+
+def test_every_screen_has_exactly_one_top_heading():
+    # the start screen's heading is hidden once the questions begin, so the page's own h1 must not live inside it
+    assert len(re.findall(r"<h1\b", PAGE)) == 1
+    h1_at = PAGE.index("<h1")
+    assert h1_at < PAGE.index('<section id="start"') and h1_at < PAGE.index("<noscript>")

@@ -39,7 +39,8 @@
   .lang button[aria-pressed="true"] { background: var(--forest); color: #fff; }
   h1, h2 { font-family: "Source Serif 4", "Mukta", serif; font-weight: 600; margin: 0; line-height: 1.25; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
-  .hero h1 { font-size: 30px; margin: 8px 0 10px; color: var(--navy); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .hero h1, .hero h2 { font-size: 30px; margin: 8px 0 10px; color: var(--navy); }
   .hero p { margin: 0 0 16px; color: var(--ink-2); }
   .facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; padding: 0; list-style: none; }
   .facts li { background: var(--forest-soft); color: var(--forest); border-radius: 999px; padding: 4px 12px; font-size: 15px; font-weight: 600; }
@@ -84,25 +85,26 @@
   .cta { margin-top: 18px; padding: 16px; border-radius: 14px; background: var(--forest-soft); color: var(--navy); }
   .cta a { color: var(--forest); font-weight: 700; }
   [hidden] { display: none !important; }
-  @media (max-width: 400px) { .opts.two { grid-template-columns: 1fr; } .hero h1 { font-size: 26px; } }
+  @media (max-width: 400px) { .opts.two { grid-template-columns: 1fr; } .hero h1, .hero h2 { font-size: 26px; } }
   @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
+    <h1 class="sr">DwaniYojana</h1>
     <a class="brand" href="./"><span class="seal" aria-hidden="true">ध</span><span class="word" lang="hi">ध्वनि<span lang="en">Yojana</span></span><span class="sr"> · DwaniForms home</span></a>
     <div class="lang" role="group" aria-label="Language / भाषा">
       <button type="button" data-l="hi" aria-pressed="true">हिन्दी</button><button type="button" data-l="en" aria-pressed="false">English</button>
     </div>
   </header>
 
-  <noscript><section class="card hero"><h1>मुझे कौन-सी सरकारी योजना मिल सकती है?</h1>
+  <noscript><section class="card hero"><h2>मुझे कौन-सी सरकारी योजना मिल सकती है?</h2>
     <p>यह पेज चलाने के लिए ब्राउज़र में JavaScript चालू कीजिए, फिर पेज दोबारा खोलिए।</p>
     <p lang="en">Please turn on JavaScript in your browser and open this page again.</p></section></noscript>
   <main id="main" aria-live="polite">
     <section id="start" class="card hero">
-      <h1 id="start-h" data-t="h1"></h1>
+      <h2 id="start-h" data-t="h1"></h2>
       <p data-t="lead"></p>
       <ul class="facts"><li data-t="f1"></li><li data-t="f2"></li><li data-t="f3"></li></ul>
       <button type="button" class="go" id="go" data-t="go"></button>
