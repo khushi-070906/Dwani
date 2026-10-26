@@ -51,6 +51,10 @@ assert len(_HI_0_99) == 100, len(_HI_0_99)
 _HI_NUM = {_norm(w): i for i, w in enumerate(_HI_0_99)}
 _HI_NUM.update({_norm(k): v for k, v in {
     "पाँच": 5, "छः": 6, "छे": 6, "छ": 6, "अठ्ठाईस": 28, "पचीस": 25, "सत्रा": 17, "अठारा": 18, "बाइस": 22, "तेइस": 23,
+    # Other spellings of the same words, as speech recognisers and people write them ("अठाईस" and "पैसठ" are the common ones).
+    "पन्द्रह": 15, "उनीस": 19, "अठाईस": 28, "अट्ठाइस": 28, "सताईस": 27, "इकत्तीस": 31, "तेंतीस": 33, "छतीस": 36, "सैतीस": 37,
+    "अड़तिस": 38, "उन्तालीस": 39, "तिरालीस": 43, "चवालीस": 44, "उन्चास": 49, "तिरेपन": 53, "अठावन": 58, "उन्सठ": 59,
+    "तिरेसठ": 63, "चौसठ": 64, "पैसठ": 65, "छासठ": 66, "सरसठ": 67, "उन्हत्तर": 69, "उन्यासी": 79, "अठासी": 88, "पंचानवे": 95,
 }.items()})
 # romanised Hindi (Whisper sometimes emits Latin for Hinglish). "no" is deliberately NOT here: it is the English word
 # ("Aadhaar no. ...", "no income") far more often than a spelling of nau.

@@ -214,6 +214,16 @@ def test_romanised_hindi_numbers_21_to_99():
     assert spoken_to_int("ek lakh pachas hazaar") == 150000
 
 
+def test_hindi_number_words_are_understood_in_their_other_common_spellings():
+    # people (and recognisers) write the same word several ways; none of these may fall through to "not understood"
+    said = {"अठाईस": 28, "अट्ठाइस": 28, "पैसठ": 65, "चौसठ": 64, "पन्द्रह": 15, "सताईस": 27, "अठावन": 58, "छासठ": 66, "पंचानवे": 95, "अठासी": 88}
+    for word, n in said.items():
+        assert spoken_to_int(word) == n, word
+        assert spoken_to_int(word + " साल") == n, word
+    assert spoken_to_int("एक लाख अठाईस हज़ार") == 128000
+    assert spoken_to_digits("एक दो तीन") == "123"                               # digit-by-digit dictation is unchanged
+
+
 def test_skip_word_inside_an_answer_does_not_skip():
     P = messages.is_skip
     assert P("skip") and P("Skip.") and P("please skip") and P("कोई नहीं") and P("I don't have it")
